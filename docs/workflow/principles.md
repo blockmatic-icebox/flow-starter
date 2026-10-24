@@ -82,7 +82,7 @@ Each practice below follows a simple pattern: the problem, what Flow chooses, th
 
 **Trade-off:** Integration and conflicting edits still need a coordinator.
 
-**Example:** One agent explores pricing models while another spikes UI—after plan authorization for build tasks.
+**Example:** One agent explores pricing models while another spikes UI—after explicit **Build** authorization for implementation tasks.
 
 ## Judgment, not a checklist
 

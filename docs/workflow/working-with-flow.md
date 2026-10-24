@@ -73,7 +73,7 @@ Dotted edges mean: new evidence or risk can send you back to an earlier activity
 | --- | --- |
 | Bug fix | Behavior matches intent; relevant checks reported honestly |
 | Learning decision | Assumption tested or explicitly deferred; findings recorded if durable |
-| Implementation slice | Agreed acceptance criteria met; limitations stated at Ship |
+| Implementation slice | Verified and integrated into local `main`; limitations stated at Ship |
 
 Technical verification and customer-value evidence are different questions ([learning-and-improvement.md](learning-and-improvement.md)).
 

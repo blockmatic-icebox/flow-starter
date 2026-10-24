@@ -187,7 +187,7 @@ For a small task, a concise plan in the conversation is sufficient. For sustaine
 
 **Exit condition:** The first implementation slice is unambiguous and verifiable.
 
-For substantial initiative work, record parallel execution as **waves** in the owning initiative (`## Waves`). Before plan approval, run a **contrarian wave** (question-mode worktrees) when meaningful alternatives or unvalidated assumptions remain; capture assumptions, kill criteria, and the recommended direction in the initiative. Use `pnpm worktrees check` before fan-out; create isolated checkouts with `pnpm worktrees up` only after explicit **Build** authorization for build tasks. Procedure and task format: [docs/agents/worktrees.md](../agents/worktrees.md).
+For substantial initiative work, record parallel execution as **waves** in the owning initiative (`## Waves`). Before plan approval, run a **contrarian wave** (question-mode worktrees) when meaningful alternatives or unvalidated assumptions remain; capture assumptions, kill criteria, and the recommended direction in the initiative. After explicit **Build** authorization, the coordinator uses `pnpm worktrees` to prepare ready tasks, run workers in isolated checkouts, verify results, and serialize integration into local `main`. Procedure and task format: [docs/agents/worktrees.md](../agents/worktrees.md).
 
 Dependency-aware planning and parallel investigation: [delegation.md](../agents/delegation.md#plan).
 
@@ -204,7 +204,9 @@ Dependency-aware planning and parallel investigation: [delegation.md](../agents/
 - Do not modify unrelated files for incidental cleanup.
 - For multi-file or planned slices, apply `incremental-implementation` (see [skills.md](../agents/skills.md)).
 
-**Exit condition:** The agreed slice works locally and has relevant verification evidence.
+**Exit condition:** The agreed slice is verified and integrated into local `main` (or explicitly blocked with a recovery path). A worker exit alone is not completion.
+
+After implementation authorization, the coordinator automatically launches ready independent tasks in isolated worktrees, verifies each result, and integrates accepted work into local `main` one task at a time. GitHub publication remains optional and separately authorized.
 
 Build waves and parallel builders: [delegation.md](../agents/delegation.md#build).
 
@@ -229,7 +231,9 @@ A working implementation does not itself prove that the feature created customer
 
 #### Diff-scoped review before an authorized commit
 
-Before an explicitly authorized commit, inspect the staged diff and changed-file list. Read only the product, design, architecture and decision contracts affected by those changes. Check for contradictions, unrelated modifications, missing tests, undocumented behavior changes and secrets. Run applicable deterministic checks. Do not expand the review to the entire repository without evidence that the change crosses a broader boundary. Never commit or push without explicit authorization.
+Before an explicitly authorized commit, inspect the staged diff and changed-file list. Read only the product, design, architecture and decision contracts affected by those changes. Check for contradictions, unrelated modifications, missing tests, undocumented behavior changes and secrets. Run applicable deterministic checks. Do not expand the review to the entire repository without evidence that the change crosses a broader boundary.
+
+Implementation authorization includes scoped local task-branch commits and serialized integration commits into local `main` for accepted work. Never push without explicit authorization.
 
 Security-sensitive changes — request boundaries, authorization, secrets, GenUI validation, database credentials — also require the [security model](../security/security-model.md) and the tests that cover the changed boundary.
 
@@ -251,7 +255,7 @@ Independent verification when warranted: [delegation.md](../agents/delegation.md
 - Update accepted project contracts when decisions or intended behavior changed.
 - Capture product outcome evidence when available; otherwise state what remains unknown.
 
-Do not declare something shipped merely because code was written. Publishing, merging, or deploying requires the appropriate user authorization and environment.
+Do not declare something shipped merely because code was written. Publishing to a remote, opening a pull request, and deploying require the appropriate user authorization and environment. Integrating verified work into local `main` during authorized **Build** is not publication.
 
 Parallel readiness checks and honest release boundaries: [delegation.md](../agents/delegation.md#ship).
 

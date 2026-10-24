@@ -1,0 +1,38 @@
+{
+  "id": "D16",
+  "title": "Authorized build wave graph fans out",
+  "signals": {
+    "flowStage": "Build",
+    "buildAuthorized": true,
+    "waveGraph": { "taskCount": 3, "maxConcurrent": 2 },
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["incremental-implementation"]
+    },
+    "max-safe": {
+      "executionMode": "parallel-implementation",
+      "workerCount": 2,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["incremental-implementation"],
+      "maxConcurrent": 2
+    },
+    "adaptive": {
+      "executionMode": "parallel-implementation",
+      "workerCount": 2,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["incremental-implementation"],
+      "maxConcurrent": 2
+    }
+  }
+}

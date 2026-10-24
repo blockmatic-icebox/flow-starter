@@ -34,8 +34,8 @@ When several methodology skills could apply (`idea-refine`, `problem-validation`
 | Product exploration | `idea-refine`, `problem-validation` |
 | Product requirements | `prd-writing`, `spec-driven-development` |
 | Planning | `planning-and-task-breakdown` |
-| Build (multi-file or planned slice) | `incremental-implementation`; add `test-driven-development` when behavior changes |
-| Parallel waves (initiative + `pnpm worktrees`) | `planning-and-task-breakdown`, `incremental-implementation`; contrarian Explore: `idea-refine`, `problem-validation` |
+| Build (multi-file or planned slice) | `incremental-implementation`; add `test-driven-development` when behavior changes. Slice commits on task branches are included in implementation authorization; they do not authorize push. |
+| Parallel waves (initiative + `pnpm worktrees run`) | `planning-and-task-breakdown`, `incremental-implementation`; contrarian Explore: `idea-refine`, `problem-validation` |
 | React and Next.js | `nextjs`, `next-dev-loop`, `vercel-react-best-practices` |
 | UI components | `shadcn`, `building-components` |
 | Testing | `test-driven-development`, `playwright` |

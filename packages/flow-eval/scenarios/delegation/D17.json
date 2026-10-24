@@ -1,0 +1,38 @@
+{
+  "id": "D17",
+  "title": "Build wave graph without subagents falls back solo",
+  "signals": {
+    "flowStage": "Build",
+    "buildAuthorized": true,
+    "waveGraph": { "taskCount": 3, "maxConcurrent": 2 },
+    "subagentsAvailable": false
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["incremental-implementation"]
+    },
+    "max-safe": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "fallback": "subagents-unavailable",
+      "skillsIncludes": ["incremental-implementation"]
+    },
+    "adaptive": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "fallback": "subagents-unavailable",
+      "skillsIncludes": ["incremental-implementation"]
+    }
+  }
+}

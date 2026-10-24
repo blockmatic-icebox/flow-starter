@@ -214,6 +214,28 @@ const matchBuild = (
 ): DelegationResult | undefined => {
   if (
     signals.buildAuthorized &&
+    signals.flowStage === "Build" &&
+    signals.waveGraph &&
+    signals.waveGraph.taskCount > 1 &&
+    !signals.overlappingWrites
+  ) {
+    const builders = Math.min(
+      signals.waveGraph.taskCount,
+      signals.waveGraph.maxConcurrent ?? signals.waveGraph.taskCount
+    );
+    return {
+      executionMode: "parallel-implementation",
+      workerCount: builders,
+      roles: Array.from({ length: builders }, () => "builder" as WorkerRole),
+      writable: true,
+      skills: ["incremental-implementation", "test-driven-development"],
+      humanGate: false,
+      allowBuild: true,
+      maxConcurrent: signals.waveGraph.maxConcurrent ?? builders,
+    };
+  }
+  if (
+    signals.buildAuthorized &&
     signals.parallelBuilderCount &&
     signals.parallelBuilderCount > 0 &&
     !signals.overlappingWrites
@@ -313,9 +335,19 @@ const applyPolicy = ({
 }): DelegationResult => {
   if (!signals.subagentsAvailable) {
     if (policy === "solo") return soloFromCore({ signals, core });
-    return {
-      ...soloFromCore({ signals, core, fallback: "subagents-unavailable" }),
+    const solo = soloFromCore({
+      signals,
+      core,
       fallback: "subagents-unavailable",
+    });
+    return {
+      ...solo,
+      allowBuild: core.allowBuild,
+      fallback: "subagents-unavailable",
+      maxConcurrent: 1,
+      workerCount: 1,
+      roles: ["coordinator"],
+      writable: solo.writable,
     };
   }
 

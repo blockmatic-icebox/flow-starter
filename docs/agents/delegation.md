@@ -68,11 +68,12 @@ Example wave graph (B and C after A; D after B and C; E after D):
 
 #### task: contract
 
-- mode: build
+- mode: question
 - flow_stage: Plan
 - depends_on: []
-- writes: [packages/api/src/types.ts]
-- build_authorized: yes ...
+- writes: []
+- reads: [ARCHITECTURE.md]
+- skills: [planning-and-task-breakdown]
 
 ### Wave implement
 
@@ -102,9 +103,9 @@ Example wave graph (B and C after A; D after B and C; E after D):
 
 ### Build
 
-After authorization, run **dependency-aware waves**—not everything at once. Wave 1: shared contracts and interfaces. Wave 2: parallel **builders** with non-overlapping `writes`. Wave 3: coordinator integrates and resolves mismatches; run deterministic checks. Wave 4: **verifiers** where warranted.
+After authorization, the coordinator automatically runs **dependency-aware scheduling**—not everything at once. Launch ready independent tasks in isolated worktrees up to host capacity; refill as tasks integrate into local `main`. Wave 1: shared contracts and interfaces. Wave 2: parallel **builders** with non-overlapping `writes`. Wave 3: coordinator verifies, serializes integration, and resolves mismatches; run deterministic checks. Wave 4: **verifiers** where warranted.
 
-Use `pnpm worktrees up` when multiple agents write in parallel. Without worktrees, Task subagents share the checkout—keep same-file edits on the coordinator. Multi-file slices use `incremental-implementation`.
+Use `pnpm worktrees prepare` / `pnpm worktrees run` (or `up` to prepare a wave). Do not parallel-write a shared checkout. Multi-file slices use `incremental-implementation` (local task commits under implementation authorization).
 
 ### Review
 
@@ -149,7 +150,7 @@ Detailed dumps only when the coordinator needs them for a decision. Do not pass 
 
 | Situation | Behavior |
 | --- | --- |
-| Subagent tools unavailable | Solo coordinator execution; record limitation; do not claim a worker ran |
+| Subagent tools unavailable | Sequential execution in isolated worktrees when possible; record limitation; do not claim parallel workers ran |
 | Incomplete research | State gaps; do not invent evidence |
 | Worker failure | Retry once if cheap; otherwise sequential fallback |
 | Conflicting findings | Coordinator reconciles solo (human gate); escalate product conflicts to human; do not spawn another parallel research wave |

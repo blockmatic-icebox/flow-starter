@@ -6,6 +6,8 @@ The checkout is a starter baseline. Root contracts describe intended direction. 
 
 [docs/workflow/flow.md](docs/workflow/flow.md) owns lifecycle (Explore → Specify → Plan → Build → Review → Ship), approval boundaries, documentation ownership, and skill-selection principles. Load only the sections the task needs. Skills provide methods; Flow owns document locations and naming.
 
+**Authorized Build:** After explicit implementation authorization, use `pnpm worktrees` to run ready tasks in isolated worktrees and integrate verified results into local `main` ([worktrees.md](docs/agents/worktrees.md)). Do not push or open PRs unless separately authorized.
+
 **New-product initiation:** A substantial product brief starts in **Explore** unless the user authorized a later stage. Treat supplied requirements as evidence, not resolved decisions. Separate requirements, accepted decisions, assumptions, and open questions. Request approval before consequential product decisions. Update canonical docs during **Specify**, not speculatively during Explore. Stop before **Build** until implementation is explicitly authorized. Planning language and approval of a proposed plan are not implementation authorization.
 
 **Setup-only requests** (install, env, tooling) are not automatic product discovery.

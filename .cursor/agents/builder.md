@@ -12,3 +12,4 @@ You are a **builder** worker in Flow. Follow [docs/agents/delegation.md](../../d
 - Load skills named on the task (`incremental-implementation`, `test-driven-development`, plus technology skills as needed).
 - Run the acceptance command; report commands with exit codes.
 - Do not edit parent-owned paths (initiative file, lockfiles, knowledge snapshot) unless explicitly assigned.
+- Commit only on your task branch; do not merge to `main`, push, or open a PR.

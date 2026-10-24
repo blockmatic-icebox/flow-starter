@@ -1,6 +1,6 @@
 # Parallel worktrees
 
-Host-agnostic coordination for multiple coding agents. [delegation.md](delegation.md) decides whether to fan out; this document owns gates, wave format, commands, and briefs. The initiative owns the wave graph; `pnpm worktrees` validates it and creates isolated git checkouts. The agent host (Cursor, Claude Code, VPC runner, and others) starts agents and passes each one the generated brief.
+Host-agnostic coordination for multiple coding agents. [delegation.md](delegation.md) decides whether to fan out; this document owns gates, wave format, commands, and briefs. The initiative owns the wave graph; `pnpm worktrees` validates it, manages lifecycle state, and integrates verified results into local `main`. The agent host (Cursor CLI, and others) starts agents and passes each one the generated brief.
 
 Worker roles map to task fields: **researcher** (`mode: question`, empty `writes`), **builder** (`mode: build`, `build_authorized: yes`), **verifier** (`mode: question`, `flow_stage: Review`, empty `writes`).
 
@@ -12,15 +12,23 @@ Worker roles map to task fields: **researcher** (`mode: question`, empty `writes
 
 Skip waves for a single-file fix with no `## Waves` section in the initiative.
 
+After **Build** authorization, ready independent tasks run automatically in isolated worktrees. The coordinator verifies each result and serializes integration into local `main`. A task is complete only after integration and verification.
+
 ## Gates
 
 1. **Explore / Specify** — canonical product docs update in the initiative or `PRODUCT.md`, not in question worktrees.
 2. **Contrarian wave** — before plan approval on substantial work, run question-mode tasks (skills such as `idea-refine`, `problem-validation`) in separate worktrees. Parent records assumptions, kill criteria, and recommendation in the initiative.
 3. **Plan** — dependency graph and waves live under `## Waves` in [docs/initiatives/<slug>.md](../initiatives/).
-4. **Build** — `pnpm worktrees up` creates build worktrees only when `build_authorized: yes` on that task.
+4. **Build** — build worktrees only when `build_authorized: yes` on that task and implementation is authorized.
 5. **Review** — optional review worktree after the parent integrates a wave (`code-review-and-quality`).
 
 Plan approval is not Build authorization.
+
+## Task lifecycle
+
+`pending` → `ready` → `running` → `verifying` → `ready-to-integrate` → `integrated`
+
+Also `blocked` (merge conflict, dirty main, unmet prerequisite) and `failed` (worker or acceptance failure). State is stored under `.worktrees/state/<slug>.json` (gitignored).
 
 ## Initiative wave format
 
@@ -59,6 +67,13 @@ Each task is a `#### task: <id>` block:
 | `skills` | yes | Installed skill ids from `skills-lock.json` |
 | `acceptance` | build only | Shell command that must exit 0 |
 | `build_authorized` | build only | Must be `yes` to create a build worktree |
+| `schema_owner` | db only | Must be `yes` when writing under `packages/db/**` |
+
+### Path rules
+
+- Relative paths only; no `..`, globs, or absolute paths.
+- Directory ownership is prefix-based (`pkg/src` owns `pkg/src/a.ts`).
+- Concurrent tasks (no dependency path between them) must not overlap on `writes`.
 
 ### Parent-owned paths
 
@@ -68,7 +83,7 @@ Build tasks must not list these under `writes` (parent integrates them):
 - `pnpm-lock.yaml`
 - `skills-lock.json`
 - `**/knowledge-snapshot.ts`
-- Database schema and migration files under `packages/db/**` unless the task is explicitly the schema owner for the wave
+- Database schema and migration files under `packages/db/**` unless the task sets `schema_owner: yes` and is the only schema owner for the initiative
 
 Tasks in the same wave must not overlap on `writes` paths.
 
@@ -78,25 +93,33 @@ From the repository root:
 
 ```bash
 pnpm worktrees check <initiative-slug>
-pnpm worktrees up <initiative-slug> <wave-name>
-pnpm worktrees down <initiative-slug> <wave-name>
+pnpm worktrees prepare <initiative-slug> [wave-name]
+pnpm worktrees run <initiative-slug> [--host cursor] [--worker "<cmd>"]
+pnpm worktrees status <initiative-slug>
+pnpm worktrees cleanup <initiative-slug> [--force]
+pnpm worktrees up <initiative-slug> <wave-name>    # alias: prepare wave
+pnpm worktrees down <initiative-slug> <wave-name>  # safe cleanup for wave
 ```
 
-- **check** — parse `docs/initiatives/<slug>.md`, validate skills, dependencies, cycles, write overlap, and build authorization.
-- **up** — create branch `wt/<slug>/<task-id>` and worktree at `.worktrees/<slug>/<task-id>`. Write brief at `.worktrees/briefs/<slug>/<task-id>.md` (not on the task branch).
-- **down** — remove worktrees for that wave after the parent has merged changes. Does not merge or push.
+- **check** — parse `docs/initiatives/<slug>.md`, validate skills, dependencies, cycles, write overlap, build authorization, and concurrent write rules.
+- **prepare** / **up** — create worktrees for **ready** tasks (dependencies integrated). Optional wave filter still enforces prerequisites. Writes brief at `.worktrees/briefs/<slug>/<task-id>.md`.
+- **run** — schedule workers, verify, and integrate into local `main`. Use `--host cursor` with the Cursor CLI (`agent --workspace <path>`). Use `--worker` for deterministic test/fixture workers. Does not push or open PRs.
+- **status** — show persisted task lifecycle state.
+- **cleanup** / **down** — remove integrated worktrees when clean; refuses dirty or unintegrated work unless `--force` (still never force-deletes unmerged work by default).
 
-`.worktrees/` is gitignored.
+Branches: `wt/<slug>/<task-id>`. Worktrees: `.worktrees/<slug>/<task-id>`. `.worktrees/` is gitignored.
+
+## Starting state
+
+Task branches pin a base revision. Scoped dirty changes under a ready task’s `writes` may be captured in a local checkpoint commit without modifying the user’s index or unrelated files. Dependent tasks start from integrated `main`.
+
+## Isolation limits
+
+Worktrees isolate git checkouts, not external resources. Avoid shared dev ports and browser sessions; isolate test databases when required. Do not run worker migrations against shared production databases. Worktrees are not a security sandbox.
 
 ## Agent brief
 
-Each brief is self-contained (subagents do not see parent chat). It includes:
-
-- Initiative path and task id
-- Flow stage and mode
-- `writes`, `reads`, `skills`
-- Acceptance command (build tasks)
-- Return format: summary; files changed (if any); commands with exit codes; blockers; open questions; risks and recommended next action; skills whose `SKILL.md` was actually loaded
+Each brief is self-contained (subagents do not see parent chat). It includes initiative path, task id, flow stage, mode, base revision, `writes`, `reads`, `skills`, acceptance command (build tasks), and the return format from [delegation.md](delegation.md#worker-report).
 
 For browser verification in a worktree, use a dedicated agent-browser session per [verify.md](verify.md).
 

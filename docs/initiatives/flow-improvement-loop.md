@@ -30,7 +30,7 @@ Harness implementation and scenario cards: [flow-evaluation-suite.md](flow-evalu
 | Record this initiative | Plan acceptance / Build for initiative doc |
 | Live eval run | Message naming pilot, scenario ids, arm, model, session cap |
 | Remediation batch | Message naming batch id and finding ids |
-| Commit / push / ship | Existing Flow rules; not implied by eval or remediation approval |
+| Commit / push / ship | Existing Flow rules; not implied by eval or remediation approval. Remediation approval does not authorize implementation, local integration, or push. After a remediation batch is approved, routine scoped execution and integration into local `main` follow normal **Build** rules without repeated approval. |
 
 ## Evaluation layers
 
