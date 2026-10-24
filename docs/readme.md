@@ -173,6 +173,7 @@ The distinction is intentional:
 ### Agent and engineering documentation
 
 - [AGENTS.md](../AGENTS.md) — agent entrypoint and context navigation.
+- [Browser verification](agents/verify.md) — agent-browser workflow for UI changes.
 - [ARCHITECTURE.md](../ARCHITECTURE.md) — current technical structure and boundaries.
 - [Flow contract](workflow/flow.md) — workflow and documentation conventions.
 - [ADR 0001](adr/0001-agentic-architecture.md) — foundational architecture.
@@ -210,18 +211,9 @@ The development server must be running when connecting the MCP bridge.
 
 ### Browser development
 
-For changes to visual components or interactions:
+Coding agents and humans verifying UI must follow [agents/verify.md](agents/verify.md): installed **agent-browser** skill, `https://flow.localhost` (or direct `dev:app`), snapshot/screenshot/console/errors, plus matching `pnpm test` / `pnpm test:browser` when applicable.
 
-1. Start the application using `pnpm dev` or `pnpm --filter web dev:app`.
-2. Open the affected page in a browser.
-3. Verify interactions and relevant loading, empty and error states.
-4. Check responsive behavior and keyboard accessibility.
-5. Inspect runtime and browser console errors.
-6. Use Next.js development MCP diagnostics when available.
-7. Run the relevant automated checks.
-8. Report actual verification results and limitations.
-
-A successful build does not automatically establish correct visual behavior.
+A successful build does not establish correct visual behavior.
 
 ## Included examples and configuration
 

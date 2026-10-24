@@ -67,7 +67,7 @@ pnpm test:browser
 
 **Fixture lab:** `/__genui__/fixtures/:fixtureId` when `GENUI_FIXTURE_LAB=1` (not on Vercel). IDs in `packages/genui/src/fixtures/lab-fixtures.ts`. Playwright uses port **3199** (`apps/web/scripts/playwright-webserver.sh`).
 
-**While coding:** Playwright for regression; agent-browser for exploratory UI ([README browser development](../../../README.md#browser-development)); next-devtools-mcp for App Router runtime issues.
+**While coding:** Playwright for regression; agent-browser for exploratory UI ([docs/agents/verify.md](../../agents/verify.md)); `pnpm mcp:next` for App Router runtime issues.
 
 **Planned gates (not default):** Eve `defineEval` + scripted models (basilic); MCP Apps host when `MCP_APP_GENUI_UI_READY` is true (`apps/web/lib/mcp/mcp-app-readiness.ts`); auth E2E when Better Auth ships; live Promptfoo opt-in only.
 
