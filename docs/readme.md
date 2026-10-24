@@ -113,13 +113,13 @@ Flow Starter is not tied to one product idea.
 
 The repository includes:
 
-- A Next.js application.
+- Two Next.js applications: apps/web (product starter) and apps/flow (Flow experience).
 - A reusable GenUI package and demonstration.
 - A generative UI composition API.
-- A site consultant chat example.
-- A read-only consultant MCP example with explicit production access rules.
+- Flow Agent chat in apps/flow, grounded in approved repository documentation.
+- A read-only Flow Agent MCP example with explicit production access rules.
 - Bounded public HTTP inputs, fail-closed production rate limits, and host-owned action policies.
-- `@repo/db`: Drizzle, committed migrations, and Neon Local. The web demo does not require a database.
+- `@repo/db`: Drizzle, committed migrations, and Neon Local. The Flow GenUI demo does not require a database.
 - Shared design-system components.
 - An agent skills manifest.
 - Next.js development MCP tooling.
@@ -248,11 +248,11 @@ A successful build does not establish correct visual behavior.
 
 The starter contains fictional Acme data and replaceable examples.
 
-The GenUI demonstration is available at `/genui-demo`.
+The GenUI demonstration is available at the Flow application's root path (`/`). Start it with `pnpm dev:flow`.
 
-The site consultant uses `POST /api/chat`.
+Flow Agent uses `POST /api/chat` in `apps/flow`.
 
-The read-only consultant MCP integration uses `/api/mcp`.
+The read-only Flow Agent MCP integration uses `/api/mcp` in `apps/flow`.
 
 These are example capabilities, not required business-product features.
 
@@ -264,9 +264,9 @@ Optional model-backed examples can use:
 
 Local development may call MCP without a bearer token. Production does not. Configure `APP_ORIGIN`, `CONSULTANT_MCP_BEARER` or `CONSULTANT_MCP_PUBLIC_READ_ONLY=1`, and `CONSULTANT_MCP_ALLOWED_ORIGINS` before exposing `/api/mcp`. Production compose and chat also require `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
 
-The GenUI demo, consultant chat, and MCP tools are examples. They are not a finished product identity, authentication system, or security certification.
+The GenUI demo, Flow Agent chat, and read-only MCP tools are Flow application capabilities and examples. They do not define the adopter's product identity, authentication system, or production security posture.
 
-Use the actual environment variable examples defined under `apps/web`.
+Use the environment examples for the application being configured: `apps/web/.env.example` for the product starter and `apps/flow/.env.example` for the Flow experience.
 
 Never commit secrets.
 
