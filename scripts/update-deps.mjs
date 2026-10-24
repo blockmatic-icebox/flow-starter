@@ -35,6 +35,11 @@ function main() {
     cmd: "pnpm",
     cwd: join(repoRoot, ".deepsec"),
   });
+  // Architecture checks still use the classic compiler API (removed from the TS 7 main export).
+  run({
+    args: ["add", "-D", "-w", "typescript-ast@npm:typescript@5.8.3"],
+    cmd: "pnpm",
+  });
 }
 
 main();
