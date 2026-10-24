@@ -36,13 +36,13 @@ Optional tier-3 model answers: set `AI_GATEWAY_API_KEY` (and optionally `GENUI_M
 
 ## Flow workflow
 
-This starter includes [Flow](docs/Workflow/Flow.md), a lightweight workflow for product discovery and software delivery:
+This starter includes [Flow](docs/workflow/flow.md), a lightweight workflow for product discovery and software delivery:
 
 **Explore → Specify → Plan → Build → Review → Ship**
 
 Flow defines documentation ownership and conventions while installed third-party skills provide specialized product, design, and engineering techniques.
 
-`AGENTS.md` is the compact router for coding agents. `docs/Workflow/Flow.md` is the workflow contract. Read only the relevant project documents for a task.
+`AGENTS.md` is the compact router for coding agents. `docs/workflow/flow.md` is the workflow contract. Read only the relevant project documents for a task.
 
 ### Project skills
 
@@ -173,5 +173,5 @@ Do not make any product-specific example mandatory.
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — data flow and GenUI tiers
 - [ROADMAP.md](ROADMAP.md) — canonical delivery milestones and status
-- [docs/specs/genui/README.md](docs/specs/genui/README.md) — GenUI implementation and historical extraction notes
+- [docs/specs/genui/readme.md](docs/specs/genui/readme.md) — GenUI implementation and historical extraction notes
 - [AGENTS.md](AGENTS.md) — agent editing rules for this repo

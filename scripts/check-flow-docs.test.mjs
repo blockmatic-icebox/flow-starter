@@ -20,10 +20,7 @@ function defaultMarkdownContent(relative) {
     return `# Spec\n\n**Last reviewed:** 2026-10-24\n**Status:** Current\n`;
   }
 
-  if (
-    relative.startsWith("docs/adr/") ||
-    relative.startsWith("docs/pdr/")
-  ) {
+  if (relative.startsWith("docs/adr/") || relative.startsWith("docs/pdr/")) {
     return "Date: 2026-10-24\n\n# Decision\n";
   }
 
@@ -72,8 +69,8 @@ test("accepts canonical filenames", (t) => {
 
 test("preserves explicit legacy nested GenUI spec documents", (t) => {
   const root = fixture(t, [
-    "docs/specs/genui/README.md",
-    "docs/specs/genui/INVENTORY.md",
+    "docs/specs/genui/readme.md",
+    "docs/specs/genui/inventory.md",
   ]);
 
   assert.deepEqual(validateFlowDocs(root), []);
@@ -226,8 +223,8 @@ test("rejects spec missing status", (t) => {
 });
 
 test("validates historical nested GenUI spec metadata", (t) => {
-  const root = fixture(t, ["docs/specs/genui/INVENTORY.md"], {
-    "docs/specs/genui/INVENTORY.md":
+  const root = fixture(t, ["docs/specs/genui/inventory.md"], {
+    "docs/specs/genui/inventory.md":
       "# Inventory\n\n**Last reviewed:** 2026-10-24\n**Status:** Historical\n",
   });
 

@@ -4,7 +4,7 @@
 
 **Status:** Current
 
-Evidence-based extraction from gaboesquivel.com (read-only source) into `@repo/genui`. See [INVENTORY.md](./INVENTORY.md) for historical source-to-target mappings and snapshot evidence.
+Evidence-based extraction from gaboesquivel.com (read-only source) into `@repo/genui`. See [inventory.md](./inventory.md) for historical source-to-target mappings and snapshot evidence.
 
 ## Three-level strategy
 

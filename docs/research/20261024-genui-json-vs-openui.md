@@ -109,7 +109,7 @@ A new comparison should use reproducible examples and current library versions.
 - [OpenUI Lang documentation](https://www.openui.com/docs/openui-lang)
 - [json-render repository](https://github.com/vercel-labs/json-render)
 - [ADR 003](../adr/0003-genui-openui-foundation.md)
-- [GenUI extraction inventory](../specs/genui/INVENTORY.md)
+- [GenUI extraction inventory](../specs/genui/inventory.md)
 - [Broader research](20261020-generative-ui.md)
 
 ## Evidence limitations

@@ -19,8 +19,8 @@ const rules = [
 ];
 
 const legacyPaths = new Set([
-  "docs/specs/genui/INVENTORY.md",
-  "docs/specs/genui/README.md",
+  "docs/specs/genui/inventory.md",
+  "docs/specs/genui/readme.md",
 ]);
 
 const researchDatePattern =
@@ -313,7 +313,7 @@ if (import.meta.url === entrypoint) {
     }
 
     console.error(
-      "\nSee docs/Workflow/Flow.md for canonical documentation conventions."
+      "\nSee docs/workflow/flow.md for canonical documentation conventions."
     );
 
     process.exitCode = 1;

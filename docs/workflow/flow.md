@@ -147,8 +147,8 @@ Use one authoritative home for each fact. Link related documents instead of copy
 | Location | Responsibility |
 | --- | --- |
 | `AGENTS.md` | Lightweight agent entrypoint and task-specific document routing |
-| `docs/Workflow/Flow.md` | Workflow, skill orchestration, document conventions, and lifecycle |
-| `docs/Workflow/README.md` | Human-readable introduction to Flow and naming conventions |
+| `docs/workflow/flow.md` | Workflow, skill orchestration, document conventions, and lifecycle |
+| `docs/workflow/readme.md` | Human-readable introduction to Flow and naming conventions |
 | `PRODUCT.md` | Current product vision, audience, business context, scope, outcomes, and capabilities |
 | `DESIGN.md` | Current visual, interaction, experience, and accessibility direction |
 | `ARCHITECTURE.md` | Current technical structure, boundaries, constraints, and major system choices |

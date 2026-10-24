@@ -101,7 +101,7 @@ Registered actions, input validation, and declared approval/authentication requi
 | `/api/genui/compose` | POST | Body: `{ query, clientRequestId?, version? }`. Returns `application/x-ndjson` stream. |
 | `/genui-demo` | GET | Client demo calling the compose API |
 
-The compose route applies optional per-IP daily limits (`apps/web/lib/genui/`, off on `flow.localhost` unless `GENUI_ENFORCE_RATE_LIMIT=1`) and builds a minimal capability context (`correlationId`, `ip`, `clock`). Telemetry and Redis-backed caps follow the gaboesquivel.com pattern in `docs/specs/genui/INVENTORY.md`.
+The compose route applies optional per-IP daily limits (`apps/web/lib/genui/`, off on `flow.localhost` unless `GENUI_ENFORCE_RATE_LIMIT=1`) and builds a minimal capability context (`correlationId`, `ip`, `clock`). Telemetry and Redis-backed caps follow the gaboesquivel.com pattern in `docs/specs/genui/inventory.md`.
 
 The in-memory cap store is a demonstration mechanism, not a distributed production rate limiter. Its counts are process-local and may reset or diverge across instances. The request IP is derived from forwarding headers, whose trust depends on the hosting proxy configuration. Production applications must replace this with an appropriately trusted, distributed enforcement mechanism.
 
