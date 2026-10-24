@@ -1,10 +1,24 @@
 #!/usr/bin/env node
 
 import { execSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { readFileSync, rmSync } from "node:fs";
 import { platform } from "node:os";
 import { exit } from "node:process";
 
 const osvScannerVersion = "2.6.0";
+
+// Official checksums from osv-scanner_SHA256SUMS for v2.6.0.
+const osvScannerChecksums = {
+  "osv-scanner_darwin_amd64":
+    "60c5296637e977b28eeda5c7f13573e447659a632922737f94d11fa7e30ad6ca",
+  "osv-scanner_darwin_arm64":
+    "98c460dcd37de25819babd757d04542045b6243113e209edcd4d89fedb0256b4",
+  "osv-scanner_linux_amd64":
+    "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+  "osv-scanner_linux_arm64":
+    "2c71403eb443d05891c4f268c3ad771cf4f16e5443463fd7851ef8f454d3c7e4",
+};
 
 function checkToolExists(toolName, checkCommand) {
   try {
@@ -73,6 +87,8 @@ function installTool() {
       ? `https://github.com/google/osv-scanner/releases/download/v${version}/osv-scanner_darwin_${arch}`
       : `https://github.com/google/osv-scanner/releases/download/v${version}/osv-scanner_linux_${arch}`;
 
+  const fileName =
+    os === "macos" ? `osv-scanner_darwin_${arch}` : `osv-scanner_linux_${arch}`;
   const tempFile = "/tmp/osv-scanner";
 
   try {
@@ -88,6 +104,15 @@ function installTool() {
       downloadCommand = `curl -L -o ${tempFile} "${downloadUrl}"`;
     }
     execSync(downloadCommand, { stdio: "inherit" });
+    const expected = osvScannerChecksums[fileName];
+    if (!expected) throw new Error(`no pinned checksum for ${fileName}`);
+    const digest = createHash("sha256")
+      .update(readFileSync(tempFile))
+      .digest("hex");
+    if (digest !== expected) {
+      rmSync(tempFile, { force: true });
+      throw new Error(`checksum mismatch for ${fileName}`);
+    }
     execSync(`chmod +x ${tempFile}`, { stdio: "ignore" });
     execSync(`sudo mv ${tempFile} /usr/local/bin/osv-scanner`, {
       stdio: "inherit",

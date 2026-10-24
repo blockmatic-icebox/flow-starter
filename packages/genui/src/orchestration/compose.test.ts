@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { composeQuery } from "./compose";
+import { validateCompositionEnvelope } from "../contract/compiler";
+import { composeQuery, publishComposition } from "./compose";
 import { defaultEntityIds } from "./routing";
 
 describe("composeQuery", () => {
@@ -16,6 +17,37 @@ describe("composeQuery", () => {
     assert.equal(result.metadata.tier, 1);
     assert.equal(result.metadata.validationOk, true);
     assert.equal(result.metadata.component, "ComparisonView");
+    assert.deepEqual(
+      result.events.map((event) => event.type),
+      ["start", "partial", "complete"]
+    );
+    const partial = result.events.find((event) => event.type === "partial");
+    assert.ok(partial && partial.type === "partial");
+    assert.equal(
+      validateCompositionEnvelope({ envelope: partial.envelope }).ok,
+      true
+    );
+  });
+
+  it("does not emit a renderable event when validation fails", () => {
+    const events: { type: string }[] = [];
+    const result = publishComposition({
+      emit: (event) => events.push(event),
+      envelope: {
+        fallbackText: "Unavailable.",
+        libraryVersion: 1,
+        openuiText: "root = NotARealComponent()",
+        records: [],
+        requestId: "bad",
+      },
+      requestId: "bad",
+      sequence: 1,
+    });
+    assert.equal(result.ok, false);
+    assert.deepEqual(
+      events.map((event) => event.type),
+      ["error"]
+    );
   });
 
   it("composes tier 2 stack for compound prompts", async () => {

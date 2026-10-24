@@ -6,7 +6,7 @@ Date: 2026-10-24
 
 ## Context
 
-Flow’s roadmap referenced json-render for early canvas specs. gaboesquivel.com already ships a production **select → compile → render** GenUI stack on OpenUI Lang (`@openuidev/lang-core`, `@openuidev/react-lang`), shared compiler validation, NDJSON compose streaming, and MCP Apps host patterns.
+Flow’s roadmap referenced json-render for early canvas specs. The extraction source already shipped a production **select → compile → render** GenUI stack on OpenUI Lang (`@openuidev/lang-core`, `@openuidev/react-lang`), shared compiler validation, NDJSON compose streaming, and MCP Apps host patterns.
 
 This extraction task generalizes that architecture for adopters without copying portfolio data or site routes.
 

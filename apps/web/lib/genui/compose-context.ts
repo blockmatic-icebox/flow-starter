@@ -1,17 +1,17 @@
 export interface ComposeCapabilityContext {
   clock: Date;
   correlationId: string;
-  ip: string;
+  subject: string;
 }
 
 export const composeContextFromRequest = ({
   correlationId,
-  ip,
+  subject,
 }: {
   correlationId: string;
-  ip: string;
+  subject: string;
 }): ComposeCapabilityContext => ({
   clock: new Date(),
   correlationId,
-  ip,
+  subject,
 });

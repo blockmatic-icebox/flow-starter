@@ -40,7 +40,7 @@ Choose technologies that work well together instead of presenting multiple compe
 
 The selected direction includes Next.js, React, TypeScript, Vercel, AI SDK, OpenUI Lang and reusable monorepo packages.
 
-The architecture also selects Eve, Better Auth, Neon and Drizzle for future integration.
+The architecture also selects Eve and Better Auth for later product integration. Neon and Drizzle ship as the database baseline; product tables and authentication data do not.
 
 Selection does not mean every integration is currently implemented.
 
@@ -117,7 +117,9 @@ The repository includes:
 - A reusable GenUI package and demonstration.
 - A generative UI composition API.
 - A site consultant chat example.
-- A read-only consultant MCP example.
+- A read-only consultant MCP example with explicit production access rules.
+- Bounded public HTTP inputs, fail-closed production rate limits, and host-owned action policies.
+- `@repo/db`: Drizzle, committed migrations, and Neon Local. The web demo does not require a database.
 - Shared design-system components.
 - An agent skills manifest.
 - Next.js development MCP tooling.
@@ -135,7 +137,7 @@ The architecture identifies additional integrations that can be implemented when
 
 - Eve for agent runtime capabilities.
 - Better Auth for application authentication.
-- Neon Postgres and Drizzle for persistence.
+- Product tables, authentication data, and tenant isolation on the existing database baseline.
 - Shared authorized operations for humans and agents.
 - Further MCP and MCP Apps integration.
 - Isolated preview and migration workflows.
@@ -175,6 +177,8 @@ The distinction is intentional:
 - [AGENTS.md](../AGENTS.md) — agent entrypoint and context navigation.
 - [Browser verification](agents/verify.md) — agent-browser workflow for UI changes.
 - [ARCHITECTURE.md](../ARCHITECTURE.md) — current technical structure and boundaries.
+- [SECURITY.md](../SECURITY.md) — disclosure and what this starter does and does not certify.
+- [Security model](security/security-model.md) — implemented boundaries and adopter responsibilities.
 - [Flow contract](workflow/flow.md) — workflow and documentation conventions.
 - [ADR 0001](adr/0001-agentic-architecture.md) — foundational architecture.
 - [ADR 0009](adr/0009-react-nextjs-fractal-architecture.md) — React and Next.js conventions.
@@ -187,12 +191,27 @@ Do not read all documents by default.
 
 ## Foundation development
 
-The repository includes reproducible checks:
+Quick start:
+
+```bash
+pnpm install
+pnpm setup:env
+pnpm dev
+```
+
+`pnpm setup` installs dependencies and copies environment templates. `pnpm setup:full` also installs skills, secret scanners, Portless, DeepSec, and Playwright. Scanner installation may ask for administrator rights. The minimal setup does not.
+
+Reproducible checks:
 
 ```bash
 pnpm qa
 pnpm ci:local
+pnpm security:check
 ```
+
+`pnpm qa` is the local quality command. `pnpm ci:local` adds browser tests, the offline GenUI eval, security checks, and the production build. GitHub Actions runs CI and security checks on pull requests to `main`. Those builds do not receive model, database, or deployment secrets. DeepSec stays manual.
+
+Production MCP and rate limits fail closed until `APP_ORIGIN`, Redis, and either a bearer token or `CONSULTANT_MCP_PUBLIC_READ_ONLY=1` are set. See [the security model](security/security-model.md).
 
 For focused validation:
 
@@ -233,7 +252,9 @@ Optional model-backed examples can use:
 - `GENUI_MODEL`
 - `CONSULTANT_MODEL`
 
-The example consultant MCP may use `CONSULTANT_MCP_BEARER` when exposed outside trusted local development.
+Local development may call MCP without a bearer token. Production does not. Configure `APP_ORIGIN`, `CONSULTANT_MCP_BEARER` or `CONSULTANT_MCP_PUBLIC_READ_ONLY=1`, and `CONSULTANT_MCP_ALLOWED_ORIGINS` before exposing `/api/mcp`. Production compose and chat also require `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+
+The GenUI demo, consultant chat, and MCP tools are examples. They are not a finished product identity, authentication system, or security certification.
 
 Use the actual environment variable examples defined under `apps/web`.
 

@@ -1,11 +1,12 @@
-# GenUI architecture inventory (gaboesquivel.com → Flow Starter)
+# GenUI architecture inventory (source extraction → Flow Starter)
 
 **Last reviewed:** 2026-10-24
 
 **Status:** Historical
 
-**Source inspected:** `/Users/gabo/Code/gaboesquivel.com` on branch `develop` @ `b1569c24` (clean, matches `origin/develop`).  
-**Target:** `/Users/gabo/Code/flow-starter` on `main`.
+**Source inspected:** prior production GenUI implementation, branch `develop` @ `b1569c24`.
+
+**Target:** the Flow Starter repository on `main`.
 
 Classifications: **COPY** (portable as-is), **ADAPT** (generalize), **REBUILD** (new in Flow), **OMIT** (website-specific).
 

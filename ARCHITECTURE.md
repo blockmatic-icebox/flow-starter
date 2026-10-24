@@ -64,15 +64,16 @@ Adopters use this architecture rather than designing an alternative React struct
 
 The implementation and current package boundaries are described here; the rationale and enforcement requirements belong in ADR 0009.
 
-## 3. Generative UI: select → compile → render
+## 3. Generative UI: select → compile → validate → render
 
 | Stage | Responsibility |
 | --- | --- |
 | **Select** | Route the user query to tier 1 (known intent), tier 2 (declarative compound), or tier 3 (open-ended). |
 | **Compile** | Parse OpenUI text, enforce component/composite allowlists, validate props with Zod, ground record references. |
-| **Render** | `@repo/genui/react` maps compiled experiences to React views using the host design system. |
+| **Validate** | Structural validation finishes before any renderable `partial` or `complete` event is emitted. The browser validates inbound NDJSON again before React sees it. |
+| **Render** | `@repo/genui/react` renders only an envelope the compiler accepts. It does not execute model-authored HTML, CSS, JavaScript, or unknown components. |
 
-**Envelope:** `CompositionEnvelope` carries `openuiText`, grounded `records`, and metadata. The client consumes **NDJSON** events (`start`, `partial`, `complete`, `error`) from `POST /api/genui/compose`.
+**Envelope:** `CompositionEnvelope` carries `openuiText`, grounded `records`, and metadata. The client consumes **NDJSON** events (`start`, `partial`, `complete`, `error`) from `POST /api/genui/compose`. A newer submission aborts the previous request and ignores events for older request ids.
 
 **Fixtures:** the demo uses fictional **Acme Analytics** catalog data under `packages/genui/src/fixtures/`. Adopters swap in their own record providers.
 
@@ -91,10 +92,11 @@ Tier 1–2 paths are fully testable without network access. Tier 3 is optional (
 ## 5. Actions and security
 
 - **Registered actions** live in a host-owned registry (`createActionRegistry`). Kinds include navigate, filter, sort, server-tool, etc.
-- Model output **does not** define privileged actions. Invocations require schema validation; sensitive operations set `requiresApproval` / `requiresAuth`.
+- Each registration carries an `ActionSecurityPolicy` (`requiresAuth`, `requiresApproval`). Callers and model output cannot supply those flags. An invocation only names an action id and input.
+- Model output **does not** define privileged actions. Validation checks the registry, the input schema, and the trusted policy. Execution stays separate from validation.
 - Compose and render paths treat external text as untrusted: injection patterns route to safe **Answer** or **Status** experiences.
 
-Registered actions, input validation, and declared approval/authentication requirements are foundational contracts. Actual privileged execution and end-to-end user authorization must be implemented and verified by the host. The current registry is not a completed cross-channel authorization system.
+The registry is not a completed approval workflow or cross-channel authorization system. The adopting product still implements identity, resource ownership, and privileged execution. See [ADR 0011](docs/adr/0011-api-and-agent-security-boundaries.md) and [docs/security/security-model.md](docs/security/security-model.md).
 
 ## 6. API surface (implemented)
 
@@ -105,9 +107,13 @@ Registered actions, input validation, and declared approval/authentication requi
 | `/api/mcp` | GET, POST, DELETE | Read-only MCP (Streamable HTTP) for external agents; same consultant tools as chat. |
 | `/genui-demo` | GET | Client demo calling the compose API |
 
-The compose and consultant routes apply optional per-IP daily limits (`apps/web/lib/genui/`, off on `flow.localhost` unless `GENUI_ENFORCE_RATE_LIMIT=1`) and build a minimal capability context (`correlationId`, `ip`, `clock`). Consultant MCP is read-only for external callers ([ADR 006](docs/adr/0006-external-invocation-is-read-only.md)); in-app chat may invoke allowlisted client actions (`open-genui-demo`, `toggle-theme`). Agent-to-UI events in the sidebar use the AI SDK UI message stream (AG-UI vocabulary per [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md)). Telemetry and Redis-backed caps follow the gaboesquivel.com pattern in `docs/specs/genui/inventory.md`.
+Public JSON routes read a bounded body (`apps/web/lib/security/read-json-request.ts`) and validate it before work: compose is limited to 16 KiB and chat to 128 KiB. Compose accepts `{ query, clientRequestId?, version? }` and rejects extra fields. Chat accepts the AI SDK UI message envelope, rejects client system instructions, and does not forward raw model reasoning (`sendReasoning: false`). Consultant responses use `stepCountIs(5)` and an 800-token output bound. Without `AI_GATEWAY_API_KEY`, chat stays on the deterministic fallback.
 
-The in-memory cap store is a demonstration mechanism, not a distributed production rate limiter. Its counts are process-local and may reset or diverge across instances. The request IP is derived from forwarding headers, whose trust depends on the hosting proxy configuration. Production applications must replace this with an appropriately trusted, distributed enforcement mechanism.
+Rate limits are 60 compose requests and 120 consultant requests per UTC day per trusted subject (`admitCompose`, `admitChat`). Enforcement follows server configuration, not the request hostname. Production requires Upstash Redis (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`) and returns 503 when that configuration or the store is unavailable. Development uses a process-local memory counter. A forwarded IP is a quota subject only when `RATE_LIMIT_TRUSTED_IP_HEADER` names a header the ingress overwrites. Otherwise callers share one bucket. IP addresses are not authentication.
+
+`/api/mcp` allows unauthenticated local access only when `NODE_ENV=development`, and only for loopback and `flow.localhost`. Production requires `APP_ORIGIN` plus either `CONSULTANT_MCP_BEARER` or `CONSULTANT_MCP_PUBLIC_READ_ONLY=1`. A present `Origin` must match the application origin or `CONSULTANT_MCP_ALLOWED_ORIGINS`. A matching origin is not authentication. The public mode exposes the same three read-only consultant tools. In-app chat may still invoke `open_genui_demo` and `toggle_theme`. See [ADR 0006](docs/adr/0006-external-invocation-is-read-only.md) and [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md).
+
+Database clients validate TLS certificates. `DATABASE_TLS_INSECURE_LOCAL=1` applies only outside production and only for an explicit loopback proxy. Production never disables certificate verification because a URL contains `localhost`.
 
 ## 7. Planned platform integrations
 
@@ -128,12 +134,12 @@ Site consultant chat and read-only MCP are implemented per [ADR 0010](docs/adr/0
 
 Local gates:
 
-- `pnpm qa` — Flow docs, React architecture boundaries, lint, knip, sherif, types, unit tests, and `drizzle-kit check` for `@repo/db` (no database required).
-- `pnpm hooks:pre-commit` — staged secret-file block, gitleaks on staged changes, then `pnpm qa` (non-mutating).
-- `pnpm security:check` — full gitleaks, OSV, and `pnpm audit` (requires gitleaks and osv-scanner; see `pnpm setup`).
-- `pnpm ci:local` — `pnpm qa`, `pnpm test:scripts`, `pnpm security:check`, and production build.
+- `pnpm qa` — Flow docs, React architecture boundaries, lint, knip, sherif, types, unit tests, and `drizzle-kit check` for `@repo/db` (no database required). Knip reports unlisted dependencies and unresolved imports. The Next.js TypeScript plugin name in `packages/ts` is an editor plugin, not a package import, so Knip ignores the unresolved name `next` there. Generated shadcn files under `packages/ui/src/components` stay in the catalog even when a demo does not import every component.
+- `pnpm hooks:pre-commit` — staged secret-file block, staged secret scan, then checks selected from the staged diff. It does not run Playwright, the production build, or the full test suite.
+- `pnpm security:check` — secret-scanner canary, full gitleaks scan, OSV on both lockfiles, and `pnpm audit` (requires gitleaks and osv-scanner; `pnpm setup:full` or the individual setup commands).
+- `pnpm ci:local` — `pnpm qa`, documentation and architecture tests, script tests, offline GenUI eval, browser tests, security checks, and the production build.
 
-GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and [`.github/workflows/security.yml`](.github/workflows/security.yml) mirror the local gates but remain **disabled for push/PR** on CI until uncommented. [`.github/workflows/pr-title.yml`](.github/workflows/pr-title.yml) enforces Conventional Commits on PR titles. DeepSec stays manual in [`.github/workflows/deepsec.yml`](.github/workflows/deepsec.yml).
+GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and [`.github/workflows/security.yml`](.github/workflows/security.yml) run on pull requests and pushes to `main`. Pull request builds use `pull_request` and do not receive deployment or model secrets. [`.github/workflows/pr-title.yml`](.github/workflows/pr-title.yml) enforces Conventional Commits on PR titles. DeepSec stays manual in [`.github/workflows/deepsec.yml`](.github/workflows/deepsec.yml).
 
 GenUI unit tests and graded prompt matrix: `pnpm --filter @repo/genui test` (`packages/genui/src/eval/query-matrix.ts`, offline: `pnpm eval:genui:offline`). Consultant MCP protocol tests: `pnpm --filter web test`. Browser fixture lab and shell smokes: `pnpm test:browser` (see [docs/specs/genui/readme.md](docs/specs/genui/readme.md#tests)).
 

@@ -18,14 +18,18 @@ function main() {
     exit(1);
   }
 
+  const lockfiles = ["pnpm-lock.yaml", ".deepsec/pnpm-lock.yaml"];
   try {
-    execSync("osv-scanner scan --lockfile=pnpm-lock.yaml --format=markdown", {
-      stdio: "inherit",
-    });
+    for (const lockfile of lockfiles) {
+      console.log(`\nScanning ${lockfile}\n`);
+      execSync(`osv-scanner scan --lockfile=${lockfile} --format=markdown`, {
+        stdio: "inherit",
+      });
+    }
     exit(0);
   } catch {
     console.error(
-      "\nOSV Scanner found vulnerabilities. Update affected dependencies.\n"
+      "\nOSV Scanner could not complete or found vulnerabilities. Update affected dependencies or restore registry access.\n"
     );
     exit(1);
   }

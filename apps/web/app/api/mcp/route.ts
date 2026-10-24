@@ -1,48 +1,72 @@
 import { NextResponse } from "next/server";
 
-import { admitChat } from "@/lib/consultant/admit-chat";
 import { handleConsultantMcpRequest } from "@/lib/consultant/mcp-handler";
-import { memoryCapStore } from "@/lib/genui/cap-store";
-import {
-  composeRateLimitEnforced,
-  isLocalDevHost,
-  readRequestIp,
-  requestHost,
-} from "@/lib/genui/request";
+import type { CreateCapStoreResult } from "@/lib/genui/create-cap-store";
+import { enforceDailyCap } from "@/lib/genui/enforce-daily-cap";
+import { authorizeMcpAccess, withMcpCors } from "@/lib/security/mcp-access";
 
 export const runtime = "nodejs";
 
-const capStore = memoryCapStore();
-
-const authorizeMcp = (request: Request) => {
-  const host = requestHost(request);
-  if (isLocalDevHost(host)) return true;
-  const expected = process.env.CONSULTANT_MCP_BEARER?.trim();
-  if (!expected) return true;
-  const header = request.headers.get("authorization")?.trim();
-  return header === `Bearer ${expected}`;
-};
-
-const handleMcp = async (request: Request) => {
-  if (!authorizeMcp(request)) {
-    return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
-  }
-
-  const ip = readRequestIp(request);
-  const host = requestHost(request);
-  const admitted = await admitChat({
-    enforce: composeRateLimitEnforced({ host }),
-    ip,
-    now: new Date(),
-    store: capStore,
+const jsonError = ({
+  message,
+  origin,
+  status,
+}: {
+  message: string;
+  origin: string | null;
+  status: number;
+}) =>
+  withMcpCors({
+    origin,
+    response: NextResponse.json({ message }, { status }),
   });
-  if (!admitted.ok) {
-    return NextResponse.json({ message: admitted.message }, { status: 429 });
-  }
 
-  return handleConsultantMcpRequest(request);
+export const handleMcpRequest = async ({
+  createStore,
+  env = process.env,
+  now = new Date(),
+  request,
+}: {
+  createStore?: (input: { env: NodeJS.ProcessEnv }) => CreateCapStoreResult;
+  env?: NodeJS.ProcessEnv;
+  now?: Date;
+  request: Request;
+}) => {
+  const access = authorizeMcpAccess({ env, request });
+  if (!access.ok)
+    return jsonError({
+      message: access.message,
+      origin: null,
+      status: access.status,
+    });
+
+  if (request.method === "OPTIONS")
+    return withMcpCors({
+      origin: access.corsOrigin,
+      response: new Response(null, { status: 204 }),
+    });
+
+  const admitted = await enforceDailyCap({
+    createStore,
+    env,
+    kind: "chat",
+    now,
+    request,
+  });
+  if (!admitted.ok)
+    return jsonError({
+      message: admitted.message,
+      origin: access.corsOrigin,
+      status: admitted.status,
+    });
+
+  const response = await handleConsultantMcpRequest(request);
+  return withMcpCors({ origin: access.corsOrigin, response });
 };
 
-export const GET = handleMcp;
-export const POST = handleMcp;
-export const DELETE = handleMcp;
+const handle = (request: Request) => handleMcpRequest({ request });
+
+export const GET = handle;
+export const POST = handle;
+export const DELETE = handle;
+export const OPTIONS = handle;

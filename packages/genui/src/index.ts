@@ -11,6 +11,7 @@ export type {
 export {
   createActionRegistry,
   validateActionInvocation,
+  type ActionSecurityPolicy,
   type RegisteredAction,
   type RegisteredActionKind,
 } from "./core/actions";
@@ -39,3 +40,4 @@ export {
   type ComposeStreamEvent,
 } from "./orchestration/stream";
 export { acmeCatalogRecords } from "./fixtures/acme-catalog";
+export { MAX_QUERY_CODE_POINTS } from "./core/limits";

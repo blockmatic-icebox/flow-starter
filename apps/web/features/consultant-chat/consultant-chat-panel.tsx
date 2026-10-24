@@ -83,16 +83,8 @@ export const ConsultantChatPanel = () => {
               Try: “How is this app built?” or “Open the GenUI demo.”
             </p>
           )}
-          {messages.map((message, index) => (
-            <ConsultantMessageParts
-              key={message.id}
-              message={message}
-              isStreaming={
-                isBusy &&
-                index === messages.length - 1 &&
-                message.role === "assistant"
-              }
-            />
+          {messages.map((message) => (
+            <ConsultantMessageParts key={message.id} message={message} />
           ))}
         </div>
       </ScrollArea>

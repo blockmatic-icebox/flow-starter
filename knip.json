@@ -9,8 +9,8 @@
     "nsTypes": "off",
     "optionalPeerDependencies": "off",
     "types": "off",
-    "unlisted": "off",
-    "unresolved": "off"
+    "unlisted": "error",
+    "unresolved": "error"
   },
   "workspaces": {
     ".": {
@@ -50,6 +50,7 @@
     "packages/genui/src/fixtures/**",
     "apps/web/hooks/use-highlighted-code.ts"
   ],
+  "ignoreUnresolved": ["next"],
   "ignoreDependencies": [
     "@tailwindcss/postcss",
     "next-themes",

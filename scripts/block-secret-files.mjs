@@ -1,85 +1,79 @@
 #!/usr/bin/env node
 
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
+import { resolve } from "node:path";
 import { exit } from "node:process";
+import { pathToFileURL } from "node:url";
 
-const blockedPatterns = [
-  /^\.env$/,
-  /^\.env\./,
-  /\.env$/,
-  /\.pem$/,
-  /\.key$/,
-  /^id_rsa/,
-  /id_rsa$/,
-  /\.p12$/,
-  /\.pfx$/,
-  /\.jks$/,
-  /\.keystore$/,
-  /\.crt$/,
-  /\.cer$/,
-  /\.der$/,
-  /\.p7b$/,
-  /\.p7c$/,
-  /\.p7m$/,
-  /\.p7s$/,
-  /\.keytab$/,
+const allowedEnvNames = new Set([".env.example", ".env.schema"]);
+
+const blockedSuffixes = [
+  ".pem",
+  ".key",
+  ".p12",
+  ".pfx",
+  ".jks",
+  ".keystore",
+  ".crt",
+  ".cer",
+  ".der",
+  ".p7b",
+  ".p7c",
+  ".p7m",
+  ".p7s",
+  ".keytab",
 ];
 
-const allowedPatterns = [
-  /\.env\.[^/]+\.example$/,
-  /\.env\.schema$/,
-  /\.env\.development$/,
-  /\.env\.staging$/,
-  /\.env\.production$/,
-  /\.env\.test$/,
-];
+const basenameOf = (filename) => filename.split("/").pop() ?? filename;
+
+export const isAllowedEnvTemplate = (filename) => {
+  const name = basenameOf(filename);
+  if (allowedEnvNames.has(name)) return true;
+  return /^\.env\.[^/]+\.example$/u.test(name);
+};
+
+const isEnvLike = (name) =>
+  name === ".env" ||
+  name.startsWith(".env.") ||
+  name.endsWith(".env") ||
+  name.includes(".env.");
+
+const isKeyMaterial = (name) =>
+  name === "id_rsa" ||
+  name.startsWith("id_rsa.") ||
+  blockedSuffixes.some((suffix) => name.endsWith(suffix));
 
 export function isBlocked(filename) {
-  for (const allowed of allowedPatterns) {
-    if (allowed.test(filename)) {
-      return false;
-    }
-  }
-
-  for (const blocked of blockedPatterns) {
-    if (blocked.test(filename)) {
-      return true;
-    }
-  }
-
-  return false;
+  const name = basenameOf(filename);
+  if (isAllowedEnvTemplate(filename)) return false;
+  return isEnvLike(name) || isKeyMaterial(name);
 }
 
-function getStagedFiles() {
-  const output = execSync("git diff --cached --name-only --diff-filter=ACMR", {
-    encoding: "utf-8",
-    stdio: ["pipe", "pipe", "pipe"],
-  });
-  return output
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
+function stagedFiles() {
+  const output = execFileSync(
+    "git",
+    ["diff", "--cached", "--name-only", "-z", "--diff-filter=ACMR"],
+    { encoding: "utf-8" }
+  );
+  return output.split("\0").filter((line) => line.length > 0);
 }
 
 function main() {
-  const blockedFiles = getStagedFiles().filter(isBlocked);
-
-  if (blockedFiles.length === 0) {
-    exit(0);
-  }
+  const blockedFiles = stagedFiles().filter(isBlocked);
+  if (blockedFiles.length === 0) exit(0);
 
   console.error(
     "\nSecurity check failed: attempting to commit sensitive files\n"
   );
-  for (const file of blockedFiles) {
-    console.error(`  - ${file}`);
-  }
+  for (const file of blockedFiles) console.error(`  - ${file}`);
   console.error(
-    "\nUse .env.<qualifier>.example templates instead of committing secrets.\n"
+    "\nUse .env.example, .env.<qualifier>.example, or .env.schema templates instead of committing secrets.\n"
   );
   exit(1);
 }
 
-if (process.argv[1] === import.meta.filename) {
-  main();
-}
+const entrypoint = process.argv[1]
+  ? pathToFileURL(resolve(process.argv[1])).href
+  : null;
+
+if (import.meta.url === entrypoint) main();

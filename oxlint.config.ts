@@ -25,6 +25,22 @@ export default defineConfig({
       },
     },
     {
+      files: ["apps/web/tests/browser/genui-demo.spec.ts"],
+      rules: {
+        "promise/avoid-new": "off",
+      },
+    },
+    {
+      files: [
+        "apps/web/lib/security/read-json-request.ts",
+        "apps/web/lib/genui/cap-store.test.ts",
+        "packages/genui/src/orchestration/stream.ts",
+      ],
+      rules: {
+        "eslint/no-await-in-loop": "off",
+      },
+    },
+    {
       files: ["scripts/**/*.mjs"],
       rules: {
         "eslint/no-await-in-loop": "off",

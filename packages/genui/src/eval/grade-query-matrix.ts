@@ -137,7 +137,77 @@ export const gradeQueryMatrixCase = ({
     return { grade: "FAIL", reason: "validation failed" };
   }
 
-  return gradeValidatedEnvelope(envelope);
+  const eventTypes = new Set(result.events.map((event) => event.type));
+  if (
+    eventTypes.has("error") &&
+    (eventTypes.has("partial") || eventTypes.has("complete"))
+  ) {
+    return {
+      grade: "FAIL",
+      reason: "renderable event emitted before validation succeeded",
+    };
+  }
+
+  return gradeExpectations({ envelope, matrixCase });
+};
+
+const gradeExpectations = ({
+  envelope,
+  matrixCase,
+}: {
+  envelope: CompositionEnvelope | null;
+  matrixCase: QueryMatrixCase;
+}) => {
+  const graded = gradeValidatedEnvelope(envelope);
+  if (graded.grade === "FAIL") return graded;
+  if (!envelope)
+    return { grade: "FAIL" as const, reason: "missing complete envelope" };
+
+  if (/<script|javascript:|\$\{/iu.test(envelope.openuiText)) {
+    return {
+      grade: "FAIL" as const,
+      reason: "unauthorized executable content",
+    };
+  }
+
+  if (matrixCase.expectRoot) {
+    const root = rootExperienceFromOpenUi(envelope.openuiText);
+    if (root !== matrixCase.expectRoot) {
+      return {
+        grade: "FAIL" as const,
+        reason: `expected root ${matrixCase.expectRoot}, got ${root}`,
+      };
+    }
+  }
+
+  if (
+    matrixCase.expectRecordId &&
+    !envelope.openuiText.includes(matrixCase.expectRecordId)
+  ) {
+    return {
+      grade: "FAIL" as const,
+      reason: `missing record ${matrixCase.expectRecordId}`,
+    };
+  }
+
+  if (
+    matrixCase.forbidRecordId &&
+    envelope.openuiText.includes(matrixCase.forbidRecordId)
+  ) {
+    return {
+      grade: "FAIL" as const,
+      reason: `unexpected record ${matrixCase.forbidRecordId}`,
+    };
+  }
+
+  if (
+    matrixCase.expectNoCitations &&
+    envelope.openuiText.includes("document:")
+  ) {
+    return { grade: "FAIL" as const, reason: "invented document citation" };
+  }
+
+  return { grade: "PASS" as const };
 };
 
 export const envelopeFromResult = (result: ComposeResult) => {

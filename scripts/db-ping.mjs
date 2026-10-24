@@ -14,7 +14,12 @@ async function main() {
   loadDotenv({ root: repoRoot });
 
   const url = process.env.DATABASE_URL ?? defaultUrl;
-  const { sql } = createDb({ url });
+  const env = { ...process.env };
+  const localProxy =
+    /\/\/(?:[^/@]+@)?(?:localhost|127\.0\.0\.1|\[::1\])(?::|\/|$)/u.test(url);
+  if (env.NODE_ENV !== "production" && localProxy)
+    env.DATABASE_TLS_INSECURE_LOCAL ??= "1";
+  const { sql } = createDb({ env, url });
 
   try {
     const [row] = await sql`select 1 as ok`;
@@ -30,6 +35,10 @@ async function main() {
 try {
   await main();
 } catch (error) {
-  console.error(`\nDatabase ping failed: ${error.message}\n`);
+  const detail = error instanceof Error ? error.message : "connection failed";
+  const safe = /postgres(?:ql)?:|password|secret/iu.test(detail)
+    ? "connection failed"
+    : detail;
+  console.error(`\nDatabase ping failed: ${safe}\n`);
   exit(1);
 }

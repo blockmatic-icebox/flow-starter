@@ -13,27 +13,41 @@ export const registeredActionKinds = [
 
 export type RegisteredActionKind = (typeof registeredActionKinds)[number];
 
-export const actionInvocationSchema = z.object({
+export interface ActionSecurityPolicy {
+  requiresApproval: boolean;
+  requiresAuth: boolean;
+}
+
+/** Untrusted invocation. Security flags are not accepted from the caller. */
+export const actionInvocationSchema = z.strictObject({
   actionId: z.string().min(1),
   input: z.record(z.string(), z.unknown()).default({}),
-  requiresApproval: z.boolean().default(false),
-  requiresAuth: z.boolean().default(true),
 });
 
 export type ActionInvocation = z.infer<typeof actionInvocationSchema>;
+
+export interface ActionPrincipal {
+  approved?: boolean;
+  userId: string | null;
+}
 
 export interface RegisteredAction {
   description: string;
   id: string;
   inputSchema: z.ZodType;
   kind: RegisteredActionKind;
+  policy: ActionSecurityPolicy;
 }
 
 export type ActionExecutor = (input: {
   action: RegisteredAction;
   invocation: ActionInvocation;
-  principal: { userId: string | null };
-}) => Promise<{ ok: true } | { ok: false; code: string }>;
+  principal: ActionPrincipal;
+}) => Promise<{ ok: true } | { code: string; ok: false }>;
+
+const policyReady = (policy: ActionSecurityPolicy | undefined) =>
+  typeof policy?.requiresAuth === "boolean" &&
+  typeof policy.requiresApproval === "boolean";
 
 export const createActionRegistry = () => {
   const actions = new Map<string, RegisteredAction>();
@@ -41,6 +55,8 @@ export const createActionRegistry = () => {
     get: (id: string) => actions.get(id),
     list: () => [...actions.values()],
     register: (action: RegisteredAction) => {
+      if (!policyReady(action.policy))
+        throw new Error(`missing-action-policy:${action.id}`);
       if (actions.has(action.id))
         throw new Error(`duplicate-action:${action.id}`);
       actions.set(action.id, action);
@@ -50,9 +66,11 @@ export const createActionRegistry = () => {
 
 export const validateActionInvocation = ({
   invocation,
+  principal = { userId: null },
   registry,
 }: {
   invocation: unknown;
+  principal?: ActionPrincipal;
   registry: ReturnType<typeof createActionRegistry>;
 }) => {
   const parsed = actionInvocationSchema.safeParse(invocation);
@@ -63,6 +81,10 @@ export const validateActionInvocation = ({
   const input = action.inputSchema.safeParse(parsed.data.input);
   if (!input.success)
     return { code: "invalid_action_input", ok: false as const };
+  if (action.policy.requiresAuth && !principal.userId)
+    return { code: "auth_required", ok: false as const };
+  if (action.policy.requiresApproval && principal.approved !== true)
+    return { code: "approval_required", ok: false as const };
   return {
     action,
     input: input.data,

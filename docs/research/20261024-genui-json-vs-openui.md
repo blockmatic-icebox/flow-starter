@@ -36,7 +36,7 @@ OpenUI Lang represents interface composition using a compact declarative languag
 
 For Flow Starter, the relevant advantages were:
 
-- Existing implementation experience in gaboesquivel.com.
+- Existing implementation experience from the prior production GenUI stack.
 - A reusable select → compile → render architecture.
 - Existing component and composite contracts.
 - A practical path to validated declarative composition.
@@ -63,7 +63,7 @@ Choosing it for the same initial surface would have required maintaining or migr
 | Approved component vocabulary | Supported through the library and host implementation | Supported through catalogs and renderer configuration |
 | Validation | Requires correct parser, schema, and host policy integration | Requires correct schema, catalog, and host policy integration |
 | Streaming and dynamic composition | Relevant capabilities in its ecosystem | Relevant capabilities in its ecosystem |
-| Existing Flow source implementation | Previously used in gaboesquivel.com | Not selected as the portable GenUI implementation |
+| Existing Flow source implementation | Prior production GenUI stack (OpenUI Lang) | Not selected as the portable GenUI implementation |
 | Flow Starter migration effort | Lower given existing source patterns | Additional migration or parallel maintenance required |
 | General security superiority | Not established | Not established |
 | Independent performance superiority | Not established | Not established |

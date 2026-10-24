@@ -11,7 +11,7 @@ export default defineConfig({
     {
       id: "flow",
       root: "..",
-      priorityPaths: ["apps/web", "packages/ui"],
+      priorityPaths: ["apps/web", "packages/ui", "packages/genui"],
     },
     // <deepsec:projects-insert-above>
   ],

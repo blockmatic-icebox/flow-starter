@@ -13,15 +13,19 @@ function main() {
 
   try {
     runStep({
+      command: "node --test tests/security/secret-scanner-smoke.test.mjs",
+      label: "1. Secret scanner self-test",
+    });
+    runStep({
       command: "node scripts/block-secret-files.mjs",
-      label: "1. Blocked secret file types (staged)",
+      label: "2. Blocked secret file types (staged)",
     });
     runStep({
       command: "pnpm security:secrets:full",
-      label: "2. Full repository secret scan",
+      label: "3. Full repository secret scan",
     });
-    runStep({ command: "pnpm security:osv", label: "3. OSV dependency scan" });
-    runStep({ command: "pnpm security:audit", label: "4. pnpm audit (high+)" });
+    runStep({ command: "pnpm security:osv", label: "4. OSV dependency scan" });
+    runStep({ command: "pnpm security:audit", label: "5. pnpm audit (high+)" });
   } catch {
     console.error("\nSecurity checks failed.\n");
     exit(1);

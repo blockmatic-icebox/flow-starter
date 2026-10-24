@@ -4,7 +4,7 @@ import type { CompositionEnvelope } from "@repo/genui";
 import { consumeNdjsonResponse } from "@repo/genui";
 import { GenuiRenderer } from "@repo/genui/react";
 import { parseAsString, useQueryState } from "nuqs";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export const GenuiDemoClient = () => {
   const [query, setQuery] = useQueryState(
@@ -14,33 +14,74 @@ export const GenuiDemoClient = () => {
       .withOptions({ history: "replace" })
   );
   const [envelope, setEnvelope] = useState<CompositionEnvelope | null>(null);
-  const [status, setStatus] = useState<string>("idle");
+  const [status, setStatus] = useState("idle");
+  const [notice, setNotice] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const requestIdRef = useRef("");
 
   const submit = async () => {
     if (!query.trim()) return;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const requestId = crypto.randomUUID();
+    requestIdRef.current = requestId;
     setStatus("loading");
     setEnvelope(null);
-    const response = await fetch("/api/genui/compose", {
-      body: JSON.stringify({
-        clientRequestId: crypto.randomUUID(),
-        query,
-        version: 1,
-      }),
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-    });
-    let latest: CompositionEnvelope | null = null;
-    await consumeNdjsonResponse({
-      onEvent: (event) => {
-        if (event.type === "partial" || event.type === "complete") {
-          latest = event.envelope as CompositionEnvelope;
-          setEnvelope(latest);
-        }
-        if (event.type === "error") setStatus("error");
-      },
-      response,
-    });
-    setStatus(latest ? "complete" : "error");
+    setNotice(null);
+
+    try {
+      const response = await fetch("/api/genui/compose", {
+        body: JSON.stringify({
+          clientRequestId: requestId,
+          query,
+          version: 1,
+        }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        signal: controller.signal,
+      });
+      if (requestIdRef.current !== requestId) return;
+      if (!response.ok) {
+        setStatus("error");
+        setNotice("The composition request failed.");
+        return;
+      }
+
+      let sawComplete = false;
+      let sawError = false;
+      const consumed = await consumeNdjsonResponse({
+        onEvent: (event) => {
+          if (requestIdRef.current !== requestId) return;
+          if (event.requestId !== requestId) return;
+          if (event.type === "partial") {
+            setEnvelope(event.envelope);
+            setStatus("streaming");
+          }
+          if (event.type === "complete") {
+            setEnvelope(event.envelope);
+            sawComplete = true;
+          }
+          if (event.type === "error") {
+            sawError = true;
+            setNotice(event.message);
+          }
+        },
+        response,
+      });
+      if (requestIdRef.current !== requestId) return;
+      if (!consumed.ok || sawError || !sawComplete) {
+        setStatus("error");
+        if (!consumed.ok) setNotice("The composition stream was invalid.");
+        return;
+      }
+      setStatus("complete");
+    } catch {
+      if (requestIdRef.current !== requestId || controller.signal.aborted)
+        return;
+      setStatus("error");
+      setNotice("The composition request failed.");
+    }
   };
 
   return (
@@ -72,6 +113,7 @@ export const GenuiDemoClient = () => {
         </button>
       </form>
       <p className="text-muted-foreground text-xs">Status: {status}</p>
+      {notice ? <p className="text-destructive text-xs">{notice}</p> : null}
       {envelope ? (
         <div className="border-border rounded-lg border p-4">
           <GenuiRenderer complete={status === "complete"} envelope={envelope} />

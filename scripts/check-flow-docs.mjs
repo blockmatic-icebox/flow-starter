@@ -220,6 +220,123 @@ function validateDocumentMetadata(root) {
   return errors;
 }
 
+export const requiredDocuments = [
+  "AGENTS.md",
+  "ARCHITECTURE.md",
+  "docs/readme.md",
+  "docs/workflow/readme.md",
+  "docs/workflow/flow.md",
+];
+
+const rootLinkDocuments = [
+  "AGENTS.md",
+  "ARCHITECTURE.md",
+  "DESIGN.md",
+  "GLOSSARY.md",
+  "PRODUCT.md",
+  "README.md",
+  "ROADMAP.md",
+  "SECURITY.md",
+];
+
+function stripFencedCode(markdown) {
+  const lines = markdown.split("\n");
+  const kept = [];
+  let fence = null;
+
+  for (const line of lines) {
+    const match = /^(?: {0,3})(?<mark>`{3,}|~{3,})/u.exec(line);
+    if (match) {
+      const mark = match.groups.mark[0];
+      const size = match.groups.mark.length;
+      if (!fence) {
+        fence = { mark, size };
+        continue;
+      }
+      if (fence.mark === mark && size >= fence.size) {
+        fence = null;
+        continue;
+      }
+    }
+    if (!fence) kept.push(line);
+  }
+
+  return kept.join("\n");
+}
+
+function linkDestination(raw) {
+  const trimmed = raw.trim();
+  if (trimmed.startsWith("<")) {
+    const end = trimmed.indexOf(">");
+    return end === -1 ? trimmed.slice(1) : trimmed.slice(1, end);
+  }
+  return trimmed.split(/\s+/u)[0] ?? "";
+}
+
+function markdownDestinations(markdown) {
+  const source = stripFencedCode(markdown);
+  const destinations = [];
+  const inline = /!?\[[^\]]*\]\((?<dest><[^>\n]+>|[^)\s]+)(?:\s+[^)]*)?\)/gu;
+  for (const match of source.matchAll(inline))
+    destinations.push(match.groups.dest);
+  const references = /^\s*\[[^\]]+\]:\s*(?<dest>\S+)/gmu;
+  for (const match of source.matchAll(references))
+    destinations.push(match.groups.dest);
+  return destinations;
+}
+
+function externalLink(target) {
+  return /^(?:[a-z][a-z0-9+.-]*:|\/\/)/iu.test(target);
+}
+
+function validateMarkdownLinks(root) {
+  const errors = [];
+  const files = [
+    ...rootLinkDocuments.map((relative) => path.join(root, relative)),
+    ...markdownFiles(path.join(root, "docs")),
+  ];
+
+  for (const filename of files) {
+    if (!existsSync(filename)) continue;
+    const relative = relativePath(root, filename);
+    const content = readFileSync(filename, "utf-8");
+
+    for (const rawDestination of markdownDestinations(content)) {
+      const destination = linkDestination(rawDestination);
+      if (
+        !destination ||
+        destination.startsWith("#") ||
+        externalLink(destination)
+      )
+        continue;
+
+      let decoded = destination;
+      try {
+        decoded = decodeURIComponent(destination);
+      } catch {
+        errors.push(`${relative}: broken link ${destination}`);
+        continue;
+      }
+
+      const hash = decoded.search(/[?#]/u);
+      const targetPath = hash === -1 ? decoded : decoded.slice(0, hash);
+      if (!targetPath) continue;
+
+      const absolute = path.resolve(path.dirname(filename), targetPath);
+      if (!existsSync(absolute))
+        errors.push(`${relative}: broken link ${destination}`);
+    }
+  }
+
+  return errors;
+}
+
+function validateRequiredDocuments(root) {
+  return requiredDocuments
+    .filter((relative) => !existsSync(path.join(root, relative)))
+    .map((relative) => `missing canonical document ${relative}`);
+}
+
 export function validateFlowDocs(root = repositoryRoot) {
   const errors = [];
   const documents = [];
@@ -293,7 +410,11 @@ export function validateFlowDocs(root = repositoryRoot) {
     }
   }
 
-  errors.push(...validateDocumentMetadata(root));
+  errors.push(
+    ...validateDocumentMetadata(root),
+    ...validateRequiredDocuments(root),
+    ...validateMarkdownLinks(root)
+  );
 
   return errors;
 }
