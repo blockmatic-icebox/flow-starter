@@ -24,7 +24,7 @@ export interface QueryMatrixCase {
 
 const controlledPrompts = [
   "Compare Orbit plan versus Nova plan",
-  "Show MRR and churn metrics",
+  "Show MRR with churn metrics",
   "Timeline of product releases",
   "Search for mobile products",
   "List all products in the catalog",
