@@ -40,7 +40,11 @@ Hidden stakeholder scripts: `__dev/flow-evals/catalog/<scenarioId>/hidden.json` 
 
 ## Grading
 
-Deterministic gates run first. Markdown reports lead with **Gate**, then quality (withheld when confidence is low).
+Deterministic gates run first. Reports lead with **Gate**, **Official eligible**, then quality (withheld when telemetry is incomplete or gates fail).
+
+Offline integrity: `pnpm flow-eval:check` from the repository root (types, unit tests, baseline preserve).
+
+Evidence per scenario includes `transcript.jsonl`, `stream.raw.log`, `prep-baseline.json`, `commands.json`, and `git-status.txt`.
 
 ## Arms
 

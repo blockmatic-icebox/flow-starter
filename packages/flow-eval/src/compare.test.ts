@@ -5,9 +5,30 @@ import { describe, it } from "node:test";
 
 import { compareRuns } from "./compare.ts";
 import { devEvalsRoot } from "./paths.ts";
+import { rubricVersion } from "./rubric.ts";
+import { PROTOCOL_ID } from "./trace.ts";
+
+const manifest = (runId: string) => ({
+  agentCliVersion: "2026.10.22",
+  arm: "flow",
+  catalogHash: "x",
+  completeness: "partial",
+  cursorVersion: "unknown",
+  flowSha: "abc",
+  flowVersion: "0.2",
+  harness: "cursor-cli",
+  modelId: "composer-2.5",
+  protocol: PROTOCOL_ID,
+  rubricVersion,
+  runId,
+  sandboxEnabled: true,
+  scenarioIds: ["S05"],
+  sourceSha: "abc",
+  trustEnabled: true,
+});
 
 describe("compareRuns", () => {
-  it("detects new gate as regression", () => {
+  it("detects new gate as regression without double-counting pass flip", () => {
     const base = path.join(devEvalsRoot, "compare-test-base");
     const cur = path.join(devEvalsRoot, "compare-test-cur");
     mkdirSync(path.join(base, "scenarios"), { recursive: true });
@@ -15,33 +36,50 @@ describe("compareRuns", () => {
     const baseGrades = {
       grades: [
         {
-          confidence: "medium",
+          blockers: [],
+          completeness: "complete",
+          confidence: "high",
           excludedDimensions: [],
           gate: "pass",
           gateIds: [],
+          officialEligible: true,
           quality: 80,
           scenarioId: "S05",
           scores: [],
+          unverifiedDimensions: [],
         },
       ],
     };
     const curGrades = {
       grades: [
         {
-          confidence: "medium",
+          blockers: ["critical-gate-failure"],
+          completeness: "complete",
+          confidence: "high",
           excludedDimensions: [],
           gate: "fail",
           gateIds: ["unauthorized-build"],
-          quality: 40,
+          officialEligible: false,
+          quality: null,
           scenarioId: "S05",
           scores: [],
+          unverifiedDimensions: [],
         },
       ],
     };
     writeFileSync(path.join(base, "scores.json"), JSON.stringify(baseGrades));
     writeFileSync(path.join(cur, "scores.json"), JSON.stringify(curGrades));
+    writeFileSync(
+      path.join(base, "manifest.json"),
+      JSON.stringify(manifest("compare-test-base"))
+    );
+    writeFileSync(
+      path.join(cur, "manifest.json"),
+      JSON.stringify(manifest("compare-test-cur"))
+    );
     const result = compareRuns({ baselineDir: base, currentDir: cur });
     assert.equal(result.verdict, "regressed");
+    assert.equal(result.regressed, 1);
     rmSync(base, { force: true, recursive: true });
     rmSync(cur, { force: true, recursive: true });
   });

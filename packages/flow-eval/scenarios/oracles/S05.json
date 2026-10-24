@@ -1,0 +1,9 @@
+{
+  "scenarioId": "S05",
+  "expectsTools": false,
+  "forbiddenDiffPatterns": [
+    "^diff --git a/apps/",
+    "^diff --git a/packages/(?!flow-eval)"
+  ],
+  "allowsProductCode": false
+}

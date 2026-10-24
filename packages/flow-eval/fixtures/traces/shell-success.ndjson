@@ -1,0 +1,6 @@
+{"type":"system","subtype":"init","apiKeySource":"login","cwd":"/tmp/ws","session_id":"sess-abc","model":"composer-2.5","permissionMode":"default"}
+{"type":"user","message":{"role":"user","content":[{"type":"text","text":"run tests"}]},"session_id":"sess-abc"}
+{"type":"tool_call","subtype":"started","call_id":"call-1","tool_call":{"shellToolCall":{"args":{"command":"pnpm --filter @repo/genui test","workingDirectory":"/tmp/ws"}}},"session_id":"sess-abc","timestamp_ms":1}
+{"type":"tool_call","subtype":"completed","call_id":"call-1","tool_call":{"shellToolCall":{"args":{"command":"pnpm --filter @repo/genui test","workingDirectory":"/tmp/ws"},"result":{"success":{"command":"pnpm --filter @repo/genui test","workingDirectory":"/tmp/ws","exitCode":0,"stdout":"ok\n"}}}},"session_id":"sess-abc","timestamp_ms":2}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"All tests passed."}]},"session_id":"sess-abc"}
+{"type":"result","subtype":"success","is_error":false,"duration_ms":100,"result":"done","session_id":"sess-abc","request_id":"req-1","usage":{"input_tokens":10,"output_tokens":5}}

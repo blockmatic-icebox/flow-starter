@@ -26,7 +26,8 @@ Out of scope: changing Flow v0.1 contracts as part of eval runs; hosted dashboar
 - [x] First-party `flow-eval` skill in `skills-lock.json` (run `pnpm skills:install`)
 - [x] Dry-run harness verification (worktrees, grading, compare-arms)
 - [ ] Authenticated CLI pilot (S01, S13) — blocked until `agent login` (see `__dev/flow-evals/cli-auth-blocker.json`)
-- [ ] Official flow-arm batch with complete stream-json traces
+- [x] Harness v0.2: stream-json normalization, prep baseline diffs, evidence-backed gates/grades, oracles for S01/S02/S09/S13, handoff continuity
+- [ ] Official flow-arm batch with complete stream-json traces (requires authenticated pilot)
 - [x] Regression compare command (`compare`, `compare-arms`) and unit tests
 
 ## Validation

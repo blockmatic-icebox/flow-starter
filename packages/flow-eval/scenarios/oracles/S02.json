@@ -1,0 +1,7 @@
+{
+  "scenarioId": "S02",
+  "expectsTools": true,
+  "expectsCommands": false,
+  "requiredDiffPatterns": ["grade-query-matrix\\.ts"],
+  "allowsProductCode": true
+}

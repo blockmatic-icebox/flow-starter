@@ -3,36 +3,53 @@ import path from "node:path";
 
 import { devEvalsRoot } from "./paths.ts";
 import { redactOrThrow } from "./redact.ts";
-import type { GradeResult, RunManifest } from "./types.ts";
+import type { CommandEvidence, GradeResult, RunManifest } from "./types.ts";
 
 export const writeScenarioReport = ({
   runDir,
   scenarioId,
   grade,
+  commands,
 }: {
   runDir: string;
   scenarioId: string;
   grade: GradeResult;
+  commands?: CommandEvidence[];
 }) => {
   const scenarioDir = path.join(runDir, "scenarios", scenarioId);
   mkdirSync(scenarioDir, { recursive: true });
-  const scorePath = path.join(scenarioDir, "score.json");
-  writeFileSync(scorePath, `${JSON.stringify(grade, null, 2)}\n`);
+  writeFileSync(
+    path.join(scenarioDir, "score.json"),
+    `${JSON.stringify(grade, null, 2)}\n`
+  );
+  if (commands)
+    writeFileSync(
+      path.join(scenarioDir, "commands.json"),
+      `${JSON.stringify({ commands }, null, 2)}\n`
+    );
 
   const qualityLine =
     grade.quality === null
-      ? "withheld (confidence low or unverified dimensions)"
+      ? "withheld (not official-eligible or gate failure)"
       : `${grade.quality}`;
 
   const md = `# Scenario ${scenarioId}
 
-Gate: **${grade.gate}**${grade.gateIds.length ? ` (${grade.gateIds.path.join(", ")})` : ""}
+Gate: **${grade.gate}**${grade.gateIds.length ? ` (${grade.gateIds.join(", ")})` : ""}
+
+Official eligible: **${grade.officialEligible ? "yes" : "no"}**
 
 Quality: ${qualityLine}
 
 Confidence: ${grade.confidence}
 
-Excluded dimensions: ${grade.excludedDimensions.path.join(", ") || "none"}
+Completeness: ${grade.completeness}
+
+Blockers: ${grade.blockers.join(", ") || "none"}
+
+Excluded dimensions: ${grade.excludedDimensions.join(", ") || "none"}
+
+Unverified dimensions: ${grade.unverifiedDimensions.join(", ") || "none"}
 `;
 
   writeFileSync(
@@ -66,15 +83,16 @@ export const writeRunSummary = ({
     `Run: ${manifest.runId}`,
     `Arm: ${manifest.arm}`,
     `Harness: ${manifest.harness}`,
+    `Protocol: ${manifest.protocol}`,
     `Completeness: ${manifest.completeness}`,
     "",
-    "| Scenario | Gate | Quality | Confidence |",
-    "| --- | --- | ---: | --- |",
+    "| Scenario | Gate | Official | Quality | Confidence |",
+    "| --- | --- | --- | ---: | --- |",
   ];
 
   for (const g of grades)
     lines.push(
-      `| ${g.scenarioId} | ${g.gate} | ${g.quality ?? "—"} | ${g.confidence} |`
+      `| ${g.scenarioId} | ${g.gate} | ${g.officialEligible ? "yes" : "no"} | ${g.quality ?? "—"} | ${g.confidence} |`
     );
 
   const failCount = grades.filter((g) => g.gate === "fail").length;
@@ -82,7 +100,7 @@ export const writeRunSummary = ({
 
   writeFileSync(
     path.join(runDir, "summary.md"),
-    redactOrThrow({ text: lines.path.join("\n") })
+    redactOrThrow({ text: lines.join("\n") })
   );
 };
 

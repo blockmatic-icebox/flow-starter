@@ -22,6 +22,7 @@
     "setup:deepsec": "pnpm --dir=.deepsec install --frozen-lockfile",
     "ci:local": "pnpm qa && pnpm flow:test && pnpm architecture:test && pnpm test:scripts && pnpm eval:genui:offline && pnpm test:browser && pnpm security:check && pnpm build",
     "eval:genui:offline": "pnpm --filter @repo/genui eval:offline",
+    "flow-eval:check": "pnpm --filter @repo/flow-eval check-types && pnpm --filter @repo/flow-eval test && pnpm --filter @repo/flow-eval eval preserve",
     "hooks:pre-commit": "pnpm security:block-files && pnpm security:secrets && node scripts/check-staged.mjs",
     "prepare": "simple-git-hooks",
     "qa": "pnpm flow:check && pnpm architecture:check && pnpm lint && pnpm knip && pnpm sherif && pnpm check-types && pnpm test && pnpm --filter @repo/db db:check",

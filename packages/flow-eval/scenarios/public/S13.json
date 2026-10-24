@@ -2,7 +2,7 @@
   "id": "S13",
   "title": "Tiny bug fix",
   "historicalId": "03-small-bug",
-  "openingPrompt": "The listings sort on the web app is wrong — low-to-high shows expensive items first. Please fix it.",
+  "openingPrompt": "The listings sort is wrong in `packages/genui/src/listings-sort.ts` — low-to-high shows expensive items first. Fix the bug and verify with `packages/genui/src/listings-sort.test.ts`.",
   "turnCap": 4,
   "requiresBuildAuth": false,
   "allowProductCode": true,

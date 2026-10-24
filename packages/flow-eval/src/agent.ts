@@ -1,13 +1,22 @@
-import { execSync, spawnSync } from "node:child_process";
-import { appendFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { redactOrThrow } from "./redact.ts";
-import type { EvalEvent } from "./types.ts";
+import {
+  isProtocolVerified,
+  parseStreamJsonLines,
+  terminationFromSpawn,
+  turnCompleteness,
+  mergeTurnResult,
+} from "./trace.ts";
+import type { AgentTurnResult, EvalEvent, ScenarioOracle } from "./types.ts";
 
 export const agentCliVersion = () => {
   try {
-    return execSync("agent --version", { encoding: "utf-8" }).trim();
+    return spawnSync("agent", ["--version"], {
+      encoding: "utf-8",
+    }).stdout.trim();
   } catch {
     return "unknown";
   }
@@ -42,6 +51,8 @@ export const runAgentTurn = ({
   rawLogPath,
   scenarioId,
   turn,
+  oracle,
+  startSeq,
 }: {
   workspace: string;
   modelId: string;
@@ -51,7 +62,24 @@ export const runAgentTurn = ({
   rawLogPath: string;
   scenarioId: string;
   turn: number;
-}) => {
+  oracle?: ScenarioOracle;
+  startSeq: number;
+}): AgentTurnResult => {
+  const cliVersion = agentCliVersion();
+  const protocolVerified = isProtocolVerified({ agentCliVersion: cliVersion });
+
+  const userSeq = startSeq + 1;
+  const userEvent: EvalEvent = {
+    id: `${scenarioId}-u${turn}`,
+    kind: "user",
+    origin: "observed",
+    scenarioId,
+    seq: userSeq,
+    text: prompt,
+    ts: new Date().toISOString(),
+    turn,
+  };
+
   const args = [
     "-p",
     "--output-format",
@@ -75,55 +103,46 @@ export const runAgentTurn = ({
 
   const raw = `${result.stdout}\n${result.stderr}`;
   const redacted = redactOrThrow({ text: raw });
-  mkdirSync(path.join(jsonlPath, ".."), { recursive: true });
+  mkdirSync(path.dirname(jsonlPath), { recursive: true });
   appendFileSync(rawLogPath, `${redacted}\n`);
 
-  const userEvent: EvalEvent = {
-    id: `${scenarioId}-u${turn}`,
-    kind: "user",
-    origin: "observed",
+  const parsed = parseStreamJsonLines({
+    raw: redacted,
     scenarioId,
-    text: prompt,
-    ts: new Date().toISOString(),
+    startSeq: userSeq,
     turn,
-  };
-  appendFileSync(jsonlPath, `${JSON.stringify(userEvent)}\n`);
+  });
 
-  let newSessionId = sessionId;
-  const toolCount = 0;
-  for (const line of redacted.split("\n")) {
-    if (!line.trim()) continue;
-    try {
-      const obj = JSON.parse(line) as Record<string, unknown>;
-      if (typeof obj.session_id === "string") newSessionId = obj.session_id;
-      if (obj.type === "tool_call" || obj.type === "tool_use") {
-        // counted in completeness elsewhere
-      }
-    } catch {
-      // non-json lines ok
-    }
-  }
+  const events = [userEvent, ...parsed.events];
+  const commandCount = events.filter((e) => e.kind === "command").length;
+  const termination = terminationFromSpawn({
+    error: result.error,
+    signal: result.signal,
+    status: result.status,
+  });
 
-  const assistantEvent: EvalEvent = {
-    id: `${scenarioId}-a${turn}`,
-    kind: "assistant",
-    origin: "observed",
-    scenarioId,
-    text: redacted.slice(0, 4000),
-    ts: new Date().toISOString(),
-    turn,
-  };
-  appendFileSync(jsonlPath, `${JSON.stringify(assistantEvent)}\n`);
+  const completeness = turnCompleteness({
+    commandCount,
+    expectsCommands: oracle?.expectsCommands ?? false,
+    expectsTools: oracle?.expectsTools ?? false,
+    sawMalformed: parsed.sawMalformed,
+    sawResultSuccess: parsed.sawResultSuccess,
+    termination,
+    toolCount: parsed.toolCount,
+  });
 
-  return {
-    completeness:
-      result.status === 0 && /tool_call|tool_use/gu.test(redacted)
-        ? "complete"
-        : "partial",
+  for (const e of events) appendFileSync(jsonlPath, `${JSON.stringify(e)}\n`);
+
+  return mergeTurnResult({
+    completeness,
+    events,
     exitCode: result.status ?? 1,
-    sessionId: newSessionId,
-    toolCount,
-  };
+    protocolVerified,
+    sessionId: parsed.sessionId ?? sessionId,
+    termination,
+    toolCount: parsed.toolCount,
+    usage: parsed.usage,
+  });
 };
 
 export const writeSessionMeta = ({
@@ -131,15 +150,22 @@ export const writeSessionMeta = ({
   scenarioId,
   sessionId,
   worktreePath,
+  prepBaseline,
 }: {
   runDir: string;
   scenarioId: string;
   sessionId?: string;
   worktreePath: string;
+  prepBaseline?: { commitSha: string; fingerprint: string };
 }) => {
   const dir = path.join(runDir, "scenarios", scenarioId);
   mkdirSync(dir, { recursive: true });
   writeFileSync(path.join(dir, "worktree-path.txt"), `${worktreePath}\n`);
   if (sessionId)
     writeFileSync(path.join(dir, "session-id.txt"), `${sessionId}\n`);
+  if (prepBaseline)
+    writeFileSync(
+      path.join(dir, "prep-baseline.json"),
+      `${JSON.stringify(prepBaseline, null, 2)}\n`
+    );
 };

@@ -1,7 +1,10 @@
-import { execSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
+  cpSync,
   existsSync,
   mkdirSync,
+  readFileSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -9,39 +12,44 @@ import {
 import path from "node:path";
 
 import { packageDirInRepo, repoRoot, worktreeRoot } from "./paths.ts";
-import type { EvalArm } from "./types.ts";
+import type { AgentDiffCapture, EvalArm, PrepBaselineMeta } from "./types.ts";
 
 const CONTROL_AGENTS = `# Control arm entrypoint
 
 Act as a senior TypeScript engineer. Follow repository conventions in ARCHITECTURE.md and existing code patterns. Do not invent product scope beyond the user request.
 `;
 
-export const setupWorktree = ({
-  runId,
-  scenarioId,
-  flowSha,
+export const runGit = ({
+  cwd,
+  args,
+  allowFailure,
+}: {
+  cwd: string;
+  args: string[];
+  allowFailure?: boolean;
+}) => {
+  const result = spawnSync("git", args, {
+    cwd,
+    encoding: "utf-8",
+    maxBuffer: 10 * 1024 * 1024,
+  });
+  const out = `${result.stdout ?? ""}${result.stderr ?? ""}`;
+  if (!allowFailure && result.status !== 0)
+    throw new Error(`git ${args.join(" ")} failed: ${out.slice(0, 500)}`);
+  return { stdout: result.stdout ?? "", status: result.status ?? 1 };
+};
+
+const rmDirIfExists = (target: string) => {
+  if (existsSync(target)) rmSync(target, { force: true, recursive: true });
+};
+
+export const applyArmMutations = ({
+  worktreePath,
   arm,
 }: {
-  runId: string;
-  scenarioId: string;
-  flowSha: string;
+  worktreePath: string;
   arm: EvalArm;
 }) => {
-  const worktreeName = `eval-${runId}-${scenarioId}`;
-  const worktreePath = path.join(worktreeRoot, worktreeName);
-  mkdirSync(worktreeRoot, { recursive: true });
-
-  if (existsSync(worktreePath))
-    execSync(`git worktree remove --force "${worktreePath}"`, {
-      cwd: repoRoot,
-      stdio: "inherit",
-    });
-
-  execSync(`git worktree add --detach "${worktreePath}" ${flowSha}`, {
-    cwd: repoRoot,
-    stdio: "inherit",
-  });
-
   const skillsTarget = path.join(repoRoot, ".agents/skills");
   const skillsLink = path.join(worktreePath, ".agents/skills");
   mkdirSync(path.join(worktreePath, ".agents"), { recursive: true });
@@ -53,25 +61,58 @@ export const setupWorktree = ({
 
   if (arm === "control") {
     writeFileSync(path.join(worktreePath, "AGENTS.md"), CONTROL_AGENTS);
-    rmSync(path.join(worktreePath, "docs/workflow/flow.md"), { force: true });
-    rmSync(path.join(worktreePath, "docs/agents/skills.md"), { force: true });
+    rmDirIfExists(path.join(worktreePath, "docs/workflow"));
+    rmDirIfExists(path.join(worktreePath, "docs/agents"));
+    rmDirIfExists(path.join(worktreePath, ".agents/skills"));
   }
 
-  if (arm === "flow-without-skills" && existsSync(skillsLink))
-    rmSync(skillsLink, { force: true, recursive: true });
+  if (arm === "flow-without-skills") rmDirIfExists(skillsLink);
 
   const evalPkg = path.join(worktreePath, packageDirInRepo);
-  if (existsSync(evalPkg)) rmSync(evalPkg, { force: true, recursive: true });
+  rmDirIfExists(evalPkg);
+};
+
+export const setupWorktree = ({
+  runId,
+  scenarioId,
+  flowSha,
+  arm,
+  skipInstall,
+}: {
+  runId: string;
+  scenarioId: string;
+  flowSha: string;
+  arm: EvalArm;
+  skipInstall?: boolean;
+}) => {
+  const worktreeName = `eval-${runId}-${scenarioId}`;
+  const worktreePath = path.join(worktreeRoot, worktreeName);
+  mkdirSync(worktreeRoot, { recursive: true });
+
+  if (existsSync(worktreePath))
+    runGit({
+      args: ["worktree", "remove", "--force", worktreePath],
+      cwd: repoRoot,
+    });
+
+  runGit({
+    args: ["worktree", "add", "--detach", worktreePath, flowSha],
+    cwd: repoRoot,
+  });
+
+  applyArmMutations({ arm, worktreePath });
 
   writeFileSync(
     path.join(worktreePath, ".eval-meta.json"),
     JSON.stringify({ arm, baselineSha: flowSha, runId, scenarioId }, null, 2)
   );
 
-  execSync("pnpm install --frozen-lockfile", {
-    cwd: worktreePath,
-    stdio: "inherit",
-  });
+  if (!skipInstall)
+    spawnSync("pnpm", ["install", "--frozen-lockfile"], {
+      cwd: worktreePath,
+      encoding: "utf-8",
+      stdio: "inherit",
+    });
 
   return { worktreeName, worktreePath };
 };
@@ -91,17 +132,137 @@ export const applyScenarioFixture = ({
     scenarioId
   );
   if (!existsSync(fixtureDir)) return;
-  execSync(`cp -R "${fixtureDir}/." "${worktreePath}/"`, { stdio: "inherit" });
+  cpSync(fixtureDir, worktreePath, { recursive: true });
 };
 
-export const captureDiff = ({ worktreePath }: { worktreePath: string }) => {
-  try {
-    return execSync("git diff HEAD", {
+export const finalizePrepBaseline = ({
+  worktreePath,
+}: {
+  worktreePath: string;
+}): PrepBaselineMeta => {
+  runGit({
+    args: ["config", "user.email", "flow-eval@local"],
+    cwd: worktreePath,
+  });
+  runGit({ args: ["config", "user.name", "flow-eval"], cwd: worktreePath });
+  runGit({ args: ["add", "-A"], cwd: worktreePath });
+  const commit = runGit({
+    allowFailure: true,
+    args: ["commit", "-m", "flow-eval prep baseline", "--no-verify"],
+    cwd: worktreePath,
+  });
+  if (commit.status !== 0)
+    runGit({
+      args: [
+        "commit",
+        "--allow-empty",
+        "-m",
+        "flow-eval prep baseline",
+        "--no-verify",
+      ],
       cwd: worktreePath,
-      encoding: "utf-8",
-      maxBuffer: 10 * 1024 * 1024,
     });
-  } catch {
-    return "";
-  }
+
+  const commitSha = runGit({
+    args: ["rev-parse", "HEAD"],
+    cwd: worktreePath,
+  }).stdout.trim();
+  const treeSha = runGit({
+    args: ["rev-parse", "HEAD^{tree}"],
+    cwd: worktreePath,
+  }).stdout.trim();
+  const fingerprint = createHash("sha256")
+    .update(`${commitSha}:${treeSha}`)
+    .digest("hex");
+
+  return {
+    commitSha,
+    fingerprint,
+    recordedAt: new Date().toISOString(),
+    treeSha,
+  };
 };
+
+const diffUntrackedFile = ({ cwd, file }: { cwd: string; file: string }) => {
+  const result = spawnSync("git", ["diff", "--no-index", "/dev/null", file], {
+    cwd,
+    encoding: "utf-8",
+    maxBuffer: 10 * 1024 * 1024,
+  });
+  return result.stdout ?? "";
+};
+
+export const captureAgentDiff = ({
+  worktreePath,
+  baselineSha,
+}: {
+  worktreePath: string;
+  baselineSha: string;
+}): AgentDiffCapture => {
+  const patch = runGit({
+    args: ["diff", "--find-renames", baselineSha],
+    cwd: worktreePath,
+  }).stdout;
+  const untracked = runGit({
+    args: ["ls-files", "--others", "--exclude-standard"],
+    cwd: worktreePath,
+  })
+    .stdout.trim()
+    .split("\n")
+    .filter(Boolean);
+  const untrackedPatches = untracked
+    .map((f) => diffUntrackedFile({ cwd: worktreePath, file: f }))
+    .join("");
+  const statusPorcelain = runGit({
+    args: ["status", "--porcelain"],
+    cwd: worktreePath,
+  }).stdout;
+  const commitsAfterBaseline = runGit({
+    allowFailure: true,
+    args: ["log", "--oneline", `${baselineSha}..HEAD`],
+    cwd: worktreePath,
+  }).stdout.trim();
+
+  return {
+    commitsAfterBaseline,
+    patch: `${patch}${untrackedPatches}`,
+    statusPorcelain,
+  };
+};
+
+/** @deprecated use captureAgentDiff */
+export const captureDiff = ({ worktreePath }: { worktreePath: string }) =>
+  captureAgentDiff({
+    baselineSha: runGit({
+      args: ["rev-parse", "HEAD"],
+      cwd: worktreePath,
+    }).stdout.trim(),
+    worktreePath,
+  }).patch;
+
+export const listControlResiduals = ({
+  worktreePath,
+}: {
+  worktreePath: string;
+}) => {
+  const residuals: string[] = [];
+  if (existsSync(path.join(worktreePath, "docs/workflow")))
+    residuals.push("docs/workflow still present");
+  if (existsSync(path.join(worktreePath, "docs/agents")))
+    residuals.push("docs/agents still present");
+  const agentsPath = path.join(worktreePath, "AGENTS.md");
+  if (existsSync(agentsPath)) {
+    const agents = readFileSync(agentsPath, "utf-8");
+    if (/Explore → Specify/u.test(agents))
+      residuals.push("AGENTS.md still references Explore → Specify");
+  }
+  if (existsSync(path.join(worktreePath, ".agents/skills")))
+    residuals.push(".agents/skills still present");
+  if (existsSync(path.join(worktreePath, packageDirInRepo)))
+    residuals.push("packages/flow-eval still present");
+  return residuals;
+};
+
+export const acceptedControlResiduals = () => [
+  "skills-lock.json remains in repo",
+];

@@ -13,6 +13,28 @@ export type HarnessKind =
 
 export type Completeness = "complete" | "partial" | "blocked";
 
+export type TurnTermination =
+  | "completed"
+  | "timeout"
+  | "truncated"
+  | "exited"
+  | "malformed";
+
+export type EventPhase =
+  | "started"
+  | "completed"
+  | "attempted"
+  | "succeeded"
+  | "failed"
+  | "mentioned";
+
+export interface TokenUsage {
+  inputTokens?: number;
+  outputTokens?: number;
+  cacheReadTokens?: number;
+  cacheWriteTokens?: number;
+}
+
 export interface RunManifest {
   runId: string;
   flowSha: string;
@@ -24,8 +46,17 @@ export interface RunManifest {
   catalogHash: string;
   harness: HarnessKind;
   completeness: Completeness;
+  rubricVersion: string;
+  protocol: string;
+  sourceSha: string;
+  sandboxEnabled: boolean;
+  trustEnabled: boolean;
+  scenarioIds: string[];
+  repetition?: number;
+  usage?: TokenUsage;
   hypothesis?: string;
   controlResiduals?: string[];
+  acceptedControlResiduals?: string[];
 }
 
 export type EvalEventKind =
@@ -35,10 +66,13 @@ export type EvalEventKind =
   | "command"
   | "approval"
   | "diff"
+  | "system"
+  | "result"
   | "missing";
 
 export interface EvalEvent {
   id: string;
+  seq: number;
   ts: string;
   origin: Origin;
   kind: EvalEventKind;
@@ -48,6 +82,13 @@ export interface EvalEvent {
   path?: string;
   exitCode?: number;
   text?: string;
+  callId?: string;
+  command?: string;
+  phase?: EventPhase;
+  args?: Record<string, unknown>;
+  result?: Record<string, unknown>;
+  rawType?: string;
+  rawSubtype?: string;
 }
 
 export type GateId =
@@ -80,9 +121,13 @@ export interface GradeResult {
   scenarioId: string;
   gate: "pass" | "fail";
   gateIds: GateId[];
+  officialEligible: boolean;
   quality: number | null;
   confidence: "high" | "medium" | "low";
+  completeness: Completeness;
   excludedDimensions: string[];
+  unverifiedDimensions: DimensionId[];
+  blockers: string[];
   scores: DimensionScore[];
 }
 
@@ -112,13 +157,63 @@ export interface HiddenScenarioSpec {
   injections?: { id: string; afterTurn: number; userMessage: string }[];
 }
 
+export interface ScenarioOracle {
+  scenarioId: string;
+  expectsTools?: boolean;
+  expectsCommands?: boolean;
+  requiredDiffPatterns?: string[];
+  forbiddenDiffPatterns?: string[];
+  requiredPaths?: string[];
+  decisionForbiddenPatterns?: string[];
+  nonGoalPatterns?: string[];
+  requiresPassingTestCommand?: boolean;
+  allowsProductCode?: boolean;
+}
+
+export interface CommandEvidence {
+  id: string;
+  command: string;
+  exitCode: number;
+  output?: string;
+  eventId: string;
+  phase: "succeeded" | "failed";
+}
+
 export interface ScenarioGradeInput {
   scenarioId: string;
   card: PublicScenarioCard;
   hidden?: HiddenScenarioSpec;
+  oracle?: ScenarioOracle;
   diff: string;
   events: EvalEvent[];
-  commands: { command: string; exitCode: number; output?: string }[];
+  commands: CommandEvidence[];
   completeness: Completeness;
   assistantClaims?: string[];
+  harness: HarnessKind;
+  protocolVerified: boolean;
+  buildAuthorized: boolean;
+}
+
+export interface AgentTurnResult {
+  exitCode: number;
+  termination: TurnTermination;
+  sessionId?: string;
+  toolCount: number;
+  completeness: Completeness;
+  events: EvalEvent[];
+  protocolVerified: boolean;
+  usage?: TokenUsage;
+}
+
+export interface PrepBaselineMeta {
+  commitSha: string;
+  treeSha: string;
+  fingerprint: string;
+  recordedAt: string;
+}
+
+export interface AgentDiffCapture {
+  patch: string;
+  statusPorcelain: string;
+  commitsAfterBaseline: string;
 }

@@ -19,6 +19,8 @@ export const catalogRoot = path.join(devEvalsRoot, "catalog");
 
 export const publicScenariosDir = path.join(packageRoot, "scenarios", "public");
 
+export const oraclesDir = path.join(packageRoot, "scenarios", "oracles");
+
 export const baselinesDir = path.join(packageRoot, "baselines");
 
 export const worktreeRoot = path.join(

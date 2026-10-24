@@ -1,0 +1,7 @@
+{
+  "scenarioId": "S01",
+  "expectsTools": false,
+  "expectsCommands": false,
+  "forbiddenDiffPatterns": ["^diff --git a/apps/"],
+  "allowsProductCode": false
+}
