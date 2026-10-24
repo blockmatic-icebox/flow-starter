@@ -1,6 +1,6 @@
 # Domain documentation
 
-This repository uses one primary domain context. [AGENTS.md](../../AGENTS.md) is the universal agent router; [docs/workflow/flow.md](../../docs/workflow/flow.md) owns documentation conventions and lifecycle.
+This repository uses one primary domain context. [AGENTS.md](../../AGENTS.md) is the universal agent router; [docs/workflow/flow.md](../workflow/flow.md) owns documentation conventions and lifecycle. UI verification: [verify.md](verify.md).
 
 ## When to read the glossary
 
