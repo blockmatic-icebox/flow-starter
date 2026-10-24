@@ -237,6 +237,11 @@ export const integrateTask = ({ repoRoot, slug, state, task }) => {
       cwd: integrationCwd,
     });
     if (mergeResult.status !== 0) {
+      runGit({
+        allowFailure: true,
+        args: ["merge", "--abort"],
+        cwd: integrationCwd,
+      });
       setTaskStatus(state, task.id, "blocked", {
         blockedReason: "merge conflict",
       });
@@ -244,6 +249,11 @@ export const integrateTask = ({ repoRoot, slug, state, task }) => {
     }
 
     if (!integrationMergeClean({ integrationCwd })) {
+      runGit({
+        allowFailure: true,
+        args: ["merge", "--abort"],
+        cwd: integrationCwd,
+      });
       setTaskStatus(state, task.id, "blocked", {
         blockedReason: "merge conflict markers present",
       });

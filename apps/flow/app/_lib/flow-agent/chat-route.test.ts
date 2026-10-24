@@ -44,7 +44,7 @@ describe("chat route", () => {
     });
     assert.equal(response.status, 200);
     const body = await response.text();
-    assert.match(body, /Flow Starter/u);
+    assert.match(body, /Flow Factory/u);
     assert.equal(body.includes("reasoning"), false);
   });
 
@@ -90,7 +90,7 @@ describe("chat route", () => {
               parts: [
                 {
                   input: {},
-                  output: { text: "Flow Starter" },
+                  output: { text: "Flow Factory" },
                   state: "output-available",
                   toolCallId: "call-1",
                   type: "tool-describe_architecture",

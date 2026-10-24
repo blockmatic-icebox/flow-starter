@@ -120,7 +120,7 @@ describe("consultant MCP protocol", () => {
     }>(response);
     assert.equal(body.error, undefined);
     assert.equal(body.result?.content[0]?.type, "text");
-    assert.match(body.result?.content[0]?.text ?? "", /Flow Starter/u);
+    assert.match(body.result?.content[0]?.text ?? "", /Flow Factory/u);
   });
 
   it("tools/call rejects unknown tools", async () => {

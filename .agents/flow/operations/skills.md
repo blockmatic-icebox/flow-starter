@@ -6,6 +6,8 @@ Do not load the full catalog. Skills for technologies that are not implemented h
 
 **Flow** chooses the activity. **Skills** provide methods. **Subagents** provide isolated execution. Choose delegation separately from skill selection ([delegation.md](delegation.md)).
 
+`flow-improve` and `flow-eval` load only when the user explicitly invokes that work. Ordinary product features, bugs, and refactors do not load them.
+
 ## Phase-aware selection
 
 Select skills using the actual task and uncertainty, not keyword matching alone.

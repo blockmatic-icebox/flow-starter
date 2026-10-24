@@ -70,7 +70,7 @@ export const FlowAgentPanel = () => {
       <header className="border-b px-4 py-3">
         <h2 className="text-sm font-medium">Flow Agent</h2>
         <p className="text-muted-foreground text-xs">
-          Flow methodology and Flow Starter architecture. Voice uses your
+          Flow methodology and Flow Factory architecture. Voice uses your
           browser microphone.
         </p>
       </header>

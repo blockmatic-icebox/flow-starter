@@ -4,7 +4,7 @@ Flow is a lightweight way to build software with people and coding agents togeth
 
 ## Who it is for
 
-Flow is written for **solo founders and small technical teams** who want useful products, not just more code. You can use Flow with any stack; in this repository it ships alongside [Flow Starter](../../docs/readme.md), which already chose Next.js, React, TypeScript, and related foundations ([PDR 0001](../../docs/pdr/0001-agnostic-api-first.md)).
+Flow is written for **solo founders and small technical teams** who want useful products, not just more code. You can use Flow with any stack; in this repository it ships inside [Flow Factory](../../docs/readme.md), which provides an opinionated foundation (Next.js, React, TypeScript, and related tools—see [PDR 0001](../../docs/pdr/0001-agnostic-api-first.md)).
 
 ## Why Flow exists
 
@@ -19,15 +19,25 @@ Flow helps you:
 
 Flow does **not** guarantee faster delivery, quality, autonomous shipping, or product–market fit. Repository instructions encourage good behavior; they cannot force every model or tool to comply ([flow.md](flow.md)).
 
-## Flow versus Flow Starter
+## Flow versus Flow Factory
 
-|  | Flow | Flow Starter |
+|  | Flow | Flow Factory |
 | --- | --- | --- |
-| What it is | Methodology and document conventions | Opinionated technical starter |
-| You define | Your product in `PRODUCT.md` and `DESIGN.md` | Which app you build on (`apps/web`, etc.) |
-| Authority for workflow | [flow.md](flow.md) | Same; starter docs explain adoption |
+| What it is | Methodology and document conventions | Agentic product-development environment |
+| You define | Your product in `PRODUCT.md` and `DESIGN.md` | Which application you build (`apps/web`, etc.) |
+| Authority for workflow | [flow.md](flow.md) | Same; [docs/readme.md](../../docs/readme.md) explains the foundation |
 
-The `apps/flow` demo application is not the methodology; it demonstrates GenUI and a read-only Flow Agent ([ADR 0012](../../docs/adr/0012-flow-and-web-applications.md)).
+The **Flow app** (`apps/flow`) is not the methodology; it demonstrates GenUI and a read-only Flow Agent ([ADR 0012](../../docs/adr/0012-flow-and-web-applications.md)).
+
+## Kinds of work
+
+Flow uses one lifecycle for three everyday situations ([flow.md](flow.md#kinds-of-work)):
+
+- **New product** — discovery, decisions, and a first useful slice.
+- **Existing product** — features, fixes, and maintenance with proportional ceremony.
+- **Flow improvement** — methodology and skills, via user-invoked `flow-improve`, not a second lifecycle.
+
+Parallel execution, evaluation, and improvement are documented under [operations/](operations/); procedures live there and in [flow.md](flow.md), not in this introduction.
 
 ## Reading path
 

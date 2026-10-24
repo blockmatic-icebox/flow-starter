@@ -10,11 +10,13 @@ Improve Flow from evidence gathered while building Flow Starter, without blockin
 
 **Recommended stop:** L1. L0 (observe + report) is the first implementation ship.
 
+Loop B (L0 observer) is **not built**; Flow Factory alignment does not authorize implementing hooks or auto-observation in this batch.
+
 ## Related work
 
 - Manual eval and remediation loop: [flow-improvement-loop.md](flow-improvement-loop.md)
 - Harness and scenarios: [flow-evaluation-suite.md](flow-evaluation-suite.md)
-- Operating summary: [learning-and-improvement.md](../guides/improvement.md)
+- Operating summary: [improvement.md](../guides/improvement.md)
 - Autonomy levels and L2 gate: [ADR 0013](../decisions/adr/0013-flow-improvement-autonomy.md) (**Proposed**)
 
 ## Assumptions

@@ -1,6 +1,12 @@
 # Learning and improvement
 
-Two questions often get conflated: **Did the change work technically?** and **Did it help the product?** Flow keeps them separate.
+Three questions are easy to conflate at **Ship**:
+
+1. **Did the change work technically?** (acceptance, tests, security)
+2. **Did it help the product?** (user or business outcome)
+3. **Did the workflow itself create recurring friction?** (methodology, not the feature)
+
+Flow keeps them separate. Only the third belongs in a later user-invoked `flow-improve` pass—not during ordinary delivery.
 
 ## Customer learning versus technical correctness
 

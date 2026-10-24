@@ -1,0 +1,12 @@
+{
+  "id": "S18",
+  "title": "Flow improvement — proportional bug fix routed through discovery",
+  "openingPrompt": "Every one-line bug fix in this repo gets a full Explore interview. Improve Flow so proportional fixes can go Build → Review → Ship. Do not rediscover the product; propose a minimal change to Flow instructions or skill routing. Do not edit packages/flow-eval or product application code.",
+  "turnCap": 6,
+  "requiresBuildAuth": true,
+  "allowProductCode": false,
+  "allowStandalonePlan": false,
+  "relevantStages": ["Explore", "Specify", "Plan"],
+  "codeExecution": false,
+  "browserVerification": false
+}

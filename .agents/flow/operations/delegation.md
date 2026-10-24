@@ -17,6 +17,8 @@ Stages, approvals, and document ownership: [flow.md](../flow.md). Parallel git w
 
 Default to considering delegation for substantial work. Use fewer workers when parallelism has little value. There is no fixed global agent count.
 
+**Independence check:** Split work only when acceptance criteria, `writes` paths, and execution order are separable and parallel overhead is likely smaller than the benefit. Otherwise stay solo. Work kind (new product, existing product, Flow improvement) does not by itself require parallel workers.
+
 ## Decision heuristic
 
 Weigh qualitatively (no scores or duration estimates):

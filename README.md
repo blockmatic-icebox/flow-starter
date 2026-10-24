@@ -58,7 +58,7 @@ pnpm setup:portless
 
 ## Architecture
 
-This application uses the opinionated [Flow Starter](docs/readme.md) foundation.
+This application uses the opinionated [Flow Factory](docs/readme.md) foundation.
 
 The inherited technical architecture includes:
 
@@ -85,7 +85,7 @@ Review the relevant architectural decisions before making consequential changes 
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Technical architecture and boundaries |
 | [AGENTS.md](AGENTS.md) | Entry point for coding agents |
 | [Flow for humans](.agents/flow/README.md) | Introduction to the development methodology |
-| [Flow Starter foundation](docs/readme.md) | Inherited architecture, tools and adoption guidance |
+| [Flow Factory foundation](docs/readme.md) | Inherited architecture, tools and adoption guidance |
 
 ## Configuration
 
@@ -95,7 +95,7 @@ Create local environment configuration only when required.
 
 Never commit credentials or secrets.
 
-For inherited examples and optional integrations, see the [Flow Starter foundation guide](docs/readme.md).
+For inherited examples and optional integrations, see the [Flow Factory foundation guide](docs/readme.md).
 
 ## Adopting this template
 

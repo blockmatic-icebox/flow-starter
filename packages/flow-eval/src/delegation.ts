@@ -36,6 +36,7 @@ export interface DelegationSignals {
   needsFunctionalReview?: boolean;
   needsUiReview?: boolean;
   waveGraph?: { taskCount: number; maxConcurrent: number };
+  methodologyChange?: boolean;
 }
 
 export interface DelegationResult {
@@ -119,6 +120,17 @@ const parallelResearchers = ({
     humanGate: false,
     allowBuild: false,
   };
+};
+
+const matchMethodologyImprovement = (
+  signals: DelegationSignals
+): DelegationResult | undefined => {
+  if (!signals.methodologyChange) return undefined;
+  return soloResult({
+    signals,
+    skills: ["writing-for-agents"],
+    allowBuild: false,
+  });
 };
 
 const matchBlocked = (
@@ -300,6 +312,7 @@ const matchReviewPlan = (
 
 const deriveCore = (signals: DelegationSignals): DelegationResult =>
   matchBlocked(signals) ??
+  matchMethodologyImprovement(signals) ??
   matchSecurity(signals) ??
   matchSpecifyExplore(signals) ??
   matchBuild(signals) ??

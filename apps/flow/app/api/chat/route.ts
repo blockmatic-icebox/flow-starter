@@ -18,7 +18,7 @@ const DEFAULT_MODEL = "anthropic/claude-sonnet-4";
 const CHAT_MAX_BODY_BYTES = 128 * 1024;
 const MAX_OUTPUT_TOKENS = 800;
 
-const system = `You are the Flow Agent — assistant for Flow methodology and Flow Starter architecture.
+const system = `You are the Flow Agent — assistant for Flow methodology and Flow Factory architecture.
 Use the describe_* and knowledge tools for factual answers grounded in bundled repository docs.
 Use focus_genui when the user wants the main Generative UI panel on the homepage.
 Use toggle_theme when the user wants to change light or dark mode.

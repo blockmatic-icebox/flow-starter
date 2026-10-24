@@ -10,7 +10,7 @@ import { FlowShell } from "@/app/_components/flow-shell";
 
 export const metadata: Metadata = {
   description:
-    "Flow — methodology, Flow Starter architecture, and Generative UI.",
+    "Flow — methodology, Flow Factory architecture, and Generative UI.",
   title: "Flow",
 };
 

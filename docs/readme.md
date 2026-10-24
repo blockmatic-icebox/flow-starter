@@ -1,20 +1,20 @@
-# Flow Starter
+# Flow Factory
 
-An opinionated foundation for building agentic products with Next.js, React and TypeScript.
+An agentic product-development environment: [Flow](../.agents/flow/README.md) methodology and Agent Skills, an opinionated reusable application foundation, isolated parallel execution (`pnpm worktrees`), product and technical documentation, evaluation harnesses, and user-invoked workflow improvement—not a permanently running reflection agent.
 
 ## Mission
 
 **Make the architectural decisions once, so developers and agents can focus on building the product.**
 
-Flow Starter provides a selected technical architecture, reusable capabilities, agent-oriented development tools, documentation conventions, and the [Flow](../.agents/flow/README.md) engineering workflow.
+Flow Factory provides a selected technical architecture, reusable capabilities, agent-oriented development tools, documentation conventions, and the Flow engineering workflow.
 
-It is technology-opinionated and business-domain-agnostic: adopters inherit the stack and define their own product, users, domain, and experience.
+It is technology-opinionated and business-domain-agnostic: adopters inherit optional foundation capabilities and define their own product, users, domain, and experience. GenUI, MCP, authentication, and database features are available when a product needs them—not requirements for every new application.
 
 ## Goals
 
 Accelerate delivery, build agent-first capabilities with host-enforced boundaries, keep a cohesive Vercel-aligned stack, maintain [Fractal React Architecture](adr/0009-react-nextjs-fractal-architecture.md), document for agents with progressive disclosure, support [controlled GenUI](adr/0003-genui-openui-foundation.md), improve the agentic developer experience, enable reliable delivery workflows, and remain reusable across products. Rationale and trade-offs: [ADR 0001](adr/0001-agentic-architecture.md).
 
-## What the starter provides
+## What the factory provides
 
 | Area | Foundation |
 | --- | --- |
@@ -51,7 +51,7 @@ Eve, Better Auth runtime, product tables and tenant isolation, shared authorized
 - [Human introduction](../.agents/flow/README.md)
 - [Operational contract](../.agents/flow/flow.md) — documentation ownership, naming, and workflow behavior
 
-Flow defines how work is organized. Flow Starter provides the selected technical architecture.
+Flow defines how work is organized. Flow Factory provides the selected technical architecture and tooling.
 
 ### Decision narrative
 
@@ -98,7 +98,7 @@ Full ADR index: [docs/adr/](adr/).
 
 Do not read every ADR or research file by default.
 
-## Adopting Flow Starter
+## Adopting Flow Factory
 
 Bootstrap from `main`:
 

@@ -2,6 +2,8 @@ Act as a senior software engineer, software architect, and agentic systems exper
 
 The checkout is a starter baseline. Root contracts describe intended direction. Code shows what runs today.
 
+This repository is **Flow Factory**—an agentic product-development environment. **Flow** is the methodology and first-party skills that organize work inside it.
+
 ## Flow
 
 For repository work other than setup-only install, env, or tooling, read and apply [.agents/skills/flow/SKILL.md](.agents/skills/flow/SKILL.md) before acting. The operational contract is [.agents/flow/flow.md](.agents/flow/flow.md).

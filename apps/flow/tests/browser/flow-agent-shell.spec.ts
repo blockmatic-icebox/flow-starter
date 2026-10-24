@@ -13,9 +13,9 @@ test("Flow Agent answers without credentials", async ({ page }) => {
   await page.goto("/");
   const composer = page.getByPlaceholder("Message Flow Agent…");
   await composer.click();
-  await page.keyboard.type("How is Flow Starter built?");
+  await page.keyboard.type("How is Flow Factory built?");
   await page.keyboard.press("Enter");
-  await expect(page.getByText(/Flow Starter/iu).first()).toBeVisible();
+  await expect(page.getByText(/Flow Factory/iu).first()).toBeVisible();
 });
 
 test("Flow Agent is reachable on a narrow viewport", async ({ page }) => {

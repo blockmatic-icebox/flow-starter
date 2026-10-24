@@ -6,7 +6,7 @@ Version: 0.1
 
 Flow is a lightweight product engineering workflow for humans and coding agents. It connects exploration, product decisions, design, engineering, review, shipping, and learning without requiring a separate project management system.
 
-This file defines workflow conventions for any project created from this starter. It does not describe the product being built.
+This file defines workflow conventions for any product using Flow. It does not describe the product being built. In this repository, Flow ships inside **Flow Factory** ([docs/readme.md](../../docs/readme.md)); stack-specific rules also appear in [AGENTS.md](../../AGENTS.md).
 
 ## Operating model
 
@@ -17,6 +17,22 @@ These are activities, not mandatory checkpoints for every change. Start at the a
 Use the least process necessary to learn or deliver something valuable.
 
 A small, well-understood bug fix may go directly to Build → Review → Ship. A new product direction may require exploration and several rounds of specification before implementation.
+
+## Kinds of work
+
+Classify the task before choosing ceremony. All kinds use the same lifecycle activities; they differ in how much discovery and documentation apply.
+
+### New product
+
+Starting from an idea, customer problem, or existing brief: understand the problem and users, establish direction and meaningful requirements, make design and architectural decisions, plan a small useful slice, implement and verify, deliver, and capture product outcome evidence when available. Use existing templates and document conventions. Do not invent customer requirements or force every initiative through every stage. Substantial briefs still begin in Explore; **Build** still requires explicit implementation authorization.
+
+### Existing product
+
+For an application already in this repository: implement features, fix bugs, refactor safely, improve performance, maintain architecture, integrate services, review, and ship. Choose the smallest relevant activity. A straightforward bug fix does not trigger a full product-discovery process.
+
+### Flow improvement
+
+Improvements to Flow skills, orchestration, evaluation, or methodology documentation are ordinary Flow work with subject matter Flow itself. Use the user-invoked `flow-improve` skill; do not open a second self-improvement lifecycle. Experiments run in isolated worktrees and integrate under existing authorization. Product work does not pause for methodology improvement unless the human prioritizes it.
 
 ## Natural-language initiation and human approval
 
@@ -120,7 +136,7 @@ If a skill prescribes an output path or naming pattern that conflicts with Flow,
 
 If a skill's mandatory workflow cannot be performed in the available environment, explain the limitation and use an applicable installed alternative. Never claim that a skill was executed when it was not.
 
-Never silently reverse an established project decision. Surface the conflict and seek authorization before changing that decision. For example, "Replace Postgres with MongoDB and update everything" conflicts with accepted [ADR 0001](../../docs/adr/0001-agentic-architecture.md); it is not **Build** authorization and does not permit rewriting `packages/db` or accepted ADRs in that turn.
+Never silently reverse an established project decision. Surface the conflict and seek authorization before changing that decision. A request that conflicts with an accepted ADR or PDR is not **Build** authorization and does not permit rewriting accepted decision records or their implementing boundaries in that turn. See [AGENTS.md](../../AGENTS.md) for stack-specific examples in this repository.
 
 ## The workflow
 
@@ -255,6 +271,14 @@ Independent verification when warranted: [delegation.md](operations/delegation.m
 - Update accepted project contracts when decisions or intended behavior changed.
 - Capture product outcome evidence when available; otherwise state what remains unknown.
 
+When the task warrants it, answer three separate questions without adding a new lifecycle stage:
+
+1. **Technical acceptance** — Did the change meet acceptance criteria and reported checks?
+2. **Product outcome** — Did it achieve the intended user or business outcome, or is that still unknown?
+3. **Workflow friction** — Did the development process itself suggest a recurring methodology issue worth a later user-invoked `flow-improve` pass? Record the observation; do not expand scope into self-improvement during ordinary product delivery.
+
+New product or market evidence may send work back to Explore; that is continuation within the lifecycle, not a seventh stage.
+
 Do not declare something shipped merely because code was written. Publishing to a remote, opening a pull request, and deploying require the appropriate user authorization and environment. Integrating verified work into local `main` during authorized **Build** is not publication.
 
 Parallel readiness checks and honest release boundaries: [delegation.md](operations/delegation.md#ship).
@@ -263,13 +287,13 @@ Parallel readiness checks and honest release boundaries: [delegation.md](operati
 
 Use one authoritative home for each fact. Link related documents instead of copying their contents.
 
-Flow Starter's mission, goals and inherited foundation are explained in docs/readme.md. The root README.md is an adopter-owned product template. Flow methodology and documentation conventions belong in .agents/flow/flow.md, with a human introduction in .agents/flow/README.md. Additional pages linked from that introduction (for example `working-with-flow.md`, `principles.md`, `influences-and-alternatives.md`, `project-context.md`, and `learning-and-improvement.md`) explain the methodology for people; they do not change the rules in this file. Current architecture belongs in ARCHITECTURE.md; durable architectural rationale belongs in ADRs. Use existing initiatives, plans and specifications only when justified by the work.
+Flow Factory's mission, goals, and inherited foundation are explained in docs/readme.md. The root README.md is an adopter-owned product template. Flow methodology and documentation conventions belong in .agents/flow/flow.md, with a human introduction in .agents/flow/README.md. Additional pages linked from that introduction (for example `working-with-flow.md`, `principles.md`, `influences.md`, `project-context.md`, and `improvement.md`) explain the methodology for people; they do not change the rules in this file. Current architecture belongs in ARCHITECTURE.md; durable architectural rationale belongs in ADRs. Use existing initiatives, plans and specifications only when justified by the work.
 
 | Location | Responsibility |
 | --- | --- |
 | `AGENTS.md` | Lightweight agent entrypoint and task-specific document routing |
 | `README.md` | Adopter-owned product README template, including essential setup and documentation links |
-| `docs/readme.md` | Human-facing introduction to the inherited Flow Starter foundation, its goals, capabilities and documentation navigation |
+| `docs/readme.md` | Human-facing introduction to Flow Factory, its goals, capabilities and documentation navigation |
 | `.agents/flow/flow.md` | Workflow, skill orchestration, document conventions, and lifecycle |
 | `.agents/flow/README.md` | Human-facing introduction to the Flow methodology |
 | `PRODUCT.md` | Current product vision, audience, business context, scope, outcomes, and capabilities |
@@ -406,7 +430,7 @@ The workflow is a repository convention, not a self-executing runtime.
 
 Agent instructions encourage compliant behavior; they cannot guarantee that every tool or model obeys the convention.
 
-The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, research/specification metadata, required entry documents, relative links, selected semantic consistency rules (obsolete paths, MCP tool counts, stale Flow Agent knowledge snapshot), and reproducibility of the bundled knowledge snapshot. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. Delegation behavior is tested separately by `@repo/flow-eval` policy scenarios (`D01`–`D15`). These checks do not verify human approval, product outcomes, skill invocation, or live subagent execution.
+The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, research/specification metadata, required entry documents, relative links, selected semantic consistency rules (obsolete paths, MCP tool counts, stale Flow Agent knowledge snapshot), and reproducibility of the bundled knowledge snapshot. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. Delegation behavior is tested separately by `@repo/flow-eval` policy scenarios (`D01`–`D18`). These checks do not verify human approval, product outcomes, skill invocation, or live subagent execution.
 
 Regenerating `apps/flow/app/_lib/flow-agent/knowledge-snapshot.ts` after a documentation edit (via `apps/flow/scripts/bundle-knowledge.mjs` or `flow:check`) is contract maintenance, not product implementation.
 

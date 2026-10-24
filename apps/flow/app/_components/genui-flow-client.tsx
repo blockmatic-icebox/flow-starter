@@ -91,7 +91,7 @@ export const GenuiFlowClient = () => {
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold">Flow</h1>
         <p className="text-muted-foreground text-sm">
-          Ask about Flow methodology and Flow Starter — answers render as
+          Ask about Flow methodology and Flow Factory — answers render as
           validated Generative UI compositions.
         </p>
       </header>

@@ -3,6 +3,7 @@ import {
   existsSync,
   mkdtempSync,
   mkdirSync,
+  readFileSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -331,6 +332,25 @@ test("ignores links inside fenced code", (t) => {
 `,
   });
   assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("flow-improve and flow-eval disable model invocation; flow does not", () => {
+  const root = path.resolve(import.meta.dirname, "..");
+  const flow = readFileSync(
+    path.join(root, ".agents/skills/flow/SKILL.md"),
+    "utf-8"
+  );
+  const improve = readFileSync(
+    path.join(root, ".agents/skills/flow-improve/SKILL.md"),
+    "utf-8"
+  );
+  const evalSkill = readFileSync(
+    path.join(root, ".agents/skills/flow-eval/SKILL.md"),
+    "utf-8"
+  );
+  assert.match(improve, /^disable-model-invocation:\s*true/mu);
+  assert.match(evalSkill, /^disable-model-invocation:\s*true/mu);
+  assert.doesNotMatch(flow, /^disable-model-invocation:/mu);
 });
 
 test("flags obsolete apps/web security paths in authoritative docs", (t) => {

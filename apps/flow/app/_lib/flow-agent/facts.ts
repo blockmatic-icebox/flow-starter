@@ -3,7 +3,7 @@ export const flowStarterFacts = {
     flow: "apps/flow (package flow-app): Flow methodology experience — Generative UI at /, Flow Agent sidebar, fixture lab, MCP and compose APIs.",
     web: "apps/web: product-neutral Next.js starter — minimal homepage, shared UI, optional database; no Flow Agent or GenUI demo.",
   },
-  name: "Flow Starter",
+  name: "Flow Factory",
   planned: [
     "Full Better Auth runtime (OAuth, sessions, protected routes) — schema groundwork only today",
     "eve agent runtime with defineTool adapters to shared actions",

@@ -14,7 +14,9 @@ Exact checkpoints: [flow.md](../flow.md).
 
 ## Three everyday scenarios
 
-### 1. Known bug (bounded fix)
+These map to **existing product** and **new product** work kinds in [flow.md](../flow.md#kinds-of-work).
+
+### 1. Known bug (bounded fix) — existing product
 
 **You:** “The invoice list sorts dates as text. Please fix it.”
 
@@ -24,7 +26,7 @@ Exact checkpoints: [flow.md](../flow.md).
 
 **Progress:** Correct sort behavior and an honest report of which commands ran. That is completion for this kind of task.
 
-### 2. Uncertain feature (learning before scale)
+### 2. Uncertain feature (learning before scale) — new product
 
 **You:** “Let’s add team comments.”
 
@@ -34,13 +36,21 @@ Exact checkpoints: [flow.md](../flow.md).
 
 **Progress:** Success is not only merged code. It can be a decision to test an assumption, narrow scope, or stop. Shipping comments without evidence they matter is not automatic success.
 
-### 3. Fresh session (resume)
+### 3. Fresh session (resume) — existing product
 
 **You:** “Continue the comments initiative.”
 
 **Collaboration:** The agent reads the initiative and accepted contracts (`PRODUCT.md`, relevant ADRs/PDRs), states the current stage, what is already approved, open questions, and the **next authorization** you must give. It should not re-ask settled decisions.
 
 **Progress:** Clear continuity and the next explicit action—not replaying earlier exploration.
+
+### 4. Workflow friction — Flow improvement
+
+**You:** “Every one-line bug fix gets a discovery interview. Fix Flow so proportional fixes skip Explore.”
+
+**Collaboration:** This is **Flow improvement**, not product discovery. Ask the agent to improve Flow (or load `flow-improve`). It should diagnose routing or instructions, propose a minimal doc change, and validate in an isolated worktree—not re-interview you about the product bug.
+
+**Progress:** A scoped methodology change with evidence, or an explicit decision that no instruction change is warranted.
 
 ## Activities you revisit
 

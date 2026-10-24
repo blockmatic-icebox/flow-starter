@@ -28,7 +28,7 @@ export type FlowAgentReadOnlyToolName =
 export const flowAgentToolDefinitions = {
   describe_architecture: {
     description:
-      "How Flow Starter is structured, what is implemented versus planned, and how apps/web differs from apps/flow.",
+      "How Flow Factory is structured, what is implemented versus planned, and how apps/web differs from apps/flow.",
     execute: () => ({ text: describeArchitecture() }),
     inputSchema: z.object({}),
   },

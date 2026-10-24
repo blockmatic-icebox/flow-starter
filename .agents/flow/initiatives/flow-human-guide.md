@@ -4,6 +4,8 @@ Date: 2026-10-24
 
 **Status:** In progress
 
+Published human guides use `influences.md` and `improvement.md` (not the draft filenames listed in scope below).
+
 ## Outcome
 
 Publish a concise human-facing guide under `.agents/flow/guides/` so solo founders and small technical teams can understand why Flow exists, how to use it with agents, where context lives, and how Flow is evaluated—without duplicating the operational contract in [flow.md](../flow.md) or adding a second documentation hierarchy.

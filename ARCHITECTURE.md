@@ -1,14 +1,14 @@
 # Architecture
 
-> Generic technical contract for Flow Starter. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are adopter-owned templates. [docs/adr/](docs/adr/) records decisions.
+> Generic technical contract for Flow Factory. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are adopter-owned templates. [docs/adr/](docs/adr/) records decisions.
 
-Flow Starter follows the [Agentic Architecture foundation](docs/adr/0001-agentic-architecture.md): capability-first operations, validated human and agent interfaces, Vercel-aligned infrastructure, and an integrated TypeScript monorepo. This document describes the current technical structure and implementation status. The foundational ADR explains technology selection and trade-offs; historical ADR 0007 and ADR 0008 have been consolidated into it.
+Flow Factory follows the [Agentic Architecture foundation](docs/adr/0001-agentic-architecture.md): capability-first operations, validated human and agent interfaces, Vercel-aligned infrastructure, and an integrated TypeScript monorepo. This document describes the current technical structure and implementation status. The foundational ADR explains technology selection and trade-offs; historical ADR 0007 and ADR 0008 have been consolidated into it.
 
 ## 1. Goals
 
-Flow Starter is an **opinionated Next.js and React** baseline for agentic applications. The application framework is a chosen part of the starter, not an interchangeable option adopters reselect from scratch.
+Flow Factory is an **opinionated Next.js and React** baseline for agentic applications. The application framework is a chosen part of the factory foundation, not an interchangeable option adopters reselect from scratch.
 
-Flow Starter demonstrates how to build **agentic applications** with:
+Flow Factory demonstrates how to build **agentic applications** with:
 
 - **Generative UI** that never executes arbitrary model output—only validated OpenUI Lang documents rendered through an allowlisted component catalog.
 - **Composition tiers**: controlled intents, declarative multi-section stacks, and optional model-backed open-ended answers.
@@ -187,7 +187,7 @@ Neon Local is a Docker proxy to a cloud branch (not an offline Postgres engine).
 
 ## 9. Adoption path
 
-See [docs/readme.md — Adopting Flow Starter](docs/readme.md#adopting-flow-starter).
+See [docs/readme.md — Adopting Flow Factory](docs/readme.md#adopting-flow-factory).
 
 ## 10. Implementation status
 

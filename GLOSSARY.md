@@ -1,6 +1,24 @@
-# Flow Starter glossary
+# Flow Factory glossary
 
-Current starter-specific vocabulary and consequential distinctions. When adopting Flow Starter for a new product, retain only relevant technical terms and replace starter-specific examples with the product's domain language. Generic platform vocabulary is not duplicated here.
+Current factory-specific vocabulary and consequential distinctions. When adopting Flow Factory for a new product, retain only relevant technical terms and replace factory-specific examples with the product's domain language. Generic platform vocabulary is not duplicated here.
+
+Historical ADRs, PDRs, and dated research through 2026-10-24 may still say **Flow Starter** for the same foundation; living docs use **Flow Factory**.
+
+## Flow
+
+Lightweight product-development methodology (Explore → Specify → Plan → Build → Review → Ship). Stack-independent; documented in [.agents/flow/flow.md](.agents/flow/flow.md).
+
+## Flow Factory
+
+Agentic product-development environment in this repository: Flow methodology, opinionated Next.js/React foundation, worktrees, documentation conventions, `@repo/flow-eval`, and user-invoked `flow-improve`.
+
+## Flow app
+
+The `apps/flow` package (`flow-app`): GenUI at `/`, Flow Agent sidebar, fixture lab, and compose/chat/MCP APIs. Demonstrates factory capabilities; not the methodology itself.
+
+## Product application
+
+The adopter-owned application, typically `apps/web` after forking templates in `PRODUCT.md` and `DESIGN.md`.
 
 ## GenUI
 
@@ -28,7 +46,7 @@ Results surface inside the workspace for validated, source-backed artifacts. Dis
 
 ## Flow Agent
 
-Read-only technical guide for Flow methodology and Flow Starter architecture. It explains the repository, implemented and planned capabilities, and development workflow through the `apps/flow` chat interface and approved read-only MCP tools. See [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md) and [ADR 0012](docs/adr/0012-flow-and-web-applications.md).
+Read-only technical guide for Flow methodology and Flow Factory architecture. It explains the repository, implemented and planned capabilities, and development workflow through the `apps/flow` chat interface and approved read-only MCP tools. See [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md) and [ADR 0012](docs/adr/0012-flow-and-web-applications.md).
 
 ## Agent-to-UI (AG-UI)
 
@@ -36,7 +54,7 @@ Vocabulary for the event stream between an agent backend and an interactive clie
 
 ## Neon Local
 
-Docker proxy (`neondatabase/neon_local`) that exposes a Neon cloud branch at `localhost:5432`. Flow Starter uses it for local development (`pnpm db:start`). It is not an offline Postgres engine; it requires Neon API credentials and network access.
+Docker proxy (`neondatabase/neon_local`) that exposes a Neon cloud branch at `localhost:5432`. Flow Factory uses it for local development (`pnpm db:start`). It is not an offline Postgres engine; it requires Neon API credentials and network access.
 
 ## External invocation (planned)
 

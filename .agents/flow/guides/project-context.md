@@ -14,8 +14,8 @@ Flow spreads product intent, decisions, and implementation across **ordinary rep
 | Bounded work with tasks and findings | [docs/initiatives/](../../../docs/initiatives/) |
 | Durable research and assessments | [docs/research/](../../../docs/research/) (dated filenames) |
 | Detailed capability contracts | [docs/specs/](../../../docs/specs/) when justified |
-| Starter adoption and stack narrative | [docs/readme.md](../../../docs/readme.md) |
-| Terms specific to this starter | [GLOSSARY.md](../../../GLOSSARY.md) |
+| Flow Factory adoption and stack narrative | [docs/readme.md](../../../docs/readme.md) |
+| Terms specific to this factory checkout | [GLOSSARY.md](../../../GLOSSARY.md) |
 | Agent procedures (skills, worktrees, verify) | [.agents/flow/operations/](../operations/) |
 | Worthwhile ideas not yet committed | `docs/ideas/<slug>.md` when first needed ([flow.md](../flow.md)) |
 

@@ -1,6 +1,6 @@
 ---
 name: flow
-description: Flow lifecycle for product and methodology work in this repo. Use for features, bugs, specs, planning, Build authorization, delegation, worktrees, skill choice, verification, and documentation ownership. Use after setup-only install or env tasks.
+description: Product-development methodology for a new product, an existing product, or Flow itself in this repo. Use for lifecycle activities, Build authorization, delegation, worktrees, skill choice, verification, and documentation ownership—not for setup-only install or env tasks.
 ---
 
 # Flow
@@ -9,7 +9,7 @@ Follow authorization rules in [AGENTS.md](../../../AGENTS.md). They apply even w
 
 ## Steps
 
-1. Choose the activity (Explore → Specify → Plan → Build → Review → Ship) from task intent. Read only the matching sections of [.agents/flow/flow.md](../../flow/flow.md).
+1. Classify the work kind (new product, existing product, or Flow improvement). For Flow improvement, stop and use user-invoked [flow-improve](../flow-improve/SKILL.md) instead of treating it as product discovery. Choose the activity (Explore → Specify → Plan → Build → Review → Ship) from task intent. Read only the matching sections of [.agents/flow/flow.md](../../flow/flow.md).
 2. Reuse accepted decisions from `docs/adr/`, `docs/pdr/`, and root contracts. Stop and surface conflicts before changing accepted ADRs or PDRs.
 3. Load the smallest methodology skill set from [.agents/flow/operations/skills.md](../../flow/operations/skills.md) for the current activity. Read each chosen `SKILL.md` before applying it.
 4. When delegation helps, follow [.agents/flow/operations/delegation.md](../../flow/operations/delegation.md) and [.agents/flow/operations/worktrees.md](../../flow/operations/worktrees.md). Plan approval is not Build authorization.

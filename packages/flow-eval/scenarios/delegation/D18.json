@@ -1,0 +1,36 @@
+{
+  "id": "D18",
+  "title": "User reports Flow routing forces discovery on small fixes",
+  "relatedLiveCard": "S18",
+  "signals": {
+    "flowStage": "Explore",
+    "methodologyChange": true,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["writing-for-agents"]
+    },
+    "max-safe": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["writing-for-agents"]
+    },
+    "adaptive": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["writing-for-agents"]
+    }
+  }
+}

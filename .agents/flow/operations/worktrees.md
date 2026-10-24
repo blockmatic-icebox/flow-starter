@@ -113,6 +113,10 @@ Branches: `wt/<slug>/<task-id>`. Worktrees: `.worktrees/<slug>/<task-id>`. `.wor
 
 Task branches pin a base revision. Scoped dirty changes under a ready task’s `writes` may be captured in a local checkpoint commit without modifying the user’s index or unrelated files. Dependent tasks start from integrated `main`.
 
+## Integration recovery
+
+When integration marks a task `blocked` because of a merge conflict or conflict markers, the coordinator aborts the in-progress merge in the integration worktree so `main` is not left mid-merge. Fix the task branch (or abandon the task), then rerun `pnpm worktrees run`. Reverting an already integrated commit on `main` uses ordinary authorized git revert; there is no separate rollback command.
+
 ## Isolation limits
 
 Worktrees isolate git checkouts, not external resources. Avoid shared dev ports and browser sessions; isolate test databases when required. Do not run worker migrations against shared production databases. Worktrees are not a security sandbox.

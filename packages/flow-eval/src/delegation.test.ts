@@ -127,6 +127,29 @@ describe("delegation policy oracle", () => {
     assert.equal(actual.workerCount, actual.roles.length);
   });
 
+  it("D03 small bug excludes discovery skills", () => {
+    const card = loadDelegationScenario({ id: "D03" });
+    for (const policy of policies) {
+      const actual = classifyDelegation({ policy, signals: card.signals });
+      assert.ok(
+        !actual.skills.includes("idea-refine"),
+        `${policy} must not load idea-refine for D03`
+      );
+      assert.equal(card.signals.methodologyChange, undefined);
+    }
+  });
+
+  it("D18 methodology change stays solo without product discovery skills", () => {
+    const card = loadDelegationScenario({ id: "D18" });
+    const actual = classifyDelegation({
+      policy: "adaptive",
+      signals: card.signals,
+    });
+    assert.ok(!actual.skills.includes("idea-refine"));
+    assert.ok(actual.skills.includes("writing-for-agents"));
+    assert.equal(actual.allowBuild, false);
+  });
+
   it("adaptive stays solo on D14 while max-safe fans out", () => {
     const card = loadDelegationScenario({ id: "D14" });
     const adaptive = classifyDelegation({
