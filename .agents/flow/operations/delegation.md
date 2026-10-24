@@ -4,7 +4,7 @@ The **Flow Coordinator** is the main coding-agent session. It may delegate bound
 
 **Flow** chooses the lifecycle activity. **Skills** provide methods ([skills.md](skills.md)). **Subagents** provide isolated execution capacity. Loading a skill does not require a dedicated worker; delegating work does not require loading every skill on the task.
 
-Stages, approvals, and document ownership: [flow.md](../workflow/flow.md). Parallel git worktrees, waves, and briefs: [worktrees.md](worktrees.md).
+Stages, approvals, and document ownership: [flow.md](../flow.md). Parallel git worktrees, waves, and briefs: [worktrees.md](worktrees.md).
 
 ## Execution modes
 
@@ -169,6 +169,6 @@ Distinguish:
 1. **Static policy tests** — `classifyDelegation` in `@repo/flow-eval` (scenarios `D01`–`D15`)
 2. **Scripted orchestration tests** — policy comparison without live agents
 3. **Real subagent runs** — `pnpm --filter @repo/flow-eval eval run` (requires agent CLI auth)
-4. **Browser verification** — [verify.md](verify.md)
+4. **Browser verification** — [verification.md](verification.md)
 
 A passing `pnpm flow:check` does not prove delegation behavior. Record metrics (wall clock, tokens, workers) only when observed; use `missing` when the environment does not expose them.

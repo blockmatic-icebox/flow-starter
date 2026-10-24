@@ -55,8 +55,14 @@ __dev
 .deepsec/data/**/runs/
 .deepsec/findings/
 
-# Agent and editor local installations
-.agents/skills/
+# Agent and editor local installations (first-party Flow skills are tracked)
+.agents/skills/*
+!.agents/skills/flow/
+!.agents/skills/flow/**
+!.agents/skills/flow-eval/
+!.agents/skills/flow-eval/**
+!.agents/skills/flow-improve/
+!.agents/skills/flow-improve/**
 .cursor/*
 !.cursor/agents/
 !.cursor/agents/**

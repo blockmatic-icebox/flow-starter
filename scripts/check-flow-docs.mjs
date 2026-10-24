@@ -16,19 +16,33 @@ const rules = [
   ["docs/research", researchFilePattern, "research"],
   ["docs/adr", decisionFilePattern, "adr"],
   ["docs/pdr", decisionFilePattern, "pdr"],
+  [".agents/flow/initiatives", slugFilePattern, "flow-initiatives"],
+  [".agents/flow/research", researchFilePattern, "flow-research"],
+  [".agents/flow/decisions/adr", decisionFilePattern, "flow-adr"],
 ];
 
 const knowledgeBundleSources = [
-  "docs/workflow/flow.md",
-  "docs/workflow/readme.md",
+  ".agents/flow/flow.md",
+  ".agents/flow/README.md",
   "docs/readme.md",
   "ARCHITECTURE.md",
   "AGENTS.md",
-  "docs/agents/domain.md",
-  "docs/agents/verify.md",
-  "docs/agents/skills.md",
-  "docs/agents/worktrees.md",
+  ".agents/flow/operations/context.md",
+  ".agents/flow/operations/verification.md",
+  ".agents/flow/operations/skills.md",
+  ".agents/flow/operations/worktrees.md",
   "PRODUCT.md",
+];
+
+const firstPartySkillIds = ["flow", "flow-eval", "flow-improve"];
+
+const legacyFlowDocDirs = ["docs/workflow", "docs/agents"];
+
+const methodologyPathDenylist = [/^docs\/workflow\//u, /^docs\/agents\//u];
+
+const productContractsInFlowDenylist = [
+  /^\.agents\/flow\/.*\/PRODUCT\.md$/u,
+  /^\.agents\/flow\/.*\/ARCHITECTURE\.md$/u,
 ];
 
 const obsoletePathPatterns = [
@@ -39,6 +53,8 @@ const obsoletePathPatterns = [
     label: "nested docs/specs/genui/",
     pattern: /docs\/specs\/genui\//u,
   },
+  { label: "docs/workflow", pattern: /docs\/workflow\//u },
+  { label: "docs/agents", pattern: /docs\/agents\//u },
 ];
 
 const semanticAuthoritativeFiles = [
@@ -48,7 +64,7 @@ const semanticAuthoritativeFiles = [
   "docs/readme.md",
   "docs/security/security-model.md",
   "docs/specs/genui.md",
-  "docs/workflow/flow.md",
+  ".agents/flow/flow.md",
 ];
 
 const researchDatePattern =
@@ -217,6 +233,15 @@ function validateDocumentMetadata(root) {
     validateResearchMetadata({ content, errors, relative });
   }
 
+  for (const filename of markdownFiles(
+    path.join(root, ".agents/flow/research")
+  )) {
+    const relative = relativePath(root, filename);
+    const content = readFileSync(filename, "utf-8");
+
+    validateResearchMetadata({ content, errors, relative });
+  }
+
   for (const filename of markdownFiles(path.join(root, "docs/specs"))) {
     const relative = relativePath(root, filename);
     const content = readFileSync(filename, "utf-8");
@@ -225,6 +250,15 @@ function validateDocumentMetadata(root) {
   }
 
   for (const filename of markdownFiles(path.join(root, "docs/adr"))) {
+    const relative = relativePath(root, filename);
+    const content = readFileSync(filename, "utf-8");
+
+    validateDecisionRecord({ content, errors, relative });
+  }
+
+  for (const filename of markdownFiles(
+    path.join(root, ".agents/flow/decisions/adr")
+  )) {
     const relative = relativePath(root, filename);
     const content = readFileSync(filename, "utf-8");
 
@@ -245,8 +279,8 @@ export const requiredDocuments = [
   "AGENTS.md",
   "ARCHITECTURE.md",
   "docs/readme.md",
-  "docs/workflow/readme.md",
-  "docs/workflow/flow.md",
+  ".agents/flow/README.md",
+  ".agents/flow/flow.md",
 ];
 
 const rootLinkDocuments = [
@@ -408,11 +442,96 @@ function validateKnowledgeSnapshot(root) {
   return errors;
 }
 
+function validateLegacyFlowDocDirs(root) {
+  return legacyFlowDocDirs
+    .filter((relative) => existsSync(path.join(root, relative)))
+    .map(
+      (relative) =>
+        `legacy Flow documentation directory still present: ${relative}`
+    );
+}
+
+function validateMethodologyPlacement(root) {
+  const errors = [];
+  for (const filename of markdownFiles(path.join(root, "docs"))) {
+    const relative = relativePath(root, filename);
+    if (methodologyPathDenylist.some((pattern) => pattern.test(relative)))
+      errors.push(
+        `${relative}: Flow methodology document must live under .agents/flow/`
+      );
+  }
+  for (const filename of markdownFiles(path.join(root, ".agents/flow"))) {
+    const relative = relativePath(root, filename);
+    if (
+      productContractsInFlowDenylist.some((pattern) => pattern.test(relative))
+    )
+      errors.push(
+        `${relative}: product contract must not live under .agents/flow/`
+      );
+  }
+  return errors;
+}
+
+function parseSkillFrontmatter(content) {
+  const match = /^---\s*\n([\s\S]*?)\n---/u.exec(content);
+  if (!match) return null;
+  const nameMatch = /^name:\s*(?<name>[a-z0-9-]+)\s*$/mu.exec(match[1]);
+  return nameMatch?.groups?.name ?? null;
+}
+
+function validateFirstPartySkills(root) {
+  const errors = [];
+  const seen = new Set();
+
+  for (const skillId of firstPartySkillIds) {
+    if (seen.has(skillId))
+      errors.push(`duplicate first-party skill id ${skillId}`);
+    seen.add(skillId);
+
+    const skillDir = path.join(root, ".agents/skills", skillId);
+    const skillFile = path.join(skillDir, "SKILL.md");
+    if (!existsSync(skillFile)) {
+      errors.push(
+        `missing first-party skill ${skillId} at .agents/skills/${skillId}/SKILL.md`
+      );
+      continue;
+    }
+
+    const content = readFileSync(skillFile, "utf-8");
+    const name = parseSkillFrontmatter(content);
+    if (name !== skillId)
+      errors.push(
+        `.agents/skills/${skillId}/SKILL.md: frontmatter name ${name ?? "missing"} !== ${skillId}`
+      );
+
+    const lockPath = path.join(root, "skills-lock.json");
+    if (existsSync(lockPath)) {
+      const lock = JSON.parse(readFileSync(lockPath, "utf-8"));
+      const entry = lock.skills?.[skillId];
+      if (!entry)
+        errors.push(`skills-lock.json missing first-party skill ${skillId}`);
+      else if (
+        entry.sourceType === "local" &&
+        !entry.source?.includes(`.agents/skills/${skillId}`)
+      )
+        errors.push(
+          `skills-lock.json ${skillId} source should reference .agents/skills/${skillId}`
+        );
+    }
+  }
+
+  return errors;
+}
+
 function validateMarkdownLinks(root) {
   const errors = [];
   const files = [
     ...rootLinkDocuments.map((relative) => path.join(root, relative)),
     ...markdownFiles(path.join(root, "docs")),
+    ...markdownFiles(path.join(root, ".agents/flow")),
+    ...firstPartySkillIds.map((skillId) =>
+      path.join(root, ".agents/skills", skillId, "SKILL.md")
+    ),
   ];
 
   for (const filename of files) {
@@ -498,12 +617,16 @@ export function validateFlowDocs(root = repositoryRoot) {
       continue;
     }
 
-    if (category === "research" && !validResearchFilenameDate(suffix)) {
+    if (
+      (category === "research" || category === "flow-research") &&
+      !validResearchFilenameDate(suffix)
+    ) {
       errors.push(`${relative}: invalid ISO calendar date`);
       continue;
     }
 
-    if (category === "adr" || category === "pdr") {
+    if (category === "adr" || category === "flow-adr" || category === "pdr") {
+      const bucket = category === "pdr" ? "pdr" : "adr";
       const number = decisionNumber(filename);
 
       if (number === 0) {
@@ -511,14 +634,14 @@ export function validateFlowDocs(root = repositoryRoot) {
         continue;
       }
 
-      const previous = numbers[category].get(number);
+      const previous = numbers[bucket].get(number);
 
       if (previous) {
         errors.push(
-          `${relative}: duplicate ${category.toUpperCase()} number ${String(number).padStart(4, "0")}, already used by ${previous}`
+          `${relative}: duplicate ${bucket.toUpperCase()} number ${String(number).padStart(4, "0")}, already used by ${previous}`
         );
       } else {
-        numbers[category].set(number, relative);
+        numbers[bucket].set(number, relative);
       }
     }
   }
@@ -526,6 +649,9 @@ export function validateFlowDocs(root = repositoryRoot) {
   errors.push(
     ...validateDocumentMetadata(root),
     ...validateRequiredDocuments(root),
+    ...validateLegacyFlowDocDirs(root),
+    ...validateMethodologyPlacement(root),
+    ...validateFirstPartySkills(root),
     ...validateMarkdownLinks(root),
     ...validateSemanticConsistency(root),
     ...validateKnowledgeSnapshot(root)
@@ -549,7 +675,7 @@ if (import.meta.url === entrypoint) {
     }
 
     console.error(
-      "\nSee docs/workflow/flow.md for canonical documentation conventions."
+      "\nSee .agents/flow/flow.md for canonical documentation conventions."
     );
 
     process.exitCode = 1;

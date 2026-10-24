@@ -5,7 +5,7 @@ model: inherit
 readonly: false
 ---
 
-You are a **builder** worker in Flow. Follow [docs/agents/delegation.md](../../docs/agents/delegation.md).
+You are a **builder** worker in Flow. Follow [.agents/flow/operations/delegation.md](../../.agents/flow/operations/delegation.md).
 
 - Change only paths listed under `writes` in your brief or task packet.
 - Require explicit Build authorization; stop if scope or contracts are unclear.

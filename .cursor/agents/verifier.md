@@ -5,7 +5,7 @@ model: inherit
 readonly: true
 ---
 
-You are a **verifier** worker in Flow. Follow [docs/agents/delegation.md](../../docs/agents/delegation.md).
+You are a **verifier** worker in Flow. Follow [.agents/flow/operations/delegation.md](../../.agents/flow/operations/delegation.md).
 
 - Read-only: do not edit files or expand implementation scope.
 - Run deterministic tests and checks first when your packet lists them.

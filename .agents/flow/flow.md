@@ -143,7 +143,7 @@ Possible activities:
 
 **Documentation:** Usually none. Persist useful uncommitted ideas or durable evidence only when worth preserving.
 
-Parallel discovery: [delegation.md](../agents/delegation.md#explore).
+Parallel discovery: [delegation.md](operations/delegation.md#explore).
 
 ### 2. Specify
 
@@ -165,7 +165,7 @@ Use existing `PRODUCT.md` for product-wide direction. Create an initiative docum
 
 **Exit condition:** The work is clear enough to plan or implement, and any decision requiring human approval is resolved.
 
-Dimensional specification without duplicate doc edits: [delegation.md](../agents/delegation.md#specify).
+Dimensional specification without duplicate doc edits: [delegation.md](operations/delegation.md#specify).
 
 ### 3. Plan
 
@@ -187,9 +187,9 @@ For a small task, a concise plan in the conversation is sufficient. For sustaine
 
 **Exit condition:** The first implementation slice is unambiguous and verifiable.
 
-For substantial initiative work, record parallel execution as **waves** in the owning initiative (`## Waves`). Before plan approval, run a **contrarian wave** (question-mode worktrees) when meaningful alternatives or unvalidated assumptions remain; capture assumptions, kill criteria, and the recommended direction in the initiative. After explicit **Build** authorization, the coordinator uses `pnpm worktrees` to prepare ready tasks, run workers in isolated checkouts, verify results, and serialize integration into local `main`. Procedure and task format: [docs/agents/worktrees.md](../agents/worktrees.md).
+For substantial initiative work, record parallel execution as **waves** in the owning initiative (`## Waves`). Before plan approval, run a **contrarian wave** (question-mode worktrees) when meaningful alternatives or unvalidated assumptions remain; capture assumptions, kill criteria, and the recommended direction in the initiative. After explicit **Build** authorization, the coordinator uses `pnpm worktrees` to prepare ready tasks, run workers in isolated checkouts, verify results, and serialize integration into local `main`. Procedure and task format: [.agents/flow/operations/worktrees.md](operations/worktrees.md).
 
-Dependency-aware planning and parallel investigation: [delegation.md](../agents/delegation.md#plan).
+Dependency-aware planning and parallel investigation: [delegation.md](operations/delegation.md#plan).
 
 ### 4. Build
 
@@ -202,13 +202,13 @@ Dependency-aware planning and parallel investigation: [delegation.md](../agents/
 - Keep changes scoped to the agreed outcome.
 - Update the owning documentation when behavior or accepted direction changes.
 - Do not modify unrelated files for incidental cleanup.
-- For multi-file or planned slices, apply `incremental-implementation` (see [skills.md](../agents/skills.md)).
+- For multi-file or planned slices, apply `incremental-implementation` (see [skills.md](operations/skills.md)).
 
 **Exit condition:** The agreed slice is verified and integrated into local `main` (or explicitly blocked with a recovery path). A worker exit alone is not completion.
 
 After implementation authorization, the coordinator automatically launches ready independent tasks in isolated worktrees, verifies each result, and integrates accepted work into local `main` one task at a time. GitHub publication remains optional and separately authorized.
 
-Build waves and parallel builders: [delegation.md](../agents/delegation.md#build).
+Build waves and parallel builders: [delegation.md](operations/delegation.md#build).
 
 ### 5. Review
 
@@ -235,13 +235,13 @@ Before an explicitly authorized commit, inspect the staged diff and changed-file
 
 Implementation authorization includes scoped local task-branch commits and serialized integration commits into local `main` for accepted work. Never push without explicit authorization.
 
-Security-sensitive changes — request boundaries, authorization, secrets, GenUI validation, database credentials — also require the [security model](../security/security-model.md) and the tests that cover the changed boundary.
+Security-sensitive changes — request boundaries, authorization, secrets, GenUI validation, database credentials — also require the [security model](../../docs/security/security-model.md) and the tests that cover the changed boundary.
 
 Automatic checks prove deterministic behavior. They do not replace judgment about product intent, threat model, or whether a change belongs in the commit.
 
 Do not execute a model to validate behavior that a deterministic test, compiler, or schema can decide.
 
-Independent verification when warranted: [delegation.md](../agents/delegation.md#review).
+Independent verification when warranted: [delegation.md](operations/delegation.md#review).
 
 ### 6. Ship
 
@@ -257,32 +257,37 @@ Independent verification when warranted: [delegation.md](../agents/delegation.md
 
 Do not declare something shipped merely because code was written. Publishing to a remote, opening a pull request, and deploying require the appropriate user authorization and environment. Integrating verified work into local `main` during authorized **Build** is not publication.
 
-Parallel readiness checks and honest release boundaries: [delegation.md](../agents/delegation.md#ship).
+Parallel readiness checks and honest release boundaries: [delegation.md](operations/delegation.md#ship).
 
 ## Documentation ownership
 
 Use one authoritative home for each fact. Link related documents instead of copying their contents.
 
-Flow Starter's mission, goals and inherited foundation are explained in docs/readme.md. The root README.md is an adopter-owned product template. Flow methodology and documentation conventions belong in docs/workflow/flow.md, with a human introduction in docs/workflow/readme.md. Additional pages linked from that introduction (for example `working-with-flow.md`, `principles.md`, `influences-and-alternatives.md`, `project-context.md`, and `learning-and-improvement.md`) explain the methodology for people; they do not change the rules in this file. Current architecture belongs in ARCHITECTURE.md; durable architectural rationale belongs in ADRs. Use existing initiatives, plans and specifications only when justified by the work.
+Flow Starter's mission, goals and inherited foundation are explained in docs/readme.md. The root README.md is an adopter-owned product template. Flow methodology and documentation conventions belong in .agents/flow/flow.md, with a human introduction in .agents/flow/README.md. Additional pages linked from that introduction (for example `working-with-flow.md`, `principles.md`, `influences-and-alternatives.md`, `project-context.md`, and `learning-and-improvement.md`) explain the methodology for people; they do not change the rules in this file. Current architecture belongs in ARCHITECTURE.md; durable architectural rationale belongs in ADRs. Use existing initiatives, plans and specifications only when justified by the work.
 
 | Location | Responsibility |
 | --- | --- |
 | `AGENTS.md` | Lightweight agent entrypoint and task-specific document routing |
 | `README.md` | Adopter-owned product README template, including essential setup and documentation links |
 | `docs/readme.md` | Human-facing introduction to the inherited Flow Starter foundation, its goals, capabilities and documentation navigation |
-| `docs/workflow/flow.md` | Workflow, skill orchestration, document conventions, and lifecycle |
-| `docs/workflow/readme.md` | Human-facing introduction to the Flow methodology |
+| `.agents/flow/flow.md` | Workflow, skill orchestration, document conventions, and lifecycle |
+| `.agents/flow/README.md` | Human-facing introduction to the Flow methodology |
 | `PRODUCT.md` | Current product vision, audience, business context, scope, outcomes, and capabilities |
 | `DESIGN.md` | Current visual, interaction, experience, and accessibility direction |
 | `ARCHITECTURE.md` | Current technical structure, boundaries, constraints, and major system choices |
 | `GLOSSARY.md` | Terms with project-specific meanings and consequential distinctions |
 | `docs/ideas/<slug>.md` | Worthwhile possibilities that are not yet implementation commitments |
-| `docs/initiatives/<slug>.md` | Intentional bounded work: outcome, scope, assumptions, tasks, progress, validation, and findings |
-| `docs/research/YYYYMMDD-<slug>.md` | Durable evidence, source assessment, limitations, and research findings |
+| `docs/initiatives/<slug>.md` | Product bounded work: outcome, scope, assumptions, tasks, progress, validation, and findings |
+| `.agents/flow/initiatives/<slug>.md` | Flow methodology bounded work (evaluation, improvement, guides) |
+| `docs/research/YYYYMMDD-<slug>.md` | Product research and evidence |
+| `.agents/flow/research/YYYYMMDD-<slug>.md` | Flow methodology research and migration evidence |
+| `.agents/flow/guides/` | Human-facing methodology pages (do not override this file) |
+| `.agents/flow/operations/` | Delegation, worktrees, skills, verification, domain context |
 | `docs/specs/<slug>.md` | Optional detailed requirements or contracts for a substantial capability |
 | `docs/plans/<slug>.md` | Optional standalone implementation plans when an initiative would be insufficient or inappropriate |
 | `docs/pdr/NNNN-<slug>.md` | Consequential product decisions and their rationale |
-| `docs/adr/NNNN-<slug>.md` | Consequential architectural decisions and their rationale |
+| `docs/adr/NNNN-<slug>.md` | Product architectural decisions and their rationale |
+| `.agents/flow/decisions/adr/NNNN-<slug>.md` | Flow methodology architectural decisions (shared ADR number sequence) |
 
 These directories are created only when the first useful document needs them.
 
@@ -313,7 +318,7 @@ For ADRs, use the next unused number after the largest existing numeric ADR iden
 
 Create a decision record only when the decision is meaningful, difficult to reverse, has real alternatives, and would be surprising without recorded context.
 
-Store ADRs in `docs/adr/` and PDRs in `docs/pdr/` with four-digit prefixes (`0001-<slug>.md`). Do not use `docs/decisions/`, `ADR-001` filenames, or uppercase type prefixes.
+Store product ADRs in `docs/adr/` and Flow methodology ADRs in `.agents/flow/decisions/adr/`. Store PDRs in `docs/pdr/` with four-digit prefixes (`0001-<slug>.md`). Use the next unused number across both ADR trees. Do not use `docs/decisions/`, `ADR-001` filenames, or uppercase type prefixes.
 
 Use this structure for every new ADR and PDR:
 
@@ -339,7 +344,7 @@ Replace `ADR` with `PDR` for product decisions. Use four-digit ids in titles (`A
 
 **Status** must be exactly one of: `Proposed`, `Accepted`, `Superseded by ADR NNNN`, or `Deprecated`. Record the decision date only in the `Date:` line, not in **Status**.
 
-Rationale and alternatives belong in the record. Current implementation detail belongs in [ARCHITECTURE.md](../../ARCHITECTURE.md), [docs/specs/](../specs/), or [docs/security/security-model.md](../security/security-model.md).
+Rationale and alternatives belong in the record. Current implementation detail belongs in [ARCHITECTURE.md](../../ARCHITECTURE.md), [docs/specs/](../../docs/specs/), or [docs/security/security-model.md](../../docs/security/security-model.md).
 
 Preserve previous accepted decisions as historical records. If a decision changes, write a superseding record and update the current owning document.
 
@@ -355,7 +360,7 @@ Principles:
 - Apply Flow document ownership and naming to skill outputs.
 - Explicitly requested skills take precedence when installed and applicable.
 
-The task-to-skill map lives in [docs/agents/skills.md](../agents/skills.md). Skill installation does not imply execution.
+The task-to-skill map lives in [.agents/flow/operations/skills.md](operations/skills.md). Skill installation does not imply execution.
 
 ## Documentation discipline
 

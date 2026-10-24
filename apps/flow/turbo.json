@@ -8,12 +8,12 @@
         "$TURBO_ROOT$/ARCHITECTURE.md",
         "$TURBO_ROOT$/AGENTS.md",
         "$TURBO_ROOT$/docs/readme.md",
-        "$TURBO_ROOT$/docs/workflow/flow.md",
-        "$TURBO_ROOT$/docs/workflow/readme.md",
-        "$TURBO_ROOT$/docs/agents/domain.md",
-        "$TURBO_ROOT$/docs/agents/verify.md",
-        "$TURBO_ROOT$/docs/agents/skills.md",
-        "$TURBO_ROOT$/docs/agents/worktrees.md"
+        "$TURBO_ROOT$/.agents/flow/flow.md",
+        "$TURBO_ROOT$/.agents/flow/README.md",
+        "$TURBO_ROOT$/.agents/flow/operations/context.md",
+        "$TURBO_ROOT$/.agents/flow/operations/verification.md",
+        "$TURBO_ROOT$/.agents/flow/operations/skills.md",
+        "$TURBO_ROOT$/.agents/flow/operations/worktrees.md"
       ]
     }
   }

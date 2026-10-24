@@ -15,16 +15,14 @@ Dozens of other skills in `skills-lock.json` (Vercel, Expo, UI, database, and so
 
 ## Directly used skills
 
-From [skills-lock.json](../../skills-lock.json) and [agents/skills.md](../agents/skills.md):
+From [skills-lock.json](../../../skills-lock.json) and [operations/skills.md](../operations/skills.md):
 
 | Source | Installed skills | Why they fit |
 | --- | --- | --- |
 | [Addy Osmani agent-skills](https://github.com/addyosmani/agent-skills) | `idea-refine`, `spec-driven-development`, `planning-and-task-breakdown`, `incremental-implementation`, `test-driven-development`, `code-review-and-quality`, `documentation-and-adrs` | Cover refinement through delivery and decision records; `idea-refine` includes product thinking |
 | [Matt Pocock skills](https://github.com/mattpocock/skills) | `domain-modeling`, `writing-for-agents` | Terminology maintenance and how agent-facing docs are structured |
 | [ProductSkills](https://github.com/assimovt/productskills) | `problem-validation`, `prd-writing`, `experiment-design` | Discovery, requirements, and experiments when justified |
-| Local | `flow-eval` | User-invoked evaluation runner only—not a “understand Flow” methodology skill |
-
-There is **no** skill named `flow` in the manifest.
+| Local | `flow`, `flow-eval`, `flow-improve` | `flow` routes lifecycle work; `flow-eval` runs the harness; `flow-improve` is user-invoked methodology improvement |
 
 **What Flow adds:** when to load a skill, approval boundaries, and canonical file locations (for example, sustained plans live in initiatives, not the planning skill’s default `tasks/plan.md`).
 
@@ -32,9 +30,9 @@ There is **no** skill named `flow` in the manifest.
 
 ## Adapted practices
 
-- **Progressive disclosure** — route agents to depth on demand (influenced by Matt Pocock’s writing-for-agents work; house rules in [flow.md](flow.md)).
+- **Progressive disclosure** — route agents to depth on demand (influenced by Matt Pocock’s writing-for-agents work; house rules in [flow.md](../flow.md)).
 - **One fact, one home** — link instead of duplicating ownership tables.
-- **Glossary discipline** — project-specific terms in [GLOSSARY.md](../../GLOSSARY.md) for this starter; your product replaces them when adopting.
+- **Glossary discipline** — project-specific terms in [GLOSSARY.md](../../../GLOSSARY.md) for this starter; your product replaces them when adopting.
 - **Proportionate discovery** — discovery methods when uncertainty warrants them, not a mandatory business-planning phase.
 
 Conceptual influences (not installed as skills): [Lean Startup principles](https://theleanstartup.com/principles), [continuous discovery](https://www.producttalk.org/getting-started-with-discovery/) as reasoning aids for customer learning.
@@ -59,5 +57,5 @@ Historical open items (not current Flow): standalone “explain Flow” skill pa
 
 ## Further reading
 
-- Skill routing: [agents/skills.md](../agents/skills.md)
+- Skill routing: [operations/skills.md](../operations/skills.md)
 - Curated evidence and public links: [20261024-flow-methodology-influences.md](../research/20261024-flow-methodology-influences.md)

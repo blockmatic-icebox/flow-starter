@@ -101,7 +101,7 @@ main() {
 
   replace_in_file "apps/web/next.config.ts" "$host_from" "$host_to"
   replace_in_file "apps/web/AGENTS.md" "$host_from" "$host_to"
-  replace_in_file "docs/agents/verify.md" "$host_from" "$host_to"
+  replace_in_file ".agents/flow/operations/verification.md" "$host_from" "$host_to"
   replace_in_file "docs/readme.md" "$host_from" "$host_to"
   replace_in_file "apps/flow/app/_lib/flow-agent/knowledge-snapshot.ts" "$host_from" "$host_to"
 

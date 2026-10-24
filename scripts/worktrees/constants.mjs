@@ -1,5 +1,6 @@
 export const PARENT_OWNED_WRITE_PATTERNS = [
   /^docs\/initiatives\//u,
+  /^\.agents\/flow\/initiatives\//u,
   /^pnpm-lock\.yaml$/u,
   /^skills-lock\.json$/u,
   /knowledge-snapshot\.ts$/u,

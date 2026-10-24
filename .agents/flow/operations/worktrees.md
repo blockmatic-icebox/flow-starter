@@ -121,7 +121,7 @@ Worktrees isolate git checkouts, not external resources. Avoid shared dev ports 
 
 Each brief is self-contained (subagents do not see parent chat). It includes initiative path, task id, flow stage, mode, base revision, `writes`, `reads`, `skills`, acceptance command (build tasks), and the return format from [delegation.md](delegation.md#worker-report).
 
-For browser verification in a worktree, use a dedicated agent-browser session per [verify.md](verify.md).
+For browser verification in a worktree, use a dedicated agent-browser session per [verification.md](verification.md).
 
 ## Skill seats (phase-aware)
 

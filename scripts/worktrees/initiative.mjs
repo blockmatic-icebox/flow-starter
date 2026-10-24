@@ -22,7 +22,22 @@ export function loadSkillsLock(repositoryRootPath) {
 export function initiativePath(slug, repositoryRootPath) {
   const slugError = validateSlug(slug);
   if (slugError) throw new Error(slugError);
-  return path.join(repositoryRootPath, "docs/initiatives", `${slug}.md`);
+  const product = path.join(
+    repositoryRootPath,
+    "docs/initiatives",
+    `${slug}.md`
+  );
+  const flow = path.join(
+    repositoryRootPath,
+    ".agents/flow/initiatives",
+    `${slug}.md`
+  );
+  if (existsSync(product) && existsSync(flow))
+    throw new Error(
+      `duplicate initiative slug ${slug}: docs/initiatives and .agents/flow/initiatives`
+    );
+  if (existsSync(flow)) return flow;
+  return product;
 }
 
 function parseListBlock(lines, startIndex) {

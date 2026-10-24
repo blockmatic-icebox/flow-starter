@@ -1,6 +1,6 @@
 # Browser verification
 
-Use the installed **agent-browser** skill ([`skills-lock.json`](../../skills-lock.json) → `vercel-labs/agent-browser`). Install or refresh project skills with `pnpm skills:install`. Before any CLI commands, load the workflow from the tool:
+Use the installed **agent-browser** skill ([`skills-lock.json`](../../../skills-lock.json) → `vercel-labs/agent-browser`). Install or refresh project skills with `pnpm skills:install`. Before any CLI commands, load the workflow from the tool:
 
 ```bash
 agent-browser skills get core

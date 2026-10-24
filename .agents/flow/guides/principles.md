@@ -42,7 +42,7 @@ Each practice below follows a simple pattern: the problem, what Flow chooses, th
 
 **Problem:** Agent sessions end; chat history does not own the product.
 
-**Choice:** One authoritative home per fact in repository documents; agents read only what the task needs ([flow.md](flow.md)).
+**Choice:** One authoritative home per fact in repository documents; agents read only what the task needs ([flow.md](../flow.md)).
 
 **Benefit:** Fresh sessions can recover intent.
 
@@ -54,7 +54,7 @@ Each practice below follows a simple pattern: the problem, what Flow chooses, th
 
 **Problem:** Loading every installed skill wastes attention and implies ceremony.
 
-**Choice:** Flow routes the smallest skill set for current uncertainty ([agents/skills.md](../agents/skills.md)); skills supply methods, Flow owns locations and naming.
+**Choice:** Flow routes the smallest skill set for current uncertainty ([operations/skills.md](../operations/skills.md)); skills supply methods, Flow owns locations and naming.
 
 **Benefit:** Right method without catalog theater.
 
@@ -76,7 +76,7 @@ Each practice below follows a simple pattern: the problem, what Flow chooses, th
 
 **Problem:** Solo work is simple; substantial work benefits from parallel investigation or builders.
 
-**Choice:** Consider delegation when independence and elapsed time justify it; default coordination rules live in [agents/delegation.md](../agents/delegation.md).
+**Choice:** Consider delegation when independence and elapsed time justify it; default coordination rules live in [operations/delegation.md](../operations/delegation.md).
 
 **Benefit:** Faster discovery or build without surrendering human control.
 

@@ -1,6 +1,6 @@
 # Product template
 
-> Replace this file with your product contract. [DESIGN.md](DESIGN.md) owns presentation; [ARCHITECTURE.md](ARCHITECTURE.md) owns technical boundaries. Follow [Flow](docs/workflow/flow.md) for documentation conventions and delivery workflow.
+> Replace this file with your product contract. [DESIGN.md](DESIGN.md) owns presentation; [ARCHITECTURE.md](ARCHITECTURE.md) owns technical boundaries. Follow [Flow](.agents/flow/flow.md) for documentation conventions and delivery workflow.
 
 ## Vision
 

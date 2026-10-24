@@ -9,8 +9,8 @@ disable-model-invocation: true
 ## Steps
 
 1. Name the mode: `preserve`, `grade`, `pilot`, `run`, `compare`, or `handoff`.
-2. Do not edit [docs/workflow/flow.md](../../docs/workflow/flow.md) or mutate `__dev/flow-evals/20261024-flow-v0.1-1256e532/`.
-3. Run the CLI from the repository root (see [RUN.md](../RUN.md)).
+2. Do not edit [.agents/flow/flow.md](../../flow/flow.md) or mutate `__dev/flow-evals/20261024-flow-v0.1-1256e532/`.
+3. Run the CLI from the repository root (see [RUN.md](../../../packages/flow-eval/RUN.md)).
 4. Report **gate**, **official eligible**, **confidence**, blockers, and missing telemetry before any quality percentage.
 
 ## Completion

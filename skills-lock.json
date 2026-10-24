@@ -169,10 +169,20 @@
       "skillPath": "skills/find-animation-opportunities/SKILL.md",
       "computedHash": "465d087c41768e4f14ed640dd049036009f613feb55baaa5831b68b33178f9d2"
     },
-    "flow-eval": {
-      "source": "./packages/flow-eval/skill",
+    "flow": {
+      "source": "./.agents/skills/flow",
       "sourceType": "local",
-      "computedHash": "8d35a0cdc4598afba24f82d83eef097161d46befbde74e6aca1e2f17746c70ac"
+      "computedHash": "4db0fc29559f7fb9be38e8ac8fea54aada376e267b896598e2b275608037221c"
+    },
+    "flow-eval": {
+      "source": "./.agents/skills/flow-eval",
+      "sourceType": "local",
+      "computedHash": "bad18e8213612c7a30be8a60d2f56d69cf4b72c8c31ac0e971b5a74deeb75f58"
+    },
+    "flow-improve": {
+      "source": "./.agents/skills/flow-improve",
+      "sourceType": "local",
+      "computedHash": "4640b3871243f40aae87a84ecfc3a116d176dabfaa3ed7153e52ed052e95c7c4"
     },
     "idea-refine": {
       "source": "addyosmani/agent-skills",

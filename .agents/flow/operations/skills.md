@@ -46,7 +46,7 @@ When several methodology skills could apply (`idea-refine`, `problem-validation`
 | Database | `neon-postgres` |
 | GenUI and AI SDK | `ai-sdk`, `typesafe-ai` |
 
-The manifest remains [skills-lock.json](../../skills-lock.json). Install with `pnpm skills:install`. This page is a router, not a second manifest.
+The manifest remains [skills-lock.json](../../../skills-lock.json). Install with `pnpm skills:install`. This page is a router, not a second manifest.
 
 ## Skill usage reporting
 
@@ -70,7 +70,7 @@ When no skills were loaded:
 
 ### Classification
 
-Use [docs/workflow/flow.md](../workflow/flow.md) lifecycle activities (Explore → Specify → Plan → Build → Review → Ship) and the **Phase-aware selection** and **Preferred skills** table on this page as the authority. Do not maintain a separate skill registry for reporting.
+Use [.agents/flow/flow.md](../flow.md) lifecycle activities (Explore → Specify → Plan → Build → Review → Ship) and the **Phase-aware selection** and **Preferred skills** table on this page as the authority. Do not maintain a separate skill registry for reporting.
 
 - **Flow:** Methodology skills routed to exploration, validation, requirements, specification, planning, incremental delivery, testing discipline, review quality, or agent and decision documentation.
 - **Others:** Supporting technology, design, framework, infrastructure, and tooling skills from the same routing (for example React/Next.js, UI components, browser verification, database, MCP, GenUI, or auth stacks).

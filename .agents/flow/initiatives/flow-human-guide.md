@@ -6,11 +6,11 @@ Date: 2026-10-24
 
 ## Outcome
 
-Publish a concise human-facing guide under `docs/workflow/` so solo founders and small technical teams can understand why Flow exists, how to use it with agents, where context lives, and how Flow is evaluated—without duplicating the operational contract in [flow.md](../workflow/flow.md) or adding a second documentation hierarchy.
+Publish a concise human-facing guide under `.agents/flow/guides/` so solo founders and small technical teams can understand why Flow exists, how to use it with agents, where context lives, and how Flow is evaluated—without duplicating the operational contract in [flow.md](../flow.md) or adding a second documentation hierarchy.
 
 ## Scope
 
-- Rewrite [docs/workflow/readme.md](../workflow/readme.md) as the entry (~400 words).
+- Rewrite [.agents/flow/README.md](../README.md) as the entry (~400 words).
 - Add five sibling pages: `working-with-flow.md`, `principles.md`, `influences-and-alternatives.md`, `project-context.md`, `learning-and-improvement.md` (~2,500 words total across six pages).
 - Add curated historical research [docs/research/20261024-flow-methodology-influences.md](../research/20261024-flow-methodology-influences.md).
 - One clarifying sentence in `flow.md` on human-only sibling pages; regenerate Flow Agent knowledge snapshot after `readme.md` changes.
@@ -23,7 +23,7 @@ Out of scope: approval policy changes, new `flow` methodology skill, `docs/flow-
 | Class | Use in guide |
 | --- | --- |
 | Implemented behavior | Manifest, `flow:check`, bundle, `flow-eval`, no `flow` skill |
-| Current policy | `flow.md`, linked `docs/agents/*` |
+| Current policy | `flow.md`, linked `.agents/flow/operations/*` |
 | Accepted historical direction | Solo/small-team audience, proportionate process, selective skills (historical flow-skills repo, commit `94d43fd`) |
 | Historical proposal or research | Competitive ADOPT/REJECT rows, OMTM, validation board, Ship→Explore as product loop |
 | Needs external verification | Competitor capabilities unless reverified |
@@ -41,7 +41,7 @@ Out of scope: approval policy changes, new `flow` methodology skill, `docs/flow-
 ```bash
 pnpm flow:check
 pnpm flow:test
-wc -w docs/workflow/readme.md docs/workflow/working-with-flow.md docs/workflow/principles.md docs/workflow/influences-and-alternatives.md docs/workflow/project-context.md docs/workflow/learning-and-improvement.md
+wc -w .agents/flow/README.md .agents/flow/guides/working-with-flow.md .agents/flow/guides/principles.md .agents/flow/guides/influences-and-alternatives.md .agents/flow/guides/project-context.md .agents/flow/guides/learning-and-improvement.md
 ```
 
 Grep new pages for private paths, `filecite`, overclaims (`proven`, `guaranteed`), and a standalone `flow` skill described as shipped.
@@ -62,6 +62,6 @@ Additional: `flow.md` wins on conflict; examples match current approval contract
 
 ## Related documents
 
-- Operational authority: [flow.md](../workflow/flow.md)
+- Operational authority: [flow.md](../flow.md)
 - Evaluation harness: [flow-evaluation-suite.md](flow-evaluation-suite.md)
 - Improvement loop (operating process): [flow-improvement-loop.md](flow-improvement-loop.md)

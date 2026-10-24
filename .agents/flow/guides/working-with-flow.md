@@ -10,7 +10,7 @@ Use the least workflow that fits the risk.
 - **Substantial new product work** normally starts in **Explore**, even if you arrive with a long brief or say “build this feature.”
 - **Plan approval** and **Build authorization** are separate for substantial work: agreeing to a plan does not authorize implementation until you say so explicitly.
 
-Exact checkpoints: [flow.md](flow.md).
+Exact checkpoints: [flow.md](../flow.md).
 
 ## Three everyday scenarios
 
@@ -75,10 +75,10 @@ Dotted edges mean: new evidence or risk can send you back to an earlier activity
 | Learning decision | Assumption tested or explicitly deferred; findings recorded if durable |
 | Implementation slice | Verified and integrated into local `main`; limitations stated at Ship |
 
-Technical verification and customer-value evidence are different questions ([learning-and-improvement.md](learning-and-improvement.md)).
+Technical verification and customer-value evidence are different questions ([improvement.md](improvement.md)).
 
 ## Where to go next
 
 - Trade-offs behind the practices: [principles.md](principles.md)
 - Document homes: [project-context.md](project-context.md)
-- Worktrees and parallel agents: [agents/worktrees.md](../agents/worktrees.md), [agents/delegation.md](../agents/delegation.md)
+- Worktrees and parallel agents: [operations/worktrees.md](../operations/worktrees.md), [operations/delegation.md](../operations/delegation.md)

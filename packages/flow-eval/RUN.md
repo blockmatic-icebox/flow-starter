@@ -78,6 +78,6 @@ pnpm --filter @repo/flow-eval test
 1. **Static policy tests** — `delegation.test.ts` (no live agent)
 2. **Scripted orchestration** — policy comparison in tests (D09, D14)
 3. **Real subagent runs** — `eval run` / `eval pilot` (requires `agent` CLI auth)
-4. **Browser verification** — [docs/agents/verify.md](../../docs/agents/verify.md)
+4. **Browser verification** — [.agents/flow/operations/verification.md](../../.agents/flow/operations/verification.md)
 
 A passing `pnpm flow:check` does not prove delegation behavior. Live run artifacts belong under `__dev/flow-evals/<runId>/` (gitignored). Record wall clock, tokens, and worker counts only when observed; otherwise treat as `missing`.

@@ -4,7 +4,7 @@ Two questions often get conflated: **Did the change work technically?** and **Di
 
 ## Customer learning versus technical correctness
 
-- **Review** checks alignment with acceptance criteria, tests, security, and documentation ([flow.md](flow.md)).
+- **Review** checks alignment with acceptance criteria, tests, security, and documentation ([flow.md](../flow.md)).
 - A working implementation does **not** prove customer value.
 - **Ship** should report what ran, what stayed unverified, and product outcome evidence—or say outcome evidence is still unknown.
 
@@ -21,7 +21,7 @@ The `@repo/flow-eval` package provides a **user-invoked** harness: isolated work
 | Arms | Compare Flow entrypoint vs reduced context |
 | `flow:check` | Validates doc paths and bundle freshness—not product outcomes |
 
-Command reference: [packages/flow-eval/RUN.md](../../packages/flow-eval/RUN.md). Initiative status: [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md). As of that initiative, an **authenticated official pilot** may still be blocked pending CLI auth; treat live batch claims as in-progress unless the initiative says otherwise.
+Command reference: [packages/flow-eval/RUN.md](../../../packages/flow-eval/RUN.md). Initiative status: [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md). As of that initiative, an **authenticated official pilot** may still be blocked pending CLI auth; treat live batch claims as in-progress unless the initiative says otherwise.
 
 ## Human-reviewed improvement loop (operating process)
 
@@ -40,7 +40,9 @@ flowchart LR
   freeze --> test --> diagnose --> propose --> review --> implement --> compare --> decide
 ```
 
-**Side constraint:** an evaluation run does **not** edit [flow.md](flow.md), rubrics, or skills. Gabo and a reviewing assistant approve remediation batches before implementation.
+**Side constraint:** an evaluation run does **not** edit [flow.md](../flow.md), rubrics, or skills. Gabo and a reviewing assistant approve remediation batches before implementation.
+
+**Automated observation (planned):** [flow-self-improvement.md](../initiatives/flow-self-improvement.md) describes a default-off event log, clustering, and L1 human promotion reusing the same harness. Staged autonomy is [ADR 0013](../decisions/adr/0013-flow-improvement-autonomy.md) (**Proposed**); auto-merge (L2) is not active.
 
 Rejected for this loop (per initiative): scheduled eval cron, dashboard, orchestration platform, grading agents on stage labels alone, single opaque quality score as ship decision.
 
@@ -53,5 +55,5 @@ Rejected for this loop (per initiative): scheduled eval cron, dashboard, orchest
 ## Where to go next
 
 - Day-to-day activities: [working-with-flow.md](working-with-flow.md)
-- Operational Ship requirements: [flow.md](flow.md)
-- Run evaluations: [RUN.md](../../packages/flow-eval/RUN.md)
+- Operational Ship requirements: [flow.md](../flow.md)
+- Run evaluations: [RUN.md](../../../packages/flow-eval/RUN.md)

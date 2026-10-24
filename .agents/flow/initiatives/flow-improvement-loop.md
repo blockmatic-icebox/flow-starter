@@ -12,6 +12,8 @@ Run a manually triggered evidence loop for Flow workflow, skill routing, delegat
 
 Harness implementation and scenario cards: [flow-evaluation-suite.md](flow-evaluation-suite.md).
 
+Dogfooding self-improvement (observe → cluster → experiment → L1 promote; L2 inactive): [flow-self-improvement.md](flow-self-improvement.md), [ADR 0013](../decisions/adr/0013-flow-improvement-autonomy.md) (**Proposed**).
+
 ## Loop
 
 1. **Freeze** — Pin commit, scenario versions, rubric, `skills-lock.json` hash, harness protocol, model, arm, configuration. Historical run `20261024-flow-v0.1-1256e532` stays immutable.
@@ -66,7 +68,7 @@ Each finding: `F-<area>-<nnn>`, severity, confidence, evidence refs (with origin
 - [x] WP1 — Harness integrity (`@repo/flow-eval`): delegation gates, compare `--remediation`, criteria in reports, S07 handoff fix, user-event redaction, `skillsLockHash`
 - [x] WP2 — S16/S17 public cards and oracles, `--repetition`, `pilot-loop`, blind-review loader, catalog stubs under `__dev/flow-evals/catalog/`
 - [x] Pilot — Dry-run `pilot-loop-1792879374448` (flow + control, 2 reps). Official run blocked: `agent login` / `CURSOR_API_KEY` (see `__dev/flow-evals/cli-auth-blocker.json` and `pilot-loop-1792879424491/remediation-proposal.md`)
-- [x] WP3 — Harness remediation merged in WP1; doc alignment: [delegation.md](../agents/delegation.md) conflicting-research row. **Recommendation:** accept harness baseline at current HEAD for deterministic layer; **revise** live pilot after auth; do not edit `flow.md` for S16 authorization until official S16 evidence exists
+- [x] WP3 — Harness remediation merged in WP1; doc alignment: [delegation.md](../operations/delegation.md) conflicting-research row. **Recommendation:** accept harness baseline at current HEAD for deterministic layer; **revise** live pilot after auth; do not edit `flow.md` for S16 authorization until official S16 evidence exists
 
 ## Comparison (dry-run pilot)
 

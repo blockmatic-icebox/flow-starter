@@ -6,7 +6,7 @@ An opinionated foundation for building agentic products with Next.js, React and 
 
 **Make the architectural decisions once, so developers and agents can focus on building the product.**
 
-Flow Starter provides a selected technical architecture, reusable capabilities, agent-oriented development tools, documentation conventions, and the [Flow](workflow/readme.md) engineering workflow.
+Flow Starter provides a selected technical architecture, reusable capabilities, agent-oriented development tools, documentation conventions, and the [Flow](../.agents/flow/README.md) engineering workflow.
 
 It is technology-opinionated and business-domain-agnostic: adopters inherit the stack and define their own product, users, domain, and experience.
 
@@ -48,8 +48,8 @@ Eve, Better Auth runtime, product tables and tenant isolation, shared authorized
 
 **Explore → Specify → Plan → Build → Review → Ship**
 
-- [Human introduction](workflow/readme.md)
-- [Operational contract](workflow/flow.md) — documentation ownership, naming, and workflow behavior
+- [Human introduction](../.agents/flow/README.md)
+- [Operational contract](../.agents/flow/flow.md) — documentation ownership, naming, and workflow behavior
 
 Flow defines how work is organized. Flow Starter provides the selected technical architecture.
 
@@ -89,12 +89,12 @@ Full ADR index: [docs/adr/](adr/).
 | Why a decision was made | Decision narrative (above) |
 | Current technical structure | [ARCHITECTURE.md](../ARCHITECTURE.md) |
 | Security | [SECURITY.md](../SECURITY.md), [security model](security/security-model.md) |
-| Workflow | [flow.md](workflow/flow.md) |
+| Workflow | [flow.md](../.agents/flow/flow.md) |
 | GenUI contracts | [specs/genui.md](specs/genui.md) |
 | Product and design (adopter) | [PRODUCT.md](../PRODUCT.md), [DESIGN.md](../DESIGN.md) |
-| Browser verification | [agents/verify.md](agents/verify.md) |
-| Parallel worktrees | [agents/worktrees.md](agents/worktrees.md) |
-| Adaptive delegation | [agents/delegation.md](agents/delegation.md) |
+| Browser verification | [verification.md](../.agents/flow/operations/verification.md) |
+| Parallel worktrees | [worktrees.md](../.agents/flow/operations/worktrees.md) |
+| Adaptive delegation | [delegation.md](../.agents/flow/operations/delegation.md) |
 
 Do not read every ADR or research file by default.
 
@@ -115,7 +115,7 @@ When creating a product from this repository:
 3. Replace fictional data and optional Flow demonstrations as needed.
 4. Configure required integrations; preserve relevant ADRs and PDRs.
 5. Extend `apps/web` using existing React and capability boundaries.
-6. Verify before delivery (`pnpm qa`, [agents/verify.md](agents/verify.md) for UI).
+6. Verify before delivery (`pnpm qa`, [verification.md](../.agents/flow/operations/verification.md) for UI).
 
 ## Foundation development
 
@@ -137,7 +137,7 @@ pnpm flow:check
 
 `pnpm mcp:next` connects Next.js development diagnostics while the dev server is running.
 
-UI verification: [agents/verify.md](agents/verify.md) — `https://web.localhost` (`pnpm dev`) or `https://flow.localhost` (`pnpm dev:flow`).
+UI verification: [verification.md](../.agents/flow/operations/verification.md) — `https://web.localhost` (`pnpm dev`) or `https://flow.localhost` (`pnpm dev:flow`).
 
 ## Examples
 
@@ -154,4 +154,4 @@ pnpm exec skills list
 pnpm skills:update
 ```
 
-Manifest: `skills-lock.json`. Use the smallest relevant skill set per task ([agents/skills.md](agents/skills.md)).
+Manifest: `skills-lock.json`. Use the smallest relevant skill set per task ([skills.md](../.agents/flow/operations/skills.md)).

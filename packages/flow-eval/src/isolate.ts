@@ -86,8 +86,8 @@ export const applyArmMutations = ({
 
   if (arm === "control") {
     writeFileSync(path.join(worktreePath, "AGENTS.md"), CONTROL_AGENTS);
-    rmDirIfExists(path.join(worktreePath, "docs/workflow"));
-    rmDirIfExists(path.join(worktreePath, "docs/agents"));
+    rmDirIfExists(path.join(worktreePath, ".agents/flow"));
+    rmDirIfExists(path.join(worktreePath, ".cursor/agents"));
     rmDirIfExists(path.join(worktreePath, ".agents/skills"));
   }
 
@@ -266,10 +266,8 @@ export const listControlResiduals = ({
   worktreePath: string;
 }) => {
   const residuals: string[] = [];
-  if (existsSync(path.join(worktreePath, "docs/workflow")))
-    residuals.push("docs/workflow still present");
-  if (existsSync(path.join(worktreePath, "docs/agents")))
-    residuals.push("docs/agents still present");
+  if (existsSync(path.join(worktreePath, ".agents/flow")))
+    residuals.push(".agents/flow still present");
   const agentsPath = path.join(worktreePath, "AGENTS.md");
   if (existsSync(agentsPath)) {
     const agents = readFileSync(agentsPath, "utf-8");

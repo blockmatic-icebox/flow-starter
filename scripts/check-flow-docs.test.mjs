@@ -1,5 +1,11 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -52,13 +58,25 @@ None.
   return "# Example\n";
 }
 
+const firstPartySkillIds = ["flow", "flow-eval", "flow-improve"];
+
 const requiredDocuments = {
+  ".agents/flow/README.md": "# Flow\n",
+  ".agents/flow/flow.md": "# Contract\n",
   "AGENTS.md": "# Agents\n",
   "ARCHITECTURE.md": "# Architecture\n",
   "docs/readme.md": "# Foundation\n",
-  "docs/workflow/flow.md": "# Contract\n",
-  "docs/workflow/readme.md": "# Flow\n",
 };
+
+function firstPartySkillFixture(skillId) {
+  return `---
+name: ${skillId}
+description: fixture
+---
+
+# ${skillId}
+`;
+}
 
 function fixture(t, filenames, contents = {}, options = {}) {
   const root = mkdtempSync(path.join(os.tmpdir(), "flow-docs-"));
@@ -83,6 +101,14 @@ function fixture(t, filenames, contents = {}, options = {}) {
         defaultMarkdownContent(filename),
       "utf-8"
     );
+  }
+
+  for (const skillId of firstPartySkillIds) {
+    const skillFile = path.join(root, ".agents/skills", skillId, "SKILL.md");
+    if (!existsSync(skillFile)) {
+      mkdirSync(path.dirname(skillFile), { recursive: true });
+      writeFileSync(skillFile, firstPartySkillFixture(skillId), "utf-8");
+    }
   }
 
   return root;
@@ -285,8 +311,8 @@ test("accepts relative, encoded, directory, and fragment links", (t) => {
       "docs/ideas/customer-problem.md": `${defaultMarkdownContent("docs/ideas/customer-problem.md")}
 [Architecture](../../ARCHITECTURE.md)
 [Encoded](../my%20file.md)
-[Workflow](../workflow/)
-[Fragment](../workflow/flow.md#review)
+[Workflow](../../.agents/flow/)
+[Fragment](../../.agents/flow/flow.md#review)
 [External](https://example.com/docs)
 [Mail](mailto:security@example.invalid)
 `,

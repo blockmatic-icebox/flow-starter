@@ -18,7 +18,7 @@ The application is a starter, not a completed agent platform or product.
 
 Adopt an **agent-first, capability-first, Vercel-aligned architecture** with explicit contracts, reusable actions, controlled interfaces, and incremental delivery.
 
-Product-engineering principles (capability-first operations, API and MCP readiness, lean interfaces) live in [PDR 0001](../pdr/0001-agnostic-api-first.md). The engineering lifecycle lives in [docs/workflow/flow.md](../workflow/flow.md).
+Product-engineering principles (capability-first operations, API and MCP readiness, lean interfaces) live in [PDR 0001](../pdr/0001-agnostic-api-first.md). The engineering lifecycle lives in [.agents/flow/flow.md](../../.agents/flow/flow.md).
 
 ### Controlled generative UI
 
@@ -54,7 +54,7 @@ Keep application contracts and domain operations as independent as practical fro
 | Workspace | pnpm + Turborepo | Implemented | Supersedes [ADR 0007](0007-monorepo-vercel-stack.md) / [0008](0008-monorepo-turborepo-pnpm.md) |
 | Interop | MCP (+ MCP Apps later) | Partial | Read-only Flow Agent MCP in `apps/flow`; [ADR 0010](0010-site-consultant-chat-and-mcp.md), [0012](0012-flow-and-web-applications.md) |
 | Validation | Zod | Implemented | Request bodies, GenUI props, agent tools |
-| Engineering | Flow workflow, ADRs, agent skills | Implemented | [docs/workflow/flow.md](../workflow/flow.md) |
+| Engineering | Flow workflow, ADRs, agent skills | Implemented | [.agents/flow/flow.md](../../.agents/flow/flow.md) |
 
 ### Cross-technology integration model
 
@@ -90,7 +90,7 @@ Reconsider a selected technology when credible evidence shows unmet capability, 
 ## Related documents
 
 - [PDR 0001](../pdr/0001-agnostic-api-first.md)
-- [docs/workflow/flow.md](../workflow/flow.md)
+- [.agents/flow/flow.md](../../.agents/flow/flow.md)
 - [ARCHITECTURE.md](../../ARCHITECTURE.md)
 - Prior revision before consolidation: `13d4f89368ccb8224098f544674244094a63b814` (`docs(adr): split platform and monorepo; harden GenUI and DeepSec`). Replaces `docs/adr/001-use-flow-starter.md` (Git history).
 - [Vercel platform](https://vercel.com/docs), [AI SDK](https://ai-sdk.dev/docs/introduction), [Eve](https://eve.dev/), [OpenUI Lang](https://www.openui.com/docs/openui-lang), [MCP specification](https://modelcontextprotocol.io/specification)

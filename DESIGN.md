@@ -1,6 +1,6 @@
 # Design template
 
-> Replace this file with the product's approved visual and interaction contract. Functional requirements belong in [PRODUCT.md](PRODUCT.md). Technical architecture belongs in [ARCHITECTURE.md](ARCHITECTURE.md). Follow the [Flow workflow](docs/workflow/flow.md).
+> Replace this file with the product's approved visual and interaction contract. Functional requirements belong in [PRODUCT.md](PRODUCT.md). Technical architecture belongs in [ARCHITECTURE.md](ARCHITECTURE.md). Follow the [Flow workflow](.agents/flow/flow.md).
 
 ## Experience vision
 

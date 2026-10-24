@@ -36,7 +36,7 @@ export const flowStarterFacts = {
     "MCP Streamable HTTP (read-only Flow knowledge tools)",
   ],
   workflow:
-    "Explore → Specify → Plan → Build → Review → Ship — see docs/workflow/flow.md",
+    "Explore → Specify → Plan → Build → Review → Ship — see .agents/flow/flow.md",
 } as const;
 
 export const describeArchitecture = () =>
@@ -73,7 +73,7 @@ export const describeWorkflow = () =>
     "Flow methodology:",
     flowStarterFacts.workflow,
     "",
-    "Authority: human intent, PRODUCT.md / DESIGN.md / ARCHITECTURE.md, this workflow (docs/workflow/flow.md), installed skills, then code and tests.",
+    "Authority: human intent, PRODUCT.md / DESIGN.md / ARCHITECTURE.md, this workflow (.agents/flow/flow.md), installed skills, then code and tests.",
     "Stages are activities — use the least process needed. Small fixes may go Build → Review → Ship. A substantial new product begins with discovery of unresolved decisions, progresses through approved requirements and a verifiable plan, and must not enter Build without explicit implementation authorization.",
-    "Use docs/workflow/flow.md for stage inputs, outputs, and documentation expectations.",
+    "Use .agents/flow/flow.md for stage inputs, outputs, and documentation expectations.",
   ].join("\n");

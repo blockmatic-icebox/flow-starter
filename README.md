@@ -84,7 +84,7 @@ Review the relevant architectural decisions before making consequential changes 
 | [DESIGN.md](DESIGN.md) | Product experience, visual direction and interaction |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Technical architecture and boundaries |
 | [AGENTS.md](AGENTS.md) | Entry point for coding agents |
-| [Flow for humans](docs/workflow/readme.md) | Introduction to the development methodology |
+| [Flow for humans](.agents/flow/README.md) | Introduction to the development methodology |
 | [Flow Starter foundation](docs/readme.md) | Inherited architecture, tools and adoption guidance |
 
 ## Configuration

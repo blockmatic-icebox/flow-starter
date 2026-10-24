@@ -10,12 +10,12 @@ Close the gaps found in the 2026-10-24 contrarian review: unproven Flow effectiv
 
 ## Instructions for Cursor
 
-1. Read `AGENTS.md`, `docs/workflow/flow.md` (Build, Review sections only), `docs/agents/verify.md`.
+1. Read `AGENTS.md`, `.agents/flow/flow.md` (Build, Review sections only), `.agents/flow/operations/verification.md`.
 2. Work **one finding id at a time**, in wave order. Do not batch waves.
 3. Build only the finding ids the human names in a message. Plan approval is not Build authorization.
 4. Do not commit or push. Do not change an accepted ADR/PDR; if a finding needs it, stop and present the conflict and the ADR path.
 5. After each finding: run the listed checks, report each command with its exit code, and state anything not run. A script that exits 0 without exercising the change is not evidence.
-6. End every final response with the **Skills loaded** footer required by `docs/agents/skills.md`.
+6. End every final response with the **Skills loaded** footer required by `.agents/flow/operations/skills.md`.
 
 ## Authorization
 
@@ -23,7 +23,7 @@ Close the gaps found in the 2026-10-24 contrarian review: unproven Flow effectiv
 | --- | --- |
 | This initiative document | Plan acceptance |
 | Run a finding (`F0`–`F16`) | A later message that names that finding id |
-| Live pilot (`F13`) | Message naming scenarios, arm, model, and session cap ([flow-improvement-loop.md](flow-improvement-loop.md)) |
+| Live pilot (`F13`) | Message naming scenarios, arm, model, and session cap ([flow-improvement-loop.md](../../.agents/flow/initiatives/flow-improvement-loop.md)) |
 | Skill-lock edits (`F8`) | Message that approves the removal list |
 | Commit / push | Separate explicit request |
 
@@ -65,7 +65,7 @@ Evidence from static inspection (2026-10-24 planning) plus measured runs (see **
 | CI | Single `quality` job in `.github/workflows/ci.yml`; `permissions: contents: read`; checkout `actions/checkout@11d5960a326750d5838078e36cf38b85af677262`. `pnpm security:check` is in `ci:local` but not in CI. Gitleaks is installed in CI but not run there. |
 | npm `cn` in `@repo/ui` | `cn@0.5.0` — compiled Tailwind class merge (documented drop-in for clsx + tailwind-merge). `packages/ui/src/lib/utils.ts` re-exports `cn` from `"cn"`. ~62 components import `"cn"` directly. Not the same as inlining `clsx` + `tailwind-merge` unless we switch implementations. |
 | `shadcn` / `@shadcn/react` | `@shadcn/react` used at runtime in `message-scroller.tsx` and `questionnaire.tsx`. `shadcn` CLI package has no runtime import. |
-| Skill lock vs routing table | 57 skills in `skills-lock.json`; 25 named in `docs/agents/skills.md` (all present in lock). 32 unreferenced in routing doc. No Expo / Reanimated / Framer Motion in app or workspace dependencies. |
+| Skill lock vs routing table | 57 skills in `skills-lock.json`; 25 named in `.agents/flow/operations/skills.md` (all present in lock). 32 unreferenced in routing doc. No Expo / Reanimated / Framer Motion in app or workspace dependencies. |
 | Knowledge snapshot | `knowledge-snapshot.ts`: **74,285 bytes**, 56 lines; eager import from `knowledge.ts`. ADR 0012: knowledge bundled at build time. |
 | GenUI eval self-grade risk | `query-matrix.ts` prompts align with router keyword families; `query-matrix.test.ts` requires every case `PASS`; `eval:genui:offline` exits 1 on any failure. |
 | Playwright compose | Only `genui-demo.spec.ts` mocks `/api/genui/compose`. Tier 1 compose is deterministic without `AI_GATEWAY_API_KEY`. Dev compose skips daily cap when rate limiting is off (`enforce-daily-cap.ts`). |
@@ -77,35 +77,35 @@ Evidence from static inspection (2026-10-24 planning) plus measured runs (see **
 Measured 2026-10-24 on this checkout. `pnpm qa` and `pnpm ci:local` chain with `&&`; the aggregate exits on the first failing step.
 
 | Command | Exit code | Wall time (s) | Notes |
-| --- | ---: | ---: | --- |
+| --- | --: | --: | --- |
 | `pnpm qa` | 1 | ~0.5 | Stops at `pnpm lint` (oxlint in `scripts/worktrees/**`) |
 | `pnpm ci:local` | 1 | ~0.6 | Stops when `pnpm qa` fails |
 | `pnpm flow-eval:check` | 0 | ~0.5 | Types, unit tests, `eval preserve` |
 
 **`pnpm qa` steps (timed individually; full `qa` aborts before later steps when lint fails):**
 
-| Step | Exit code | Wall time (s) |
-| --- | ---: | ---: |
-| `pnpm flow:check` | 0 | 0.1 |
-| `pnpm architecture:check` | 0 | 0.2 |
-| `pnpm lint` | 1 | 0.2 |
-| `pnpm knip` | 1 | 0.5 |
-| `pnpm sherif` | 0 | 0.1 |
-| `pnpm check-types` | 1 | 0.2 |
-| `pnpm test` | 0 | 0.7–1.4 |
-| `pnpm --filter @repo/db db:check` | 0 | 0.2 |
+| Step                              | Exit code | Wall time (s) |
+| --------------------------------- | --------: | ------------: |
+| `pnpm flow:check`                 |         0 |           0.1 |
+| `pnpm architecture:check`         |         0 |           0.2 |
+| `pnpm lint`                       |         1 |           0.2 |
+| `pnpm knip`                       |         1 |           0.5 |
+| `pnpm sherif`                     |         0 |           0.1 |
+| `pnpm check-types`                |         1 |           0.2 |
+| `pnpm test`                       |         0 |       0.7–1.4 |
+| `pnpm --filter @repo/db db:check` |         0 |           0.2 |
 
 **Remainder of `ci:local` (timed individually):**
 
-| Step | Exit code | Wall time (s) |
-| --- | ---: | ---: |
-| `pnpm flow:test` | 0 | under 0.1 |
-| `pnpm architecture:test` | 0 | under 0.1 |
-| `pnpm test:scripts` | 0 | 2.0 |
-| `pnpm eval:genui:offline` | 0 | 1.0 |
-| `pnpm test:browser` | 0 | 22.3 |
-| `pnpm security:check` | 0 | 3.4 |
-| `pnpm build` | 0 | 3.6 |
+| Step                      | Exit code | Wall time (s) |
+| ------------------------- | --------: | ------------: |
+| `pnpm flow:test`          |         0 |     under 0.1 |
+| `pnpm architecture:test`  |         0 |     under 0.1 |
+| `pnpm test:scripts`       |         0 |           2.0 |
+| `pnpm eval:genui:offline` |         0 |           1.0 |
+| `pnpm test:browser`       |         0 |          22.3 |
+| `pnpm security:check`     |         0 |           3.4 |
+| `pnpm build`              |         0 |           3.6 |
 
 **Kill-criteria implication:** baseline `pnpm qa` is red (`lint`; `knip` and `check-types` also fail when run). Do not authorize **F1** until failures are triaged (pre-existing vs environment). Re-run `pnpm qa` after any baseline fix.
 
@@ -116,7 +116,7 @@ Measured 2026-10-24 on this checkout. `pnpm qa` and `pnpm ci:local` chain with `
 | Knowledge snapshot (source) | 74,285 B | `knowledge-snapshot.ts` on disk |
 | Knowledge in server bundle | ~82 KiB tools chunk | `server/chunks/apps_flow_app__lib_flow-agent_tools_ts_*.js` (81,738 B); embeds bundled doc bodies. Snapshot size ≈90% of chunk |
 
-**Skills:** 25 of 57 lock entries named in `docs/agents/skills.md`; 32 unreferenced (see F8 lists).
+**Skills:** 25 of 57 lock entries named in `.agents/flow/operations/skills.md`; 32 unreferenced (see F8 lists).
 
 ## Plan corrections (override brief conditionals)
 
@@ -124,7 +124,7 @@ These apply when the corresponding finding is authorized:
 
 - **F3** — Keep `cn` and `@shadcn/react`. Move unused `shadcn` CLI to `devDependencies` only. If `pnpm knip` still flags it, stop and ask. Check: `pnpm knip`, `pnpm check-types`, `pnpm test:browser`.
 - **F4** — New held-out prompt file (25–40 cases) + `test:held-out` script; expectations from product intent, not `routing.ts`; do not edit router in same change. Failures recorded here with proposed router fixes. Excluded from default `pnpm test` and `eval:genui:offline`.
-- **F8** — Propose tier split only until removal list approved. **Proposed optional drop** (not in routing table, not in stack): `animate`, `animate-expo`, `animation-vocabulary`, `eas-app-stores`, `eas-update`, `eas-workflows`, `emilkowal-animations`, `expo-dev-client`, `expo-dom`, `expo-native-ui`, `expo-router`, `expo-upgrade`, `find-animation-opportunities`, `improve-animations`, `review-animations`. **Keep in optional/core debate until human input:** `apple-design`, `ask-sonner`, `better-auth-best-practices`, `core`, `emil-design-eng`, `eve`, `flow-eval`, `neon`, `nuqs`, `portless`, `react`, `react-email`, `turborepo`, `vercel-cli`, `vercel-composition-patterns`, `vitest`, `web-design-guidelines`. Every skill in `docs/agents/skills.md` routing table must remain in **core**.
+- **F8** — Propose tier split only until removal list approved. **Proposed optional drop** (not in routing table, not in stack): `animate`, `animate-expo`, `animation-vocabulary`, `eas-app-stores`, `eas-update`, `eas-workflows`, `emilkowal-animations`, `expo-dev-client`, `expo-dom`, `expo-native-ui`, `expo-router`, `expo-upgrade`, `find-animation-opportunities`, `improve-animations`, `review-animations`. **Keep in optional/core debate until human input:** `apple-design`, `ask-sonner`, `better-auth-best-practices`, `core`, `emil-design-eng`, `eve`, `flow-eval`, `neon`, `nuqs`, `portless`, `react`, `react-email`, `turborepo`, `vercel-cli`, `vercel-composition-patterns`, `vitest`, `web-design-guidelines`. Every skill in `.agents/flow/operations/skills.md` routing table must remain in **core**.
 - **F10** — Bundle budget from F0 baseline + margin; **advisory in CI** until open question 3 says hard fail. Parser unit-tested with fixture.
 - **F11** — Refactor loading only if snapshot server-bundle share is material; keep `bundle-knowledge.mjs` on build for ADR 0012; do not edit ADR 0012; no hand-edits to snapshot.
 - **F16** — Document that `D01`–`D15` test `classifyDelegation` as a **reference model** unless open question 4 chooses agent instructions.
@@ -190,14 +190,14 @@ These apply when the corresponding finding is authorized:
 #### F8 — Trim and tier the skill lock (human decision required)
 
 - depends_on: [F0]
-- writes: `skills-lock.json`, `docs/agents/skills.md`, `docs/readme.md` (after approval only)
+- writes: `skills-lock.json`, `.agents/flow/operations/skills.md`, `docs/readme.md` (after approval only)
 - See **Plan corrections — F8** above.
 - Check: `pnpm flow:check`, `pnpm skills:install`.
 
 #### F9 — Skill update regression gate
 
 - depends_on: [F8, F13]
-- writes: `docs/agents/skills.md`
+- writes: `.agents/flow/operations/skills.md`
 - Document `pnpm skills:update` → deterministic eval → live pilot (when available) before accepting new hashes.
 
 ### Wave 4 — Performance evidence
@@ -230,7 +230,7 @@ These apply when the corresponding finding is authorized:
 #### F14 — Slim the entry point
 
 - depends_on: [F13]
-- writes: `AGENTS.md`, `docs/workflow/flow.md`
+- writes: `AGENTS.md`, `.agents/flow/flow.md`
 - Target ~40 lines in `AGENTS.md` from pilot evidence only.
 
 #### F15 — Enforce, don't just instruct
@@ -241,7 +241,7 @@ These apply when the corresponding finding is authorized:
 #### F16 — Clarify what `D01`–`D15` prove
 
 - depends_on: []
-- writes: `docs/workflow/flow.md` (Enforcement), `docs/agents/delegation.md`, `docs/initiatives/flow-evaluation-suite.md`
+- writes: `.agents/flow/flow.md` (Enforcement), `.agents/flow/operations/delegation.md`, `docs/initiatives/flow-evaluation-suite.md`
 - See **Plan corrections — F16** above.
 
 ## Out of scope
@@ -282,10 +282,10 @@ Report each command with its exit code. Anything not run is stated as not run.
 
 ## Build authorization log
 
-| Finding | Authorized | Completed |
-| --- | --- | --- |
-| F0 | Plan implementation (measure + document) | 2026-10-24 |
-| F1–F16 | — | — |
+| Finding | Authorized                               | Completed  |
+| ------- | ---------------------------------------- | ---------- |
+| F0      | Plan implementation (measure + document) | 2026-10-24 |
+| F1–F16  | —                                        | —          |
 
 ## Findings from held-out eval (F4)
 

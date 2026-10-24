@@ -8,6 +8,7 @@ import {
   loadAndValidateInitiative,
   parseInitiativeWaves,
 } from "./worktrees.mjs";
+import { initiativePath } from "./worktrees/initiative.mjs";
 
 const validInitiative = `
 # Example initiative
@@ -84,6 +85,21 @@ function tempRepo(initiativeBody = validInitiative) {
   );
   return root;
 }
+
+test("initiativePath resolves .agents/flow/initiatives", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "flow-worktrees-"));
+  const flowInitiativeDir = path.join(root, ".agents/flow/initiatives");
+  mkdirSync(flowInitiativeDir, { recursive: true });
+  writeFileSync(
+    path.join(flowInitiativeDir, "flow-eval.md"),
+    "# Eval\n",
+    "utf-8"
+  );
+  assert.equal(
+    initiativePath("flow-eval", root),
+    path.join(flowInitiativeDir, "flow-eval.md")
+  );
+});
 
 test("parseInitiativeWaves reads two waves and three tasks", () => {
   const { waves } = parseInitiativeWaves(validInitiative);

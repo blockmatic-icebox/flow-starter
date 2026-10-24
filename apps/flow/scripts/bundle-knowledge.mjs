@@ -6,15 +6,15 @@ import path from "node:path";
 const repoRoot = path.resolve(import.meta.dirname, "../../..");
 
 const sources = [
-  "docs/workflow/flow.md",
-  "docs/workflow/readme.md",
+  ".agents/flow/flow.md",
+  ".agents/flow/README.md",
   "docs/readme.md",
   "ARCHITECTURE.md",
   "AGENTS.md",
-  "docs/agents/domain.md",
-  "docs/agents/verify.md",
-  "docs/agents/skills.md",
-  "docs/agents/worktrees.md",
+  ".agents/flow/operations/context.md",
+  ".agents/flow/operations/verification.md",
+  ".agents/flow/operations/skills.md",
+  ".agents/flow/operations/worktrees.md",
   "PRODUCT.md",
 ];
 

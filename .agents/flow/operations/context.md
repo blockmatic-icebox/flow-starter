@@ -1,10 +1,10 @@
 # Domain documentation
 
-This repository uses one primary domain context. [AGENTS.md](../../AGENTS.md) is the universal agent router; [docs/workflow/flow.md](../workflow/flow.md) owns documentation conventions and lifecycle. UI verification: [verify.md](verify.md).
+This repository uses one primary domain context. [AGENTS.md](../../../AGENTS.md) is the universal agent router; [.agents/flow/flow.md](../flow.md) owns documentation conventions and lifecycle. UI verification: [verification.md](verification.md).
 
 ## When to read the glossary
 
-Read [GLOSSARY.md](../../GLOSSARY.md) when work involves:
+Read [GLOSSARY.md](../../../GLOSSARY.md) when work involves:
 
 - Domain concepts or ambiguous terminology.
 - Naming new public concepts, models, or operations.
@@ -17,7 +17,7 @@ Use the project's established term when its meaning is relevant. Do not invent s
 
 ## When to inspect decisions
 
-Read the relevant records in [docs/adr/](../adr/) when changing architecture, authorization, data boundaries, major integrations, or other consequential choices.
+Read the relevant records in [docs/adr/](../../../docs/adr/) when changing architecture, authorization, data boundaries, major integrations, or other consequential choices.
 
 Do not load every ADR automatically.
 
@@ -33,8 +33,8 @@ Create a new ADR only when a consequential architectural trade-off merits durabl
 
 ## Related contracts
 
-- [PRODUCT.md](../../PRODUCT.md): product intent and scope.
-- [DESIGN.md](../../DESIGN.md): experience and interaction direction.
-- [ARCHITECTURE.md](../../ARCHITECTURE.md): system boundaries.
+- [PRODUCT.md](../../../PRODUCT.md): product intent and scope.
+- [DESIGN.md](../../../DESIGN.md): experience and interaction direction.
+- [ARCHITECTURE.md](../../../ARCHITECTURE.md): system boundaries.
 
 Read only the relevant context for the task.
