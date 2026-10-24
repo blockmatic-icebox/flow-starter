@@ -189,6 +189,16 @@ Research and decision records provide context when a task requires them.
 
 Do not read all documents by default.
 
+## Adopting Flow Starter
+
+Bootstrap a new project from the latest `main` branch (clones into a new folder, sets your Portless hostname, and creates a fresh git history):
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-starter/main/scripts/install.sh)"
+```
+
+The installer removes itself from the cloned tree before the initial commit. It does not run `pnpm install`.
+
 ## Foundation development
 
 Quick start:
@@ -230,7 +240,7 @@ The development server must be running when connecting the MCP bridge.
 
 ### Browser development
 
-Coding agents and humans verifying UI must follow [agents/verify.md](agents/verify.md): installed **agent-browser** skill, `https://flow.localhost` (or direct `dev:app`), snapshot/screenshot/console/errors, plus matching `pnpm test` / `pnpm test:browser` when applicable.
+Coding agents and humans verifying UI must follow [agents/verify.md](agents/verify.md): installed **agent-browser** skill, `https://web.localhost` for `pnpm dev` or `https://flow.localhost` for `pnpm dev:flow` (or direct `dev:app`), snapshot/screenshot/console/errors, plus matching `pnpm test` / `pnpm test:browser` when applicable.
 
 A successful build does not establish correct visual behavior.
 

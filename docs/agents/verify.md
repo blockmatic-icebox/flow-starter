@@ -18,10 +18,11 @@ Start the app with `pnpm dev` (Portless) or `pnpm --filter web dev:app` (direct 
 
 | Mode | URL |
 | --- | --- |
-| Portless (default) | `https://flow.localhost` |
+| Portless (default) | `https://web.localhost` (`pnpm dev` — product app) |
+| Flow agent app | `https://flow.localhost` (`pnpm dev:flow`) |
 | Direct Next dev | `http://localhost:3000` (or the port shown in the terminal) |
 
-Use HTTPS on `flow.localhost` when certificate trust is set up (`pnpm setup:portless`). Fall back to direct `dev:app` only when Portless or TLS blocks the CLI. Leave TLS verification enabled.
+Use HTTPS on `web.localhost` or `flow.localhost` when certificate trust is set up (`pnpm setup:portless`). Fall back to direct `dev:app` only when Portless or TLS blocks the CLI. Leave TLS verification enabled.
 
 GenUI fixture lab routes (`/__genui__/fixtures/:id`) require `GENUI_FIXTURE_LAB=1` on the server. Playwright sets this automatically; for manual or agent-browser passes against fixtures, run Next with that env or use `pnpm test:browser` for automated coverage.
 
