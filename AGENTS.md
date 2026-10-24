@@ -4,7 +4,7 @@ The checkout is a starter baseline. Root contracts describe intended direction. 
 
 ## Flow workflow
 
-[FLOW.md](FLOW.md) is the canonical workflow and documentation-convention contract. Read its relevant sections when selecting skills, planning substantial work, or creating or changing documentation. External skills supply specialized methodology; Flow controls the resulting artifact's canonical location, naming, and lifecycle. Do not read every linked document by default.
+[FLOW.md](FLOW.md) defines the agent-agnostic workflow, skill-selection rules, and documentation conventions. Load the relevant sections when planning substantial work, using specialized skills, or changing documentation. Skills provide methods; Flow owns document locations, naming, and lifecycle. Use progressive disclosure: do not read every linked document by default.
 
 ## Decisions
 
@@ -17,7 +17,7 @@ Update the owning document in the same change. Use a PDR in `docs/pdr/` for a co
 - Product behavior, scope, or acceptance → [PRODUCT.md](PRODUCT.md)
 - UI, interaction, or visual changes → [DESIGN.md](DESIGN.md)
 - Architecture, integrations, or persistence → [ARCHITECTURE.md](ARCHITECTURE.md)
-- Implementation sequence → [ARCHITECTURE.md](ARCHITECTURE.md) §10 and [ROADMAP.md](ROADMAP.md)
+- Current delivery priorities and progress → [ROADMAP.md](ROADMAP.md); read [ARCHITECTURE.md](ARCHITECTURE.md) for technical boundaries.
 - Project-specific terms → [GLOSSARY.md](GLOSSARY.md)
 - Hard-to-reverse rationale → the relevant file in [docs/adr/](docs/adr/)
 - Dated evidence → [docs/research/](docs/research/). Accepted direction stays in the root contracts and `docs/adr/`.
@@ -33,7 +33,7 @@ Use [FLOW.md](FLOW.md) for Explore → Specify → Plan → Build → Review →
 - Install skills from [skills-lock.json](skills-lock.json) (`pnpm skills:install`, `pnpm skills:update`). Do not author, copy, or commit `SKILL.md` here.
 - UI, layout, or interaction changes: verify in a running browser before finishing. Follow [Browser development](README.md#browser-development). Backend-only and docs-only changes finish without a browser pass.
 - Run the checks that match the change. Report the commands and results. Do not bypass quality gates or misrepresent results.
-- Pre-commit (`simple-git-hooks`) runs `pnpm qa` (`lint:fix`, typecheck, unit tests) and `git update-index --again` for formatter fixes on staged files.
+- Pre-commit runs the non-mutating `pnpm qa` checks. Format code deliberately with `pnpm lint:fix` before staging. Hooks must never stage files or reformat unrelated working-tree changes automatically.
 
 ## Agent skills
 

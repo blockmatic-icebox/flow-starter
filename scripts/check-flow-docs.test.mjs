@@ -1,0 +1,127 @@
+import assert from "node:assert/strict";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import test from "node:test";
+
+import { validateFlowDocs } from "./check-flow-docs.mjs";
+
+function fixture(t, filenames) {
+  const root = mkdtempSync(path.join(os.tmpdir(), "flow-docs-"));
+
+  t.after(() => {
+    rmSync(root, { force: true, recursive: true });
+  });
+
+  for (const filename of filenames) {
+    const absolute = path.join(root, filename);
+
+    mkdirSync(path.dirname(absolute), { recursive: true });
+    writeFileSync(absolute, "# Example\n", "utf-8");
+  }
+
+  return root;
+}
+
+test("allows absent optional directories", (t) => {
+  const root = fixture(t, []);
+  assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("accepts canonical filenames", (t) => {
+  const root = fixture(t, [
+    "docs/ideas/customer-problem.md",
+    "docs/initiatives/onboarding.md",
+    "docs/plans/database-migration.md",
+    "docs/specs/authentication.md",
+    "docs/research/2026-10-24-user-interviews.md",
+    "docs/adr/0007-auth-boundary.md",
+    "docs/pdr/0001-pricing-model.md",
+  ]);
+
+  assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("preserves explicit legacy documents", (t) => {
+  const root = fixture(t, [
+    "docs/adr/001-use-flow-starter.md",
+    "docs/adr/002-vercel-ai-sdk-for-tier-3.md",
+    "docs/research/generative-ui.md",
+    "docs/specs/genui/README.md",
+    "docs/specs/genui/INVENTORY.md",
+  ]);
+
+  assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("rejects uppercase decision prefixes", (t) => {
+  const root = fixture(t, ["docs/adr/ADR-new-decision.md"]);
+
+  assert.match(validateFlowDocs(root).join("\n"), /invalid filename/u);
+});
+
+test("rejects new three-digit ADRs", (t) => {
+  const root = fixture(t, ["docs/adr/007-new-decision.md"]);
+
+  assert.match(validateFlowDocs(root).join("\n"), /invalid filename/u);
+});
+
+test("detects collision between legacy 001 and new 0001", (t) => {
+  const root = fixture(t, [
+    "docs/adr/001-use-flow-starter.md",
+    "docs/adr/0001-another-decision.md",
+  ]);
+
+  assert.match(validateFlowDocs(root).join("\n"), /duplicate ADR number/u);
+});
+
+test("detects duplicate modern ADR numbers", (t) => {
+  const root = fixture(t, [
+    "docs/adr/0007-first-decision.md",
+    "docs/adr/0007-second-decision.md",
+  ]);
+
+  assert.match(validateFlowDocs(root).join("\n"), /duplicate ADR number/u);
+});
+
+test("does not share identifiers across ADRs and PDRs", (t) => {
+  const root = fixture(t, [
+    "docs/adr/0001-technical-boundary.md",
+    "docs/pdr/0001-product-boundary.md",
+  ]);
+
+  assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("rejects nested new specifications", (t) => {
+  const root = fixture(t, ["docs/specs/auth/requirements.md"]);
+
+  assert.match(validateFlowDocs(root).join("\n"), /nested Markdown/u);
+});
+
+test("rejects uppercase Markdown extensions", (t) => {
+  const root = fixture(t, ["docs/ideas/new-feature.MD"]);
+
+  assert.match(validateFlowDocs(root).join("\n"), /invalid filename/u);
+});
+
+test("rejects invalid calendar dates", (t) => {
+  const root = fixture(t, ["docs/research/2026-02-29-not-real.md"]);
+
+  assert.match(validateFlowDocs(root).join("\n"), /invalid ISO calendar date/u);
+});
+
+test("accepts valid leap days", (t) => {
+  const root = fixture(t, ["docs/research/2028-02-29-valid-leap-day.md"]);
+
+  assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("rejects decision identifier zero", (t) => {
+  const root = fixture(t, ["docs/adr/0000-not-a-decision.md"]);
+
+  assert.match(
+    validateFlowDocs(root).join("\n"),
+    /invalid decision identifier/u
+  );
+});

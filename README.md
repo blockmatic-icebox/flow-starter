@@ -13,16 +13,17 @@ pnpm dev
 
 Open the demo at `/genui-demo` (local URL from the dev server, or `https://flow.localhost` after [Portless setup](#local-https-portless)).
 
-| Command            | Purpose                                           |
-| ------------------ | ------------------------------------------------- |
-| `pnpm dev`         | Development (Turborepo)                           |
-| `pnpm build`       | Production build                                  |
-| `pnpm lint`        | oxlint + oxfmt                                    |
-| `pnpm check-types` | TypeScript                                        |
-| `pnpm test`        | `@repo/genui` unit tests                          |
-| `pnpm flow:check`  | Flow documentation path and naming validation     |
-| `pnpm qa`          | flow:check + lint:fix + types + test (pre-commit) |
-| `pnpm ci:local`    | same steps as GitHub Actions (includes build)     |
+| Command            | Purpose                                                 |
+| ------------------ | ------------------------------------------------------- |
+| `pnpm dev`         | Development (Turborepo)                                 |
+| `pnpm build`       | Production build                                        |
+| `pnpm lint`        | oxlint + oxfmt                                          |
+| `pnpm check-types` | TypeScript                                              |
+| `pnpm test`        | `@repo/genui` unit tests                                |
+| `pnpm flow:check`  | Flow documentation path and naming validation           |
+| `pnpm flow:test`   | Unit tests for Flow documentation validation            |
+| `pnpm qa`          | Non-mutating Flow, lint, type, and test checks          |
+| `pnpm ci:local`    | Full local CI including Flow tests and production build |
 
 Optional tier-3 model answers: set `AI_GATEWAY_API_KEY` (and optionally `GENUI_MODEL`) in `apps/web/.env.local`. See [docs/adr/002-vercel-ai-sdk-for-tier-3.md](docs/adr/002-vercel-ai-sdk-for-tier-3.md). Compose rate limits: off on `flow.localhost` by default; set `GENUI_ENFORCE_RATE_LIMIT=1` to test 429 behavior locally.
 
@@ -70,7 +71,7 @@ Ask your coding agent naturally, for example:
 
 For larger work, the agent should use a bounded initiative document under `docs/initiatives/`. Routine small changes do not need additional planning documents.
 
-Root `PRODUCT.md`, `DESIGN.md`, and `ARCHITECTURE.md` remain the current source of truth for their respective concerns. Flow prevents external skills from scattering outputs into competing document structures.
+Root `PRODUCT.md`, `DESIGN.md`, and `ARCHITECTURE.md` remain the current source of truth for their respective concerns. Flow defines canonical output locations for external skills. The repository validator checks documentation naming and decision-number collisions, while human and agent review remain necessary to verify content and intent.
 
 ### Documentation validation
 
@@ -81,6 +82,8 @@ pnpm flow:check
 ```
 
 The check is part of `pnpm qa` and `pnpm ci:local`, and runs in the existing manual CI workflow.
+
+`pnpm flow:test` tests the validator itself, including legacy numbering collisions and invalid filenames.
 
 The validator checks document paths and filenames; it does not replace engineering review, verify product decisions, or guarantee skill execution.
 
@@ -94,7 +97,9 @@ The validator checks document paths and filenames; it does not replace engineeri
 
 ## Git hooks
 
-After `pnpm install`, `prepare` installs [simple-git-hooks](https://github.com/toplenboren/simple-git-hooks). Pre-commit runs `pnpm qa` and re-stages formatter fixes (`git update-index --again`).
+After `pnpm install`, `prepare` installs `simple-git-hooks`. Pre-commit runs the non-mutating `pnpm qa` checks. Hooks do not automatically format or stage files.
+
+Run `pnpm lint:fix` deliberately before staging changes that need formatting.
 
 ## CI
 
@@ -111,9 +116,24 @@ pnpm dev
 
 Details: bypass with `pnpm --filter web dev:app`, or `PORTLESS=0 pnpm --filter web dev`.
 
+## Browser development
+
+UI, layout, and interaction changes must be verified in a running application when browser access is available.
+
+1. Run `pnpm dev` for the normal local development environment, or `pnpm --filter web dev:app` to bypass Portless.
+2. Open the relevant route. The bundled GenUI example is at `/genui-demo`.
+3. Verify the intended interaction, loading state, empty or error states as applicable, and relevant responsive layouts.
+4. Check keyboard accessibility and visible focus where controls are changed.
+5. Check the browser console for runtime errors.
+6. Run relevant automated tests and report what was verified in the browser separately from test-suite results.
+
+If browser access is unavailable, report that limitation. Do not claim visual verification from typechecking or unit tests alone.
+
+Do not make any product-specific example mandatory.
+
 ## Further reading
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — data flow and GenUI tiers
-- [ROADMAP.md](ROADMAP.md) — delivery order (detail in ARCHITECTURE §10)
-- [docs/specs/genui/README.md](docs/specs/genui/README.md) — package layout and demo API
+- [ROADMAP.md](ROADMAP.md) — canonical delivery milestones and status
+- [docs/specs/genui/README.md](docs/specs/genui/README.md) — GenUI implementation and historical extraction notes
 - [AGENTS.md](AGENTS.md) — agent editing rules for this repo
