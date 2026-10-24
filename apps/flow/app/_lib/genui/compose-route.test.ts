@@ -154,6 +154,29 @@ describe("compose route", () => {
     assert.equal(response.status, 429);
   });
 
+  it("routes product planning language to the catalog, not the Flow essay", async () => {
+    const queries = [
+      "specify the Orbit plan",
+      "explore products and specify a filter",
+      "What methodology should I use to compare plans?",
+    ];
+    const results = await Promise.all(
+      queries.map(async (query) => {
+        const response = await handleComposePost({
+          env: { AI_GATEWAY_API_KEY: "", NODE_ENV: "test" },
+          request: jsonRequest({ body: JSON.stringify({ query }) }),
+        });
+        const text = await response.text();
+        return { query, response, text };
+      })
+    );
+    for (const { query, response, text } of results) {
+      assert.equal(response.status, 200);
+      assert.equal(text.includes("entity:orbit-plan"), true, query);
+      assert.equal(text.includes("Explore → Specify"), false, query);
+    }
+  });
+
   it("answers the default Flow workflow prompt with grounded methodology text", async () => {
     const response = await handleComposePost({
       env: { NODE_ENV: "test" },

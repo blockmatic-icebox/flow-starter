@@ -1,6 +1,5 @@
 import { composeQuery } from "@repo/genui";
 
-import { composeContextFromRequest } from "@/app/_lib/genui/compose-context";
 import {
   flowWorkflowCompositionEnvelope,
   isFlowMethodologyQuery,
@@ -11,7 +10,6 @@ import {
 } from "@/app/_lib/genui/compose-request-schema";
 import type { CreateCapStoreResult } from "@/app/_lib/genui/create-cap-store";
 import { enforceDailyCap } from "@/app/_lib/genui/enforce-daily-cap";
-import { rateLimitIdentity } from "@/app/_lib/genui/request";
 import {
   jsonErrorFromReadResult,
   jsonErrorResponse,
@@ -60,12 +58,7 @@ export const handleComposePost = async ({
       status: admitted.status,
     });
 
-  const correlationId = parsed.data.clientRequestId ?? crypto.randomUUID();
-  const identity = rateLimitIdentity({ env, request });
-  const context = composeContextFromRequest({
-    correlationId,
-    subject: identity.ok ? identity.subject : "shared",
-  });
+  const requestId = parsed.data.clientRequestId ?? crypto.randomUUID();
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -80,7 +73,6 @@ export const handleComposePost = async ({
           controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
         };
         if (isFlowMethodologyQuery(parsed.data.query)) {
-          const requestId = context.correlationId;
           const envelope = flowWorkflowCompositionEnvelope({ requestId });
           emit({ requestId, sequence: 0, type: "start" });
           emit({ envelope, requestId, sequence: 1, type: "partial" });
@@ -88,7 +80,7 @@ export const handleComposePost = async ({
         } else {
           await composeQuery({
             input: {
-              clientRequestId: context.correlationId,
+              clientRequestId: requestId,
               query: parsed.data.query,
               version: parsed.data.version ?? 1,
             },
@@ -101,7 +93,7 @@ export const handleComposePost = async ({
           encoder.encode(
             `${JSON.stringify({
               message: "Composition failed.",
-              requestId: context.correlationId,
+              requestId,
               sequence: 0,
               type: "error",
             })}\n`

@@ -4,13 +4,13 @@ import { describe, it } from "node:test";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 
-import { handleConsultantMcpRequest } from "./mcp-handler";
+import { handleFlowAgentMcpRequest } from "./mcp-handler";
 import { mcpJsonRpcRequest, mcpJsonRpcResult } from "./mcp-jsonrpc";
 import { registerFlowAgentToolsOnMcpServer } from "./mcp-server";
 import { flowAgentMcpToolNames } from "./mcp-tools";
 
 const post = (body: Record<string, unknown>) =>
-  mcpJsonRpcRequest({ body, handler: handleConsultantMcpRequest });
+  mcpJsonRpcRequest({ body, handler: handleFlowAgentMcpRequest });
 
 const handleParameterizedToolMcpRequest = async (request: Request) => {
   const server = new McpServer({

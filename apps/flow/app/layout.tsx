@@ -1,12 +1,12 @@
-import { cn } from "@repo/ui/lib/utils";
+import { ThemeProvider } from "@repo/ui/components/theme-provider";
 
 import "@repo/ui/globals.css";
+import { cn } from "@repo/ui/lib/utils";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { FlowShell } from "@/app/_components/flow-shell";
-import { ThemeProvider } from "@/app/_components/theme-provider";
 
 export const metadata: Metadata = {
   description:

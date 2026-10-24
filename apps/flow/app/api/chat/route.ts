@@ -75,7 +75,6 @@ export const handleChatPost = async ({
       maxRetries: 0,
       messages,
       model,
-      onError: () => null,
       stopWhen: stepCountIs(5),
       system,
       tools,
@@ -85,7 +84,7 @@ export const handleChatPost = async ({
       sendReasoning: false,
     });
   } catch {
-    return jsonErrorResponse({ message: "Invalid chat request.", status: 400 });
+    return jsonErrorResponse({ message: publicFailure, status: 500 });
   }
 };
 

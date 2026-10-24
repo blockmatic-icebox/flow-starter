@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { handleConsultantMcpRequest } from "@/app/_lib/flow-agent/mcp-handler";
+import { handleFlowAgentMcpRequest } from "@/app/_lib/flow-agent/mcp-handler";
 import type { CreateCapStoreResult } from "@/app/_lib/genui/create-cap-store";
 import { enforceDailyCap } from "@/app/_lib/genui/enforce-daily-cap";
 import {
@@ -63,7 +63,7 @@ export const handleMcpRequest = async ({
       status: admitted.status,
     });
 
-  const response = await handleConsultantMcpRequest(request);
+  const response = await handleFlowAgentMcpRequest(request);
   return withMcpCors({ origin: access.corsOrigin, response });
 };
 

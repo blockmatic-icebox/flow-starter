@@ -53,6 +53,3 @@ export const createFlowAgentMcpServer = () => {
 
   return server;
 };
-
-/** @deprecated use createFlowAgentMcpServer */
-export const createConsultantMcpServer = createFlowAgentMcpServer;

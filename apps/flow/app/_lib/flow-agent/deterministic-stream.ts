@@ -7,9 +7,40 @@ import {
   wantsToggleTheme,
 } from "./tools";
 
-const lastUserText = (
-  messages: { role: string; parts: { type: string; text?: string }[] }[]
-) => {
+interface DeterministicMessage {
+  role: string;
+  parts: {
+    state?: string;
+    text?: string;
+    type: string;
+  }[];
+}
+
+const clientToolPartType = (type: string) =>
+  type === "tool-focus_genui" || type === "tool-toggle_theme";
+
+const hasCompletedClientToolAck = (messages: DeterministicMessage[]) => {
+  const last = messages.at(-1);
+  if (!last || last.role !== "assistant") return false;
+  return last.parts.some(
+    (part) => part.state === "output-available" && clientToolPartType(part.type)
+  );
+};
+
+const writeTextReply = ({
+  text,
+  writer,
+}: {
+  text: string;
+  writer: { write: (chunk: Record<string, unknown>) => void };
+}) => {
+  const textId = crypto.randomUUID();
+  writer.write({ id: textId, type: "text-start" });
+  writer.write({ delta: text, id: textId, type: "text-delta" });
+  writer.write({ id: textId, type: "text-end" });
+};
+
+const lastUserText = (messages: DeterministicMessage[]) => {
   for (let index = messages.length - 1; index >= 0; index -= 1) {
     const message = messages.at(index);
     if (!message || message.role !== "user") continue;
@@ -23,7 +54,7 @@ const lastUserText = (
 };
 
 export const deterministicFlowAgentResponse = (
-  messages: { role: string; parts: { type: string; text?: string }[] }[]
+  messages: DeterministicMessage[]
 ) => {
   const query = lastUserText(messages);
   const stream = createUIMessageStream({
@@ -31,34 +62,38 @@ export const deterministicFlowAgentResponse = (
       const messageId = crypto.randomUUID();
       writer.write({ messageId, messageMetadata: undefined, type: "start" });
 
-      if (wantsFocusGenui(query)) {
-        const toolCallId = crypto.randomUUID();
-        writer.write({
-          input: {},
-          providerExecuted: false,
-          providerMetadata: undefined,
-          toolCallId,
-          toolName: "focus_genui",
-          type: "tool-input-available",
+      if (hasCompletedClientToolAck(messages)) {
+        writeTextReply({
+          text: "Done.",
+          writer,
         });
-      } else if (wantsToggleTheme(query)) {
+        writer.write({ finishReason: "stop", type: "finish" });
+        return;
+      }
+
+      const clientToolName = (() => {
+        if (wantsFocusGenui(query)) return "focus_genui";
+        if (wantsToggleTheme(query)) return "toggle_theme";
+        return null;
+      })();
+
+      if (clientToolName) {
         const toolCallId = crypto.randomUUID();
         writer.write({
           input: {},
           providerExecuted: false,
           providerMetadata: undefined,
           toolCallId,
-          toolName: "toggle_theme",
+          toolName: clientToolName,
           type: "tool-input-available",
         });
       } else {
         const toolName = pickFlowAgentTool(query);
         const toolCallId = crypto.randomUUID();
-        let input: Record<string, unknown> = {};
-        if (toolName === "search_knowledge") input = { query };
-        if (toolName === "read_knowledge_document") {
-          input = { path: "docs/workflow/flow.md" };
-        }
+        const input =
+          toolName === "search_knowledge"
+            ? { query }
+            : ({} as Record<string, unknown>);
         const output = runFlowAgentTool(toolName, input);
         writer.write({
           input,
@@ -89,6 +124,3 @@ export const deterministicFlowAgentResponse = (
 
   return createUIMessageStreamResponse({ stream });
 };
-
-/** @deprecated use deterministicFlowAgentResponse */
-export const deterministicConsultantResponse = deterministicFlowAgentResponse;

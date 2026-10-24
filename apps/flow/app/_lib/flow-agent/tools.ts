@@ -25,11 +25,6 @@ export const flowAgentReadOnlyToolNames = [
 export type FlowAgentReadOnlyToolName =
   (typeof flowAgentReadOnlyToolNames)[number];
 
-/** @deprecated use flowAgentReadOnlyToolNames */
-export const consultantToolNames = flowAgentReadOnlyToolNames;
-
-export type ConsultantToolName = FlowAgentReadOnlyToolName;
-
 export const flowAgentToolDefinitions = {
   describe_architecture: {
     description:
@@ -104,23 +99,16 @@ export const flowAgentToolDefinitions = {
   },
 } as const;
 
-/** @deprecated use flowAgentToolDefinitions */
-export const consultantToolDefinitions = flowAgentToolDefinitions;
-
 export const runFlowAgentTool = (
   name: FlowAgentReadOnlyToolName,
-  input: Record<string, unknown> = {}
+  input: unknown = {}
 ) => {
-  const tool = flowAgentToolDefinitions[name];
-  const parsed = tool.inputSchema.safeParse(input);
+  const definition = flowAgentToolDefinitions[name];
+  const parsed = definition.inputSchema.safeParse(input);
   if (!parsed.success) return "Invalid tool input.";
-  const result = tool.execute(parsed.data as never);
-  return result.text;
+  const execute = definition.execute as (value: unknown) => { text: string };
+  return execute(parsed.data).text;
 };
-
-/** @deprecated use runFlowAgentTool */
-export const runConsultantTool = (name: ConsultantToolName) =>
-  runFlowAgentTool(name);
 
 export const pickFlowAgentTool = (query: string): FlowAgentReadOnlyToolName => {
   const normalized = query.toLowerCase();
@@ -151,18 +139,8 @@ export const pickFlowAgentTool = (query: string): FlowAgentReadOnlyToolName => {
   ) {
     return "search_knowledge";
   }
-  if (
-    /constru|built|architect|estructura|how is|cómo está|repo|monorepo/u.test(
-      normalized
-    )
-  ) {
-    return "describe_architecture";
-  }
   return "describe_architecture";
 };
-
-/** @deprecated use pickFlowAgentTool */
-export const pickConsultantTool = pickFlowAgentTool;
 
 export const wantsFocusGenui = (query: string) =>
   /\b(?:focus|scroll|show)\b.*\b(?:genui|generative|composition|visual)\b/iu.test(

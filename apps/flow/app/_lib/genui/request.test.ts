@@ -5,7 +5,7 @@ import { admitCompose } from "./admit-compose";
 import { COMPOSE_DAILY_LIMIT, GLOBAL_COMPOSE_COST_LIMIT } from "./admit-daily";
 import { memoryCapStore } from "./cap-store";
 import { enforceDailyCap } from "./enforce-daily-cap";
-import { rateLimitIdentity, rateLimitSubject } from "./request";
+import { rateLimitIdentity } from "./request";
 
 const trustedEnv = {
   GENUI_ENFORCE_RATE_LIMIT: "1",
@@ -70,13 +70,23 @@ describe("rateLimitIdentity", () => {
   });
 
   it("does not trust x-forwarded-for without configuration", () => {
-    const subject = rateLimitSubject({
+    const identity = rateLimitIdentity({
       env: trustedEnv,
       request: new Request("http://127.0.0.1/", {
         headers: { "x-forwarded-for": "203.0.113.9" },
       }),
     });
-    assert.equal(subject, "shared");
+    assert.equal(identity.ok, false);
+  });
+
+  it("rejects a comma-separated trusted header value", () => {
+    const identity = rateLimitIdentity({
+      env: trustedEnv,
+      request: new Request("http://127.0.0.1/", {
+        headers: { "x-real-ip": "203.0.113.1, 198.51.100.8" },
+      }),
+    });
+    assert.equal(identity.ok, false);
   });
 
   it("fails closed when enforcement is on but identity is missing", async () => {

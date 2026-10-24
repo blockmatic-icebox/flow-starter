@@ -29,7 +29,6 @@ export const enforceDailyCap = async ({
   if (!enforce && env.NODE_ENV !== "production") return { ok: true as const };
 
   const identity = rateLimitIdentity({ env, request });
-  if (enforce && !identity.ok) return unavailable;
   if (!identity.ok) return unavailable;
 
   const created = createStore({ env });
@@ -38,7 +37,6 @@ export const enforceDailyCap = async ({
 
   try {
     const admitted = await (kind === "compose" ? admitCompose : admitChat)({
-      enforce: true,
       now,
       store: created.store,
       subject: identity.subject,

@@ -48,6 +48,36 @@ describe("chat route", () => {
     assert.equal(body.includes("reasoning"), false);
   });
 
+  it("does not re-emit a client tool after its output is available", async () => {
+    const response = await handleChatPost({
+      env,
+      request: chatRequest({
+        body: JSON.stringify({
+          messages: [
+            userMessage("Toggle the theme to dark mode"),
+            {
+              id: "assistant-1",
+              parts: [
+                {
+                  input: {},
+                  output: { ok: true, theme: "dark" },
+                  state: "output-available",
+                  toolCallId: "call-toggle",
+                  type: "tool-toggle_theme",
+                },
+              ],
+              role: "assistant",
+            },
+          ],
+        }),
+      }),
+    });
+    assert.equal(response.status, 200);
+    const body = await response.text();
+    assert.match(body, /text-delta/u);
+    assert.equal(body.includes("tool-input-available"), false);
+  });
+
   it("preserves a tool-result round trip", async () => {
     const response = await handleChatPost({
       env,

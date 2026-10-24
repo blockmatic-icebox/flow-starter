@@ -6,8 +6,7 @@ import type { CompositionEnvelope } from "@repo/genui";
 
 import { describeWorkflow } from "@/app/_lib/flow-agent/facts";
 
-const flowStagePattern =
-  /flow workflow|explore.*specify|specify.*plan|methodology|explore,\s*specify/iu;
+const flowStagePattern = /flow workflow|flow methodology|explore,\s*specify/iu;
 
 export const isFlowMethodologyQuery = (query: string) =>
   flowStagePattern.test(query.trim());
