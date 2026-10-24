@@ -1,25 +1,39 @@
-# Flow
+# Flow Starter glossary
 
-Flow is a starter for agentic apps where people and agents share actions, context, and persistent state. The repository explorer is its example domain.
+Project-specific terms for this starter. Generic platform vocabulary (OpenUI Lang, Next.js, etc.) is not duplicated here.
 
-Add an entry only when Flow gives a word a project-specific meaning.
+## GenUI
 
-## Language
+Generative UI in this repo: **select → compile → render**. User text is routed to a composition tier, compiled into validated OpenUI Lang, then rendered through an allowlisted React catalog (`@repo/genui`).
 
-**Repository explorer**: The included example where a person and an agent explore repository architecture and implementation together. _Avoid_: generic agent framework, IDE
+## Composition tier
 
-**Shared action**: An authorized operation available to both a person through the interface and the agent, with the same rules and outcome. _Avoid_: UI-only handler, agent-only tool
+| Tier | Name | Role |
+| --- | --- | --- |
+| 1 | Controlled | Known intents map to a single experience deterministically. |
+| 2 | Declarative | Keyword-driven stacks of approved child expressions (e.g. SectionStack). |
+| 3 | Generative | Optional model-backed prose via Vercel AI SDK + AI Gateway; falls back without credentials. |
 
-**Workspace**: The place where a person and the agent work on a conversation and its artifact. _Avoid_: app, IDE, page
+## Composition envelope
 
-**Canvas**: The results surface inside the workspace where validated artifacts are shown and updated. _Avoid_: editor, chat
+Serializable bundle of `openuiText`, grounded `records`, and metadata. The compose API streams NDJSON events (`start`, `partial`, `complete`, `error`) around this contract.
 
-**Artifact**: A validated, source-backed result committed to the canvas. _Avoid_: page, screen
+## Shared action
 
-**UI spec**: The validated tree of approved components an artifact may contain. _Avoid_: canvas, artifact
+An authorized operation registered by the host (`createActionRegistry`), callable from UI and (when eve ships) from agent tools. Model output does not define privileged actions.
 
-**Selection context**: The objects a person has selected in the current workspace view to give a request its meaning. _Avoid_: durable filters
+## Acme fixtures
 
-**Voice**: Spoken conversation inside the workspace that can request the same authorized canvas actions as chat. _Avoid_: dictation, Wispr, ChatGPT Voice app
+Fictional catalog data under `packages/genui/src/fixtures/` used by `/genui-demo`. Adopters replace with their own record providers.
 
-**External invocation**: An authenticated call from a coding environment or other non-browser client for cited answers and optional validated specs. _Avoid_: MCP server, agent federation
+## Workspace (planned)
+
+The authenticated surface where a person and an agent share conversation, selection context, and canvas artifacts. Not shipped in the GenUI foundation slice; see [ARCHITECTURE.md](ARCHITECTURE.md) §7 and §10.
+
+## Canvas (planned)
+
+Results surface inside the workspace for validated, source-backed artifacts. Distinct from raw chat transcripts.
+
+## External invocation (planned)
+
+Authenticated non-browser clients limited to cited answers and optional validated specs—no session canvas mutation. See [docs/adr/0004-external-invocation-is-read-only.md](docs/adr/0004-external-invocation-is-read-only.md).
