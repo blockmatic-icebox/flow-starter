@@ -15,6 +15,11 @@ export const parseNulPaths = (buffer) =>
 
 const codePattern = /\.(?:[cm]?[jt]sx?)$/u;
 
+/** Keep in sync with oxfmt.config.ts ignorePatterns for staged formatting checks. */
+const oxfmtIgnoredCodePaths = new Set([
+  "apps/flow/app/_lib/flow-agent/knowledge-snapshot.ts",
+]);
+
 const isOxfmtOtherFile = (file) => {
   const base = file.split("/").pop() ?? file;
   if (base === "pnpm-lock.yaml" || base.endsWith(".lock")) return false;
@@ -83,14 +88,16 @@ export const stagedChecks = (paths) => {
       args: ["scripts/check-flow-docs.mjs"],
       cmd: process.execPath,
     });
+  const codeForOxfmt = groups.code.filter(
+    (file) => !oxfmtIgnoredCodePaths.has(file)
+  );
   if (groups.code.length > 0)
-    checks.push(
-      { args: ["exec", "oxlint", ...groups.code], cmd: "pnpm" },
-      {
-        args: ["exec", "oxfmt", "--check", ...groups.code],
-        cmd: "pnpm",
-      }
-    );
+    checks.push({ args: ["exec", "oxlint", ...groups.code], cmd: "pnpm" });
+  if (codeForOxfmt.length > 0)
+    checks.push({
+      args: ["exec", "oxfmt", "--check", ...codeForOxfmt],
+      cmd: "pnpm",
+    });
   if (groups.manifests.length > 0)
     checks.push({
       args: ["scripts/check-react-architecture.mjs"],

@@ -47,6 +47,8 @@ Do not read every ADR or research file for ordinary changes. Do not present plan
 
 Domain context: [docs/agents/domain.md](docs/agents/domain.md). Choose skills from [docs/agents/skills.md](docs/agents/skills.md) — not the full catalog.
 
+Every final agent response MUST end with a **Skills loaded** footer, following the reporting convention in [docs/agents/skills.md](docs/agents/skills.md).
+
 <!-- BEGIN:turborepo-agent-rules -->
 
 # This is NOT the Turborepo you know

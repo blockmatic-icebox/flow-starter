@@ -41,3 +41,45 @@ Never assert that automatic routing succeeded merely because a skill appears in 
 | GenUI and AI SDK | `ai-sdk`, `typesafe-ai` |
 
 The manifest remains [skills-lock.json](../../skills-lock.json). Install with `pnpm skills:install`. This page is a router, not a second manifest.
+
+## Skill usage reporting
+
+Every final agent response ends with this footer (both categories always present):
+
+```md
+**Skills loaded**
+- Flow: `skill-name`, `skill-name`
+- Others: `skill-name`, `skill-name`
+```
+
+When no skills were loaded:
+
+```md
+**Skills loaded**
+- Flow: None
+- Others: None
+```
+
+### Classification
+
+Use [docs/workflow/flow.md](../workflow/flow.md) lifecycle activities (Explore → Specify → Plan → Build → Review → Ship) and the **Phase-aware selection** and **Preferred skills** table on this page as the authority. Do not maintain a separate skill registry for reporting.
+
+- **Flow:** Methodology skills routed to exploration, validation, requirements, specification, planning, incremental delivery, testing discipline, review quality, or agent and decision documentation.
+- **Others:** Supporting technology, design, framework, infrastructure, and tooling skills from the same routing (for example React/Next.js, UI components, browser verification, database, MCP, GenUI, or auth stacks).
+
+Classification follows each skill's role in Flow, not its publisher.
+
+### Reporting rules
+
+1. Report only skills whose `SKILL.md` instructions were loaded during the current task.
+2. Never report skills merely because they appear in `skills-lock.json`, were discovered, recommended, or are installed.
+3. Use the exact installed skill identifiers from the manifest.
+4. Include both categories, even when empty (`None`).
+5. Do not load additional skills simply to populate the report.
+6. Deduplicate repeated loads of the same skill.
+7. For subagents, include their skills only when usage is verified from their reports or execution records — never infer.
+8. Reading `AGENTS.md`, workflow documents, or architecture documents is not loading a skill.
+9. Place the footer at the very end of the final response, after summaries, tests, and next actions.
+10. Apply to all tasks (research, exploration, planning, implementation, review, documentation-only).
+
+This convention improves observability; it does not prove compliance or guarantee execution.

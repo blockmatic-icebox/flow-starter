@@ -55,3 +55,17 @@ test("selects lightweight checks and skips the full suite", () => {
     true
   );
 });
+
+test("skips oxfmt when staged code is only oxfmt-ignored generated files", () => {
+  const checks = stagedChecks([
+    "apps/flow/app/_lib/flow-agent/knowledge-snapshot.ts",
+  ]);
+  assert.equal(
+    checks.some((check) => check.args.includes("oxlint")),
+    true
+  );
+  assert.equal(
+    checks.some((check) => check.args.includes("oxfmt")),
+    false
+  );
+});
