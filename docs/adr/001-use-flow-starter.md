@@ -2,7 +2,7 @@
 
 **Status:** Superseded · October 24, 2026
 
-> This initial decision has been superseded by [ADR 0007](0007-monorepo-vercel-stack.md) (Monorepo and Vercel infrastructure). The record below is preserved for history.
+> This historical baseline decision combined repository structure, platform selection, and GenUI choices. Those responsibilities are now separated into [ADR 0007](0007-monorepo-vercel-stack.md) (Vercel platform), [ADR 0008](0008-monorepo-turborepo-pnpm.md) (monorepo organization), [ADR 002](002-vercel-ai-sdk-for-tier-3.md) (AI SDK), and [ADR 003](003-genui-openui-foundation.md) (OpenUI Lang). Product principles are documented in [PDR 0001](../pdr/0001-agnostic-api-first.md). The original record is retained for provenance.
 
 ## Context
 

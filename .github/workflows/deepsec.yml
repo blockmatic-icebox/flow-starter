@@ -1,164 +1,131 @@
 name: DeepSec
 
-# Optional security workflow — remote PR triggers disabled by default.
-# Uncomment to run on pull requests when AI_GATEWAY_API_KEY is configured.
-# on:
-#   pull_request:
+# Manual-only security review.
+# Select the branch to review when dispatching the workflow.
+# No automatic push or pull_request triggers are enabled.
 
 on:
   workflow_dispatch:
+    inputs:
+      base_ref:
+        description: "Trusted base branch to compare against"
+        type: string
+        required: true
+        default: "main"
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
-permissions:
-  contents: read
 
 env:
   DEEPSEC_MAX_FILES: "80"
 
 jobs:
   analyze:
-    name: Analyze diff
-    if: >
-      github.event.pull_request.head.repo.full_name == github.repository && contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) && secrets.AI_GATEWAY_API_KEY != ''
+    name: Analyze changed files
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
     steps:
-      - name: Checkout code
+      - name: Checkout selected branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Restore trusted DeepSec workspace
+      - name: Determine changes
+        id: files
+        shell: bash
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          GIT_TERMINAL_PROMPT: "0"
+          BASE_REF: ${{ inputs.base_ref }}
         run: |
-          git rev-parse --verify "$BASE_SHA^{commit}"
-          if git cat-file -e "$BASE_SHA:.deepsec/deepsec.config.ts"; then
-            git checkout "$BASE_SHA" -- .deepsec
+          set -euo pipefail
+
+          git check-ref-format --branch "$BASE_REF" >/dev/null
+          git fetch --no-tags origin "$BASE_REF"
+
+          BASE_SHA="$(git merge-base HEAD "$(git rev-parse FETCH_HEAD)")"
+          echo "base_sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
+
+          git diff --name-only --diff-filter=AMRC \
+            "$BASE_SHA...HEAD" > deepsec-files.txt
+
+          COUNT="$(wc -l < deepsec-files.txt | tr -d ' ')"
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+          echo "Files changed: $COUNT"
+
+          if [ "$COUNT" -gt "$DEEPSEC_MAX_FILES" ]; then
+            echo "::error::Changed file count exceeds DEEPSEC_MAX_FILES"
+            exit 1
           fi
 
-      - name: List PR files
-        id: files
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          GIT_TERMINAL_PROMPT: "0"
-        run: |
-          git diff --name-only --diff-filter=AMRC "${BASE_SHA}...HEAD" | tee "${{ github.workspace }}/deepsec-files.txt"
-          count=$(wc -l < "${{ github.workspace }}/deepsec-files.txt" | tr -d ' ')
-          echo "count=$count" >> "$GITHUB_OUTPUT"
-          if [ "$count" -gt "$DEEPSEC_MAX_FILES" ]; then
-            echo "over_cap=true" >> "$GITHUB_OUTPUT"
-            echo "Skipping DeepSec process: $count files exceeds the $DEEPSEC_MAX_FILES-file cap."
-          else
-            echo "over_cap=false" >> "$GITHUB_OUTPUT"
+          if [ "$COUNT" -eq 0 ]; then
+            echo "No changed files to review."
           fi
+
+      - name: Restore trusted DeepSec configuration
+        if: steps.files.outputs.count != '0'
+        shell: bash
+        env:
+          BASE_SHA: ${{ steps.files.outputs.base_sha }}
+        run: |
+          set -euo pipefail
+
+          git cat-file -e \
+            "$BASE_SHA:.deepsec/deepsec.config.ts"
+
+          git checkout "$BASE_SHA" -- .deepsec
+
+      - name: Setup pnpm for DeepSec workspace
+        if: steps.files.outputs.count != '0'
+        uses: pnpm/action-setup@v4
+        with:
+          version: "11.25.0"
 
       - name: Setup Node.js
-        if: steps.files.outputs.over_cap != 'true'
+        if: steps.files.outputs.count != '0'
         uses: actions/setup-node@v4
         with:
           node-version: "24"
 
-      - name: Setup pnpm
-        if: steps.files.outputs.over_cap != 'true'
-        uses: pnpm/action-setup@v4
-
-      - name: Get pnpm store directory
-        if: steps.files.outputs.over_cap != 'true'
-        working-directory: .deepsec
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
-
-      - name: Setup pnpm cache
-        if: steps.files.outputs.over_cap != 'true'
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-deepsec-pnpm-${{ hashFiles('.deepsec/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-deepsec-pnpm-
-
       - name: Install DeepSec
-        if: steps.files.outputs.over_cap != 'true'
+        if: steps.files.outputs.count != '0'
         working-directory: .deepsec
         run: pnpm install --frozen-lockfile
 
-      - name: Configure DeepSec credentials
-        if: steps.files.outputs.over_cap != 'true'
+      - name: Analyze changes
+        if: steps.files.outputs.count != '0'
         working-directory: .deepsec
-        env:
-          AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
-        run: |
-          printf 'AI_GATEWAY_API_KEY=%s\nOPENAI_API_KEY=%s\nOPENAI_BASE_URL=https://ai-gateway.vercel.sh/v1\n' \
-            "$AI_GATEWAY_API_KEY" "$AI_GATEWAY_API_KEY" > .env.local
-          chmod 600 .env.local
-
-      - name: Review PR diff
-        if: steps.files.outputs.over_cap != 'true'
-        id: deepsec
-        working-directory: .deepsec
+        shell: bash
         env:
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
           OPENAI_BASE_URL: https://ai-gateway.vercel.sh/v1
         run: |
-          set -o pipefail
+          set -euo pipefail
+
+          if [ -z "$AI_GATEWAY_API_KEY" ]; then
+            echo "::error::AI_GATEWAY_API_KEY is required"
+            exit 1
+          fi
+
           pnpm exec deepsec process \
             --agent pi \
             --model xai/grok-4.6 \
             --thinking-level medium \
             --root "${{ github.workspace }}" \
             --files-from "${{ github.workspace }}/deepsec-files.txt" \
-            --comment-out ../comment.md \
             2>&1 | tee "${{ github.workspace }}/deepsec.log"
 
-      - name: Upload DeepSec log
-        if: failure() && steps.files.outputs.over_cap != 'true'
+      - name: Upload failure log
+        if: failure() && steps.files.outputs.count != '0'
         uses: actions/upload-artifact@v4
         with:
-          name: deepsec-log
+          name: deepsec-failure-log
           path: deepsec.log
+          if-no-files-found: ignore
           retention-days: 1
-
-      - name: Upload findings comment
-        if: always() && steps.files.outputs.over_cap != 'true' && hashFiles('comment.md') != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: deepsec-comment
-          path: comment.md
-          retention-days: 1
-
-  comment:
-    name: Comment findings
-    needs: analyze
-    if: always() && needs.analyze.result == 'failure'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-      - name: Download findings comment
-        id: dl
-        continue-on-error: true
-        uses: actions/download-artifact@v4
-        with:
-          name: deepsec-comment
-
-      - name: Post PR comment
-        if: steps.dl.outcome == 'success'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs')
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: fs.readFileSync('comment.md', 'utf8'),
-            })

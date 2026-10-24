@@ -98,7 +98,7 @@ const controlledDocument = ({
   }
 
   if (intent === "search-products") {
-    const hits = entities.filter(() => query.toLowerCase().includes("mobile"))
+    const hits = query.toLowerCase().includes("mobile")
       ? ["entity:pulse-mobile"]
       : entities.slice(0, 2);
     return {
@@ -207,10 +207,10 @@ export const composeQuery = async ({
     envelope = answerDocument({
       body:
         synthesized ??
-        "Open-ended composition uses a model when AI_GATEWAY_API_KEY is set; showing a grounded catalog answer instead.",
+        "No grounded answer is available for this request in the demo catalog. Configure AI_GATEWAY_API_KEY to enable optional general model responses.",
       records: acmeCatalogRecords,
       requestId,
-      sourceIds: ["document:api-overview"],
+      sourceIds: [],
     });
   }
 
