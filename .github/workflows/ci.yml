@@ -16,6 +16,7 @@ concurrency:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   quality:
@@ -46,4 +47,11 @@ jobs:
         run: pnpm setup:playwright
 
       - run: pnpm test:browser
+
+      - name: Turborepo remote cache
+        if: vars.TURBO_TEAM != ''
+        uses: vercel/setup-turborepo-remote-cache-action@v1.0.0
+        with:
+          team: ${{ vars.TURBO_TEAM }}
+
       - run: pnpm build

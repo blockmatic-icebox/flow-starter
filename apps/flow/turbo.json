@@ -1,0 +1,20 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "inputs": [
+        "$TURBO_EXTENDS$",
+        "$TURBO_ROOT$/PRODUCT.md",
+        "$TURBO_ROOT$/ARCHITECTURE.md",
+        "$TURBO_ROOT$/AGENTS.md",
+        "$TURBO_ROOT$/docs/readme.md",
+        "$TURBO_ROOT$/docs/workflow/flow.md",
+        "$TURBO_ROOT$/docs/workflow/readme.md",
+        "$TURBO_ROOT$/docs/agents/domain.md",
+        "$TURBO_ROOT$/docs/agents/verify.md",
+        "$TURBO_ROOT$/docs/agents/skills.md",
+        "$TURBO_ROOT$/docs/agents/worktrees.md"
+      ]
+    }
+  }
+}

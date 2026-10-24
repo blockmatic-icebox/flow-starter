@@ -159,6 +159,15 @@ These are specified for adopters building a full workspace; they are **not requi
 
 Flow Agent chat and read-only MCP are implemented in `apps/flow`, following the historical integration decision in [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md) and the current application split in [ADR 0012](docs/adr/0012-flow-and-web-applications.md). Eve workspace voice (ADR 004) and `/dev` placement (ADR 005) apply only when those features are implemented.
 
+### Vercel deployment
+
+Deploy **`web`** and **`flow-app`** as separate Vercel projects ([ADR 0012](docs/adr/0012-flow-and-web-applications.md)). Set each project’s **Root Directory** to `apps/web` or `apps/flow`, enable **Include source files outside of the Root Directory in the Build Step**, and keep install, build, and ignore commands in [`apps/web/vercel.json`](apps/web/vercel.json) and [`apps/flow/vercel.json`](apps/flow/vercel.json).
+
+- **Filtered install** — `pnpm install --frozen-lockfile --filter <package>...` installs only that app and its workspace dependencies (not the full root dev graph).
+- **Skip unaffected builds** — `turbo query affected --tasks build --packages <package> --exit-code` in `ignoreCommand`; Vercel skips when nothing affects that app’s `build` task.
+- **Flow knowledge hash** — [`apps/flow/turbo.json`](apps/flow/turbo.json) adds the ten repository documents read by [`apps/flow/scripts/bundle-knowledge.mjs`](apps/flow/scripts/bundle-knowledge.mjs) to `flow-app#build` inputs so remote cache and affected detection stay correct when docs change.
+- **CI remote cache** — [`.github/workflows/ci.yml`](.github/workflows/ci.yml) uses Vercel Remote Cache when the repository variable `TURBO_TEAM` is set (OIDC policy on the Vercel team). Vercel project builds use the platform Turborepo integration by default.
+
 ## 8. Quality and CI
 
 Local gates:

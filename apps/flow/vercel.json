@@ -1,0 +1,5 @@
+{
+  "installCommand": "pnpm install --frozen-lockfile --filter flow-app...",
+  "buildCommand": "pnpm --filter flow-app build",
+  "ignoreCommand": "npx --yes turbo@2.11.10 query affected --tasks build --packages flow-app --exit-code || exit 1"
+}

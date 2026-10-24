@@ -1,0 +1,5 @@
+{
+  "installCommand": "pnpm install --frozen-lockfile --filter web...",
+  "buildCommand": "pnpm --filter web build",
+  "ignoreCommand": "npx --yes turbo@2.11.10 query affected --tasks build --packages web --exit-code || exit 1"
+}
