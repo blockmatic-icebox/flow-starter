@@ -7,7 +7,10 @@
     "dev": "turbo run dev",
     "setup": "pnpm setup:portless",
     "setup:portless": "portless trust && portless proxy start",
-    "qa": "pnpm lint && pnpm check-types && pnpm test",
+    "ci:local": "pnpm lint && pnpm check-types && pnpm test && pnpm build",
+    "hooks:pre-commit": "pnpm run qa && git update-index --again",
+    "prepare": "simple-git-hooks",
+    "qa": "pnpm lint:fix && pnpm check-types && pnpm test",
     "test": "pnpm --filter @repo/genui test",
     "lint": "oxlint . && oxfmt --check .",
     "lint:fix": "oxlint --fix . && oxfmt --write --no-error-on-unmatched-pattern .",
@@ -21,11 +24,15 @@
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
     "portless": "^0.15.8",
+    "simple-git-hooks": "2.14.0",
     "skills": "1.7.2",
     "tsc-ts": "^0.0.2",
     "turbo": "^2.11.9",
     "typescript": "7.0.2",
     "ultracite": "8.0.1"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm run hooks:pre-commit"
   },
   "engines": {
     "node": ">=24"

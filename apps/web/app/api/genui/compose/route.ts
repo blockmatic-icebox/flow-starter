@@ -23,13 +23,13 @@ export const POST = async (request: Request) => {
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
-    start(controller) {
+    async start(controller) {
       const abortController = new AbortController();
       const onAbort = () => abortController.abort();
       request.signal.addEventListener("abort", onAbort);
       const deadline = setTimeout(() => abortController.abort(), DEADLINE_MS);
       try {
-        composeQuery({
+        await composeQuery({
           input: {
             clientRequestId,
             query,

@@ -13,7 +13,7 @@ Update the owning document in the same change. Use a PDR in `docs/pdr/` for a co
 - Product behavior, scope, or acceptance → [PRODUCT.md](PRODUCT.md)
 - UI, interaction, or visual changes → [DESIGN.md](DESIGN.md)
 - Architecture, integrations, or persistence → [ARCHITECTURE.md](ARCHITECTURE.md)
-- Delivery sequence → [ROADMAP.md](ROADMAP.md)
+- Implementation sequence → [ARCHITECTURE.md](ARCHITECTURE.md) §10
 - Project-specific terms → [GLOSSARY.md](GLOSSARY.md)
 - Hard-to-reverse rationale → the relevant file in [docs/adr/](docs/adr/)
 - Dated evidence → [docs/research/](docs/research/). Accepted direction stays in the root contracts and `docs/adr/`.
@@ -36,6 +36,7 @@ Explore → Specify → Plan → Build → Review → Ship. A small change does 
 - Install skills from [skills-lock.json](skills-lock.json) (`pnpm skills:install`, `pnpm skills:update`). Do not author, copy, or commit `SKILL.md` here.
 - UI, layout, or interaction changes: verify in a running browser before finishing. Follow [Browser development](README.md#browser-development). Backend-only and docs-only changes finish without a browser pass.
 - Run the checks that match the change. Report the commands and results. Do not bypass quality gates or misrepresent results.
+- Pre-commit (`simple-git-hooks`) runs `pnpm qa` (`lint:fix`, typecheck, unit tests) and `git update-index --again` for formatter fixes on staged files.
 
 ## Agent skills
 

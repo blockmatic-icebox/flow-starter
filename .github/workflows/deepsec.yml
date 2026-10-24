@@ -1,7 +1,12 @@
 name: DeepSec
 
+# Optional security workflow — remote PR triggers disabled by default.
+# Uncomment to run on pull requests when AI_GATEWAY_API_KEY is configured.
+# on:
+#   pull_request:
+
 on:
-  pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

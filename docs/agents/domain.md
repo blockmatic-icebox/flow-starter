@@ -23,7 +23,7 @@ For product behavior, presentation, or technical boundaries, follow the pointers
 └── packages/
 ```
 
-Root contracts (`PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`, `ROADMAP.md`) sit beside this map. Application code lives under `apps/` and `packages/`.
+Root contracts (`PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`) sit beside this map. Application code lives under `apps/` and `packages/`.
 
 ## Use the glossary's vocabulary
 
