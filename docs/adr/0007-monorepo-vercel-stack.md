@@ -110,7 +110,6 @@ Maintain clear boundaries and address actual portability requirements when they 
 - [ADR 002 — Vercel AI SDK](0002-vercel-ai-sdk-for-tier-3.md)
 - [ADR 003 — OpenUI Lang](0003-genui-openui-foundation.md)
 - [ARCHITECTURE.md](../../ARCHITECTURE.md)
-- [ROADMAP.md](../../ROADMAP.md)
 
 ## References
 

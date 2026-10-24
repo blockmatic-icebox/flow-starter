@@ -143,14 +143,24 @@ Neon Local is a Docker proxy to a cloud branch (not an offline Postgres engine).
 
 ## 9. Adoption path
 
-1. Fork and replace **PRODUCT.md** / **DESIGN.md**.
-2. Swap Acme fixtures and routing keywords for your domain.
-3. Extend `packages/genui` component registry and React views.
-4. Add auth, product schema, and eve tools when the workspace ships (database baseline is already in `@repo/db`).
-5. Enable CI triggers when the remote repository is ready.
+1. Create a product from Flow Starter and personalize README.md.
+2. Define product intent, audience and capabilities in PRODUCT.md.
+3. Define the visual and interaction direction in DESIGN.md.
+4. Replace fictional fixtures and optional example interfaces when appropriate.
+5. Extend the established application capabilities, shared UI and GenUI contracts.
+6. Implement optional identity, persistence and agent runtime integrations when the product needs them.
+7. Run the existing quality checks and verify the application before deployment.
 
-## 10. Delivery status
+## 10. Implementation status
 
-Current milestone order, progress, and acceptance goals are maintained in [ROADMAP.md](ROADMAP.md).
+This document describes the current technical baseline and intended system boundaries.
 
-This architecture document owns technical boundaries and intended system structure, not a competing delivery task list.
+Implemented and planned capabilities must be identified accurately in their relevant architecture sections.
+
+The inherited foundation's mission, goals and capabilities are explained in [docs/readme.md](docs/readme.md).
+
+Product-specific delivery work can be managed through Flow's existing initiatives, optional plans and specifications when appropriate.
+
+Do not introduce a separate mandatory planning document.
+
+Update the relevant architectural contract when the implementation materially changes.

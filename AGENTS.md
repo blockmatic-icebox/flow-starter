@@ -17,7 +17,8 @@ Update the owning document in the same change. Use a PDR in `docs/pdr/` for a co
 - Product behavior, scope, or acceptance → [PRODUCT.md](PRODUCT.md)
 - UI, interaction, or visual changes → [DESIGN.md](DESIGN.md)
 - Architecture, integrations, or persistence → [ARCHITECTURE.md](ARCHITECTURE.md)
-- Current delivery priorities and progress → [ROADMAP.md](ROADMAP.md); read [ARCHITECTURE.md](ARCHITECTURE.md) for technical boundaries.
+- Flow Starter's inherited foundation, goals or adoption guidance → [docs/readme.md](docs/readme.md).
+- Human-facing explanation of Flow → [docs/workflow/readme.md](docs/workflow/readme.md). Operational rules remain in [docs/workflow/flow.md](docs/workflow/flow.md).
 - Project-specific terms → [GLOSSARY.md](GLOSSARY.md)
 - Hard-to-reverse rationale → the relevant file in [docs/adr/](docs/adr/)
 - Architecture-wide technology choice, platform trade-offs, or major integration change → read the relevant sections of [ADR 0001](docs/adr/0001-agentic-architecture.md).
@@ -33,7 +34,7 @@ Use [docs/workflow/flow.md](docs/workflow/flow.md) for Explore → Specify → P
 - Prefer a CLI. Use MCP when no CLI covers the operation.
 - `__dev/` is a local bucket and is gitignored. Do not treat it as product or architecture direction, and do not reference it from application code or committed docs.
 - Install skills from [skills-lock.json](skills-lock.json) (`pnpm skills:install`, `pnpm skills:update`). Do not author, copy, or commit `SKILL.md` here.
-- UI, layout, or interaction changes: verify in a running browser before finishing. Follow [Browser development](README.md#browser-development). Backend-only and docs-only changes finish without a browser pass.
+- UI, layout, or interaction changes: verify in a running browser before finishing. Follow [Browser development](docs/readme.md#browser-development). Backend-only and docs-only changes finish without a browser pass.
 - Run the checks that match the change. Report the commands and results. Do not bypass quality gates or misrepresent results.
 - React application changes must preserve server/client boundaries and the established fractal component architecture. Use relevant installed skills, not all technical skills at once.
 - For Next.js development issues, use the framework's runtime MCP diagnostics when available; then verify relevant behavior in the browser. If runtime tools are unavailable, report that limitation and use the established CLI/browser fallback.

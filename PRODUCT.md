@@ -1,6 +1,6 @@
 # Product template
 
-> Replace this file with your product contract. [DESIGN.md](DESIGN.md) owns presentation; [ARCHITECTURE.md](ARCHITECTURE.md) owns technical boundaries; [ROADMAP.md](ROADMAP.md) owns current delivery sequence and status.
+> Replace this file with your product contract. [DESIGN.md](DESIGN.md) owns presentation; [ARCHITECTURE.md](ARCHITECTURE.md) owns technical boundaries. Follow [Flow](docs/workflow/flow.md) for documentation conventions and delivery workflow.
 
 ## Vision
 

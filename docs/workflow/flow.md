@@ -1,6 +1,6 @@
 Date: 2026-10-24
 
-# Flujo de Trabajo – Método Flow
+# Flow — Product development workflow
 
 Version: 0.1
 
@@ -144,15 +144,18 @@ Do not declare something shipped merely because code was written. Publishing, me
 
 Use one authoritative home for each fact. Link related documents instead of copying their contents.
 
+Flow Starter's mission, goals and inherited foundation are explained in docs/readme.md. The root README.md is an adopter-owned product template. Flow methodology and documentation conventions belong in docs/workflow/flow.md, with a human introduction in docs/workflow/readme.md. Current architecture belongs in ARCHITECTURE.md; durable architectural rationale belongs in ADRs. Use existing initiatives, plans and specifications only when justified by the work.
+
 | Location | Responsibility |
 | --- | --- |
 | `AGENTS.md` | Lightweight agent entrypoint and task-specific document routing |
+| `README.md` | Adopter-owned product README template, including essential setup and documentation links |
+| `docs/readme.md` | Human-facing introduction to the inherited Flow Starter foundation, its goals, capabilities and documentation navigation |
 | `docs/workflow/flow.md` | Workflow, skill orchestration, document conventions, and lifecycle |
-| `docs/workflow/readme.md` | Human-readable introduction to Flow and naming conventions |
+| `docs/workflow/readme.md` | Human-facing introduction to the Flow methodology |
 | `PRODUCT.md` | Current product vision, audience, business context, scope, outcomes, and capabilities |
 | `DESIGN.md` | Current visual, interaction, experience, and accessibility direction |
 | `ARCHITECTURE.md` | Current technical structure, boundaries, constraints, and major system choices |
-| `ROADMAP.md` | Current delivery priorities, ordered milestones, and verified progress; replace or adapt when adopting the starter |
 | `GLOSSARY.md` | Terms with project-specific meanings and consequential distinctions |
 | `docs/ideas/<slug>.md` | Worthwhile possibilities that are not yet implementation commitments |
 | `docs/initiatives/<slug>.md` | Intentional bounded work: outcome, scope, assumptions, tasks, progress, validation, and findings |
@@ -269,7 +272,7 @@ Metadata records when evidence was gathered or the document was last reviewed, n
 
 The source code remains discoverable. Document the non-obvious intent, trade-offs, constraints, and decisions that are costly to reconstruct.
 
-Keep ROADMAP.md as the single source of truth for delivery sequence and milestone status. ARCHITECTURE.md describes technical structure and constraints. Initiative documents own bounded implementation scope and detailed execution progress. Avoid duplicating the same task list across these documents.
+ARCHITECTURE.md describes technical structure and constraints. Initiative documents own bounded implementation scope and detailed execution progress. Optional plans and specifications cover justified planning detail. Avoid duplicating the same task list across these documents.
 
 ## Enforcement and limits
 

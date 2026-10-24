@@ -28,7 +28,7 @@ Fictional catalog data under `packages/genui/src/fixtures/` used by `/genui-demo
 
 ## Workspace (planned)
 
-The authenticated surface where a person and an agent share conversation, selection context, and canvas artifacts. Not shipped in the GenUI foundation slice; see [ARCHITECTURE.md](ARCHITECTURE.md) §7 and [ROADMAP.md](ROADMAP.md).
+The authenticated surface where a person and an agent share conversation, selection context, and canvas artifacts. Not shipped in the GenUI foundation slice; see [ARCHITECTURE.md](ARCHITECTURE.md) §7.
 
 ## Canvas (planned)
 
