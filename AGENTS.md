@@ -13,7 +13,7 @@ Update the owning document in the same change. Use a PDR in `docs/pdr/` for a co
 - Product behavior, scope, or acceptance → [PRODUCT.md](PRODUCT.md)
 - UI, interaction, or visual changes → [DESIGN.md](DESIGN.md)
 - Architecture, integrations, or persistence → [ARCHITECTURE.md](ARCHITECTURE.md)
-- Implementation sequence → [ARCHITECTURE.md](ARCHITECTURE.md) §10
+- Implementation sequence → [ARCHITECTURE.md](ARCHITECTURE.md) §10 and [ROADMAP.md](ROADMAP.md)
 - Project-specific terms → [GLOSSARY.md](GLOSSARY.md)
 - Hard-to-reverse rationale → the relevant file in [docs/adr/](docs/adr/)
 - Dated evidence → [docs/research/](docs/research/). Accepted direction stays in the root contracts and `docs/adr/`.

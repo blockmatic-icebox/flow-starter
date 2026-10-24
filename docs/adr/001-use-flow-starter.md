@@ -20,4 +20,4 @@ Flow Starter exists to be forked. It should ship proven generative UI mechanics 
 
 - Adopters replace Acme fixtures, prompts, and branding while keeping compiler, envelope, and NDJSON compose contracts.
 - CI workflows live in `.github/workflows/` but remote triggers stay commented until the repository owner enables them.
-- json-render and other alternate composition languages remain research-only; OpenUI Lang is the implemented foundation (see ADR 0005).
+- json-render and other alternate composition languages remain research-only; OpenUI Lang is the implemented foundation (see ADR 003).

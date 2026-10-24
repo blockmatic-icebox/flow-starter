@@ -1,9 +1,19 @@
 import { composeQuery } from "@repo/genui";
 import { NextResponse } from "next/server";
 
+import { admitCompose } from "@/lib/genui/admit-compose";
+import { memoryCapStore } from "@/lib/genui/cap-store";
+import { composeContextFromRequest } from "@/lib/genui/compose-context";
+import {
+  composeRateLimitEnforced,
+  readRequestIp,
+  requestHost,
+} from "@/lib/genui/request";
+
 export const runtime = "nodejs";
 
 const DEADLINE_MS = 15_000;
+const capStore = memoryCapStore();
 
 export const POST = async (request: Request) => {
   const body = (await request.json().catch(() => null)) as {
@@ -19,7 +29,21 @@ export const POST = async (request: Request) => {
     );
   }
 
-  const clientRequestId = body?.clientRequestId?.trim() || crypto.randomUUID();
+  const ip = readRequestIp(request);
+  const host = requestHost(request);
+  const correlationId = body?.clientRequestId?.trim() || crypto.randomUUID();
+  const context = composeContextFromRequest({ correlationId, ip });
+
+  const admitted = await admitCompose({
+    enforce: composeRateLimitEnforced({ host }),
+    ip,
+    now: context.clock,
+    store: capStore,
+  });
+  if (!admitted.ok) {
+    return NextResponse.json({ message: admitted.message }, { status: 429 });
+  }
+
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -31,7 +55,7 @@ export const POST = async (request: Request) => {
       try {
         await composeQuery({
           input: {
-            clientRequestId,
+            clientRequestId: context.correlationId,
             query,
             version: body?.version ?? 1,
           },
@@ -46,7 +70,7 @@ export const POST = async (request: Request) => {
           encoder.encode(
             `${JSON.stringify({
               message: "Composition failed.",
-              requestId: clientRequestId,
+              requestId: context.correlationId,
               sequence: 0,
               type: "error",
             })}\n`

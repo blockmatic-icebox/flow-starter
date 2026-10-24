@@ -70,7 +70,7 @@ Classifications: **COPY** (portable as-is), **ADAPT** (generalize), **REBUILD** 
 | --- | --- | --- |
 | `@openuidev/lang-core` | Parser + contract library | `@repo/genui` |
 | `@openuidev/react-lang` | Renderer + React library | `@repo/genui/react` |
-| `@json-render/core`, `@json-render/react` | Other surfaces | Not used in Flow GenUI v1 (ADR 0005) |
+| `@json-render/core`, `@json-render/react` | Other surfaces | Not used in Flow GenUI v1 (ADR 003) |
 | `ai`, Jev | Semantic plan + decisions | Tier 3 / Jev not wired in Flow yet |
 
 ## Flow Starter prior state
@@ -79,7 +79,7 @@ Classifications: **COPY** (portable as-is), **ADAPT** (generalize), **REBUILD** 
 | --- | --- |
 | GenUI code | None in `apps/web`; only `docs/research/generative-ui.md` |
 | ARCHITECTURE | json-render planned for canvas |
-| Decision | ADR `docs/adr/0005-genui-openui-foundation.md` records OpenUI as implemented foundation |
+| Decision | ADR `docs/adr/003-genui-openui-foundation.md` records OpenUI as implemented foundation |
 
 ## Proposed package map (implemented)
 

@@ -1,6 +1,6 @@
 # Flow voice surfaces
 
-> Dated primary-source research (October 17, 2026). Not the product decision. See [ADR-0002](../adr/0002-voice-delegates-to-eve.md) and [ARCHITECTURE.md](../../ARCHITECTURE.md) §9.
+> Dated primary-source research (October 17, 2026). Not the product decision. See [ADR 004](../adr/004-voice-delegates-to-eve.md) and [ARCHITECTURE.md](../../ARCHITECTURE.md) §7.
 
 Research date: October 17, 2026. Primary-source review; no packages installed or integrations executed. Voice is included in Flow's defined product. This note distinguishes upstream capabilities from the integration Flow still needs to build.
 

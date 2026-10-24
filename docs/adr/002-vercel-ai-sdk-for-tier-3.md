@@ -11,7 +11,7 @@ gaboesquivel.com uses the Vercel AI SDK (`ai`) with AI Gateway for planners, sem
 - Add **`ai`** to `@repo/genui` and route tier-3 fallback answers through `generateText` when `AI_GATEWAY_API_KEY` is present.
 - Default model id: `anthropic/claude-sonnet-4` via AI Gateway; override with `GENUI_MODEL`.
 - When no gateway key is configured, tier 3 returns a grounded **Answer** experience using catalog fixtures—no network call.
-- Host apps own rate limits, telemetry, and capability context; the starter compose API stays minimal (`POST /api/genui/compose`).
+- The starter ships a minimal **capability context** (`composeContextFromRequest`) and in-memory per-IP compose rate limits (`apps/web/lib/genui/`); adopters swap the cap store and add telemetry like gaboesquivel.com.
 
 ## Consequences
 

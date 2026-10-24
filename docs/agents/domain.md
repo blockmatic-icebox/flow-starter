@@ -35,4 +35,4 @@ If the concept you need is not in the glossary yet, either you are inventing lan
 
 If output contradicts an existing ADR, surface it explicitly rather than silently overriding:
 
-> _Contradicts ADR-0004 (external invocation is read-only), but worth reopening because…_
+> _Contradicts ADR 006 (external invocation is read-only), but worth reopening because…_
