@@ -38,7 +38,7 @@ OpenAI documents browser WebRTC with a server-side WebSocket attached to the sam
 
 ### Dictation and audio components are not conversational voice
 
-Wispr Flow is a dictation application that works in other applications and websites; it can fill Flow's normal composer without becoming Flow's agent runtime. That is distinct from OpenAI Whisper transcription and from spoken conversational responses. The reviewed Wispr page does not establish an embeddable integration contract. [Wispr for developers](https://wisprflow.ai/developers).
+Wispr Flow is a dictation application that works in other applications and websites; it can fill Flow's normal composer without becoming Flow's agent runtime. That is distinct from OpenAI Whisper transcription and from spoken conversational responses. The reviewed Wispr page did not establish an embeddable integration contract at research time. As of 2026-10-24, Wispr publishes a developer dictation API (WebSocket/REST) that transcribes audio only; it does not answer product questions or drive UI actions. Embedded Wispr remains out of scope until organization access is granted. [Wispr for developers](https://wisprflow.ai/developers), [Wispr API docs](https://api-docs.wisprflow.ai/introduction).
 
 AI Elements offers `SpeechInput` for transcription, with browser speech recognition and a MediaRecorder fallback requiring an application transcription callback. `AudioPlayer` supplies playback UI. These components are useful selectively, but do not supply session orchestration, authorization, delegation, or shared canvas state. Provider credentials must remain on Flow's server. [Speech Input](https://elements.ai-sdk.dev/components/speech-input), [Audio Player](https://elements.ai-sdk.dev/components/audio-player).
 
