@@ -122,7 +122,7 @@ export const statusDocument = ({
 }) => ({
   fallbackText: message,
   libraryVersion: GENUI_LIBRARY_VERSION,
-  openuiText: `root = StatusMessage(${openUiStringLiteral(variant)}, ${openUiStringLiteral(message)})`,
+  openuiText: `root = StatusMessage(${openUiStringLiteral(message)}, ${openUiStringLiteral(variant)})`,
   records,
   requestId,
 });

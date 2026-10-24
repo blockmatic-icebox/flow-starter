@@ -17,6 +17,7 @@ export const GenuiDemoClient = () => {
   const [status, setStatus] = useState<string>("idle");
 
   const submit = async () => {
+    if (!query.trim()) return;
     setStatus("loading");
     setEnvelope(null);
     const response = await fetch("/api/genui/compose", {

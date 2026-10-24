@@ -37,7 +37,7 @@ A planned integration must not be presented as existing functionality.
 
 - Authenticated external invocation beyond the public read-only MCP slice, subject to [ADR 006](docs/adr/0006-external-invocation-is-read-only.md).
 - Eve workspace voice delegation, subject to [ADR 004](docs/adr/0004-voice-delegates-to-eve.md).
-- Additional browser, MCP Apps, and generated-interface quality testing where actual adopter needs justify it.
+- MCP Apps host harness and Eve `defineEval` suites (browser fixture lab and consultant MCP protocol tests ship; see [docs/specs/genui/readme.md](docs/specs/genui/readme.md#tests)).
 
 ## Maintenance rules
 

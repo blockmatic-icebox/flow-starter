@@ -38,6 +38,7 @@ export const checkComponentDocument = ({
 }) => {
   for (const key of Object.keys(props)) {
     if (forbiddenKeySet.has(key)) {
+      if (name === "StatusMessage" && key === "variant") continue;
       return { code: "forbidden_property" as const, key, ok: false as const };
     }
   }

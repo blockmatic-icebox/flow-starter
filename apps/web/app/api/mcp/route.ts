@@ -1,8 +1,7 @@
-import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { NextResponse } from "next/server";
 
 import { admitChat } from "@/lib/consultant/admit-chat";
-import { createConsultantMcpServer } from "@/lib/consultant/mcp-server";
+import { handleConsultantMcpRequest } from "@/lib/consultant/mcp-handler";
 import { memoryCapStore } from "@/lib/genui/cap-store";
 import {
   composeRateLimitEnforced,
@@ -41,12 +40,7 @@ const handleMcp = async (request: Request) => {
     return NextResponse.json({ message: admitted.message }, { status: 429 });
   }
 
-  const server = createConsultantMcpServer();
-  const transport = new WebStandardStreamableHTTPServerTransport({
-    sessionIdGenerator: undefined,
-  });
-  await server.connect(transport);
-  return transport.handleRequest(request);
+  return handleConsultantMcpRequest(request);
 };
 
 export const GET = handleMcp;

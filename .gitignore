@@ -14,6 +14,10 @@ node_modules
 
 # Testing
 coverage
+**/tests/browser/report/
+**/tests/browser/test-results/
+**/playwright-report/
+**/test-results/
 
 # Turbo
 .turbo

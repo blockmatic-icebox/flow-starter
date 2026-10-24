@@ -6,10 +6,12 @@
   "exports": {
     ".": "./src/index.ts",
     "./react": "./src/react/index.ts",
-    "./eval": "./src/eval/query-matrix.ts"
+    "./eval": "./src/eval/query-matrix.ts",
+    "./fixtures/lab-fixtures": "./src/fixtures/lab-fixtures.ts"
   },
   "scripts": {
     "check-types": "tsc-ts --noEmit",
+    "eval:offline": "node --import tsx scripts/eval-offline.ts",
     "test": "node --import tsx --test src/**/*.test.ts"
   },
   "dependencies": {

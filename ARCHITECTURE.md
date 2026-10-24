@@ -135,7 +135,7 @@ Local gates:
 
 GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and [`.github/workflows/security.yml`](.github/workflows/security.yml) mirror the local gates but remain **disabled for push/PR** on CI until uncommented. [`.github/workflows/pr-title.yml`](.github/workflows/pr-title.yml) enforces Conventional Commits on PR titles. DeepSec stays manual in [`.github/workflows/deepsec.yml`](.github/workflows/deepsec.yml).
 
-GenUI unit tests: `pnpm --filter @repo/genui test`. Eval matrix: `packages/genui/src/eval/query-matrix.ts`.
+GenUI unit tests and graded prompt matrix: `pnpm --filter @repo/genui test` (`packages/genui/src/eval/query-matrix.ts`, offline: `pnpm eval:genui:offline`). Consultant MCP protocol tests: `pnpm --filter web test`. Browser fixture lab and shell smokes: `pnpm test:browser` (see [docs/specs/genui/readme.md](docs/specs/genui/readme.md#tests)).
 
 ### Local Neon database
 
