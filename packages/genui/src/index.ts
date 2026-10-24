@@ -1,0 +1,44 @@
+export {
+  GENUI_LIBRARY_VERSION,
+  type CompositionEnvelope,
+  type GroundedRecord,
+} from "./core/envelope";
+export type {
+  CompileErrorCode,
+  CompiledComposition,
+  CompileResult,
+} from "./core/errors";
+export {
+  createActionRegistry,
+  validateActionInvocation,
+  type RegisteredAction,
+  type RegisteredActionKind,
+} from "./core/actions";
+export {
+  tierFromSignals,
+  type CompositionTier,
+  type RoutingDecision,
+} from "./core/tiers";
+export {
+  compileCompositionEnvelope,
+  compileExperience,
+  validateCompositionEnvelope,
+} from "./contract/compiler";
+export {
+  componentSemantics,
+  compositionGuidance,
+} from "./registry/semantics";
+export { compositeNames, type CompositeName } from "./registry/composites";
+export { componentNames, type ComponentName } from "./registry/components";
+export {
+  composeQuery,
+  type ComposeInput,
+  type ComposeResult,
+} from "./orchestration/compose";
+export { routeQuery } from "./orchestration/routing";
+export {
+  consumeNdjsonResponse,
+  parseNdjsonText,
+  type ComposeStreamEvent,
+} from "./orchestration/stream";
+export { acmeCatalogRecords } from "./fixtures/acme-catalog";

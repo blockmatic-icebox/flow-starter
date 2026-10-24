@@ -17,14 +17,14 @@ The initial release covers text, tables, architecture diagrams, grounded retriev
 | Agent | One eve agent for the `/dev` prompt and chat; authenticated external callers are follow-on work. |
 | Models | Vercel AI SDK through eve for reasoning and tools; follow-on voice delegates domain work to eve. |
 | Voice (follow-on) | Adapt the official eve Voice template approach; preserve GitHub identity and the existing `/dev` conversation. See §9. |
-| Generative presentation | json-render with text, tables, and Mermaid initially; Recharts and verified video are follow-on components. |
+| Generative presentation | `@repo/genui`: OpenUI Lang documents, shared compiler, NDJSON compose, React host adapter; fictional Acme demo at `/genui-demo`. json-render remains research / optional future canvas adapter; Recharts and verified video are follow-on components. |
 | Knowledge | Fumadocs, Markdown, `llms.txt`, configured repository source and ownership records; bounded retrieval and revision-aware citations. |
 | External data | Read-only GitHub REST for the configured repository; dependency metadata and curated videos are follow-on work. |
 | Persistence | Neon PostgreSQL + Drizzle, provisioned and billed through the Vercel-managed integration. Justified by sessions/auth, ownership, persistent canvases, and versioned transactions. Start development on the Free plan. |
 | Hosting | Vercel, with isolated previews, automated checks, controlled production releases, and recovery procedures. |
 | Shared actions | UI controls and the agent call the same authorized server operations. Domain operations stay independent of the example route and of any transport. |
 
-The runtime is **eve**; “if agent” in conversation refers to eve. Generative UI uses json-render. Vercel is the primary platform; add infrastructure only when a defined capability requires it.
+The runtime is **eve**; “if agent” in conversation refers to eve. Generative UI uses `@repo/genui` (OpenUI Lang). Vercel is the primary platform; add infrastructure only when a defined capability requires it.
 
 ## 2. Minimal structure within the monorepo
 
