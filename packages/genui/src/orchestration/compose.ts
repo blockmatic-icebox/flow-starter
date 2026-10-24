@@ -37,11 +37,13 @@ export interface ComposeResult {
 
 const queryCodePoints = (query: string) => [...query].length;
 
-const metricIds = () =>
-  acmeCatalogRecords.filter((r) => r.kind === "metric").map((r) => r.id);
+const metricIds = acmeCatalogRecords
+  .filter((record) => record.kind === "metric")
+  .map((record) => record.id);
 
-const documentIds = () =>
-  acmeCatalogRecords.filter((r) => r.kind === "document").map((r) => r.id);
+const documentIds = acmeCatalogRecords
+  .filter((record) => record.kind === "document")
+  .map((record) => record.id);
 
 const controlledDocument = ({
   intent,
@@ -83,7 +85,7 @@ const controlledDocument = ({
 
   if (intent === "show-metrics") {
     return dataExplorerDocument({
-      metricIds: metricIds(),
+      metricIds,
       records,
       requestId,
     });
@@ -91,7 +93,7 @@ const controlledDocument = ({
 
   if (intent === "product-timeline") {
     return timelineDocument({
-      orderedIds: documentIds(),
+      orderedIds: documentIds,
       records,
       requestId,
     });
@@ -157,7 +159,7 @@ const declarativeCompound = ({
   const children = [answerChild];
   if (wantsMetrics) {
     children.push(
-      `DataExplorer("metrics-dashboard", ${openUiStringList(metricIds())})`
+      `DataExplorer("metrics-dashboard", ${openUiStringList(metricIds)})`
     );
   }
   if (wantsCompare) {

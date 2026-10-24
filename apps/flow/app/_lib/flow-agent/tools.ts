@@ -112,9 +112,7 @@ export const runFlowAgentTool = (
 export const runConsultantTool = (name: ConsultantToolName) =>
   runFlowAgentTool(name);
 
-export const pickFlowAgentTool = (
-  query: string
-): FlowAgentReadOnlyToolName | null => {
+export const pickFlowAgentTool = (query: string): FlowAgentReadOnlyToolName => {
   const normalized = query.toLowerCase();
   if (
     /workflow|explore|specify|plan|build|review|ship|methodology|stage/u.test(

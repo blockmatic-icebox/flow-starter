@@ -52,7 +52,7 @@ export const deterministicFlowAgentResponse = (
           type: "tool-input-available",
         });
       } else {
-        const toolName = pickFlowAgentTool(query) ?? "describe_architecture";
+        const toolName = pickFlowAgentTool(query);
         const toolCallId = crypto.randomUUID();
         let input: Record<string, unknown> = {};
         if (toolName === "search_knowledge") input = { query };

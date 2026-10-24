@@ -1,5 +1,4 @@
 import { composeQuery } from "@repo/genui";
-import { NextResponse } from "next/server";
 
 import { composeContextFromRequest } from "@/app/_lib/genui/compose-context";
 import {
@@ -10,8 +9,8 @@ import type { CreateCapStoreResult } from "@/app/_lib/genui/create-cap-store";
 import { enforceDailyCap } from "@/app/_lib/genui/enforce-daily-cap";
 import { rateLimitSubject } from "@/app/_lib/genui/request";
 import {
-  jsonRequestMessage,
-  jsonRequestStatus,
+  jsonErrorFromReadResult,
+  jsonErrorResponse,
   readJsonRequest,
 } from "@/app/_lib/security/read-json-request";
 
@@ -19,9 +18,6 @@ export const runtime = "nodejs";
 
 const DEADLINE_MS = 15_000;
 export const COMPOSE_MAX_BODY_BYTES = 16 * 1024;
-
-const jsonError = ({ message, status }: { message: string; status: number }) =>
-  NextResponse.json({ message }, { status });
 
 export const handleComposePost = async ({
   createStore,
@@ -38,15 +34,11 @@ export const handleComposePost = async ({
     maxBytes: COMPOSE_MAX_BODY_BYTES,
     request,
   });
-  if (!body.ok)
-    return jsonError({
-      message: jsonRequestMessage(body.error),
-      status: jsonRequestStatus(body.error),
-    });
+  if (!body.ok) return jsonErrorFromReadResult(body.error);
 
   const parsed = composeRequestSchema.safeParse(body.value);
   if (!parsed.success)
-    return jsonError({
+    return jsonErrorResponse({
       message: composeRequestErrorMessage(parsed.error),
       status: 400,
     });
@@ -59,7 +51,10 @@ export const handleComposePost = async ({
     request,
   });
   if (!admitted.ok)
-    return jsonError({ message: admitted.message, status: admitted.status });
+    return jsonErrorResponse({
+      message: admitted.message,
+      status: admitted.status,
+    });
 
   const correlationId = parsed.data.clientRequestId ?? crypto.randomUUID();
   const context = composeContextFromRequest({

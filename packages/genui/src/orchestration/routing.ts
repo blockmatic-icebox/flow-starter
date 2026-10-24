@@ -1,6 +1,6 @@
 import type { CompositionTier } from "../core/tiers";
 import { tierFromSignals } from "../core/tiers";
-import { acmeCatalogRecords, acmeEntityIds } from "../fixtures/acme-catalog";
+import { acmeEntityIds } from "../fixtures/acme-catalog";
 
 export type ControlledIntent =
   | "compare-plans"
@@ -34,10 +34,7 @@ export const routeQuery = (query: string): RoutedIntent => {
     };
   }
 
-  if (
-    (normalizedQuery.includes(" and ") || normalizedQuery.includes(" plus ")) &&
-    !injection
-  ) {
+  if (normalizedQuery.includes(" and ") || normalizedQuery.includes(" plus ")) {
     const decision = tierFromSignals({
       ambiguous: false,
       hasControlledIntent: false,
@@ -127,7 +124,5 @@ export const routeQuery = (query: string): RoutedIntent => {
     tier: decision.tier,
   };
 };
-
-export const defaultCatalog = () => acmeCatalogRecords;
 
 export const defaultEntityIds = () => acmeEntityIds;

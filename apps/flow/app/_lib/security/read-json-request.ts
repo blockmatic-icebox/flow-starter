@@ -1,5 +1,7 @@
 /** Server-only. Do not import this module from Client Components. */
 
+import { NextResponse } from "next/server";
+
 export type JsonRequestError =
   | "unsupported_media_type"
   | "payload_too_large"
@@ -29,6 +31,20 @@ export const jsonRequestStatus = (error: JsonRequestError) =>
 
 export const jsonRequestMessage = (error: JsonRequestError) =>
   jsonRequestMessages[error];
+
+export const jsonErrorResponse = ({
+  message,
+  status,
+}: {
+  message: string;
+  status: number;
+}) => NextResponse.json({ message }, { status });
+
+export const jsonErrorFromReadResult = (error: JsonRequestError) =>
+  jsonErrorResponse({
+    message: jsonRequestMessage(error),
+    status: jsonRequestStatus(error),
+  });
 
 const charsetOk = (parameter: string) =>
   /^charset\s*=\s*"?utf-?8"?$/iu.test(parameter);

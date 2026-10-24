@@ -212,7 +212,5 @@ const gradeExpectations = ({
 
 export const envelopeFromResult = (result: ComposeResult) => {
   const complete = result.events.find((event) => event.type === "complete");
-  return complete?.type === "complete"
-    ? (complete.envelope as CompositionEnvelope)
-    : null;
+  return complete?.type === "complete" ? complete.envelope : null;
 };
