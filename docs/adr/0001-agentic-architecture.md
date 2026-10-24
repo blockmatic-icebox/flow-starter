@@ -1,3 +1,5 @@
+Date: 2026-10-24
+
 # ADR 0001 — Agentic Architecture
 
 **Status:** Accepted · October 24, 2026
@@ -73,7 +75,7 @@ The current GenUI implementation uses OpenUI Lang.
 
 Do not allow arbitrary model-generated frontend code or privileged action definitions.
 
-See [ADR 003](003-genui-openui-foundation.md).
+See [ADR 003](0003-genui-openui-foundation.md).
 
 ### 5. Progressive implementation
 
@@ -204,7 +206,7 @@ React component and feature structure is intentionally opinionated, following Fr
 
 **Status:** Implemented for optional tier-3 answers.
 
-**Related decision:** [ADR 002](002-vercel-ai-sdk-for-tier-3.md).
+**Related decision:** [ADR 002](0002-vercel-ai-sdk-for-tier-3.md).
 
 ### Vercel AI Gateway — preferred model access layer
 
@@ -356,9 +358,9 @@ Do not treat a session library as a complete permission model for privileged age
 
 **Status:** Implemented.
 
-**Related decision:** [ADR 003](003-genui-openui-foundation.md).
+**Related decision:** [ADR 003](0003-genui-openui-foundation.md).
 
-**Research:** [OpenUI and json-render comparison](../research/2026-10-24-genui-json-vs-openui.md).
+**Research:** [OpenUI and json-render comparison](../research/20261024-genui-json-vs-openui.md).
 
 ### Zod — runtime validation
 
@@ -463,7 +465,7 @@ Includes oxlint, oxfmt, the Node.js test runner, browser testing when needed, an
 
 ### Agent skills and Flow documentation
 
-**Selection:** Agent Skills-compatible instructions, a versioned skills manifest, AGENTS.md, and FLOW.md.
+**Selection:** Agent Skills-compatible instructions, a versioned skills manifest, AGENTS.md, and docs/Workflow/Flow.md.
 
 **Why:**
 
@@ -550,9 +552,9 @@ This ADR owns the architectural vision and the reasons for choosing the technolo
 
 [PDR 0001](../pdr/0001-agnostic-api-first.md) owns product-agnostic and capability-first product-engineering principles.
 
-[FLOW.md](../../FLOW.md) owns the software development workflow.
+[docs/Workflow/Flow.md](../../docs/Workflow/Flow.md) owns the software development workflow.
 
-[ADR 002](002-vercel-ai-sdk-for-tier-3.md) and [ADR 003](003-genui-openui-foundation.md) preserve narrower implementation decisions.
+[ADR 002](0002-vercel-ai-sdk-for-tier-3.md) and [ADR 003](0003-genui-openui-foundation.md) preserve narrower implementation decisions.
 
 Historical [ADR 0007](0007-monorepo-vercel-stack.md) and [ADR 0008](0008-monorepo-turborepo-pnpm.md) have been consolidated into this foundational record.
 

@@ -5,10 +5,7 @@ import { pathToFileURL } from "node:url";
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const slug = "[a-z0-9]+(?:-[a-z0-9]+)*";
 const slugFilePattern = new RegExp(`^${slug}\\.md$`, "u");
-const researchFilePattern = new RegExp(
-  `^\\d{4}-\\d{2}-\\d{2}-${slug}\\.md$`,
-  "u"
-);
+const researchFilePattern = new RegExp(`^\\d{8}-${slug}\\.md$`, "u");
 const decisionFilePattern = new RegExp(`^\\d{4}-${slug}\\.md$`, "u");
 
 const rules = [
@@ -22,13 +19,6 @@ const rules = [
 ];
 
 const legacyPaths = new Set([
-  "docs/adr/002-vercel-ai-sdk-for-tier-3.md",
-  "docs/adr/003-genui-openui-foundation.md",
-  "docs/adr/004-voice-delegates-to-eve.md",
-  "docs/adr/005-workspace-stays-at-dev.md",
-  "docs/adr/006-external-invocation-is-read-only.md",
-  "docs/research/generative-ui.md",
-  "docs/research/voice-surfaces.md",
   "docs/specs/genui/INVENTORY.md",
   "docs/specs/genui/README.md",
 ]);
@@ -41,6 +31,7 @@ const researchStatusPattern =
   /^\*\*Status:\*\*\s*(?<status>Current|Historical|Exploratory)\s*$/mu;
 const specStatusPattern =
   /^\*\*Status:\*\*\s*(?<status>Current|Historical|Draft)\s*$/mu;
+const decisionHeaderDatePattern = /^Date:\s*(?<date>\d{4}-\d{2}-\d{2})\s*$/mu;
 
 function markdownFiles(directory) {
   if (!existsSync(directory)) {
@@ -74,6 +65,10 @@ function decisionNumber(filename) {
   return match ? Number(match.groups.num) : null;
 }
 
+function compactDateToIso(compactDate) {
+  return `${compactDate.slice(0, 4)}-${compactDate.slice(4, 6)}-${compactDate.slice(6, 8)}`;
+}
+
 function validCalendarDate(dateString) {
   const date = new Date(`${dateString}T00:00:00.000Z`);
 
@@ -83,14 +78,14 @@ function validCalendarDate(dateString) {
   );
 }
 
-function validDate(filename) {
-  const match = /^(?<date>\d{4}-\d{2}-\d{2})-/u.exec(filename);
+function validResearchFilenameDate(filename) {
+  const match = /^(?<date>\d{8})-/u.exec(filename);
 
   if (!match) {
     return false;
   }
 
-  return validCalendarDate(match.groups.date);
+  return validCalendarDate(compactDateToIso(match.groups.date));
 }
 
 function seedLegacyDecisionNumbers({ numbers, root }) {
@@ -145,19 +140,20 @@ function validateResearchMetadata({ content, errors, relative }) {
     );
   }
 
-  const datedFilename = /^(?<date>\d{4}-\d{2}-\d{2})-/u.exec(
-    path.basename(relative)
-  );
+  const datedFilename = /^(?<date>\d{8})-/u.exec(path.basename(relative));
 
   if (
     datedFilename &&
     researchDate &&
-    researchDate.groups.date !== "Unknown (legacy)" &&
-    researchDate.groups.date !== datedFilename.groups.date
+    researchDate.groups.date !== "Unknown (legacy)"
   ) {
-    errors.push(
-      `${relative}: **Research date:** must match filename date ${datedFilename.groups.date}`
-    );
+    const fileDate = compactDateToIso(datedFilename.groups.date);
+
+    if (researchDate.groups.date !== fileDate) {
+      errors.push(
+        `${relative}: **Research date:** must match filename date ${fileDate}`
+      );
+    }
   }
 }
 
@@ -177,6 +173,19 @@ function validateSpecMetadata({ content, errors, relative }) {
   }
 }
 
+function validateDecisionHeaderDate({ content, errors, relative }) {
+  const headerDate = decisionHeaderDatePattern.exec(content);
+
+  if (!headerDate) {
+    errors.push(`${relative}: missing Date: YYYY-MM-DD header`);
+    return;
+  }
+
+  if (!validCalendarDate(headerDate.groups.date)) {
+    errors.push(`${relative}: invalid Date: header calendar date`);
+  }
+}
+
 function validateDocumentMetadata(root) {
   const errors = [];
 
@@ -192,6 +201,20 @@ function validateDocumentMetadata(root) {
     const content = readFileSync(filename, "utf-8");
 
     validateSpecMetadata({ content, errors, relative });
+  }
+
+  for (const filename of markdownFiles(path.join(root, "docs/adr"))) {
+    const relative = relativePath(root, filename);
+    const content = readFileSync(filename, "utf-8");
+
+    validateDecisionHeaderDate({ content, errors, relative });
+  }
+
+  for (const filename of markdownFiles(path.join(root, "docs/pdr"))) {
+    const relative = relativePath(root, filename);
+    const content = readFileSync(filename, "utf-8");
+
+    validateDecisionHeaderDate({ content, errors, relative });
   }
 
   return errors;
@@ -245,7 +268,7 @@ export function validateFlowDocs(root = repositoryRoot) {
       continue;
     }
 
-    if (category === "research" && !validDate(suffix)) {
+    if (category === "research" && !validResearchFilenameDate(suffix)) {
       errors.push(`${relative}: invalid ISO calendar date`);
       continue;
     }
@@ -289,7 +312,9 @@ if (import.meta.url === entrypoint) {
       console.error(`- ${error}`);
     }
 
-    console.error("\nSee FLOW.md for canonical documentation conventions.");
+    console.error(
+      "\nSee docs/Workflow/Flow.md for canonical documentation conventions."
+    );
 
     process.exitCode = 1;
   } else {

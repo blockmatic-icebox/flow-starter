@@ -74,7 +74,7 @@ The implementation and current package boundaries are described here; the ration
 
 **Fixtures:** the demo uses fictional **Acme Analytics** catalog data under `packages/genui/src/fixtures/`. Adopters swap in their own record providers.
 
-**Foundation:** OpenUI Lang (`@openuidev/lang-core`, `@openuidev/react-lang`). json-render is documented research only ([ADR 003](docs/adr/003-genui-openui-foundation.md), [2026-10-24 GenUI research](docs/research/2026-10-24-genui-json-vs-openui.md)).
+**Foundation:** OpenUI Lang (`@openuidev/lang-core`, `@openuidev/react-lang`). json-render is documented research only ([ADR 003](docs/adr/0003-genui-openui-foundation.md), [2026-10-24 GenUI research](docs/research/20261024-genui-json-vs-openui.md)).
 
 ## 4. Composition tiers
 

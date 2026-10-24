@@ -1,3 +1,5 @@
+Date: 2026-10-24
+
 # ADR 006 — External invocation is read-only for canvas
 
 **Status:** Accepted

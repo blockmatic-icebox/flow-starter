@@ -81,9 +81,9 @@ Classifications: **COPY** (portable as-is), **ADAPT** (generalize), **REBUILD** 
 
 | Item | Finding |
 | --- | --- |
-| GenUI code | None in `apps/web`; only `docs/research/generative-ui.md` |
+| GenUI code | None in `apps/web`; only `docs/research/20261020-generative-ui.md` |
 | ARCHITECTURE | json-render planned for canvas |
-| Decision | ADR `docs/adr/003-genui-openui-foundation.md` records OpenUI as implemented foundation |
+| Decision | ADR `docs/adr/0003-genui-openui-foundation.md` records OpenUI as implemented foundation |
 
 ## Proposed package map (implemented)
 

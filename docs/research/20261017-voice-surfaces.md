@@ -6,9 +6,9 @@
 
 **Status:** Historical
 
-> Historical research note. Some integration recommendations below refer to json-render and a prospective workspace architecture. Current accepted GenUI direction uses OpenUI Lang, as documented in [ADR 003](../adr/003-genui-openui-foundation.md) and [ARCHITECTURE.md](../../ARCHITECTURE.md). Treat this note as source evidence, not current implementation instructions.
+> Historical research note. Some integration recommendations below refer to json-render and a prospective workspace architecture. Current accepted GenUI direction uses OpenUI Lang, as documented in [ADR 003](../adr/0003-genui-openui-foundation.md) and [ARCHITECTURE.md](../../ARCHITECTURE.md). Treat this note as source evidence, not current implementation instructions.
 
-> Dated primary-source research (October 17, 2026). Not the product decision. See [ADR 004](../adr/004-voice-delegates-to-eve.md) and [ARCHITECTURE.md](../../ARCHITECTURE.md) §7.
+> Dated primary-source research (October 17, 2026). Not the product decision. See [ADR 004](../adr/0004-voice-delegates-to-eve.md) and [ARCHITECTURE.md](../../ARCHITECTURE.md) §7.
 
 Research date: October 17, 2026. Primary-source review; no packages installed or integrations executed. Voice is included in Flow's defined product. This note distinguishes upstream capabilities from the integration Flow still needs to build.
 

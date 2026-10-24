@@ -1,3 +1,5 @@
+Date: 2026-10-17
+
 # ADR 004 — Voice delegates domain work to eve
 
 **Status:** Accepted · October 17, 2026
@@ -13,4 +15,4 @@ When implemented, the speech model handles listening and presentation only. Grou
 ## Consequences
 
 - Voice is follow-on work under [PRODUCT.md](../../PRODUCT.md).
-- See [ARCHITECTURE.md](../../ARCHITECTURE.md) §7 and [voice-surfaces research](../research/voice-surfaces.md).
+- See [ARCHITECTURE.md](../../ARCHITECTURE.md) §7 and [voice-surfaces research](../research/20261017-voice-surfaces.md).
