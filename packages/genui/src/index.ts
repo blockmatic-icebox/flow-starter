@@ -24,10 +24,7 @@ export {
   compileExperience,
   validateCompositionEnvelope,
 } from "./contract/compiler";
-export {
-  componentSemantics,
-  compositionGuidance,
-} from "./registry/semantics";
+export { componentSemantics, compositionGuidance } from "./registry/semantics";
 export { compositeNames, type CompositeName } from "./registry/composites";
 export { componentNames, type ComponentName } from "./registry/components";
 export {

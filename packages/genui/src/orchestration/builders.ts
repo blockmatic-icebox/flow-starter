@@ -1,7 +1,4 @@
-import {
-  openUiStringList,
-  openUiStringLiteral,
-} from "../contract/openui-text";
+import { openUiStringList, openUiStringLiteral } from "../contract/openui-text";
 import type { CompositionEnvelope, GroundedRecord } from "../core/envelope";
 import { GENUI_LIBRARY_VERSION } from "../core/envelope";
 import type { CompositeName } from "../registry/composites";

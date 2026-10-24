@@ -4,8 +4,8 @@ import { describe, it } from "node:test";
 import { composeQuery } from "./compose";
 
 describe("composeQuery", () => {
-  it("routes compare plans to tier 1", () => {
-    const result = composeQuery({
+  it("routes compare plans to tier 1", async () => {
+    const result = await composeQuery({
       input: {
         clientRequestId: "t1",
         query: "Compare Orbit plan versus Nova plan",
@@ -17,8 +17,8 @@ describe("composeQuery", () => {
     assert.equal(result.metadata.component, "ComparisonView");
   });
 
-  it("composes tier 2 stack for compound prompts", () => {
-    const result = composeQuery({
+  it("composes tier 2 stack for compound prompts", async () => {
+    const result = await composeQuery({
       input: {
         clientRequestId: "t2",
         query: "Explain the API and show revenue metrics",

@@ -1,6 +1,6 @@
 # Flow
 
-Open-source starter for agentic systems on Vercel, with a planned self-explaining `/dev` workspace. Next.js App Router in `apps/web`, shared shadcn-style UI in `packages/ui`. No Better Auth routes, eve runtime, Neon PostgreSQL/Drizzle app data, `/dev` workspace, or GitHub REST client in the tree yet — root `ARCHITECTURE.md` and `ROADMAP.md` describe planned identity, agent, canvas, and grounding boundaries.
+Open-source starter for agentic systems on Vercel, with a planned self-explaining `/dev` workspace. Next.js App Router in `apps/web`, shared shadcn-style UI in `packages/ui`. No Better Auth routes, eve runtime, Neon PostgreSQL/Drizzle app data, `/dev` workspace, or GitHub REST client in the tree yet — root `ARCHITECTURE.md` describes planned identity, agent, canvas, grounding boundaries, and implementation sequence (§10).
 
 ## What this codebase does
 

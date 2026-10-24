@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   description:
-    "Flow starter shell — workspace, agent, and GitHub sign-in are defined in the root product documents and built per ROADMAP.md.",
+    "Flow Starter — generative UI demo and implementation sequence in ARCHITECTURE.md.",
   title: "Flow",
 };
 

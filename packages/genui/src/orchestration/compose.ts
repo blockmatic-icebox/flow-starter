@@ -1,8 +1,5 @@
 import { validateCompositionEnvelope } from "../contract/compiler";
-import {
-  openUiStringList,
-  openUiStringLiteral,
-} from "../contract/openui-text";
+import { openUiStringList, openUiStringLiteral } from "../contract/openui-text";
 import type { CompositionEnvelope } from "../core/envelope";
 import { MAX_QUERY_CODE_POINTS } from "../core/limits";
 import type { CompositionTier } from "../core/tiers";
@@ -16,6 +13,7 @@ import {
   statusDocument,
   timelineDocument,
 } from "./builders";
+import { synthesizeOpenEndedAnswer } from "./model";
 import { defaultEntityIds, routeQuery } from "./routing";
 import type { ComposeStreamEvent } from "./stream";
 
@@ -158,7 +156,7 @@ const declarativeCompound = ({
   });
 };
 
-export const composeQuery = ({
+export const composeQuery = async ({
   input,
   onEvent,
   signal,
@@ -166,7 +164,7 @@ export const composeQuery = ({
   input: ComposeInput;
   onEvent?: (event: ComposeStreamEvent) => void;
   signal?: AbortSignal;
-}): ComposeResult => {
+}): Promise<ComposeResult> => {
   const query = input.query.trim();
   if (!query || queryCodePoints(query) > MAX_QUERY_CODE_POINTS) {
     throw new Error("invalid-query");
@@ -195,6 +193,7 @@ export const composeQuery = ({
   const routed = routeQuery(query);
   let envelope: CompositionEnvelope;
   let tier: CompositionTier = routed.tier;
+  let modelCalls = 0;
 
   if (routed.intent) {
     tier = 1;
@@ -203,8 +202,12 @@ export const composeQuery = ({
     envelope = declarativeCompound({ query, requestId });
   } else {
     tier = 3;
+    const synthesized = await synthesizeOpenEndedAnswer({ query, signal });
+    if (synthesized) modelCalls = 1;
     envelope = answerDocument({
-      body: "Open-ended composition is available when a model provider is configured; using grounded answer fallback.",
+      body:
+        synthesized ??
+        "Open-ended composition uses a model when AI_GATEWAY_API_KEY is set; showing a grounded catalog answer instead.",
       records: acmeCatalogRecords,
       requestId,
       sourceIds: ["document:api-overview"],
@@ -244,7 +247,7 @@ export const composeQuery = ({
       tier,
       validationOk: true,
     },
-    modelCalls: 0,
+    modelCalls,
     parseErrors: 0,
   };
 };
