@@ -2,22 +2,14 @@ import { safeValidateUIMessages } from "ai";
 import type { ToolSet, UIMessage } from "ai";
 import { z } from "zod";
 
+import { flowAgentChatToolNames } from "./chat-tools";
+
 const MAX_MESSAGES = 30;
 const MAX_PARTS = 40;
 const MAX_TEXT_CODE_POINTS = 8000;
 const MAX_ID_LENGTH = 128;
 
-const consultantToolNames = new Set([
-  "describe_architecture",
-  "describe_capabilities",
-  "describe_technologies",
-  "describe_workflow",
-  "list_knowledge_documents",
-  "read_knowledge_document",
-  "search_knowledge",
-  "focus_genui",
-  "toggle_theme",
-]);
+const allowedChatToolNames = new Set<string>(flowAgentChatToolNames);
 
 const codePointLength = (value: string) => [...value].length;
 
@@ -35,7 +27,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const allowedToolName = (type: string) =>
   type.startsWith("tool-") &&
-  consultantToolNames.has(type.slice("tool-".length));
+  allowedChatToolNames.has(type.slice("tool-".length));
 
 const unsupportedPart = (part: Record<string, unknown>) => {
   const { type } = part;
@@ -46,7 +38,7 @@ const unsupportedPart = (part: Record<string, unknown>) => {
   if (type === "dynamic-tool")
     return (
       typeof part.toolName !== "string" ||
-      !consultantToolNames.has(part.toolName)
+      !allowedChatToolNames.has(part.toolName)
     );
   if (type.startsWith("tool-")) return !allowedToolName(type);
   return true;

@@ -59,9 +59,7 @@ export const parseNdjsonText = (
     return { ok: false, reason: "oversized_response" };
   const events: ComposeStreamEvent[] = [];
   const lines = text.split("\n");
-  const completeLines = text.endsWith("\n")
-    ? lines.slice(0, -1)
-    : lines.slice(0, -1);
+  const completeLines = lines.slice(0, -1);
   const trailing = lines.at(-1) ?? "";
   for (const line of completeLines) {
     if (!line.trim()) continue;

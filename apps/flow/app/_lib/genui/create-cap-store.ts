@@ -14,8 +14,13 @@ const configured = (value: string | undefined) => {
   return trimmed.length > 0 ? trimmed : null;
 };
 
+const defaultCreateRedis = ({ token, url }: { token: string; url: string }) =>
+  new Redis({ token, url });
+
+let cachedProductionRedis: { cacheKey: string; store: CapStore } | undefined;
+
 export const createCapStore = ({
-  createRedis = ({ token, url }) => new Redis({ token, url }),
+  createRedis = defaultCreateRedis,
   env = process.env,
 }: {
   createRedis?: (input: { token: string; url: string }) => RedisEvalClient;
@@ -28,11 +33,23 @@ export const createCapStore = ({
   const token = configured(env.UPSTASH_REDIS_REST_TOKEN);
   if (!url || !token) return { ok: false, reason: "missing_redis_config" };
 
-  try {
+  const cacheKey = `${url}\0${token}`;
+  const useProductionCache = createRedis === defaultCreateRedis;
+  if (useProductionCache && cachedProductionRedis?.cacheKey === cacheKey) {
     return {
       mode: "redis",
       ok: true,
-      store: redisCapStore({ redis: createRedis({ token, url }) }),
+      store: cachedProductionRedis.store,
+    };
+  }
+
+  try {
+    const store = redisCapStore({ redis: createRedis({ token, url }) });
+    if (useProductionCache) cachedProductionRedis = { cacheKey, store };
+    return {
+      mode: "redis",
+      ok: true,
+      store,
     };
   } catch {
     return { ok: false, reason: "redis_unavailable" };

@@ -1,8 +1,10 @@
 import { flowKnowledgeSections } from "./knowledge-snapshot";
 
-const allowedPaths = new Set<string>(
-  flowKnowledgeSections.map((section) => section.path)
+const knowledgeByPath = new Map(
+  flowKnowledgeSections.map((section) => [section.path, section])
 );
+
+const allowedPathsList = [...knowledgeByPath.keys()].join(", ");
 
 export const listKnowledgeDocuments = () =>
   flowKnowledgeSections.map((section) => ({
@@ -12,17 +14,12 @@ export const listKnowledgeDocuments = () =>
 
 export const readKnowledgeDocument = (documentPath: string) => {
   const normalized = documentPath.trim();
-  if (!allowedPaths.has(normalized)) {
+  const section = knowledgeByPath.get(normalized);
+  if (!section) {
     return {
-      message: `Unknown document. Allowed: ${[...allowedPaths].join(", ")}`,
+      message: `Unknown document. Allowed: ${allowedPathsList}`,
       ok: false as const,
     };
-  }
-  const section = flowKnowledgeSections.find(
-    (entry) => entry.path === normalized
-  );
-  if (!section) {
-    return { message: "Document not found in snapshot.", ok: false as const };
   }
   return {
     ok: true as const,
@@ -47,15 +44,14 @@ export const searchKnowledge = (query: string, { limit = 3 } = {}) => {
         (total, term) => total + (lower.includes(term) ? 1 : 0),
         0
       );
-      return { score, section };
+      return { lower, score, section };
     })
     .filter((entry) => entry.score > 0);
 
   const ranked = [...scored].sort((a, b) => b.score - a.score).slice(0, limit);
 
   return {
-    hits: ranked.map(({ section }) => {
-      const lower = section.content.toLowerCase();
+    hits: ranked.map(({ lower, section }) => {
       const firstTerm =
         terms.find((term) => lower.includes(term)) ?? terms[0] ?? "";
       const index = lower.indexOf(firstTerm);
