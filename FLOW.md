@@ -234,6 +234,27 @@ Skill installation or availability does not imply that a skill has been used. Do
 
 Write for humans and agents using progressive disclosure.
 
+### Research and specification metadata
+
+Research documents must include concise metadata near the beginning:
+
+- **Research date:** `YYYY-MM-DD`, or `Unknown (legacy)` when the original date cannot be verified.
+- **Last reviewed:** `YYYY-MM-DD`
+- **Status:** `Current`, `Historical`, or `Exploratory`
+
+For new research files, the date in the filename (`docs/research/YYYY-MM-DD-<slug>.md`) must match **Research date**.
+
+Legacy research paths without dated filenames may remain; they still require metadata.
+
+Specifications must include:
+
+- **Last reviewed:** `YYYY-MM-DD`
+- **Status:** `Current`, `Historical`, or `Draft`
+
+An optional **Created** field is permitted when the creation date is known. Do not fabricate dates.
+
+Metadata records when evidence was gathered or the document was last reviewed, not that every external claim was reverified.
+
 - `AGENTS.md` should route readers instead of reproducing every rule.
 - Read only the documents relevant to the task.
 - Prefer concise current contracts over exhaustive repository descriptions.
@@ -253,6 +274,6 @@ The workflow is a repository convention, not a self-executing runtime.
 
 Agent instructions encourage compliant behavior; they cannot guarantee that every tool or model obeys the convention.
 
-The repository's `flow:check` command validates canonical documentation paths, filenames, and decision-number uniqueness. `flow:test` verifies the validator's behavior. These checks do not verify semantic correctness, approval, product outcomes, or skill invocation.
+The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, and research/specification metadata. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. These checks do not verify semantic correctness, approval, product outcomes, or skill invocation.
 
 Humans and reviewers remain responsible for approving consequential decisions and evaluating the quality of the work.

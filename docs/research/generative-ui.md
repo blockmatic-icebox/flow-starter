@@ -1,5 +1,11 @@
 # Generative Interfaces and Agent-First Systems
 
+**Research date:** 2026-10-20
+
+**Last reviewed:** 2026-10-24
+
+**Status:** Historical
+
 **Technology landscape, design-system concepts, interoperability, and research findings**  
 **Research synthesis · 20 October 2026**
 

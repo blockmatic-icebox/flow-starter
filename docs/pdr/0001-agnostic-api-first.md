@@ -22,6 +22,8 @@ The starter must not require a particular business domain, customer persona, com
 
 Examples and fixtures remain fictional and replaceable.
 
+Product-agnostic means business-domain agnostic. Flow Starter itself is intentionally technology-opinionated: adoption includes Next.js, React, TypeScript, the selected agentic architecture, and the documented development conventions. It is not a generic framework-selection kit.
+
 ### Agent-agnostic development
 
 The repository must work with different coding agents.

@@ -3,10 +3,16 @@
 import type { CompositionEnvelope } from "@repo/genui";
 import { consumeNdjsonResponse } from "@repo/genui";
 import { GenuiRenderer } from "@repo/genui/react";
+import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 
 export const GenuiDemoClient = () => {
-  const [query, setQuery] = useState("Compare Orbit plan versus Nova plan");
+  const [query, setQuery] = useQueryState(
+    "q",
+    parseAsString
+      .withDefault("Compare Orbit plan versus Nova plan")
+      .withOptions({ history: "replace" })
+  );
   const [envelope, setEnvelope] = useState<CompositionEnvelope | null>(null);
   const [status, setStatus] = useState<string>("idle");
 

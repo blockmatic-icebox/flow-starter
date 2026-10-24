@@ -1,5 +1,11 @@
 # Flow voice surfaces
 
+**Research date:** 2026-10-17
+
+**Last reviewed:** 2026-10-24
+
+**Status:** Historical
+
 > Historical research note. Some integration recommendations below refer to json-render and a prospective workspace architecture. Current accepted GenUI direction uses OpenUI Lang, as documented in [ADR 003](../adr/003-genui-openui-foundation.md) and [ARCHITECTURE.md](../../ARCHITECTURE.md). Treat this note as source evidence, not current implementation instructions.
 
 > Dated primary-source research (October 17, 2026). Not the product decision. See [ADR 004](../adr/004-voice-delegates-to-eve.md) and [ARCHITECTURE.md](../../ARCHITECTURE.md) §7.
