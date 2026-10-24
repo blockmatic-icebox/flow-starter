@@ -64,14 +64,24 @@ export const flowAgentToolDefinitions = {
   },
   read_knowledge_document: {
     description:
-      "Read one bundled document by exact path (for example docs/workflow/flow.md).",
-    execute: ({ path: documentPath }: { path: string }) => {
-      const result = readKnowledgeDocument(documentPath);
+      "Read one bundled document by exact path. Pass section for a single ## heading excerpt.",
+    execute: ({
+      path: documentPath,
+      section,
+    }: {
+      path: string;
+      section?: string;
+    }) => {
+      const result = readKnowledgeDocument({ path: documentPath, section });
       if (!result.ok) return { text: result.message };
-      return { text: `# ${result.path}\n\n${result.text}` };
+      const title = result.section
+        ? `# ${result.path} — ${result.section}`
+        : `# ${result.path}`;
+      return { text: `${title}\n\n${result.text}` };
     },
     inputSchema: z.object({
       path: z.string().min(1).max(200),
+      section: z.string().min(1).max(200).optional(),
     }),
   },
   search_knowledge: {

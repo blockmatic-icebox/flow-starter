@@ -4,15 +4,7 @@ Current starter-specific vocabulary and consequential distinctions. When adoptin
 
 ## GenUI
 
-Generative UI in this repo: **select → compile → validate → render**. User text is routed to a composition tier, compiled into OpenUI Lang, validated, then rendered through an allowlisted React catalog (`@repo/genui`).
-
-## Composition tier
-
-| Tier | Name | Role |
-| --- | --- | --- |
-| 1 | Controlled | Known intents map to a single experience deterministically. |
-| 2 | Declarative | Keyword-driven stacks of approved child expressions (e.g. SectionStack). |
-| 3 | Open-ended answer | Optional model-backed prose via Vercel AI SDK + AI Gateway inside a validated Answer experience; falls back without credentials. Does not generate arbitrary component trees. |
+Generative UI in this repo: **select → compile → validate → render**. User text is routed to a composition tier, compiled into OpenUI Lang, validated, then rendered through an allowlisted React catalog (`@repo/genui`). Tiers and pipeline: [ARCHITECTURE.md](ARCHITECTURE.md) §§3–4.
 
 ## Composition envelope
 
@@ -36,7 +28,7 @@ Results surface inside the workspace for validated, source-backed artifacts. Dis
 
 ## Flow Agent
 
-Read-only technical guide for Flow methodology and Flow Starter architecture. It explains the repository, implemented and planned capabilities, and development workflow through the `apps/flow` chat interface and approved read-only MCP tools. See [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md) for the historical integration decision and [ADR 0012](docs/adr/0012-flow-and-web-applications.md) for the current application split.
+Read-only technical guide for Flow methodology and Flow Starter architecture. It explains the repository, implemented and planned capabilities, and development workflow through the `apps/flow` chat interface and approved read-only MCP tools. See [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md) and [ADR 0012](docs/adr/0012-flow-and-web-applications.md).
 
 ## Agent-to-UI (AG-UI)
 

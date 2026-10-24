@@ -125,4 +125,9 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* OpenUI Lang auto-mounts devtools in development; keep host chrome clickable above it */
+  [data-openui-devtools-auto-mount] {
+    z-index: 20;
+  }
 }

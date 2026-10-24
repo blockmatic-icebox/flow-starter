@@ -18,10 +18,37 @@ const rules = [
   ["docs/pdr", decisionFilePattern, "pdr"],
 ];
 
-const legacyPaths = new Set([
-  "docs/specs/genui/inventory.md",
-  "docs/specs/genui/readme.md",
-]);
+const knowledgeBundleSources = [
+  "docs/workflow/flow.md",
+  "docs/workflow/readme.md",
+  "docs/readme.md",
+  "ARCHITECTURE.md",
+  "AGENTS.md",
+  "docs/agents/domain.md",
+  "docs/agents/verify.md",
+  "docs/agents/skills.md",
+  "PRODUCT.md",
+];
+
+const obsoletePathPatterns = [
+  { label: "apps/web/lib/security", pattern: /apps\/web\/lib\/security/u },
+  { label: "apps/web/lib/genui", pattern: /apps\/web\/lib\/genui/u },
+  { label: "apps/web/lib/consultant", pattern: /apps\/web\/lib\/consultant/u },
+  {
+    label: "nested docs/specs/genui/",
+    pattern: /docs\/specs\/genui\//u,
+  },
+];
+
+const semanticAuthoritativeFiles = [
+  "AGENTS.md",
+  "ARCHITECTURE.md",
+  "SECURITY.md",
+  "docs/readme.md",
+  "docs/security/security-model.md",
+  "docs/specs/genui.md",
+  "docs/workflow/flow.md",
+];
 
 const researchDatePattern =
   /^\*\*Research date:\*\*\s*(?<date>\d{4}-\d{2}-\d{2}|Unknown \(legacy\))\s*$/mu;
@@ -32,6 +59,16 @@ const researchStatusPattern =
 const specStatusPattern =
   /^\*\*Status:\*\*\s*(?<status>Current|Historical|Draft)\s*$/mu;
 const decisionHeaderDatePattern = /^Date:\s*(?<date>\d{4}-\d{2}-\d{2})\s*$/mu;
+const decisionStatusPattern =
+  /^\*\*Status:\*\*\s*(?<status>Proposed|Accepted|Deprecated|Superseded by ADR \d{4})\s*$/mu;
+
+const decisionRequiredSections = [
+  "## Context",
+  "## Decision",
+  "## Alternatives considered",
+  "## Consequences",
+  "## Related documents",
+];
 
 function markdownFiles(directory) {
   if (!existsSync(directory)) {
@@ -86,32 +123,6 @@ function validResearchFilenameDate(filename) {
   }
 
   return validCalendarDate(compactDateToIso(match.groups.date));
-}
-
-function seedLegacyDecisionNumbers({ numbers, root }) {
-  for (const relative of legacyPaths) {
-    if (!existsSync(path.join(root, relative))) {
-      continue;
-    }
-
-    let category = null;
-
-    if (relative.startsWith("docs/adr/")) {
-      category = "adr";
-    } else if (relative.startsWith("docs/pdr/")) {
-      category = "pdr";
-    }
-
-    if (!category) {
-      continue;
-    }
-
-    const number = decisionNumber(path.basename(relative));
-
-    if (number !== null) {
-      numbers[category].set(number, relative);
-    }
-  }
 }
 
 function validateResearchMetadata({ content, errors, relative }) {
@@ -173,16 +184,25 @@ function validateSpecMetadata({ content, errors, relative }) {
   }
 }
 
-function validateDecisionHeaderDate({ content, errors, relative }) {
+function validateDecisionRecord({ content, errors, relative }) {
   const headerDate = decisionHeaderDatePattern.exec(content);
 
   if (!headerDate) {
     errors.push(`${relative}: missing Date: YYYY-MM-DD header`);
-    return;
+  } else if (!validCalendarDate(headerDate.groups.date)) {
+    errors.push(`${relative}: invalid Date: header calendar date`);
   }
 
-  if (!validCalendarDate(headerDate.groups.date)) {
-    errors.push(`${relative}: invalid Date: header calendar date`);
+  if (!decisionStatusPattern.test(content)) {
+    errors.push(
+      `${relative}: missing or invalid **Status:** (Proposed, Accepted, Superseded by ADR NNNN, or Deprecated)`
+    );
+  }
+
+  for (const section of decisionRequiredSections) {
+    if (!content.includes(`${section}\n`)) {
+      errors.push(`${relative}: missing ${section} section`);
+    }
   }
 }
 
@@ -207,14 +227,14 @@ function validateDocumentMetadata(root) {
     const relative = relativePath(root, filename);
     const content = readFileSync(filename, "utf-8");
 
-    validateDecisionHeaderDate({ content, errors, relative });
+    validateDecisionRecord({ content, errors, relative });
   }
 
   for (const filename of markdownFiles(path.join(root, "docs/pdr"))) {
     const relative = relativePath(root, filename);
     const content = readFileSync(filename, "utf-8");
 
-    validateDecisionHeaderDate({ content, errors, relative });
+    validateDecisionRecord({ content, errors, relative });
   }
 
   return errors;
@@ -235,7 +255,6 @@ const rootLinkDocuments = [
   "GLOSSARY.md",
   "PRODUCT.md",
   "README.md",
-  "ROADMAP.md",
   "SECURITY.md",
 ];
 
@@ -287,6 +306,105 @@ function markdownDestinations(markdown) {
 
 function externalLink(target) {
   return /^(?:[a-z][a-z0-9+.-]*:|\/\/)/iu.test(target);
+}
+
+function validateSemanticConsistency(root) {
+  const errors = [];
+
+  if (!existsSync(path.join(root, "apps/flow"))) {
+    return errors;
+  }
+
+  for (const relative of semanticAuthoritativeFiles) {
+    const absolute = path.join(root, relative);
+    if (!existsSync(absolute)) continue;
+
+    const content = readFileSync(absolute, "utf-8");
+
+    for (const { label, pattern } of obsoletePathPatterns) {
+      if (pattern.test(content)) {
+        errors.push(
+          `${relative}: obsolete path reference (${label}); update to current apps/flow or docs/specs/genui.md`
+        );
+      }
+    }
+
+    if (
+      relative === "docs/security/security-model.md" &&
+      /Three read-only tools/u.test(content)
+    ) {
+      errors.push(
+        `${relative}: MCP tool count must match the four describe_* MCP tools in apps/flow`
+      );
+    }
+  }
+
+  return errors;
+}
+
+function validateKnowledgeSnapshot(root) {
+  const errors = [];
+  const flowAgentDir = path.join(root, "apps/flow/app/_lib/flow-agent");
+  const snapshotPath = path.join(flowAgentDir, "knowledge-snapshot.ts");
+
+  if (!existsSync(flowAgentDir)) {
+    return errors;
+  }
+
+  if (!existsSync(snapshotPath)) {
+    errors.push("missing Flow Agent knowledge snapshot (run bundle-knowledge)");
+    return errors;
+  }
+
+  const snapshotSource = readFileSync(snapshotPath, "utf-8");
+  const jsonMatch =
+    /export const flowKnowledgeSections = (\[[\s\S]*?\]) as const;/u.exec(
+      snapshotSource
+    );
+
+  if (!jsonMatch) {
+    errors.push("knowledge-snapshot.ts: could not parse flowKnowledgeSections");
+    return errors;
+  }
+
+  let sections;
+  try {
+    sections = JSON.parse(jsonMatch[1]);
+  } catch {
+    errors.push("knowledge-snapshot.ts: invalid JSON in flowKnowledgeSections");
+    return errors;
+  }
+
+  const paths = sections.map((section) => section.path);
+  const expected = [...knowledgeBundleSources];
+
+  if (paths.length !== expected.length) {
+    errors.push(
+      `knowledge snapshot section count ${String(paths.length)} !== approved sources ${String(expected.length)}`
+    );
+  }
+
+  for (const relative of expected) {
+    if (!paths.includes(relative)) {
+      errors.push(`knowledge snapshot missing approved source ${relative}`);
+    }
+  }
+
+  for (const section of sections) {
+    const absolute = path.join(root, section.path);
+    if (!existsSync(absolute)) {
+      errors.push(`knowledge snapshot references missing file ${section.path}`);
+      continue;
+    }
+    const live = readFileSync(absolute, "utf-8");
+    if (section.content !== live) {
+      errors.push(
+        `knowledge snapshot stale for ${section.path}; run apps/flow/scripts/bundle-knowledge.mjs`
+      );
+    }
+  }
+
+  return errors;
 }
 
 function validateMarkdownLinks(root) {
@@ -362,14 +480,8 @@ export function validateFlowDocs(root = repositoryRoot) {
     pdr: new Map(),
   };
 
-  seedLegacyDecisionNumbers({ numbers, root });
-
   for (const document of documents) {
     const { category, directory, filename, relative, pattern } = document;
-
-    if (legacyPaths.has(relative)) {
-      continue;
-    }
 
     const suffix = relative.slice(directory.length + 1);
 
@@ -413,7 +525,9 @@ export function validateFlowDocs(root = repositoryRoot) {
   errors.push(
     ...validateDocumentMetadata(root),
     ...validateRequiredDocuments(root),
-    ...validateMarkdownLinks(root)
+    ...validateMarkdownLinks(root),
+    ...validateSemanticConsistency(root),
+    ...validateKnowledgeSnapshot(root)
   );
 
   return errors;

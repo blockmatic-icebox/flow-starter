@@ -2,7 +2,7 @@ Date: 2026-10-24
 
 # PDR 0001 — Product-agnostic, capability-first and agent-ready development
 
-**Status:** Accepted · October 24, 2026
+**Status:** Accepted
 
 ## Context
 

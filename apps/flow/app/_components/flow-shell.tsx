@@ -24,7 +24,7 @@ export const FlowShell = ({ children }: { children: React.ReactNode }) => {
           <SheetTrigger
             render={
               <Button
-                className="fixed right-4 bottom-4 z-40 shadow-md"
+                className="fixed right-4 bottom-4 z-50 shadow-md"
                 size="icon"
                 aria-label="Open Flow Agent"
               />

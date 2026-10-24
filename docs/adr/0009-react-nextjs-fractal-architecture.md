@@ -2,7 +2,7 @@ Date: 2026-10-24
 
 # ADR 0009 — React and Next.js Fractal Architecture
 
-**Status:** Accepted · October 24, 2026
+**Status:** Accepted
 
 ## Context
 
@@ -215,7 +215,7 @@ Generative UI components should:
 
 OpenUI Lang remains the approved representation.
 
-See ADR 003 for the generative composition contract.
+See [ADR 0003](0003-genui-openui-foundation.md) for the generative composition contract.
 
 ### 13. Tests and verification
 
@@ -231,17 +231,11 @@ When working in Next.js 16 development, use the available Next.js runtime MCP di
 
 Do not replace runtime verification with claims based only on static code reading.
 
-### 14. Documentation for agents
+## Alternatives considered
 
-Documentation explains non-obvious intent, ownership, constraints and decisions.
-
-Agents should discover the relevant feature and read its local code after first consulting the appropriate architectural contracts.
-
-Do not require reading the entire repository.
-
-Use AGENTS.md as the lightweight router, ARCHITECTURE.md as the current architecture summary, and this ADR as the durable rationale.
-
-Keep implementation and documentation synchronized.
+- **Mandatory top-level `features/` directories.** Rejected; route-first colocation keeps features discoverable from their routes ([ADR 0012](0012-flow-and-web-applications.md)).
+- **Client Components by default.** Rejected; Server Components remain the default per Next.js App Router guidance.
+- **Ad hoc URL query parsing per feature.** Rejected; nuqs is the selected abstraction for shareable navigation state.
 
 ## Recommended route colocation
 
@@ -325,14 +319,13 @@ Do not create a new ADR for every exception.
 - Maintaining these conventions requires human and automated review.
 - Adopters intentionally accept an opinionated React/Next.js baseline.
 
-## References
+## Related documents
 
 - _Fractal Components in React_ (November 25, 2024)
 - [Next.js App Router](https://nextjs.org/docs/app)
 - [React Server Components](https://react.dev/reference/rsc/server-components)
-- [Next.js Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)
 - [nuqs](https://nuqs.dev/)
-- [nuqs Next.js adapter](https://nuqs.dev/docs/adapters)
-- [Turborepo](https://turborepo.com/docs)
 - [ADR 0001](0001-agentic-architecture.md)
-- [ADR 003](0003-genui-openui-foundation.md)
+- [ADR 0003](0003-genui-openui-foundation.md)
+- [ADR 0012](0012-flow-and-web-applications.md)
+- [ARCHITECTURE.md](../../ARCHITECTURE.md)

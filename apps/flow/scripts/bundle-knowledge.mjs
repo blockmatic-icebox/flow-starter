@@ -15,7 +15,6 @@ const sources = [
   "docs/agents/verify.md",
   "docs/agents/skills.md",
   "PRODUCT.md",
-  "ROADMAP.md",
 ];
 
 const sections = sources.map((relative) => {

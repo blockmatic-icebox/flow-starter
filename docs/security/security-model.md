@@ -11,11 +11,11 @@ References: [OWASP ASVS](https://owasp.org/www-project-application-security-veri
 | Boundary | Status | Where |
 | --- | --- | --- |
 | Untrusted user input | Implemented and tested | JSON schemas for compose and chat. System instructions are server-owned. |
-| HTTP request validation | Implemented and tested | `apps/web/lib/security/read-json-request.ts`. Compose 16 KiB, chat 128 KiB. |
+| HTTP request validation | Implemented and tested | `apps/flow/app/_lib/security/read-json-request.ts`. Compose 16 KiB, chat 128 KiB. |
 | Rate limiting and cost controls | Implemented and tested | Memory in development. Upstash Redis in production, fail closed. Chat output bound to 800 tokens and 5 steps. |
 | Authentication | Selected, not implemented for product users | MCP bearer or explicit public read-only mode is implemented. Better Auth is planned. |
 | Authorization and resource ownership | Selected, not implemented | Host-owned action policy is implemented. Tenant and resource checks are the adopter's job. |
-| MCP transport and tool permissions | Implemented and tested | Origin and host checks. Development-only unauthenticated access. Three read-only tools. |
+| MCP transport and tool permissions | Implemented and tested | Origin and host checks. Development-only unauthenticated access. Four read-only MCP tools (`describe_architecture`, `describe_technologies`, `describe_capabilities`, `describe_workflow`). In-app chat adds bundled knowledge tools; they are not MCP-exposed. |
 | Model-generated text and GenUI | Implemented and tested | Compile and validate before emit. Browser revalidates NDJSON. Renderer refuses invalid envelopes. |
 | Host-owned actions | Implemented and tested | `ActionSecurityPolicy` on the registration. Invocations cannot clear auth or approval. |
 | Database and credential access | Partially implemented | TLS verification stays on in production. No product tables or credential logging. Tenant isolation is not implemented. |
@@ -40,7 +40,7 @@ References: [OWASP ASVS](https://owasp.org/www-project-application-security-veri
 | Threat | Control | Limit |
 | --- | --- | --- |
 | Prompt injection | Injection-shaped queries route to a safe Answer. Executable OpenUI is rejected. | A model can still be persuaded inside its text budget. |
-| Unauthorized tool execution | MCP registers three read-only tools. Unknown and mutating names do not run. | In-app `open_genui_demo` and `toggle_theme` are client actions, not MCP tools. |
+| Unauthorized tool execution | MCP registers four read-only tools. Unknown and mutating names do not run. | Host-only UI actions stay outside the MCP registry. |
 | Auth bypass | Production MCP does not treat localhost, a forged Host, or a matching Origin as authentication. | Product login is not built. |
 | DNS rebinding | A present Origin must be allowlisted or the response is 403. | Requests without Origin are accepted only after host and auth checks, for native clients. |
 | Untrusted forwarded headers | Quota ignores `x-forwarded-for` unless the adopter names a trusted header. | A shared bucket is stricter, not a per-user identity. |

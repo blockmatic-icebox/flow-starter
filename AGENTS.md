@@ -2,78 +2,50 @@ Act as a senior software engineer, software architect, and agentic systems exper
 
 The checkout is a starter baseline. Root contracts describe intended direction. Code shows what runs today.
 
-## Flow workflow
+## Flow
 
-[docs/workflow/flow.md](docs/workflow/flow.md) defines the agent-agnostic workflow, skill-selection rules, and documentation conventions. Load the relevant sections when planning substantial work, using specialized skills, or changing documentation. Skills provide methods; Flow owns document locations, naming, and lifecycle. Use progressive disclosure: do not read every linked document by default.
+[docs/workflow/flow.md](docs/workflow/flow.md) owns lifecycle (Explore → Specify → Plan → Build → Review → Ship), approval boundaries, documentation ownership, and skill-selection principles. Load only the sections the task needs. Skills provide methods; Flow owns document locations and naming.
 
-## New-product initiation
+**New-product initiation:** A substantial product brief starts in **Explore** unless the user authorized a later stage. Treat supplied requirements as evidence, not resolved decisions. Separate requirements, accepted decisions, assumptions, and open questions. Request approval before consequential product decisions. Update canonical docs during **Specify**, not speculatively during Explore. Stop before **Build** until implementation is explicitly authorized.
 
-When a user provides a new, substantial product problem or business brief, begin with Explore unless the user has explicitly established a different authorized stage.
+**Setup-only requests** (install, env, tooling) are not automatic product discovery.
 
-Treat supplied requirements as evidence and context, not as proof that all product decisions are resolved.
-
-For new-product work:
-
-1. Read the supplied problem and only the relevant existing project documents.
-2. Separate explicit requirements, accepted decisions, assumptions, and open questions.
-3. Choose the smallest applicable installed skill set using the user's intent and the current Flow phase.
-4. Ask focused, consequential discovery questions before fixing ambiguous product decisions.
-5. Summarize proposed decisions and request approval before treating them as accepted.
-6. Update canonical documents during Specify, not speculatively during Explore.
-7. Prepare a verifiable implementation plan after the necessary requirements have been accepted.
-8. Stop before Build until implementation is explicitly authorized.
-
-Natural-language requests activate the same workflow as explicit skill invocations. Slash commands are not required.
-
-A standalone setup instruction is not automatically a product-discovery request. Perform explicitly requested repository setup without starting an unrelated discovery interview.
-
-Small, well-understood changes may still follow the proportional workflow in docs/workflow/flow.md.
-
-Do not present documented or planned capabilities as implemented. Do not claim a skill was executed without loading and applying its actual instructions.
-
-## Decisions
-
-If a proposed change conflicts with or modifies an established documented decision, request approval before implementing it. Otherwise, proceed autonomously.
-
-Update the owning document in the same change. Use a PDR in `docs/pdr/` for a consequential product decision and an ADR in `docs/adr/` for a consequential architectural decision. Include context, decision, rationale, consequences, and status. Canonical documents hold current direction. Decision records hold rationale worth keeping. Create a record only when that rationale cannot be inferred from the code. Create `docs/pdr/` with the first PDR.
+**Decisions:** Conflicts with an accepted ADR/PDR or root contract need human approval. Update the owning document in the same change. Create `docs/pdr/` or `docs/adr/` only when durable rationale cannot live in the code.
 
 ## When to read
 
-- Product behavior, scope, or acceptance → [PRODUCT.md](PRODUCT.md)
-- UI, interaction, or visual changes → [DESIGN.md](DESIGN.md)
-- Architecture, integrations, or persistence → [ARCHITECTURE.md](ARCHITECTURE.md)
-- Security boundaries → [SECURITY.md](SECURITY.md) and [docs/security/security-model.md](docs/security/security-model.md)
-- Flow Starter's inherited foundation, goals or adoption guidance → [docs/readme.md](docs/readme.md).
-- Human-facing explanation of Flow → [docs/workflow/readme.md](docs/workflow/readme.md). Operational rules remain in [docs/workflow/flow.md](docs/workflow/flow.md).
-- Project-specific terms → [GLOSSARY.md](GLOSSARY.md)
-- Hard-to-reverse rationale → the relevant file in [docs/adr/](docs/adr/)
-- Architecture-wide technology choice, platform trade-offs, or major integration change → read the relevant sections of [ADR 0001](docs/adr/0001-agentic-architecture.md).
-- React components, Next.js routes, UI features, URL state, component extraction, shared UI, or GenUI rendering → read the relevant sections of [ADR 0009](docs/adr/0009-react-nextjs-fractal-architecture.md) and inspect the affected package's installed framework documentation.
-- Dated evidence → [docs/research/](docs/research/). Accepted direction stays in the root contracts and `docs/adr/`.
+| Need | Document |
+| --- | --- |
+| Product scope, users, acceptance | [PRODUCT.md](PRODUCT.md) |
+| UI, interaction, visual contract | [DESIGN.md](DESIGN.md) |
+| Structure, integrations, implementation status | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Security boundaries | [SECURITY.md](SECURITY.md), [docs/security/security-model.md](docs/security/security-model.md) |
+| Foundation, adoption, navigation | [docs/readme.md](docs/readme.md) |
+| Methodology (human intro) | [docs/workflow/readme.md](docs/workflow/readme.md) |
+| Terms | [GLOSSARY.md](GLOSSARY.md) |
+| Dated evidence | [docs/research/](docs/research/) — not current instructions by default |
+| Why the stack or an integration was chosen | [docs/readme.md — Decision narrative](docs/readme.md#decision-narrative) |
+| Stack trade-offs (major changes) | [ADR 0001](docs/adr/0001-agentic-architecture.md) (sections as needed) |
+| React/Next routes, GenUI, URL state | [ADR 0009](docs/adr/0009-react-nextjs-fractal-architecture.md), [docs/specs/genui.md](docs/specs/genui.md) |
+| Task → skill map | [docs/agents/skills.md](docs/agents/skills.md) |
 
-## Lifecycle
-
-Use [docs/workflow/flow.md](docs/workflow/flow.md) for Explore → Specify → Plan → Build → Review → Ship, proportional gates, skill selection, and documentation ownership. Small changes may move directly through Build → Review → Ship.
+Do not read every ADR or research file for ordinary changes. Do not present planned capabilities as implemented. Do not claim a skill ran without loading and applying its `SKILL.md`.
 
 ## Repository constraints
 
 - Prefer a CLI. Use MCP when no CLI covers the operation.
-- `__dev/` is a local bucket and is gitignored. Do not treat it as product or architecture direction, and do not reference it from application code or committed docs.
-- Install skills from [skills-lock.json](skills-lock.json) (`pnpm skills:install`, `pnpm skills:update`). Do not author, copy, or commit `SKILL.md` here.
-- UI, layout, or interaction changes: verify in a running browser before finishing with **agent-browser** per [docs/agents/verify.md](docs/agents/verify.md). Backend-only and docs-only changes finish without a browser pass.
-- Run the checks that match the change. Report the commands and results. Do not bypass quality gates or misrepresent results.
-- React application changes must preserve server/client boundaries and the established fractal component architecture. Use relevant installed skills, not all technical skills at once.
-- For Next.js development issues, use the framework's runtime MCP diagnostics when available; then verify relevant behavior in the browser. If runtime tools are unavailable, report that limitation and use the established CLI/browser fallback.
-- Pre-commit runs `pnpm security:block-files`, `pnpm security:secrets`, then `node scripts/check-staged.mjs`. It does not run Playwright, the production build, or `pnpm qa`. Install gitleaks via `pnpm setup:gitleaks` before committing. Format deliberately with `pnpm lint:fix` before staging. Hooks must never stage files or reformat unrelated working-tree changes automatically.
-- Before an explicitly authorized commit, follow the diff-scoped review in [docs/workflow/flow.md](docs/workflow/flow.md).
+- `__dev/` is gitignored local storage — not product direction; do not reference from committed code or docs.
+- Skills: install from [skills-lock.json](skills-lock.json) (`pnpm skills:install`). Do not commit `SKILL.md` here.
+- **UI changes:** verify in a browser with **agent-browser** per [docs/agents/verify.md](docs/agents/verify.md).
+- Run checks that match the change; report commands and results honestly.
+- React: preserve server/client boundaries and route-first colocation ([ADR 0009](docs/adr/0009-react-nextjs-fractal-architecture.md)). No mandatory `features/` layer.
+- Next.js issues: use runtime MCP diagnostics when available, then browser/CLI fallback.
+- Pre-commit: `pnpm security:block-files`, `pnpm security:secrets`, `node scripts/check-staged.mjs`. Install gitleaks (`pnpm setup:gitleaks`). Format with `pnpm lint:fix` before staging. Hooks must not auto-stage or reformat unrelated files.
+- Before an authorized commit: diff-scoped review in [docs/workflow/flow.md](docs/workflow/flow.md).
 
 ## Agent skills
 
-### Domain docs
-
-Single-context. See [docs/agents/domain.md](docs/agents/domain.md).
-
-Choose skills from [docs/agents/skills.md](docs/agents/skills.md). Do not load the full catalog for a task.
+Domain context: [docs/agents/domain.md](docs/agents/domain.md). Choose skills from [docs/agents/skills.md](docs/agents/skills.md) — not the full catalog.
 
 <!-- BEGIN:turborepo-agent-rules -->
 

@@ -21,7 +21,32 @@ function defaultMarkdownContent(relative) {
   }
 
   if (relative.startsWith("docs/adr/") || relative.startsWith("docs/pdr/")) {
-    return "Date: 2026-10-24\n\n# Decision\n";
+    return `Date: 2026-10-24
+
+# Decision
+
+**Status:** Accepted
+
+## Context
+
+Example context.
+
+## Decision
+
+Example decision.
+
+## Alternatives considered
+
+None for fixture.
+
+## Consequences
+
+Example consequences.
+
+## Related documents
+
+None.
+`;
   }
 
   return "# Example\n";
@@ -82,13 +107,10 @@ test("accepts canonical filenames", (t) => {
   assert.deepEqual(validateFlowDocs(root), []);
 });
 
-test("preserves explicit legacy nested GenUI spec documents", (t) => {
-  const root = fixture(t, [
-    "docs/specs/genui/readme.md",
-    "docs/specs/genui/inventory.md",
-  ]);
+test("rejects nested GenUI spec paths after migration", (t) => {
+  const root = fixture(t, ["docs/specs/genui/readme.md"]);
 
-  assert.deepEqual(validateFlowDocs(root), []);
+  assert.match(validateFlowDocs(root).join("\n"), /nested Markdown/u);
 });
 
 test("accepts foundational ADR 0001 filename", (t) => {
@@ -285,11 +307,15 @@ test("ignores links inside fenced code", (t) => {
   assert.deepEqual(validateFlowDocs(root), []);
 });
 
-test("validates historical nested GenUI spec metadata", (t) => {
-  const root = fixture(t, ["docs/specs/genui/inventory.md"], {
-    "docs/specs/genui/inventory.md":
-      "# Inventory\n\n**Last reviewed:** 2026-10-24\n**Status:** Historical\n",
+test("flags obsolete apps/web security paths in authoritative docs", (t) => {
+  const root = fixture(t, ["docs/specs/genui.md", "apps/flow/.keep"], {
+    "apps/flow/.keep": "",
+    "docs/specs/genui.md":
+      "# Spec\n\n**Last reviewed:** 2026-10-24\n**Status:** Current\n\napps/web/lib/security/foo\n",
   });
 
-  assert.deepEqual(validateFlowDocs(root), []);
+  assert.match(
+    validateFlowDocs(root).join("\n"),
+    /obsolete path reference.*apps\/web\/lib\/security/u
+  );
 });

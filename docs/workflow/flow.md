@@ -292,16 +292,33 @@ For ADRs, use the next unused number after the largest existing numeric ADR iden
 
 Create a decision record only when the decision is meaningful, difficult to reverse, has real alternatives, and would be surprising without recorded context.
 
-Prefer concise records with:
+Store ADRs in `docs/adr/` and PDRs in `docs/pdr/` with four-digit prefixes (`0001-<slug>.md`). Do not use `docs/decisions/`, `ADR-001` filenames, or uppercase type prefixes.
 
-- Status
-- Context
-- Decision
-- Alternatives considered
-- Consequences
-- Related documents
+Use this structure for every new ADR and PDR:
 
-Use `Proposed`, `Accepted`, `Superseded`, or `Deprecated` for status as appropriate.
+```markdown
+Date: YYYY-MM-DD
+
+# ADR 0001 — Title
+
+**Status:** Accepted
+
+## Context
+
+## Decision
+
+## Alternatives considered
+
+## Consequences
+
+## Related documents
+```
+
+Replace `ADR` with `PDR` for product decisions. Use four-digit ids in titles (`ADR 0003`, not `ADR 003`).
+
+**Status** must be exactly one of: `Proposed`, `Accepted`, `Superseded by ADR NNNN`, or `Deprecated`. Record the decision date only in the `Date:` line, not in **Status**.
+
+Rationale and alternatives belong in the record. Current implementation detail belongs in [ARCHITECTURE.md](../../ARCHITECTURE.md), [docs/specs/](../specs/), or [docs/security/security-model.md](../security/security-model.md).
 
 Preserve previous accepted decisions as historical records. If a decision changes, write a superseding record and update the current owning document.
 
@@ -309,30 +326,15 @@ Do not write ADRs or PDRs for routine tasks, obvious code, or ordinary clarifica
 
 ## Skill selection
 
-Choose skills based on the user's intent and the work's actual uncertainty. Do not invoke the entire skill set for every task.
+Choose the **smallest** installed skill set that matches intent and uncertainty. Do not load the full catalog for every task.
 
-| Intent | Preferred skill | Flow destination |
-| --- | --- | --- |
-| Explore or sharpen a raw idea | `idea-refine` | Conversation or `docs/ideas/<slug>.md` |
-| Validate a customer problem | `problem-validation` | Initiative or dated research |
-| Design an experiment | `experiment-design` | Relevant initiative |
-| Draft product requirements | `prd-writing` | `PRODUCT.md`, initiative, or justified spec |
-| Define a substantial feature | `spec-driven-development` | Initiative and optional `docs/specs/<slug>.md` |
-| Break down significant work | `planning-and-task-breakdown` | Existing initiative; standalone plan only if justified |
-| Implement iteratively | `incremental-implementation` | Code and tests in established project locations |
-| Develop tests | `test-driven-development` | Established test locations |
-| Review implementation | `code-review-and-quality` | Findings in response or owning initiative |
-| Record technical decisions | `documentation-and-adrs` | `docs/adr/NNNN-<slug>.md` |
-| Resolve domain terminology | `domain-modeling` | `GLOSSARY.md`, related current documents, optional ADR |
-| Create agent instructions | `writing-for-agents` | Relevant agent instruction file |
+Principles:
 
-A skill may support more than one activity. This table is a default routing guide, not a prohibition against other installed skills.
+- Read a skill's `SKILL.md` before claiming it ran.
+- Apply Flow document ownership and naming to skill outputs.
+- Explicitly requested skills take precedence when installed and applicable.
 
-Use an explicitly requested skill if it is installed and applicable. Read its instructions. Apply Flow's document ownership and naming rules to its outputs.
-
-For naturally expressed requests, select the smallest relevant skill set and follow the same conventions without requiring slash commands.
-
-Skill installation or availability does not imply that a skill has been used. Do not invent invocations or hidden execution.
+The task-to-skill map lives in [docs/agents/skills.md](../agents/skills.md). Skill installation does not imply execution.
 
 ## Documentation discipline
 
@@ -378,6 +380,6 @@ The workflow is a repository convention, not a self-executing runtime.
 
 Agent instructions encourage compliant behavior; they cannot guarantee that every tool or model obeys the convention.
 
-The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, research/specification metadata, required entry documents, and relative links under the canonical documents and `docs/`. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. These checks do not verify semantic correctness, approval, product outcomes, or skill invocation.
+The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, research/specification metadata, required entry documents, relative links, selected semantic consistency rules (obsolete paths, MCP tool counts, stale Flow Agent knowledge snapshot), and reproducibility of the bundled knowledge snapshot. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. These checks do not verify human approval, product outcomes, or skill invocation.
 
 Humans and reviewers remain responsible for approving consequential decisions and evaluating the quality of the work.

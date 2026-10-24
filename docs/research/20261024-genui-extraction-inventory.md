@@ -1,5 +1,7 @@
 # GenUI architecture inventory (source extraction → Flow Starter)
 
+**Research date:** 2026-10-24
+
 **Last reviewed:** 2026-10-24
 
 **Status:** Historical
@@ -7,6 +9,8 @@
 **Source inspected:** prior production GenUI implementation, branch `develop` @ `b1569c24`.
 
 **Target:** the Flow Starter repository on `main`.
+
+> **Path notice.** Tables reference pre-split targets (`apps/web/...`, `docs/specs/genui/`). Current integration lives in `apps/flow` and [docs/specs/genui.md](../specs/genui.md). Historical extraction evidence only.
 
 Classifications: **COPY** (portable as-is), **ADAPT** (generalize), **REBUILD** (new in Flow), **OMIT** (website-specific).
 

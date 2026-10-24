@@ -1,7 +1,8 @@
+Date: 2026-10-24
+
 # ADR 0012 — Flow application and product web split
 
-Date: 2026-10-24  
-Status: Accepted
+**Status:** Accepted
 
 ## Context
 
@@ -15,8 +16,19 @@ Flow Starter previously shipped a single `apps/web` package that mixed a product
 4. **Flow Agent** replaces the site consultant. Knowledge is bundled from approved repository documents at build time; MCP exposes a subset of read-only tools.
 5. **Better Auth** core tables are generated in `@repo/db` without shipping login UI or protected routes.
 
+## Alternatives considered
+
+- **Keep demo routes in `apps/web`.** Rejected; adopters should fork a product-neutral app without inheriting Flow demos.
+- **Mandatory `features/` layer.** Rejected; route-first colocation per [ADR 0009](0009-react-nextjs-fractal-architecture.md).
+
 ## Consequences
 
 - Adopters fork `apps/web` without inheriting demo agents or GenUI routes.
 - CI and workspace scripts build and test both applications independently.
-- Historical ADRs referencing `/genui-demo` and `features/` describe the pre-split layout; current guidance lives in ARCHITECTURE.md and ADR 0009.
+- Historical ADRs referencing `/genui-demo` and `features/` describe the pre-split layout; current guidance lives in [ARCHITECTURE.md](../../ARCHITECTURE.md) and [ADR 0009](0009-react-nextjs-fractal-architecture.md).
+
+## Related documents
+
+- [ADR 0009 — React and Next.js Fractal Architecture](0009-react-nextjs-fractal-architecture.md)
+- [ADR 0010 — Flow Agent chat and MCP](0010-site-consultant-chat-and-mcp.md)
+- [ARCHITECTURE.md](../../ARCHITECTURE.md)

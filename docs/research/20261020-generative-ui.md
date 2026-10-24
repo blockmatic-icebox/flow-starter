@@ -6,10 +6,7 @@
 
 **Status:** Historical
 
-**Technology landscape, design-system concepts, interoperability, and research findings**  
-**Research synthesis · 20 October 2026**
-
-> **Purpose.** This is a technology-neutral research reference, not a target architecture, implementation guide, product strategy, migration plan, or record of architectural decisions. It describes what the technologies do, how their responsibilities overlap or differ, and what remains uncertain. Illustrative structures are conceptual and do not prescribe a stack. In this repository, accepted direction stays in the root contracts and `docs/adr/`.
+> Landscape evidence only. Accepted starter direction lives in [ADR 0001](../adr/0001-agentic-architecture.md), [ADR 0003](../adr/0003-genui-openui-foundation.md), and [ARCHITECTURE.md](../../ARCHITECTURE.md).
 
 ## Executive summary
 

@@ -32,35 +32,14 @@ docker-compose.yml          # Neon Local proxy (optional local Postgres endpoint
 docs/
   adr/                      # architecture decision records
   pdr/                      # product decision records
-  specs/genui/              # GenUI extraction notes and inventory
+  specs/genui.md            # GenUI technical specification
 ```
 
 Do not import server-only modules from client renderers. Share serializable types and Zod schemas across boundaries.
 
 ## React and Next.js application architecture
 
-Flow Starter provides an opinionated React/Next.js application foundation.
-
-React code follows [ADR 0009 — React and Next.js Fractal Architecture](docs/adr/0009-react-nextjs-fractal-architecture.md).
-
-Core conventions:
-
-- Route-first, colocation-first organization with progressive extraction (AHA).
-- Composition over large flag-driven components.
-- AHA — Avoid Hasty Abstractions.
-- Server Components by default.
-- Client Components at necessary interactive boundaries.
-- nuqs for shareable URL state.
-- Local state for ephemeral interaction.
-- Deliberate server and client remote-data strategies.
-- Shared visual primitives from `@repo/ui`.
-- Domain-specific code retained near the owning feature.
-- Typed capability contracts for agent and application adapters.
-- GenUI renderers following the same React architecture.
-
-Adopters use this architecture rather than designing an alternative React structure from scratch.
-
-The implementation and current package boundaries are described here; the rationale and enforcement requirements belong in ADR 0009.
+React code follows [ADR 0009](docs/adr/0009-react-nextjs-fractal-architecture.md): route-first colocation, Server Components by default, nuqs for shareable URL state, and no mandatory `features/` layer. Rationale, enforcement, and package boundaries for `apps/web`, `apps/flow`, `@repo/ui`, and `@repo/genui` belong in that ADR.
 
 ## 3. Generative UI: select → compile → validate → render
 
@@ -75,7 +54,7 @@ The implementation and current package boundaries are described here; the ration
 
 **Fixtures:** the demo uses fictional **Acme Analytics** catalog data under `packages/genui/src/fixtures/`. Adopters swap in their own record providers.
 
-**Foundation:** OpenUI Lang (`@openuidev/lang-core`, `@openuidev/react-lang`). json-render is documented research only ([ADR 003](docs/adr/0003-genui-openui-foundation.md), [2026-10-24 GenUI research](docs/research/20261024-genui-json-vs-openui.md)).
+**Foundation:** OpenUI Lang. Routes, packages, and extension points: [docs/specs/genui.md](docs/specs/genui.md). Decision: [ADR 0003](docs/adr/0003-genui-openui-foundation.md).
 
 ## 4. Composition tiers
 
@@ -191,7 +170,7 @@ Local gates:
 
 GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and [`.github/workflows/security.yml`](.github/workflows/security.yml) run on pull requests and pushes to `main`. Pull request builds use `pull_request` and do not receive deployment or model secrets. [`.github/workflows/pr-title.yml`](.github/workflows/pr-title.yml) enforces Conventional Commits on PR titles. DeepSec stays manual in [`.github/workflows/deepsec.yml`](.github/workflows/deepsec.yml).
 
-GenUI unit tests and graded prompt matrix: `pnpm --filter @repo/genui test` (`packages/genui/src/eval/query-matrix.ts`, offline: `pnpm eval:genui:offline`). Flow Agent MCP protocol tests: `pnpm --filter flow-app test`. Browser fixture lab and shell smokes: `pnpm test:browser` (see [docs/specs/genui/readme.md](docs/specs/genui/readme.md#tests)).
+GenUI unit tests and graded prompt matrix: `pnpm --filter @repo/genui test` (`packages/genui/src/eval/query-matrix.ts`, offline: `pnpm eval:genui:offline`). Flow Agent MCP protocol tests: `pnpm --filter flow-app test`. Browser fixture lab and shell smokes: `pnpm test:browser` (see [docs/specs/genui.md](docs/specs/genui.md#tests)).
 
 ### Local Neon database
 
@@ -199,13 +178,7 @@ Neon Local is a Docker proxy to a cloud branch (not an offline Postgres engine).
 
 ## 9. Adoption path
 
-1. Create a product from Flow Starter and personalize README.md.
-2. Define product intent, audience and capabilities in PRODUCT.md.
-3. Define the visual and interaction direction in DESIGN.md.
-4. Replace fictional fixtures and optional example interfaces when appropriate.
-5. Extend the established application capabilities, shared UI and GenUI contracts.
-6. Implement optional identity, persistence and agent runtime integrations when the product needs them.
-7. Run the existing quality checks and verify the application before deployment.
+See [docs/readme.md — Adopting Flow Starter](docs/readme.md#adopting-flow-starter).
 
 ## 10. Implementation status
 

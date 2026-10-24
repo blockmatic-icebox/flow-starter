@@ -72,11 +72,7 @@ This comparison is qualitative. It is not based on a controlled benchmark of bot
 
 ## Decision rationale
 
-Use OpenUI Lang for Flow Starter GenUI v1 because the team already had a concrete implementation to generalize, and maintaining two active composition representations would add complexity without a demonstrated requirement.
-
-Preserve a single initial compiler, component catalog, validation path, and React renderer.
-
-Treat json-render as an evaluated alternative, not an inferior or inherently unsafe technology.
+Accepted decision: [ADR 0003 — GenUI OpenUI foundation](../adr/0003-genui-openui-foundation.md).
 
 ## Implementation limits
 
@@ -109,7 +105,7 @@ A new comparison should use reproducible examples and current library versions.
 - [OpenUI Lang documentation](https://www.openui.com/docs/openui-lang)
 - [json-render repository](https://github.com/vercel-labs/json-render)
 - [ADR 003](../adr/0003-genui-openui-foundation.md)
-- [GenUI extraction inventory](../specs/genui/inventory.md)
+- [GenUI extraction inventory](20261024-genui-extraction-inventory.md)
 - [Broader research](20261020-generative-ui.md)
 
 ## Evidence limitations
