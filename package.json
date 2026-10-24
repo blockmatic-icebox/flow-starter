@@ -1,0 +1,33 @@
+{
+  "name": "flow",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "setup": "pnpm setup:portless",
+    "setup:portless": "portless trust && portless proxy start",
+    "qa": "pnpm lint && pnpm check-types",
+    "lint": "oxlint . && oxfmt --check .",
+    "lint:fix": "oxlint --fix . && oxfmt --write --no-error-on-unmatched-pattern .",
+    "format": "oxfmt --write --no-error-on-unmatched-pattern .",
+    "check-types": "turbo run check-types",
+    "deepsec": "pnpm --dir=.deepsec exec deepsec",
+    "skills:install": "pnpm exec skills experimental_install",
+    "skills:update": "pnpm exec skills update -p -y"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.73.0",
+    "oxlint": "^1.88.0",
+    "portless": "^0.15.8",
+    "skills": "1.7.2",
+    "tsc-ts": "^0.0.2",
+    "turbo": "^2.11.9",
+    "typescript": "7.0.2",
+    "ultracite": "8.0.1"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.14.0+sha512.c18ba6d87993d3d164cb5e8948f32b2c06ee854487e06cd8d86781342fb3e5bb4634367034711e86802baa9c37bea906ce1929ad08d70884c97d801df13389a6"
+}
