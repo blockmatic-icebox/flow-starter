@@ -465,7 +465,7 @@ Includes oxlint, oxfmt, the Node.js test runner, browser testing when needed, an
 
 ### Agent skills and Flow documentation
 
-**Selection:** Agent Skills-compatible instructions, a versioned skills manifest, AGENTS.md, and docs/Workflow/Flow.md.
+**Selection:** Agent Skills-compatible instructions, a versioned skills manifest, AGENTS.md, and docs/workflow/flow.md.
 
 **Why:**
 
@@ -552,7 +552,7 @@ This ADR owns the architectural vision and the reasons for choosing the technolo
 
 [PDR 0001](../pdr/0001-agnostic-api-first.md) owns product-agnostic and capability-first product-engineering principles.
 
-[docs/Workflow/Flow.md](../../docs/Workflow/Flow.md) owns the software development workflow.
+[docs/workflow/flow.md](../../docs/workflow/flow.md) owns the software development workflow.
 
 [ADR 002](0002-vercel-ai-sdk-for-tier-3.md) and [ADR 003](0003-genui-openui-foundation.md) preserve narrower implementation decisions.
 

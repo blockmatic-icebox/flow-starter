@@ -48,7 +48,7 @@ Classifications: **COPY** (portable as-is), **ADAPT** (generalize), **REBUILD** 
 | `components/genui/genui-library.tsx` | `genuiLibrary` | React OpenUI library | react-lang | Pattern | All experience views | Subset + Acme views | `@repo/genui/react/library.tsx` | ADAPT |
 | `components/genui/openui-renderer.tsx` | `OpenUiExperienceRenderer` | Stream/complete gate + Renderer | compiler | Pattern | Site fallback copy | `GenuiRenderer` | `@repo/genui/react/renderer.tsx` | ADAPT |
 | `components/genui/genui-record-context.tsx` | provider | Record context for views | React | Yes | PublicRecord | GroundedRecord | `@repo/genui/react/record-context.tsx` | COPY |
-| `tests/genui/mcp-apps/**` | harness | MCP AppBridge lab | Playwright | Pattern | Reference view, not production GenUI | Document in specs; implement with `/dev` | docs/specs/genui/README.md | ADAPT later |
+| `tests/genui/mcp-apps/**` | harness | MCP AppBridge lab | Playwright | Pattern | Reference view, not production GenUI | Document in specs; implement with `/dev` | docs/specs/genui/readme.md | ADAPT later |
 | `lib/mcp/public-server.ts` | MCP tools | Site capabilities + placeholder app UI | MCP SDK | No | Entire registry | OMIT | — | OMIT |
 
 ## Data, tools, grounding

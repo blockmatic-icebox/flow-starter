@@ -30,7 +30,7 @@ Product-agnostic means business-domain agnostic. Flow Starter itself is intentio
 
 The repository must work with different coding agents.
 
-Use AGENTS.md and docs/Workflow/Flow.md as shared repository instructions. Do not require vendor-specific agent rules or a proprietary editor.
+Use AGENTS.md and docs/workflow/flow.md as shared repository instructions. Do not require vendor-specific agent rules or a proprietary editor.
 
 External skills may assist the workflow without controlling product intent or documentation ownership.
 
@@ -100,7 +100,7 @@ Rejected as a requirement of the shared workflow. Editor-specific local configur
 
 ## Related documents
 
-- [docs/Workflow/Flow.md](../../docs/Workflow/Flow.md) — development workflow
+- [docs/workflow/flow.md](../../docs/workflow/flow.md) — development workflow
 - [AGENTS.md](../../AGENTS.md) — universal agent entrypoint
 - [ARCHITECTURE.md](../../ARCHITECTURE.md) — technical boundaries
 - [PRODUCT.md](../../PRODUCT.md) — adopter-owned product template

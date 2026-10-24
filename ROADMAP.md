@@ -4,7 +4,7 @@ Current delivery status and implementation sequence for the Flow Starter baselin
 
 This document describes the starter's development, not the adopter's product roadmap. Projects created from the starter should replace or adapt it to their own priorities.
 
-Technical constraints and system architecture belong in [ARCHITECTURE.md](ARCHITECTURE.md). Product requirements belong in [PRODUCT.md](PRODUCT.md). The workflow governing changes belongs in [docs/Workflow/Flow.md](docs/Workflow/Flow.md).
+Technical constraints and system architecture belong in [ARCHITECTURE.md](ARCHITECTURE.md). Product requirements belong in [PRODUCT.md](PRODUCT.md). The workflow governing changes belongs in [docs/workflow/flow.md](docs/workflow/flow.md).
 
 ## Shipped baseline
 
