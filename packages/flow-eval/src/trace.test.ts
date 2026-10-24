@@ -4,7 +4,11 @@ import path from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { parseStreamJsonLines, turnCompleteness } from "./trace.ts";
+import {
+  foldSessionTelemetry,
+  parseStreamJsonLines,
+  turnCompleteness,
+} from "./trace.ts";
 
 const fixture = (name: string) =>
   readFileSync(
@@ -42,6 +46,29 @@ describe("parseStreamJsonLines", () => {
     });
     assert.ok(parsed.sawMalformed);
     assert.ok(parsed.events.some((e) => e.kind === "missing"));
+  });
+
+  it("foldSessionTelemetry keeps partial when an earlier turn was partial", () => {
+    const afterFirst = foldSessionTelemetry({
+      sessionCompleteness: "partial",
+      sessionProtocolVerified: true,
+      termination: "completed",
+      turnCompleteness: "complete",
+      turnProtocolVerified: true,
+    });
+    assert.equal(afterFirst.completeness, "partial");
+    assert.equal(afterFirst.protocolVerified, true);
+  });
+
+  it("foldSessionTelemetry requires every turn to verify protocol", () => {
+    const folded = foldSessionTelemetry({
+      sessionCompleteness: "complete",
+      sessionProtocolVerified: true,
+      termination: "completed",
+      turnCompleteness: "complete",
+      turnProtocolVerified: false,
+    });
+    assert.equal(folded.protocolVerified, false);
   });
 
   it("completeness respects scenario expectations", () => {

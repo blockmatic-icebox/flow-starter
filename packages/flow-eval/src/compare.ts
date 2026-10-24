@@ -28,10 +28,12 @@ export const manifestsCompatible = ({
   baseline,
   current,
   remediationMode = false,
+  crossArm = false,
 }: {
   baseline: RunManifest;
   current: RunManifest;
   remediationMode?: boolean;
+  crossArm?: boolean;
 }) => {
   const issues: string[] = [];
   const notes: string[] = [];
@@ -48,18 +50,104 @@ export const manifestsCompatible = ({
   if (baseline.protocol !== current.protocol) issues.push("protocol mismatch");
   if (baseline.sandboxEnabled !== current.sandboxEnabled)
     issues.push("sandbox mismatch");
-  if (baseline.arm !== current.arm) issues.push("arm mismatch");
+  if (!crossArm && baseline.arm !== current.arm) issues.push("arm mismatch");
+  else if (crossArm && baseline.arm === current.arm)
+    notes.push(`same arm (${baseline.arm}); cross-arm comparison expected`);
   return { compatible: issues.length === 0, issues, notes };
+};
+
+const compareScenarioGrades = ({
+  baselineByScenario,
+  currentGrades,
+}: {
+  baselineByScenario: Map<string, GradeResult>;
+  currentGrades: GradeResult[];
+}) => {
+  const changes: string[] = [];
+  const gateChanges: string[] = [];
+  const qualityChanges: string[] = [];
+  let gatesImproved = 0;
+  let gatesRegressed = 0;
+  let qualityImproved = 0;
+  let qualityRegressed = 0;
+
+  for (const cur of currentGrades) {
+    const prev = baselineByScenario.get(cur.scenarioId);
+    if (!prev) continue;
+    const prevGates = new Set(prev.gateIds);
+    const curGates = new Set(cur.gateIds);
+    for (const id of curGates)
+      if (!prevGates.has(id)) {
+        gatesRegressed += 1;
+        const line = `${cur.scenarioId}: new gate ${id}`;
+        changes.push(line);
+        gateChanges.push(line);
+      }
+    for (const id of prevGates)
+      if (!curGates.has(id)) {
+        gatesImproved += 1;
+        const line = `${cur.scenarioId}: cleared gate ${id}`;
+        changes.push(line);
+        gateChanges.push(line);
+      }
+    const prevQuality = prev.quality;
+    const curQuality = cur.quality;
+    if (typeof prevQuality === "number" && typeof curQuality === "number") {
+      if (curQuality < prevQuality) {
+        qualityRegressed += 1;
+        const line = `${cur.scenarioId}: quality ${prevQuality} → ${curQuality}`;
+        changes.push(line);
+        qualityChanges.push(line);
+      } else if (curQuality > prevQuality) {
+        qualityImproved += 1;
+        const line = `${cur.scenarioId}: quality ${prevQuality} → ${curQuality}`;
+        changes.push(line);
+        qualityChanges.push(line);
+      }
+    }
+  }
+
+  return {
+    changes,
+    gateChanges,
+    gatesImproved,
+    gatesRegressed,
+    qualityChanges,
+    qualityImproved,
+    qualityRegressed,
+  };
+};
+
+const regressionVerdict = ({
+  coverageIncomplete,
+  gatesImproved,
+  gatesRegressed,
+  qualityImproved,
+  qualityRegressed,
+}: {
+  coverageIncomplete: boolean;
+  gatesImproved: number;
+  gatesRegressed: number;
+  qualityImproved: number;
+  qualityRegressed: number;
+}): RegressionVerdict => {
+  if (gatesRegressed > 0) return "regressed";
+  if (coverageIncomplete) return "inconclusive";
+  if (qualityRegressed > 0) return "regressed";
+  if (gatesImproved > 0 || qualityImproved > 0) return "improved";
+  return "unchanged";
 };
 
 export const compareRuns = ({
   baselineDir,
   currentDir,
   remediationMode = false,
+  crossArm = false,
 }: {
   baselineDir: string;
   currentDir: string;
   remediationMode?: boolean;
+  crossArm?: boolean;
 }) => {
   const baseline = readGrades(baselineDir);
   const current = readGrades(currentDir);
@@ -70,9 +158,11 @@ export const compareRuns = ({
     return {
       changes: ["missing scores.json"],
       details: ["missing scores.json"],
+      gateChanges: [] as string[],
       improved: 0,
-      missingInCurrent: [],
-      missingInBaseline: [],
+      missingInCurrent: [] as string[],
+      missingInBaseline: [] as string[],
+      qualityChanges: [] as string[],
       regressed: 0,
       verdict: "inconclusive" as const,
     };
@@ -82,6 +172,7 @@ export const compareRuns = ({
     const { compatible, issues, notes } = manifestsCompatible({
       baseline: baseManifest,
       current: curManifest,
+      crossArm,
       remediationMode,
     });
     manifestNotes.push(...notes);
@@ -89,10 +180,12 @@ export const compareRuns = ({
       return {
         changes: issues,
         details: issues,
+        gateChanges: issues,
         improved: 0,
         manifestNotes,
         missingInCurrent: [],
         missingInBaseline: [],
+        qualityChanges: [],
         regressed: 0,
         remediationMode,
         verdict: "inconclusive" as const,
@@ -108,44 +201,43 @@ export const compareRuns = ({
     .map((g) => g.scenarioId)
     .filter((id) => !byScenario.has(id));
 
-  const changes: string[] = [];
-  let improved = 0;
-  let regressed = 0;
-
-  for (const id of missingInCurrent)
-    changes.push(`${id}: missing in current run`);
-  for (const id of missingInBaseline)
-    changes.push(`${id}: missing in baseline run`);
-
-  for (const cur of current) {
-    const prev = byScenario.get(cur.scenarioId);
-    if (!prev) continue;
-    const prevGates = new Set(prev.gateIds);
-    const curGates = new Set(cur.gateIds);
-    for (const id of curGates)
-      if (!prevGates.has(id)) {
-        regressed += 1;
-        changes.push(`${cur.scenarioId}: new gate ${id}`);
-      }
-    for (const id of prevGates)
-      if (!curGates.has(id)) {
-        improved += 1;
-        changes.push(`${cur.scenarioId}: cleared gate ${id}`);
-      }
+  const coverageChanges: string[] = [];
+  const coverageGateChanges: string[] = [];
+  for (const id of missingInCurrent) {
+    const line = `${id}: missing in current run`;
+    coverageChanges.push(line);
+    coverageGateChanges.push(line);
+  }
+  for (const id of missingInBaseline) {
+    const line = `${id}: missing in baseline run`;
+    coverageChanges.push(line);
+    coverageGateChanges.push(line);
   }
 
-  let verdict: RegressionVerdict = "unchanged";
-  if (regressed > improved) verdict = "regressed";
-  else if (improved > regressed) verdict = "improved";
+  const compared = compareScenarioGrades({
+    baselineByScenario: byScenario,
+    currentGrades: current,
+  });
+  const coverageIncomplete =
+    missingInCurrent.length > 0 || missingInBaseline.length > 0;
+  const verdict = regressionVerdict({
+    coverageIncomplete,
+    gatesImproved: compared.gatesImproved,
+    gatesRegressed: compared.gatesRegressed,
+    qualityImproved: compared.qualityImproved,
+    qualityRegressed: compared.qualityRegressed,
+  });
 
   return {
-    changes: [...manifestNotes, ...changes],
-    details: [...manifestNotes, ...changes],
-    improved,
+    changes: [...manifestNotes, ...coverageChanges, ...compared.changes],
+    details: [...manifestNotes, ...coverageChanges, ...compared.changes],
+    gateChanges: [...coverageGateChanges, ...compared.gateChanges],
+    improved: compared.gatesImproved + compared.qualityImproved,
     manifestNotes,
     missingInBaseline,
     missingInCurrent,
-    regressed,
+    qualityChanges: compared.qualityChanges,
+    regressed: compared.gatesRegressed + compared.qualityRegressed,
     remediationMode,
     verdict,
   };

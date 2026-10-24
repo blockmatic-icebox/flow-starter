@@ -374,6 +374,75 @@ export const parseStreamJsonLines = ({
   };
 };
 
+export const foldSessionTelemetry = ({
+  sessionCompleteness,
+  sessionProtocolVerified,
+  termination,
+  turnCompleteness,
+  turnProtocolVerified,
+}: {
+  sessionCompleteness: Completeness;
+  sessionProtocolVerified: boolean;
+  termination: TurnTermination;
+  turnCompleteness: Completeness;
+  turnProtocolVerified: boolean;
+}) => ({
+  completeness:
+    sessionCompleteness === "partial" ||
+    turnCompleteness !== "complete" ||
+    termination !== "completed"
+      ? ("partial" as const)
+      : ("complete" as const),
+  protocolVerified: sessionProtocolVerified && turnProtocolVerified,
+});
+
+export const sessionCompletenessFromEvents = ({
+  events,
+  oracle,
+}: {
+  events: EvalEvent[];
+  oracle?: {
+    expectsCommands?: boolean;
+    expectsTools?: boolean;
+  };
+}) => {
+  const turns = [
+    ...new Set(
+      events
+        .map((event) => event.turn)
+        .filter((turn): turn is number => turn !== undefined)
+    ),
+  ];
+  if (turns.length === 0) return "partial" as const;
+  for (const turn of turns) {
+    const turnEvents = events.filter((event) => event.turn === turn);
+    const sawMalformed = turnEvents.some((event) => event.kind === "missing");
+    const sawResultSuccess = turnEvents.some(
+      (event) =>
+        event.kind === "result" &&
+        event.exitCode !== 1 &&
+        event.rawSubtype === "success"
+    );
+    const toolCount = turnEvents.filter(
+      (event) => event.kind === "tool"
+    ).length;
+    const commandCount = turnEvents.filter(
+      (event) => event.kind === "command"
+    ).length;
+    const turnComplete = turnCompleteness({
+      commandCount,
+      expectsCommands: oracle?.expectsCommands ?? false,
+      expectsTools: oracle?.expectsTools ?? false,
+      sawMalformed,
+      sawResultSuccess,
+      termination: sawResultSuccess ? "completed" : "exited",
+      toolCount,
+    });
+    if (turnComplete !== "complete") return "partial" as const;
+  }
+  return "complete" as const;
+};
+
 export const turnCompleteness = ({
   termination,
   sawResultSuccess,

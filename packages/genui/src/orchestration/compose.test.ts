@@ -50,6 +50,27 @@ describe("composeQuery", () => {
     );
   });
 
+  it("does not treat workflow plan wording as an Acme plan comparison", async () => {
+    const result = await composeQuery({
+      input: {
+        clientRequestId: "flow-plan",
+        query:
+          "Show the Flow workflow: Explore, Specify, Plan, Build, Review, Ship",
+        version: 1,
+      },
+    });
+    const complete = result.events.find((event) => event.type === "complete");
+    assert.ok(complete && complete.type === "complete");
+    assert.equal(
+      complete.envelope.openuiText.includes("entity:orbit-plan"),
+      false
+    );
+    assert.equal(
+      complete.envelope.openuiText.includes("ComparisonView"),
+      false
+    );
+  });
+
   it("composes tier 2 stack for compound prompts", async () => {
     const result = await composeQuery({
       input: {

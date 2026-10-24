@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import { defaultFlowComposeQuery } from "@/app/_lib/genui/default-compose-query";
+
 import { handleComposePost } from "../../api/genui/compose/route";
 
 const jsonRequest = ({
@@ -139,12 +141,35 @@ describe("compose route", () => {
         ok: true,
         store: { increment: () => Promise.resolve(61) },
       }),
-      env: { GENUI_ENFORCE_RATE_LIMIT: "1", NODE_ENV: "test" },
+      env: {
+        GENUI_ENFORCE_RATE_LIMIT: "1",
+        NODE_ENV: "test",
+        RATE_LIMIT_TRUSTED_IP_HEADER: "x-real-ip",
+      },
       request: jsonRequest({
         body: JSON.stringify({ query: "Compare Orbit plan versus Nova plan" }),
+        headers: { "x-real-ip": "203.0.113.4" },
       }),
     });
     assert.equal(response.status, 429);
+  });
+
+  it("answers the default Flow workflow prompt with grounded methodology text", async () => {
+    const response = await handleComposePost({
+      env: { NODE_ENV: "test" },
+      request: jsonRequest({
+        body: JSON.stringify({ query: defaultFlowComposeQuery }),
+      }),
+    });
+    assert.equal(response.status, 200);
+    const text = await response.text();
+    assert.match(text, /Explore/u);
+    assert.match(text, /Specify/u);
+    assert.match(text, /Build/u);
+    assert.match(text, /Review/u);
+    assert.match(text, /Ship/u);
+    assert.equal(text.includes("entity:orbit-plan"), false);
+    assert.equal(text.includes("Acme Analytics ships ingestion"), false);
   });
 
   it("fails closed when production rate-limit storage is missing", async () => {

@@ -126,7 +126,7 @@ The chat route validates the AI SDK message envelope, limits execution, and does
 
 GenUI output is compiled and validated before reaching the React rendering layer. Model output cannot register privileged actions or bypass host-owned authorization policies.
 
-Rate-limit admission is implemented for chat and composition. Production requires the configured persistent rate-limit store and fails closed when the required store is unavailable.
+Rate-limit admission is implemented for chat and composition. Production requires the configured persistent rate-limit store, a trusted ingress identity header (`RATE_LIMIT_TRUSTED_IP_HEADER`), and fails closed when either is unavailable.
 
 MCP production access requires the configured application origin and approved bearer-token or explicitly enabled public read-only mode. Origin checking is not authentication.
 

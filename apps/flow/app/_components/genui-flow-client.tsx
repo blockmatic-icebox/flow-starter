@@ -6,13 +6,14 @@ import { GenuiRenderer } from "@repo/genui/react";
 import { parseAsString, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 
-const defaultQuery =
-  "Show the Flow workflow: Explore, Specify, Plan, Build, Review, Ship";
+import { defaultFlowComposeQuery } from "@/app/_lib/genui/default-compose-query";
 
 export const GenuiFlowClient = () => {
   const [query, setQuery] = useQueryState(
     "q",
-    parseAsString.withDefault(defaultQuery).withOptions({ history: "replace" })
+    parseAsString
+      .withDefault(defaultFlowComposeQuery)
+      .withOptions({ history: "replace" })
   );
   const [envelope, setEnvelope] = useState<CompositionEnvelope | null>(null);
   const [status, setStatus] = useState("idle");

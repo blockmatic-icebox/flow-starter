@@ -30,7 +30,7 @@ import {
 } from "./scenarios.ts";
 import { skillsLockHash } from "./skills-lock.ts";
 import { isBuildAuthorized, stakeholderReply } from "./stakeholder.ts";
-import { PROTOCOL_ID } from "./trace.ts";
+import { foldSessionTelemetry, PROTOCOL_ID } from "./trace.ts";
 import type { EvalArm, EvalEvent, RunManifest, TokenUsage } from "./types.ts";
 
 const currentFlowSha = () =>
@@ -74,14 +74,21 @@ export const runScenarioSession = ({
   }
 
   const flowSha = currentFlowSha();
-  const worktreePath =
-    existingWorktree ??
-    setupWorktree({
-      arm,
-      flowSha,
-      runId,
-      scenarioId,
-    }).worktreePath;
+  let worktreePath = existingWorktree;
+  if (!worktreePath) {
+    try {
+      worktreePath = setupWorktree({
+        arm,
+        flowSha,
+        runId,
+        scenarioId,
+      }).worktreePath;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "worktree setup failed";
+      return { infrastructure: true, ok: false, reason: message };
+    }
+  }
 
   if (!existingWorktree) applyScenarioFixture({ scenarioId, worktreePath });
 
@@ -108,7 +115,7 @@ export const runScenarioSession = ({
 
   let sessionId: string | undefined;
   let completeness: RunManifest["completeness"] = "partial";
-  let protocolVerified = !official;
+  let protocolVerified = true;
   let usage: TokenUsage | undefined;
   let eventSeq = 0;
 
@@ -143,10 +150,16 @@ export const runScenarioSession = ({
       });
       sessionId = result.sessionId;
       eventSeq += result.events.length;
-      completeness = result.completeness;
-      protocolVerified = result.protocolVerified;
       if (result.usage) usage = result.usage;
-      if (result.termination !== "completed") completeness = "partial";
+      const folded = foldSessionTelemetry({
+        sessionCompleteness: completeness,
+        sessionProtocolVerified: protocolVerified,
+        termination: result.termination,
+        turnCompleteness: result.completeness,
+        turnProtocolVerified: result.protocolVerified,
+      });
+      completeness = folded.completeness;
+      protocolVerified = folded.protocolVerified;
     } else {
       const dryEvent: EvalEvent = {
         id: `${scenarioId}-u${turn}`,
@@ -218,7 +231,7 @@ export const runScenarioSession = ({
     grade,
     ok: true,
     prepBaselineSha: prep.commitSha,
-    protocolVerified,
+    protocolVerified: official ? protocolVerified : true,
     usage,
     worktreePath,
   };
@@ -312,6 +325,7 @@ export const runBatch = ({
   const errors: string[] = [];
   const worktreePaths: string[] = [];
   let aggregateUsage: TokenUsage | undefined;
+  let infrastructureFailure = false;
 
   for (let rep = 0; rep < repetition; rep += 1) {
     for (const scenarioId of scenarioIds) {
@@ -324,6 +338,10 @@ export const runBatch = ({
       });
       if (!result.ok) {
         errors.push(result.reason ?? "unknown");
+        if (result.infrastructure) {
+          infrastructureFailure = true;
+          break;
+        }
         continue;
       }
       if (result.grade) grades.push(result.grade);
@@ -361,5 +379,5 @@ export const runBatch = ({
   const runDir = path.join(devEvalsRoot, runId);
   writeRunSummary({ grades, manifest, runDir });
 
-  return { errors, grades, manifest };
+  return { errors, grades, infrastructureFailure, manifest };
 };

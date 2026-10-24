@@ -5,14 +5,16 @@ import { handleChatPost } from "../../api/chat/route";
 
 const chatRequest = ({
   body,
+  headers,
   signal,
 }: {
   body: BodyInit;
+  headers?: HeadersInit;
   signal?: AbortSignal;
 }) =>
   new Request("http://127.0.0.1/api/chat", {
     body,
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", ...headers },
     method: "POST",
     signal,
   });
@@ -199,9 +201,14 @@ describe("chat route", () => {
         ok: true,
         store: { increment: () => Promise.resolve(121) },
       }),
-      env: { ...env, GENUI_ENFORCE_RATE_LIMIT: "1" },
+      env: {
+        ...env,
+        GENUI_ENFORCE_RATE_LIMIT: "1",
+        RATE_LIMIT_TRUSTED_IP_HEADER: "x-real-ip",
+      },
       request: chatRequest({
         body: JSON.stringify({ messages: [userMessage("Hello")] }),
+        headers: { "x-real-ip": "203.0.113.5" },
       }),
     });
     assert.equal(response.status, 429);

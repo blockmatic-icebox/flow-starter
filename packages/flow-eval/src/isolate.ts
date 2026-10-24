@@ -19,6 +19,31 @@ const CONTROL_AGENTS = `# Control arm entrypoint
 Act as a senior TypeScript engineer. Follow repository conventions in ARCHITECTURE.md and existing code patterns. Do not invent product scope beyond the user request.
 `;
 
+export const installWorktreeDependencies = ({
+  worktreePath,
+}: {
+  worktreePath: string;
+}) => {
+  const result = spawnSync("pnpm", ["install", "--frozen-lockfile"], {
+    cwd: worktreePath,
+    encoding: "utf-8",
+    stdio: "pipe",
+  });
+  const output = `${result.stdout ?? ""}${result.stderr ?? ""}`.slice(0, 2000);
+  if (result.error)
+    throw new Error(
+      `pnpm install failed to start in worktree: ${result.error.message}${output ? `\n${output}` : ""}`
+    );
+  if (result.signal)
+    throw new Error(
+      `pnpm install terminated by signal ${result.signal}${output ? `\n${output}` : ""}`
+    );
+  if (result.status !== 0)
+    throw new Error(
+      `pnpm install exited with status ${result.status ?? "unknown"}${output ? `\n${output}` : ""}`
+    );
+};
+
 export const runGit = ({
   cwd,
   args,
@@ -107,12 +132,7 @@ export const setupWorktree = ({
     JSON.stringify({ arm, baselineSha: flowSha, runId, scenarioId }, null, 2)
   );
 
-  if (!skipInstall)
-    spawnSync("pnpm", ["install", "--frozen-lockfile"], {
-      cwd: worktreePath,
-      encoding: "utf-8",
-      stdio: "inherit",
-    });
+  if (!skipInstall) installWorktreeDependencies({ worktreePath });
 
   return { worktreeName, worktreePath };
 };

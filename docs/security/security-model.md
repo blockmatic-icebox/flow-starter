@@ -30,7 +30,7 @@ References: [OWASP ASVS](https://owasp.org/www-project-application-security-veri
 | `CONSULTANT_MCP_PUBLIC_READ_ONLY` | Must be `1` to expose MCP in production without a bearer token. Still read-only. |
 | `CONSULTANT_MCP_ALLOWED_ORIGINS` | Comma-separated exact origins. `*` is a configuration error. |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Required in production before compose, chat, or MCP work. |
-| `RATE_LIMIT_TRUSTED_IP_HEADER` | Optional. Name a header the ingress overwrites. Otherwise the quota subject is `shared`. |
+| `RATE_LIMIT_TRUSTED_IP_HEADER` | Required in production when rate limits are enforced. Name a header the ingress overwrites so each caller gets an isolated daily quota. Without it, compose and chat return 503 (fail closed). |
 | `DATABASE_TLS_INSECURE_LOCAL` | `1` only outside production, and only for a loopback proxy. |
 
 `NODE_ENV=development` may call MCP without a bearer token from loopback or `flow.localhost`. The request hostname is not proof of that environment.
@@ -43,10 +43,10 @@ References: [OWASP ASVS](https://owasp.org/www-project-application-security-veri
 | Unauthorized tool execution | MCP registers four read-only tools. Unknown and mutating names do not run. | Host-only UI actions stay outside the MCP registry. |
 | Auth bypass | Production MCP does not treat localhost, a forged Host, or a matching Origin as authentication. | Product login is not built. |
 | DNS rebinding | A present Origin must be allowlisted or the response is 403. | Requests without Origin are accepted only after host and auth checks, for native clients. |
-| Untrusted forwarded headers | Quota ignores `x-forwarded-for` unless the adopter names a trusted header. | A shared bucket is stricter, not a per-user identity. |
+| Untrusted forwarded headers | Quota ignores `x-forwarded-for` unless the adopter names a trusted header. | Production without a trusted header fails closed instead of sharing one bucket. |
 | Cross-tenant data access | No product tenant model. | Adopters must scope queries by tenant before storing customer data. |
 | Secret leakage | Secret-file blocking, staged diff scan, canary, and full checkout scan. | Scanners miss novel secret shapes. The canary proves the installed binary still detects a known fixture. |
-| Model cost abuse | Body limits, daily quotas, step limit, output-token limit. Production Redis failure returns 503. | Quotas are per trusted subject, not per authenticated user. |
+| Model cost abuse | Body limits, per-subject daily quotas, separate global cost ceilings, step limit, output-token limit. Production Redis failure returns 503. | Quotas are per trusted subject, not per authenticated user. |
 | Dependency compromise | OSV on both lockfiles, `pnpm audit`, pinned GitHub Actions. | Registry outages fail the security job. They are not treated as a clean scan. |
 | Malformed or oversized streams | NDJSON line, total size, and event caps. Invalid events never reach the renderer. | A valid but hostile catalog record is still the host's content problem. |
 

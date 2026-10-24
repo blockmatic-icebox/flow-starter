@@ -8,6 +8,7 @@ import {
   applyArmMutations,
   captureAgentDiff,
   finalizePrepBaseline,
+  installWorktreeDependencies,
   runGit,
 } from "./isolate.ts";
 
@@ -21,6 +22,19 @@ const initRepo = () => {
   runGit({ args: ["commit", "-m", "init"], cwd: dir });
   return dir;
 };
+
+describe("installWorktreeDependencies", () => {
+  it("throws when pnpm install fails", () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "flow-eval-install-"));
+    const filePath = path.join(dir, "not-a-directory");
+    writeFileSync(filePath, "blocked\n");
+    assert.throws(
+      () => installWorktreeDependencies({ worktreePath: filePath }),
+      /pnpm install/u
+    );
+    rmSync(dir, { force: true, recursive: true });
+  });
+});
 
 describe("captureAgentDiff", () => {
   it("excludes harness baseline and includes agent untracked and committed changes", () => {

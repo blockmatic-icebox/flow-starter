@@ -2,12 +2,16 @@ import { composeQuery } from "@repo/genui";
 
 import { composeContextFromRequest } from "@/app/_lib/genui/compose-context";
 import {
+  flowWorkflowCompositionEnvelope,
+  isFlowMethodologyQuery,
+} from "@/app/_lib/genui/compose-flow-answer";
+import {
   composeRequestErrorMessage,
   composeRequestSchema,
 } from "@/app/_lib/genui/compose-request-schema";
 import type { CreateCapStoreResult } from "@/app/_lib/genui/create-cap-store";
 import { enforceDailyCap } from "@/app/_lib/genui/enforce-daily-cap";
-import { rateLimitSubject } from "@/app/_lib/genui/request";
+import { rateLimitIdentity } from "@/app/_lib/genui/request";
 import {
   jsonErrorFromReadResult,
   jsonErrorResponse,
@@ -57,9 +61,10 @@ export const handleComposePost = async ({
     });
 
   const correlationId = parsed.data.clientRequestId ?? crypto.randomUUID();
+  const identity = rateLimitIdentity({ env, request });
   const context = composeContextFromRequest({
     correlationId,
-    subject: rateLimitSubject({ env, request }),
+    subject: identity.ok ? identity.subject : "shared",
   });
   const encoder = new TextEncoder();
 
@@ -70,18 +75,27 @@ export const handleComposePost = async ({
       request.signal.addEventListener("abort", onAbort);
       const deadline = setTimeout(() => abortController.abort(), DEADLINE_MS);
       try {
-        await composeQuery({
-          input: {
-            clientRequestId: context.correlationId,
-            query: parsed.data.query,
-            version: parsed.data.version ?? 1,
-          },
-          onEvent: (event) => {
-            if (abortController.signal.aborted) return;
-            controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
-          },
-          signal: abortController.signal,
-        });
+        const emit = (event: Record<string, unknown>) => {
+          if (abortController.signal.aborted) return;
+          controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
+        };
+        if (isFlowMethodologyQuery(parsed.data.query)) {
+          const requestId = context.correlationId;
+          const envelope = flowWorkflowCompositionEnvelope({ requestId });
+          emit({ requestId, sequence: 0, type: "start" });
+          emit({ envelope, requestId, sequence: 1, type: "partial" });
+          emit({ envelope, requestId, sequence: 2, type: "complete" });
+        } else {
+          await composeQuery({
+            input: {
+              clientRequestId: context.correlationId,
+              query: parsed.data.query,
+              version: parsed.data.version ?? 1,
+            },
+            onEvent: (event) => emit(event),
+            signal: abortController.signal,
+          });
+        }
       } catch {
         controller.enqueue(
           encoder.encode(

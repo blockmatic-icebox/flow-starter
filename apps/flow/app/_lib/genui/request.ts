@@ -7,11 +7,25 @@ export const rateLimitEnforced = ({ env }: { env: NodeJS.ProcessEnv }) => {
   return env.NODE_ENV === "production";
 };
 
+export const rateLimitIdentity = ({
+  env,
+  request,
+}: {
+  env: NodeJS.ProcessEnv;
+  request: Request;
+}) => {
+  const headerName = env.RATE_LIMIT_TRUSTED_IP_HEADER?.trim();
+  if (!headerName) return { ok: false as const };
+  const candidate =
+    request.headers.get(headerName)?.split(",")[0]?.trim() ?? "";
+  if (!/^[\d.a-fA-F:]{1,64}$/u.test(candidate)) return { ok: false as const };
+  return { ok: true as const, subject: candidate };
+};
+
 /**
  * Subject for unauthenticated demo quotas.
  * A forwarded IP header is used only when the deployment names the header its
- * ingress overwrites. Otherwise every caller shares one bucket so a spoofed
- * header cannot mint new quotas.
+ * ingress overwrites. When rate limits are enforced, missing identity fails closed.
  */
 export const rateLimitSubject = ({
   env,
@@ -20,10 +34,7 @@ export const rateLimitSubject = ({
   env: NodeJS.ProcessEnv;
   request: Request;
 }) => {
-  const headerName = env.RATE_LIMIT_TRUSTED_IP_HEADER?.trim();
-  if (!headerName) return SHARED_SUBJECT;
-  const candidate =
-    request.headers.get(headerName)?.split(",")[0]?.trim() ?? "";
-  if (!/^[\d.a-fA-F:]{1,64}$/u.test(candidate)) return SHARED_SUBJECT;
-  return candidate;
+  const identity = rateLimitIdentity({ env, request });
+  if (identity.ok) return identity.subject;
+  return SHARED_SUBJECT;
 };

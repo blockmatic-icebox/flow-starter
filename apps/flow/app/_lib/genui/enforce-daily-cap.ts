@@ -4,7 +4,7 @@ import { admitCompose } from "./admit-compose";
 import { CapStoreUnavailableError } from "./cap-store";
 import { createCapStore } from "./create-cap-store";
 import type { CreateCapStoreResult } from "./create-cap-store";
-import { rateLimitEnforced, rateLimitSubject } from "./request";
+import { rateLimitEnforced, rateLimitIdentity } from "./request";
 
 const unavailable = {
   message: "This service is not available.",
@@ -28,6 +28,10 @@ export const enforceDailyCap = async ({
   const enforce = rateLimitEnforced({ env });
   if (!enforce && env.NODE_ENV !== "production") return { ok: true as const };
 
+  const identity = rateLimitIdentity({ env, request });
+  if (enforce && !identity.ok) return unavailable;
+  if (!identity.ok) return unavailable;
+
   const created = createStore({ env });
   if (!created.ok) return unavailable;
   if (!enforce) return { ok: true as const };
@@ -37,7 +41,7 @@ export const enforceDailyCap = async ({
       enforce: true,
       now,
       store: created.store,
-      subject: rateLimitSubject({ env, request }),
+      subject: identity.subject,
     });
     if (!admitted.ok)
       return {

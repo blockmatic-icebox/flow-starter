@@ -1,23 +1,15 @@
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { assertAgentAuth } from "./agent.ts";
-import { mergeBlindScores, loadBlindReview } from "./blind-review.ts";
 import { compareRuns } from "./compare.ts";
-import { extractCommands } from "./evidence.ts";
-import { gradeScenario } from "./grade.ts";
+import { gradeScenarioFromRunDir } from "./grade-from-run.ts";
 import { handoffAgentBPrompt } from "./handoff.ts";
 import { runBatch, runScenarioSession } from "./orchestrate.ts";
 import { devEvalsRoot, baselineRunId } from "./paths.ts";
 import { verifyBaselinePreserved } from "./preserve.ts";
-import {
-  loadHiddenScenario,
-  loadPublicScenario,
-  loadScenarioOracle,
-  listPublicScenarioIds,
-} from "./scenarios.ts";
-import { isBuildAuthorized } from "./stakeholder.ts";
-import type { EvalArm, EvalEvent } from "./types.ts";
+import { listPublicScenarioIds } from "./scenarios.ts";
+import type { EvalArm } from "./types.ts";
 
 const usage = () => {
   console.log(`flow-eval CLI
@@ -71,14 +63,6 @@ const assertArm = ({ arm }: { arm: string }) => {
   }
 };
 
-const loadEvents = ({ filePath }: { filePath: string }) => {
-  if (!existsSync(filePath)) return [] as EvalEvent[];
-  return readFileSync(filePath, "utf-8")
-    .split("\n")
-    .filter(Boolean)
-    .map((line) => JSON.parse(line) as EvalEvent);
-};
-
 const cmdPreserve = () => {
   const result = verifyBaselinePreserved();
   if (!result.ok) {
@@ -99,68 +83,7 @@ const cmdGrade = ({
   scenarioId: string;
 }) => {
   assertScenarioIds({ ids: [scenarioId] });
-  const scenarioDir = path.join(devEvalsRoot, runId, "scenarios", scenarioId);
-  const diff = existsSync(path.join(scenarioDir, "diff.patch"))
-    ? readFileSync(path.join(scenarioDir, "diff.patch"), "utf-8")
-    : "";
-  const events = loadEvents({
-    filePath: path.join(scenarioDir, "transcript.jsonl"),
-  });
-  const commandsPath = path.join(scenarioDir, "commands.json");
-  const commands = existsSync(commandsPath)
-    ? (
-        JSON.parse(readFileSync(commandsPath, "utf-8")) as {
-          commands: unknown[];
-        }
-      ).commands
-    : extractCommands({ events });
-  const card = loadPublicScenario({ id: scenarioId });
-  const hidden = loadHiddenScenario({ id: scenarioId });
-  const manifestPath = path.join(devEvalsRoot, runId, "manifest.json");
-  const manifest = existsSync(manifestPath)
-    ? JSON.parse(readFileSync(manifestPath, "utf-8"))
-    : { harness: "cursor-cli" };
-  const blind = loadBlindReview({ runId, scenarioId });
-  const baseGrade = gradeScenario({
-    input: {
-      buildAuthorized: isBuildAuthorized({ events, hidden }),
-      card,
-      commands: commands as ReturnType<typeof extractCommands>,
-      completeness: events.some((e) => e.kind === "result")
-        ? "complete"
-        : "partial",
-      diff,
-      events,
-      harness: manifest.harness ?? "cursor-cli",
-      hidden,
-      oracle: loadScenarioOracle({ id: scenarioId }),
-      protocolVerified: true,
-      scenarioId,
-    },
-  });
-  const grade = blind
-    ? gradeScenario({
-        input: {
-          buildAuthorized: isBuildAuthorized({ events, hidden }),
-          card,
-          commands: commands as ReturnType<typeof extractCommands>,
-          completeness: events.some((e) => e.kind === "result")
-            ? "complete"
-            : "partial",
-          diff,
-          events,
-          harness: manifest.harness ?? "cursor-cli",
-          hidden,
-          oracle: loadScenarioOracle({ id: scenarioId }),
-          protocolVerified: true,
-          scenarioId,
-        },
-        scoresOverride: mergeBlindScores({
-          base: baseGrade.scores,
-          blind,
-        }),
-      })
-    : baseGrade;
+  const grade = gradeScenarioFromRunDir({ runId, scenarioId });
   console.log(JSON.stringify(grade, null, 2));
   if (grade.gate === "fail" || !grade.officialEligible) process.exit(1);
 };
@@ -284,7 +207,7 @@ const cmdPilot = ({ model }: { model: string }) => {
     console.error(auth.reason);
     process.exit(2);
   }
-  const { errors, grades } = runBatch({
+  const { errors, grades, infrastructureFailure } = runBatch({
     runId,
     scenarioIds: ["S01", "S13"],
     arm: "flow",
@@ -293,7 +216,7 @@ const cmdPilot = ({ model }: { model: string }) => {
   });
   if (errors.length) {
     console.error(errors.join("\n"));
-    process.exit(1);
+    process.exit(infrastructureFailure ? 4 : 1);
   }
   if (grades.some((g) => g.gate === "fail" || !g.officialEligible))
     process.exit(1);
@@ -328,7 +251,7 @@ const cmdRun = ({
       process.exit(2);
     }
   }
-  const { errors, grades, manifest } = runBatch({
+  const { errors, grades, infrastructureFailure, manifest } = runBatch({
     runId,
     scenarioIds: scenarios,
     arm,
@@ -338,7 +261,7 @@ const cmdRun = ({
   });
   if (errors.length) {
     console.error(errors.join("\n"));
-    process.exit(1);
+    process.exit(infrastructureFailure ? 4 : 1);
   }
   console.log(`Run ${runId} arm=${manifest.arm} harness=${manifest.harness}`);
   if (dryRun) {
@@ -447,22 +370,31 @@ const cmdCompareArms = ({
       process.exit(2);
     }
   }
-  runBatch({
+  const flowBatch = runBatch({
     runId: flowRun,
     scenarioIds: scenarios,
     arm: "flow",
     modelId: model,
     official: !dryRun,
   });
-  runBatch({
+  if (flowBatch.errors.length) {
+    console.error(flowBatch.errors.join("\n"));
+    process.exit(flowBatch.infrastructureFailure ? 4 : 1);
+  }
+  const controlBatch = runBatch({
     runId: controlRun,
     scenarioIds: scenarios,
     arm: "control",
     modelId: model,
     official: !dryRun,
   });
+  if (controlBatch.errors.length) {
+    console.error(controlBatch.errors.join("\n"));
+    process.exit(controlBatch.infrastructureFailure ? 4 : 1);
+  }
   const result = compareRuns({
     baselineDir: path.join(devEvalsRoot, controlRun),
+    crossArm: true,
     currentDir: path.join(devEvalsRoot, flowRun),
   });
   writeFileSync(
@@ -470,7 +402,11 @@ const cmdCompareArms = ({
     `${JSON.stringify({ controlRun, flowRun, ...result }, null, 2)}\n`
   );
   console.log(JSON.stringify(result, null, 2));
-  if (!dryRun && result.verdict === "regressed") process.exit(1);
+  if (
+    !dryRun &&
+    (result.verdict === "regressed" || result.verdict === "inconclusive")
+  )
+    process.exit(1);
 };
 
 const scenarioList = (value: string | undefined, fallback: string) =>

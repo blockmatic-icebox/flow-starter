@@ -155,7 +155,10 @@ const declarativeCompound = ({
     "Acme Analytics ships ingestion, dashboards, and mobile insights."
   )}, ${openUiStringList(["document:api-overview"])})`;
   const wantsMetrics = /metric|revenue|chart/u.test(query.toLowerCase());
-  const wantsCompare = /compare|plan/u.test(query.toLowerCase());
+  const normalized = query.toLowerCase();
+  const wantsCompare =
+    /compare|versus|vs\b/u.test(normalized) &&
+    /plan|orbit|nova/u.test(normalized);
   const children = [answerChild];
   if (wantsMetrics) {
     children.push(

@@ -13,6 +13,7 @@ const productionBearer = {
   APP_ORIGIN: appOrigin,
   CONSULTANT_MCP_BEARER: token,
   NODE_ENV: "production",
+  RATE_LIMIT_TRUSTED_IP_HEADER: "x-real-ip",
 } satisfies NodeJS.ProcessEnv;
 
 const memoryStore = () => ({
@@ -44,8 +45,13 @@ const rpc = ({
   headers?: HeadersInit;
   method?: string;
   url?: string;
-}) =>
-  handleMcpRequest({
+}) => {
+  const trustedHeader = env.RATE_LIMIT_TRUSTED_IP_HEADER?.trim();
+  const identityHeader =
+    trustedHeader && !headers?.[trustedHeader as keyof HeadersInit]
+      ? { [trustedHeader]: "203.0.113.10" }
+      : {};
+  return handleMcpRequest({
     createStore: memoryStore,
     env,
     request: new Request(url, {
@@ -53,11 +59,13 @@ const rpc = ({
       headers: {
         accept: "application/json, text/event-stream",
         "content-type": "application/json",
+        ...identityHeader,
         ...headers,
       },
       method,
     }),
   });
+};
 
 const callTool = async ({
   env,
@@ -167,6 +175,7 @@ describe("MCP HTTP access", () => {
       APP_ORIGIN: appOrigin,
       CONSULTANT_MCP_PUBLIC_READ_ONLY: "1",
       NODE_ENV: "production",
+      RATE_LIMIT_TRUSTED_IP_HEADER: "x-real-ip",
     } as const satisfies NodeJS.ProcessEnv;
     await rpc({ body: initialize, env });
     const listed = await rpc({
@@ -198,6 +207,7 @@ describe("MCP HTTP access", () => {
         APP_ORIGIN: appOrigin,
         CONSULTANT_MCP_PUBLIC_READ_ONLY: "1",
         NODE_ENV: "production",
+        RATE_LIMIT_TRUSTED_IP_HEADER: "x-real-ip",
       } as const satisfies NodeJS.ProcessEnv,
       name: "mutate_canvas",
     });
