@@ -1,0 +1,36 @@
+{
+  "id": "D01",
+  "title": "Raw product idea with unclear audience",
+  "relatedLiveCard": "S01",
+  "signals": {
+    "flowStage": "Explore",
+    "independentResearchCount": 3,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["idea-refine"]
+    },
+    "max-safe": {
+      "executionMode": "parallel-investigation",
+      "workerCount": 3,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["idea-refine"]
+    },
+    "adaptive": {
+      "executionMode": "parallel-investigation",
+      "workerCount": 3,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["idea-refine"]
+    }
+  }
+}

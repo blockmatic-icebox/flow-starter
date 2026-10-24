@@ -1,0 +1,35 @@
+{
+  "id": "D11",
+  "title": "Documentation-only change",
+  "signals": {
+    "flowStage": "Build",
+    "docsOnly": true,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["writing-for-agents"]
+    },
+    "max-safe": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["writing-for-agents"]
+    },
+    "adaptive": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["writing-for-agents"]
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "D12",
+  "title": "Explicit implementation authorization",
+  "signals": {
+    "flowStage": "Build",
+    "buildAuthorized": true,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["incremental-implementation"]
+    },
+    "max-safe": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["incremental-implementation"]
+    },
+    "adaptive": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["incremental-implementation"]
+    }
+  }
+}

@@ -29,6 +29,7 @@ The checkout is a starter baseline. Root contracts describe intended direction. 
 | React/Next routes, GenUI, URL state | [ADR 0009](docs/adr/0009-react-nextjs-fractal-architecture.md), [docs/specs/genui.md](docs/specs/genui.md) |
 | Task → skill map | [docs/agents/skills.md](docs/agents/skills.md) |
 | Parallel agent worktrees | [docs/agents/worktrees.md](docs/agents/worktrees.md) |
+| Subagent delegation (multi-part, uncertain, or review work) | [docs/agents/delegation.md](docs/agents/delegation.md) |
 
 Do not read every ADR or research file for ordinary changes. Do not present planned capabilities as implemented. Do not claim a skill ran without loading and applying its `SKILL.md`.
 

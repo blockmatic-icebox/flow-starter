@@ -143,6 +143,8 @@ Possible activities:
 
 **Documentation:** Usually none. Persist useful uncommitted ideas or durable evidence only when worth preserving.
 
+Parallel discovery: [delegation.md](../agents/delegation.md#explore).
+
 ### 2. Specify
 
 **Purpose:** Agree on the outcome, scope, behavior, and acceptance criteria before substantial implementation.
@@ -162,6 +164,8 @@ Define as appropriate:
 Use existing `PRODUCT.md` for product-wide direction. Create an initiative document for bounded work that needs a durable owner. Create a separate technical or functional spec only when it adds information not already covered by the initiative.
 
 **Exit condition:** The work is clear enough to plan or implement, and any decision requiring human approval is resolved.
+
+Dimensional specification without duplicate doc edits: [delegation.md](../agents/delegation.md#specify).
 
 ### 3. Plan
 
@@ -185,6 +189,8 @@ For a small task, a concise plan in the conversation is sufficient. For sustaine
 
 For substantial initiative work, record parallel execution as **waves** in the owning initiative (`## Waves`). Before plan approval, run a **contrarian wave** (question-mode worktrees) when meaningful alternatives or unvalidated assumptions remain; capture assumptions, kill criteria, and the recommended direction in the initiative. Use `pnpm worktrees check` before fan-out; create isolated checkouts with `pnpm worktrees up` only after explicit **Build** authorization for build tasks. Procedure and task format: [docs/agents/worktrees.md](../agents/worktrees.md).
 
+Dependency-aware planning and parallel investigation: [delegation.md](../agents/delegation.md#plan).
+
 ### 4. Build
 
 **Purpose:** Implement the smallest useful change consistent with accepted decisions.
@@ -196,8 +202,11 @@ For substantial initiative work, record parallel execution as **waves** in the o
 - Keep changes scoped to the agreed outcome.
 - Update the owning documentation when behavior or accepted direction changes.
 - Do not modify unrelated files for incidental cleanup.
+- For multi-file or planned slices, apply `incremental-implementation` (see [skills.md](../agents/skills.md)).
 
 **Exit condition:** The agreed slice works locally and has relevant verification evidence.
+
+Build waves and parallel builders: [delegation.md](../agents/delegation.md#build).
 
 ### 5. Review
 
@@ -228,6 +237,8 @@ Automatic checks prove deterministic behavior. They do not replace judgment abou
 
 Do not execute a model to validate behavior that a deterministic test, compiler, or schema can decide.
 
+Independent verification when warranted: [delegation.md](../agents/delegation.md#review).
+
 ### 6. Ship
 
 **Purpose:** Deliver the agreed change and preserve enough context for continued work.
@@ -241,6 +252,8 @@ Do not execute a model to validate behavior that a deterministic test, compiler,
 - Capture product outcome evidence when available; otherwise state what remains unknown.
 
 Do not declare something shipped merely because code was written. Publishing, merging, or deploying requires the appropriate user authorization and environment.
+
+Parallel readiness checks and honest release boundaries: [delegation.md](../agents/delegation.md#ship).
 
 ## Documentation ownership
 
@@ -384,7 +397,7 @@ The workflow is a repository convention, not a self-executing runtime.
 
 Agent instructions encourage compliant behavior; they cannot guarantee that every tool or model obeys the convention.
 
-The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, research/specification metadata, required entry documents, relative links, selected semantic consistency rules (obsolete paths, MCP tool counts, stale Flow Agent knowledge snapshot), and reproducibility of the bundled knowledge snapshot. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. These checks do not verify human approval, product outcomes, or skill invocation.
+The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, research/specification metadata, required entry documents, relative links, selected semantic consistency rules (obsolete paths, MCP tool counts, stale Flow Agent knowledge snapshot), and reproducibility of the bundled knowledge snapshot. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. Delegation behavior is tested separately by `@repo/flow-eval` policy scenarios (`D01`–`D15`). These checks do not verify human approval, product outcomes, skill invocation, or live subagent execution.
 
 Regenerating `apps/flow/app/_lib/flow-agent/knowledge-snapshot.ts` after a documentation edit (via `apps/flow/scripts/bundle-knowledge.mjs` or `flow:check`) is contract maintenance, not product implementation.
 

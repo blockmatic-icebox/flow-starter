@@ -1,0 +1,37 @@
+{
+  "id": "D02",
+  "title": "Detailed brief with accepted decisions",
+  "relatedLiveCard": "S03",
+  "signals": {
+    "flowStage": "Specify",
+    "acceptedDecisionsPresent": true,
+    "independentResearchCount": 2,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["spec-driven-development"]
+    },
+    "max-safe": {
+      "executionMode": "parallel-investigation",
+      "workerCount": 2,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["spec-driven-development"]
+    },
+    "adaptive": {
+      "executionMode": "parallel-investigation",
+      "workerCount": 2,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["spec-driven-development"]
+    }
+  }
+}

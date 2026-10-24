@@ -1,0 +1,37 @@
+{
+  "id": "D03",
+  "title": "Small bug in existing feature",
+  "relatedLiveCard": "S13",
+  "signals": {
+    "flowStage": "Build",
+    "smallWellUnderstood": true,
+    "buildAuthorized": true,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["test-driven-development"]
+    },
+    "max-safe": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["test-driven-development"]
+    },
+    "adaptive": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["test-driven-development"]
+    }
+  }
+}

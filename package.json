@@ -30,7 +30,7 @@
     "worktrees": "node scripts/worktrees.mjs",
     "architecture:check": "node scripts/check-react-architecture.mjs",
     "architecture:test": "node --test scripts/check-react-architecture.test.mjs",
-    "test": "pnpm --filter @repo/genui test && pnpm --filter flow-app test && pnpm --filter @repo/db test",
+    "test": "pnpm --filter @repo/genui test && pnpm --filter flow-app test && pnpm --filter @repo/db test && pnpm --filter @repo/flow-eval test",
     "test:browser": "pnpm test:browser:web && pnpm test:browser:flow",
     "test:scripts": "node --test scripts/*.test.mjs tests/security/*.test.mjs",
     "lint": "oxlint . && oxfmt --check .",

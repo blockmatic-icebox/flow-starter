@@ -1,0 +1,35 @@
+{
+  "id": "D04",
+  "title": "New feature requiring product specification",
+  "signals": {
+    "flowStage": "Specify",
+    "needsSpecification": true,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["prd-writing"]
+    },
+    "max-safe": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["prd-writing"]
+    },
+    "adaptive": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["prd-writing"]
+    }
+  }
+}

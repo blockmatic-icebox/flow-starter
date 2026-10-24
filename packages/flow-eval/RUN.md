@@ -47,3 +47,28 @@ Deterministic gates run first. Markdown reports lead with **Gate**, then quality
 - `flow` — default Flow entrypoint and skills symlink
 - `flow-without-skills` — Flow docs, no `.agents/skills`
 - `control` — minimal `AGENTS.md`, workflow and skills router removed from worktree
+
+## Delegation policy evaluation (static)
+
+Orchestration **policies** for methodology testing are separate from eval arms:
+
+| Policy     | Behavior                                        |
+| ---------- | ----------------------------------------------- |
+| `solo`     | Coordinator only                                |
+| `max-safe` | Fan out every safe independent part             |
+| `adaptive` | Max-safe unless coordination overhead dominates |
+
+Scenarios `D01`–`D15` live in `packages/flow-eval/scenarios/delegation/`. The oracle is `classifyDelegation` in `src/delegation.ts`. Run:
+
+```bash
+pnpm --filter @repo/flow-eval test
+```
+
+### Execution classes
+
+1. **Static policy tests** — `delegation.test.ts` (no live agent)
+2. **Scripted orchestration** — policy comparison in tests (D09, D14)
+3. **Real subagent runs** — `eval run` / `eval pilot` (requires `agent` CLI auth)
+4. **Browser verification** — [docs/agents/verify.md](../../docs/agents/verify.md)
+
+A passing `pnpm flow:check` does not prove delegation behavior. Live run artifacts belong under `__dev/flow-evals/<runId>/` (gitignored). Record wall clock, tokens, and worker counts only when observed; otherwise treat as `missing`.

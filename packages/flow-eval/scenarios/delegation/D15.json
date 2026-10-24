@@ -1,0 +1,37 @@
+{
+  "id": "D15",
+  "title": "Large initiative with dependency graph",
+  "signals": {
+    "flowStage": "Plan",
+    "waveGraph": { "taskCount": 5, "maxConcurrent": 2 },
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["planning-and-task-breakdown"]
+    },
+    "max-safe": {
+      "executionMode": "parallel-implementation",
+      "workerCount": 5,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["planning-and-task-breakdown"],
+      "maxConcurrent": 2
+    },
+    "adaptive": {
+      "executionMode": "parallel-implementation",
+      "workerCount": 5,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["planning-and-task-breakdown"],
+      "maxConcurrent": 2
+    }
+  }
+}

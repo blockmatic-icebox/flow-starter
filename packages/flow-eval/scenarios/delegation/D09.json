@@ -1,0 +1,37 @@
+{
+  "id": "D09",
+  "title": "Unavailable subagent capabilities",
+  "signals": {
+    "flowStage": "Explore",
+    "independentResearchCount": 3,
+    "subagentsAvailable": false
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["idea-refine"]
+    },
+    "max-safe": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "fallback": "subagents-unavailable",
+      "skillsIncludes": ["idea-refine"]
+    },
+    "adaptive": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "fallback": "subagents-unavailable",
+      "skillsIncludes": ["idea-refine"]
+    }
+  }
+}

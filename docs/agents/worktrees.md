@@ -1,6 +1,8 @@
 # Parallel worktrees
 
-Host-agnostic coordination for multiple coding agents. The initiative owns the wave graph; `pnpm worktrees` validates it and creates isolated git checkouts. The agent host (Cursor, Claude Code, VPC runner, and others) starts agents and passes each one the generated brief.
+Host-agnostic coordination for multiple coding agents. [delegation.md](delegation.md) decides whether to fan out; this document owns gates, wave format, commands, and briefs. The initiative owns the wave graph; `pnpm worktrees` validates it and creates isolated git checkouts. The agent host (Cursor, Claude Code, VPC runner, and others) starts agents and passes each one the generated brief.
+
+Worker roles map to task fields: **researcher** (`mode: question`, empty `writes`), **builder** (`mode: build`, `build_authorized: yes`), **verifier** (`mode: question`, `flow_stage: Review`, empty `writes`).
 
 ## When to use
 
@@ -94,7 +96,7 @@ Each brief is self-contained (subagents do not see parent chat). It includes:
 - Flow stage and mode
 - `writes`, `reads`, `skills`
 - Acceptance command (build tasks)
-- Return format: files changed, commands with exit codes, blockers
+- Return format: summary; files changed (if any); commands with exit codes; blockers; open questions; risks and recommended next action; skills whose `SKILL.md` was actually loaded
 
 For browser verification in a worktree, use a dedicated agent-browser session per [verify.md](verify.md).
 

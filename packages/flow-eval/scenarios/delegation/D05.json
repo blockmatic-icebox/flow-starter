@@ -1,0 +1,38 @@
+{
+  "id": "D05",
+  "title": "Independent frontend and backend implementation",
+  "signals": {
+    "flowStage": "Build",
+    "buildAuthorized": true,
+    "parallelBuilderCount": 2,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["incremental-implementation"]
+    },
+    "max-safe": {
+      "executionMode": "parallel-implementation",
+      "workerCount": 5,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["incremental-implementation"],
+      "maxConcurrent": 2
+    },
+    "adaptive": {
+      "executionMode": "parallel-implementation",
+      "workerCount": 5,
+      "writable": true,
+      "humanGate": false,
+      "allowBuild": true,
+      "skillsIncludes": ["incremental-implementation"],
+      "maxConcurrent": 2
+    }
+  }
+}

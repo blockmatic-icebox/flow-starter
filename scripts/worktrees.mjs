@@ -295,9 +295,13 @@ ${task.mode === "build" ? `\`${task.acceptance}\` must exit 0.` : "Return findin
 
 ## Return to parent
 
-1. Files changed (if any)
-2. Commands run with exit codes
-3. Blockers or open questions
+1. Summary of results
+2. Files changed (if any)
+3. Commands run with exit codes
+4. Blockers
+5. Open questions
+6. Risks and recommended next action
+7. Skills whose SKILL.md was actually loaded
 `;
 }
 

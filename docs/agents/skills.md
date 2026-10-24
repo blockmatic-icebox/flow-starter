@@ -4,6 +4,8 @@ Use the smallest set of installed skills that the task needs. Read those instruc
 
 Do not load the full catalog. Skills for technologies that are not implemented here stay available, but they are not the default context.
 
+**Flow** chooses the activity. **Skills** provide methods. **Subagents** provide isolated execution. Choose delegation separately from skill selection ([delegation.md](delegation.md)).
+
 ## Phase-aware selection
 
 Select skills using the actual task and uncertainty, not keyword matching alone.
@@ -24,12 +26,15 @@ Read the installed skill instructions before applying them. Preserve Flow's cano
 
 Never assert that automatic routing succeeded merely because a skill appears in `skills-lock.json`. Installed availability and observed execution are separate facts.
 
+When several methodology skills could apply (`idea-refine`, `problem-validation`, `prd-writing`, `spec-driven-development`, `planning-and-task-breakdown`, `incremental-implementation`, `test-driven-development`, `code-review-and-quality`, `experiment-design`, `writing-for-agents`, `documentation-and-adrs`), load the one that matches **current uncertainty and stage**, not the full chain.
+
 | Task | Preferred skills |
 | --- | --- |
 | Flow and agent documentation | `writing-for-agents`, `documentation-and-adrs` |
 | Product exploration | `idea-refine`, `problem-validation` |
 | Product requirements | `prd-writing`, `spec-driven-development` |
 | Planning | `planning-and-task-breakdown` |
+| Build (multi-file or planned slice) | `incremental-implementation`; add `test-driven-development` when behavior changes |
 | Parallel waves (initiative + `pnpm worktrees`) | `planning-and-task-breakdown`, `incremental-implementation`; contrarian Explore: `idea-refine`, `problem-validation` |
 | React and Next.js | `nextjs`, `next-dev-loop`, `vercel-react-best-practices` |
 | UI components | `shadcn`, `building-components` |

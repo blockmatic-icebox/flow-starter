@@ -1,0 +1,36 @@
+{
+  "id": "D10",
+  "title": "Independent functional and UI review",
+  "signals": {
+    "flowStage": "Review",
+    "needsFunctionalReview": true,
+    "needsUiReview": true,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["code-review-and-quality"]
+    },
+    "max-safe": {
+      "executionMode": "independent-verification",
+      "workerCount": 2,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["agent-browser"]
+    },
+    "adaptive": {
+      "executionMode": "independent-verification",
+      "workerCount": 2,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["agent-browser"]
+    }
+  }
+}

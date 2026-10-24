@@ -115,7 +115,7 @@ You do not need every skill on every task.
 
 Choice depends on intent and the concrete needs of the work.
 
-Substantial initiatives may fan out to git worktrees after planning; see [agents/worktrees.md](../agents/worktrees.md).
+Substantial initiatives may fan out to git worktrees after planning; see [agents/worktrees.md](../agents/worktrees.md). When to use solo work versus parallel workers: [agents/delegation.md](../agents/delegation.md).
 
 ## Flow and Flow Starter
 

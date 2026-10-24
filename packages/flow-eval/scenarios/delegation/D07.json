@@ -1,0 +1,39 @@
+{
+  "id": "D07",
+  "title": "Authentication or security-sensitive modification",
+  "signals": {
+    "flowStage": "Review",
+    "securitySensitive": true,
+    "needsFunctionalReview": true,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": true,
+      "humanGateReason": "security-sensitive",
+      "allowBuild": false,
+      "skillsIncludes": ["code-review-and-quality"]
+    },
+    "max-safe": {
+      "executionMode": "independent-verification",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": true,
+      "humanGateReason": "security-sensitive",
+      "allowBuild": false,
+      "skillsIncludes": ["code-review-and-quality"]
+    },
+    "adaptive": {
+      "executionMode": "independent-verification",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": true,
+      "humanGateReason": "security-sensitive",
+      "allowBuild": false,
+      "skillsIncludes": ["code-review-and-quality"]
+    }
+  }
+}

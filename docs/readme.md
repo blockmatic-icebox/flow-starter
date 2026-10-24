@@ -94,6 +94,7 @@ Full ADR index: [docs/adr/](adr/).
 | Product and design (adopter) | [PRODUCT.md](../PRODUCT.md), [DESIGN.md](../DESIGN.md) |
 | Browser verification | [agents/verify.md](agents/verify.md) |
 | Parallel worktrees | [agents/worktrees.md](agents/worktrees.md) |
+| Adaptive delegation | [agents/delegation.md](agents/delegation.md) |
 
 Do not read every ADR or research file by default.
 

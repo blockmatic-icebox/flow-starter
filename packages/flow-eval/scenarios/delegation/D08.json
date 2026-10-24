@@ -1,0 +1,35 @@
+{
+  "id": "D08",
+  "title": "Conflicting research findings",
+  "signals": {
+    "flowStage": "Explore",
+    "conflictingResearch": true,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["idea-refine"]
+    },
+    "max-safe": {
+      "executionMode": "parallel-investigation",
+      "workerCount": 2,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["idea-refine"]
+    },
+    "adaptive": {
+      "executionMode": "parallel-investigation",
+      "workerCount": 2,
+      "writable": false,
+      "humanGate": false,
+      "allowBuild": false,
+      "skillsIncludes": ["idea-refine"]
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "id": "D06",
+  "title": "Architecture change conflicting with accepted ADR",
+  "relatedLiveCard": "S09",
+  "signals": {
+    "flowStage": "Plan",
+    "adrConflict": true,
+    "subagentsAvailable": true
+  },
+  "expected": {
+    "solo": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": true,
+      "humanGateReason": "adr-conflict",
+      "allowBuild": false,
+      "skillsIncludes": ["documentation-and-adrs"]
+    },
+    "max-safe": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": true,
+      "humanGateReason": "adr-conflict",
+      "allowBuild": false,
+      "skillsIncludes": ["documentation-and-adrs"]
+    },
+    "adaptive": {
+      "executionMode": "solo",
+      "workerCount": 1,
+      "writable": false,
+      "humanGate": true,
+      "humanGateReason": "adr-conflict",
+      "allowBuild": false,
+      "skillsIncludes": ["documentation-and-adrs"]
+    }
+  }
+}
