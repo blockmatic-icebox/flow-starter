@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
+import { SiteShell } from "@/components/site-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
@@ -38,7 +39,9 @@ export default function RootLayout({
     >
       <body>
         <NuqsAdapter>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <SiteShell>{children}</SiteShell>
+          </ThemeProvider>
         </NuqsAdapter>
       </body>
     </html>

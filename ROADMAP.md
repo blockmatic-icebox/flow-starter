@@ -11,7 +11,8 @@ Technical constraints and system architecture belong in [ARCHITECTURE.md](ARCHIT
 - `@repo/genui`: OpenUI Lang contracts, compiler, controlled and declarative composition, React adapter, and fictional Acme fixtures.
 - `POST /api/genui/compose`: NDJSON streaming with optional local rate limits.
 - `/genui-demo`: web integration example.
-- Optional AI Gateway-backed tier-3 answers, with a grounded fallback when credentials are absent.
+- Site consultant: right-hand chat sidebar on the site shell, `POST /api/chat`, read-only `GET|POST|DELETE /api/mcp` ([ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md)).
+- Optional AI Gateway-backed tier-3 answers and consultant chat, with a grounded deterministic fallback when credentials are absent.
 - Local quality commands and manual GitHub Actions workflows.
 - Flow workflow documentation and agent skills integration.
 
@@ -31,8 +32,8 @@ A planned integration must not be presented as existing functionality.
 
 ## Later candidates
 
-- External read-only invocation, subject to [ADR 006](docs/adr/0006-external-invocation-is-read-only.md).
-- Voice delegation, subject to [ADR 004](docs/adr/0004-voice-delegates-to-eve.md).
+- Authenticated external invocation beyond the public read-only MCP slice, subject to [ADR 006](docs/adr/0006-external-invocation-is-read-only.md).
+- Eve workspace voice delegation, subject to [ADR 004](docs/adr/0004-voice-delegates-to-eve.md).
 - Additional browser, MCP Apps, and generated-interface quality testing where actual adopter needs justify it.
 
 ## Maintenance rules

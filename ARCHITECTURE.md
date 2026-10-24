@@ -99,9 +99,11 @@ Registered actions, input validation, and declared approval/authentication requi
 | Endpoint | Method | Role |
 | --- | --- | --- |
 | `/api/genui/compose` | POST | Body: `{ query, clientRequestId?, version? }`. Returns `application/x-ndjson` stream. |
+| `/api/chat` | POST | Site consultant: AI SDK UI message stream; optional AI Gateway; deterministic fallback without credentials. |
+| `/api/mcp` | GET, POST, DELETE | Read-only MCP (Streamable HTTP) for external agents; same consultant tools as chat. |
 | `/genui-demo` | GET | Client demo calling the compose API |
 
-The compose route applies optional per-IP daily limits (`apps/web/lib/genui/`, off on `flow.localhost` unless `GENUI_ENFORCE_RATE_LIMIT=1`) and builds a minimal capability context (`correlationId`, `ip`, `clock`). Telemetry and Redis-backed caps follow the gaboesquivel.com pattern in `docs/specs/genui/inventory.md`.
+The compose and consultant routes apply optional per-IP daily limits (`apps/web/lib/genui/`, off on `flow.localhost` unless `GENUI_ENFORCE_RATE_LIMIT=1`) and build a minimal capability context (`correlationId`, `ip`, `clock`). Consultant MCP is read-only for external callers ([ADR 006](docs/adr/0006-external-invocation-is-read-only.md)); in-app chat may invoke allowlisted client actions (`open-genui-demo`, `toggle-theme`). Agent-to-UI events in the sidebar use the AI SDK UI message stream (AG-UI vocabulary per [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md)). Telemetry and Redis-backed caps follow the gaboesquivel.com pattern in `docs/specs/genui/inventory.md`.
 
 The in-memory cap store is a demonstration mechanism, not a distributed production rate limiter. Its counts are process-local and may reset or diverge across instances. The request IP is derived from forwarding headers, whose trust depends on the hosting proxy configuration. Production applications must replace this with an appropriately trusted, distributed enforcement mechanism.
 
@@ -117,7 +119,7 @@ These are specified for adopters building a full workspace; they are **not requi
 | Docs / retrieval | Fumadocs, bounded repo reads, revision-aware citations |
 | External clients | Read-only invocation boundary (ADR 006) |
 
-Voice (ADR 004) and `/dev` workspace placement (ADR 005) apply when those features are implemented.
+Site consultant chat and read-only MCP are implemented per [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md). Eve workspace voice (ADR 004) and `/dev` placement (ADR 005) apply when those features are implemented.
 
 ## 8. Quality and CI
 

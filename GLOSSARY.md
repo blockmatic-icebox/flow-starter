@@ -34,6 +34,14 @@ The authenticated surface where a person and an agent share conversation, select
 
 Results surface inside the workspace for validated, source-backed artifacts. Distinct from raw chat transcripts.
 
+## Site consultant
+
+Read-only technical guide for Flow Starter: how the repo is built, which technologies are implemented versus planned, and what adopters can do with the baseline. Served by the in-app chat sidebar and by MCP tools; see [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md).
+
+## Agent-to-UI (AG-UI)
+
+Vocabulary for the event stream between an agent backend and the interactive client (run lifecycle, reasoning, tool calls, text). In this starter the AI SDK UI message stream implements that layer in the consultant sidebar. Distinct from MCP tool transport.
+
 ## External invocation (planned)
 
-Authenticated non-browser clients limited to cited answers and optional validated specs—no session canvas mutation. See [docs/adr/0006-external-invocation-is-read-only.md](docs/adr/0006-external-invocation-is-read-only.md).
+Authenticated non-browser clients limited to cited answers and optional validated specs—no session canvas mutation. The shipped MCP endpoint is read-only consultant access; full external invocation remains planned. See [docs/adr/0006-external-invocation-is-read-only.md](docs/adr/0006-external-invocation-is-read-only.md).

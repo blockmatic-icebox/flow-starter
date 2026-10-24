@@ -4,7 +4,7 @@
 
 ## Visual direction
 
-_Describe the overall aesthetic (density, tone, references). Flow Starter ships neutral ChatGPT-like surfaces until you define brand tokens here._
+Neutral ChatGPT-like surfaces until adopters define brand tokens. The site shell pairs primary content with a consultant chat on the right.
 
 ## Brand and color
 
@@ -20,34 +20,37 @@ _Map tokens to CSS variables in `packages/ui` (shadcn + Tailwind). Avoid scatter
 
 ## Typography
 
-- _Sans family for UI and reading._
-- _Monospace for code and tabular data._
-- _Scale (body, UI, metadata, headings)._
+- Sans family for UI and reading (Geist in the default app).
+- Monospace for code and tabular data.
+- Body and UI at `text-sm`; metadata at `text-xs`.
 
 ## Layout
 
-- _Breakpoints and shell structure (header, sidebar, panels)._
-- _Spacing and radius scale._
+- **Site shell:** main content flex-grows; consultant chat in a fixed-width right panel on `md+`.
+- **Narrow viewports:** chat opens in a sheet; a floating control toggles it.
+- Spacing follows Tailwind scale; radius from shadcn defaults.
 
 ## Core surfaces
 
-| Surface              | Behavior                                             |
-| -------------------- | ---------------------------------------------------- |
-| _Chat / composer_    | _Input, streaming, errors, cancellation._            |
-| _Generative results_ | _How composed UI appears; loading and empty states._ |
-| _Settings / auth_    | _Sign-in pattern and account entry points._          |
+| Surface | Behavior |
+| --- | --- |
+| Consultant sidebar | `useChat` stream; reasoning and tool parts visible while the agent runs. |
+| Composer | Textarea, submit, optional speech input (Web Speech API). |
+| GenUI demo | Existing `/genui-demo` route inside the main column. |
+| Settings / auth | Not shipped in this slice. |
 
 ## Motion and accessibility
 
-- _Respect `prefers-reduced-motion`._
-- _Focus, contrast, and keyboard targets (target WCAG 2.2 AA)._
-- _Live regions for async updates (restrained, not every token)._
+- Respect `prefers-reduced-motion`; avoid decorative motion in the consultant panel.
+- Consultant status uses a restrained `aria-live="polite"` region for errors and completion.
+- Focus, contrast, and keyboard targets (target WCAG 2.2 AA).
+- Speech input requires microphone permission; text input remains available.
 
 ## Content and generative UI
 
-- _Which components the model may compose (allowlists)._
-- _What the model must never control (raw CSS, arbitrary URLs, privileged actions)._
+- Consultant answers cite curated starter facts only; GenUI compose rules unchanged in `@repo/genui`.
+- Client actions are allowlisted (`open-genui-demo`, `toggle-theme`); the model cannot register new actions.
 
 ## Verification checklist
 
-- _Light/dark, mobile, keyboard, long content, error states._
+- Light/dark, mobile sheet + desktop sidebar, keyboard submit, long transcripts, tool error states, denied microphone.
