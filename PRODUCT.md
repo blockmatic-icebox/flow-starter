@@ -6,6 +6,8 @@
 
 _Describe what the product is and why it exists in one or two paragraphs._
 
+This starter is designed to be **application-agnostic**: features are exposed via backend APIs rather than a single fixed UI. We follow an API-first and agent-friendly development model (see [PDR 0001](docs/pdr/0001-agnostic-api-first.md)) so new interfaces (web, voice, agents, etc.) can be added on top without rewriting core logic.
+
 ## Audience
 
 _Who uses this product? List primary personas and what each needs to accomplish._

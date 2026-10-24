@@ -1,6 +1,8 @@
 # ADR 001 — Use Flow Starter as the base
 
-**Status:** Accepted · October 24, 2026
+**Status:** Superseded · October 24, 2026
+
+> This initial decision has been superseded by [ADR 0007](0007-monorepo-vercel-stack.md) (Monorepo and Vercel infrastructure). The record below is preserved for history.
 
 ## Context
 
