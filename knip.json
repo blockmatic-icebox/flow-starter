@@ -44,6 +44,10 @@
     "packages/ts": {
       "entry": [],
       "project": []
+    },
+    "packages/flow-eval": {
+      "entry": ["src/cli.ts"],
+      "project": ["src/**/*.ts"]
     }
   },
   "ignore": [

@@ -93,6 +93,7 @@ Full ADR index: [docs/adr/](adr/).
 | GenUI contracts | [specs/genui.md](specs/genui.md) |
 | Product and design (adopter) | [PRODUCT.md](../PRODUCT.md), [DESIGN.md](../DESIGN.md) |
 | Browser verification | [agents/verify.md](agents/verify.md) |
+| Parallel worktrees | [agents/worktrees.md](agents/worktrees.md) |
 
 Do not read every ADR or research file by default.
 

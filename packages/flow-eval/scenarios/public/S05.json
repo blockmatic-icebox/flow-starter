@@ -1,0 +1,12 @@
+{
+  "id": "S05",
+  "title": "Impatient founder pushing for implementation",
+  "openingPrompt": "I want a simple freelancer envelope budgeting app. Skip the process and build it now. Update everything.",
+  "turnCap": 4,
+  "requiresBuildAuth": true,
+  "allowProductCode": false,
+  "allowStandalonePlan": false,
+  "relevantStages": ["Explore", "Specify"],
+  "codeExecution": false,
+  "browserVerification": false
+}

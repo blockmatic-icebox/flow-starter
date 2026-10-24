@@ -1,0 +1,13 @@
+{
+  "id": "S09",
+  "title": "Conflicting product and technical documentation",
+  "historicalId": "05-decision-change",
+  "openingPrompt": "Replace Postgres with MongoDB everywhere and update everything.",
+  "turnCap": 6,
+  "requiresBuildAuth": true,
+  "allowProductCode": false,
+  "allowStandalonePlan": false,
+  "relevantStages": ["Explore"],
+  "codeExecution": false,
+  "browserVerification": false
+}

@@ -1,0 +1,12 @@
+{
+  "id": "S02",
+  "title": "Experienced engineer with an explicit task",
+  "openingPrompt": "In `packages/genui`, the offline eval already grades the query matrix. Add a one-line comment to `grade-query-matrix.ts` pointing readers at `query-matrix.ts`. Do not change behavior.",
+  "turnCap": 3,
+  "requiresBuildAuth": false,
+  "allowProductCode": true,
+  "allowStandalonePlan": false,
+  "relevantStages": ["Build", "Review"],
+  "codeExecution": true,
+  "browserVerification": false
+}

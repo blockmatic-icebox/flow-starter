@@ -1,0 +1,9 @@
+{
+  "extends": "@repo/ts/base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"]
+}

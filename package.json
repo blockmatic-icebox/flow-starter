@@ -27,6 +27,7 @@
     "qa": "pnpm flow:check && pnpm architecture:check && pnpm lint && pnpm knip && pnpm sherif && pnpm check-types && pnpm test && pnpm --filter @repo/db db:check",
     "flow:check": "node scripts/check-flow-docs.mjs",
     "flow:test": "node --test scripts/check-flow-docs.test.mjs",
+    "worktrees": "node scripts/worktrees.mjs",
     "architecture:check": "node scripts/check-react-architecture.mjs",
     "architecture:test": "node --test scripts/check-react-architecture.test.mjs",
     "test": "pnpm --filter @repo/genui test && pnpm --filter flow-app test && pnpm --filter @repo/db test",

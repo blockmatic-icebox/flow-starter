@@ -27,6 +27,7 @@ const knowledgeBundleSources = [
   "docs/agents/domain.md",
   "docs/agents/verify.md",
   "docs/agents/skills.md",
+  "docs/agents/worktrees.md",
   "PRODUCT.md",
 ];
 

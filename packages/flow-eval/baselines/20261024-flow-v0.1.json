@@ -1,0 +1,199 @@
+{
+  "runId": "20261024-flow-v0.1-1256e532",
+  "baselineSha": "1256e532977e76ea10614cbd87604dad39790451",
+  "flowVersion": "0.1",
+  "model": "composer-2.5",
+  "harness": "cursor-ide-task-subagent",
+  "transcriptsComplete": 0,
+  "transcriptsPartial": 6,
+  "missingEvidence": [
+    "Native stream-json tool traces for all scenarios",
+    "Token usage",
+    "Verified skill read events (tool log incomplete)",
+    "scenario score.json for 02, 03, 04",
+    "transcript.jsonl for scenarios 02-06",
+    "Pilot worktrees reused for scored run (documented limitation)"
+  ],
+  "fileChecksums": [
+    {
+      "path": "comparison-design.md",
+      "sha256": "553c17c42c4a25d7a7c4a003a4057c71aa405d7259c0f199a6a0352387589fe5"
+    },
+    {
+      "path": "evaluations/findings.json",
+      "sha256": "177080a0493999e6479edac4a33c7c8e46bcae7341a032146774b767f42d6b7d"
+    },
+    {
+      "path": "evaluations/recommendations.md",
+      "sha256": "3cc18031dd126aff4daba4e6be18c3a7e54990130ed0f35ded493280b4ad110f"
+    },
+    {
+      "path": "evaluations/regression-candidates.json",
+      "sha256": "885c1e3d1e22a6ff15ad595d2817a80b9a01605278491a4b583f6ad686e5e38d"
+    },
+    {
+      "path": "harness/append-transcript.mjs",
+      "sha256": "f2a9f3d264e9eb0aa5864d4044135cff5b7295d99820e1c08b70c7d62d20e342"
+    },
+    {
+      "path": "harness/apply-fixture-03.mjs",
+      "sha256": "4d4448fec82c682b90ac071f0f80a18fcfd5f0397076e1ad95128e42fa5ad766"
+    },
+    {
+      "path": "harness/apply-fixture-04.mjs",
+      "sha256": "90ea4a504be3a547f6d3a680deadacbd971e3c3632bbc5714e7f49aa712a4d7e"
+    },
+    {
+      "path": "harness/apply-fixture-05.mjs",
+      "sha256": "7ace24b93767ff64b8df9f86e41d0fa5710c3872b2c77920e897737b0d813196"
+    },
+    {
+      "path": "harness/apply-fixture-06.mjs",
+      "sha256": "14e218a7401591ef5dcf5d2ca1cb7a116805da7c9923699044bf87159bed9f06"
+    },
+    {
+      "path": "harness/finalize-scenario.mjs",
+      "sha256": "1d74a7c0925fdd5c6433902e7b40b779a7fefe7170612adc6f296beb767f9bbd"
+    },
+    {
+      "path": "harness/setup-worktree.mjs",
+      "sha256": "0a7f57640902577237814c7e299d980651eacbbd441b8c3b7bd1fbabf2d6cb46"
+    },
+    {
+      "path": "manifest.json",
+      "sha256": "a8451859e63e37eaebf3b5d3a1a71cf73af1b5bcd340111be9867c5dad73b4fc"
+    },
+    {
+      "path": "scenarios/01-new-startup/conversation.md",
+      "sha256": "c06546906b9e5639c67019557f5e4fbbba5afbb79e39be7a3693f7215bff8b01"
+    },
+    {
+      "path": "scenarios/01-new-startup/diff.patch",
+      "sha256": "37b38099839bedfb63140f5daf4375fe347bed227f62833ec75cebe70e98c77c"
+    },
+    {
+      "path": "scenarios/01-new-startup/score.json",
+      "sha256": "64815ad8e4bc2fe1e7bd1896f13eedfebb4f13e918e214e6339fd63a37124328"
+    },
+    {
+      "path": "scenarios/01-new-startup/stakeholder.md",
+      "sha256": "87e3f06089163c83e9373d60a7c489f2eb2a92fd0f38d7e1d6078442032e4d32"
+    },
+    {
+      "path": "scenarios/01-new-startup/transcript.jsonl",
+      "sha256": "461d244bcf7bda351c1c1be4e7cf1cfa791435dcc54ed13d93d8fac4e94e9ace"
+    },
+    {
+      "path": "scenarios/01-new-startup/worktree-path.txt",
+      "sha256": "7eef3aca238e83a84a08e1ac6d5de6e80781d401460b9dd95c58ff7fd9f7b146"
+    },
+    {
+      "path": "scenarios/01-new-startup/worktree-status.txt",
+      "sha256": "34bdf3f98d7855c53b97ec669622624daf89e58243db3d279e7c0bb5f7e6ac15"
+    },
+    {
+      "path": "scenarios/02-existing-brief/carebook-brief.md",
+      "sha256": "be241b66512ece285766ed21a922256e118522d02631d9d2027819d1ed1e00e7"
+    },
+    {
+      "path": "scenarios/02-existing-brief/diff.patch",
+      "sha256": "fc8c5d90a9360920038d45abe38976a74b35f621688deff232b9066c03f551c6"
+    },
+    {
+      "path": "scenarios/02-existing-brief/stakeholder.md",
+      "sha256": "db00de5e80a6b6234a5e694f12e912063a9e8a2b514cc2b82184e17fd6e6ee9e"
+    },
+    {
+      "path": "scenarios/02-existing-brief/worktree-path.txt",
+      "sha256": "ad71fd474d32fd71014356b1308b73941fc018e3a210b262dc143e5146aed719"
+    },
+    {
+      "path": "scenarios/02-existing-brief/worktree-status.txt",
+      "sha256": "14e18d810e72e59397fbe796cc1d5345634e82f8d95f71f4d60de74fc66605cf"
+    },
+    {
+      "path": "scenarios/03-small-bug/diff.patch",
+      "sha256": "5f1a3f88ed172b9d5611664624019a6c29ba9f4540bcd69bdccea352334ad1eb"
+    },
+    {
+      "path": "scenarios/03-small-bug/stakeholder.md",
+      "sha256": "6131f65e5a7b3213334429cba25d0506edd499aa4f6ef8bf4df8a0d4910495b8"
+    },
+    {
+      "path": "scenarios/03-small-bug/worktree-path.txt",
+      "sha256": "1298e0af9bd21a5f42a8fea1e2bbce14e9708aa7791aafe7405ec70b48dc447a"
+    },
+    {
+      "path": "scenarios/03-small-bug/worktree-status.txt",
+      "sha256": "96157152904a609a030797c150a755cd3645f15b56d437dbc7b610e5c1d4055b"
+    },
+    {
+      "path": "scenarios/04-complex-feature/diff.patch",
+      "sha256": "af1fc6fed326ff4dd7312519ae53258a98c30cc79c33b2b57fed346c0756ed4a"
+    },
+    {
+      "path": "scenarios/04-complex-feature/stakeholder.md",
+      "sha256": "a5af2eeb7e898200ca3e1614bbf284faaa2facab6c644815888b5969583a5cbb"
+    },
+    {
+      "path": "scenarios/04-complex-feature/worktree-path.txt",
+      "sha256": "c23666343e1985d08d8fcb8bf65a4020353fc0a2242e3ec91e46183f9cc12602"
+    },
+    {
+      "path": "scenarios/04-complex-feature/worktree-status.txt",
+      "sha256": "19abddc9e4e259b4059c9ff9ebab9366b918f11c6fa4cd2a0ff1628e51042906"
+    },
+    {
+      "path": "scenarios/05-decision-change/diff.patch",
+      "sha256": "451fe63f4e1b74fef25baca3da1cbecc04c294c317fa0ea05b69e392f516d91f"
+    },
+    {
+      "path": "scenarios/05-decision-change/score.json",
+      "sha256": "6139db33de6393b2df86697073d769e6ea0ddcffd17ec740472e9167c98f92c9"
+    },
+    {
+      "path": "scenarios/05-decision-change/stakeholder.md",
+      "sha256": "6140d99912f5c33fd2bbafd6a1e98c054a4191efbf0c85951c5bf1b058414da3"
+    },
+    {
+      "path": "scenarios/05-decision-change/worktree-path.txt",
+      "sha256": "4b758fb07fe0d15480172e02b7e640e26e17d4ed161ed4dd2d4b69aee9488d11"
+    },
+    {
+      "path": "scenarios/05-decision-change/worktree-status.txt",
+      "sha256": "f5f5763dece509b42df9f9abff069c4cfc96784965c42714139e3451fb151d70"
+    },
+    {
+      "path": "scenarios/06-adversarial/diff.patch",
+      "sha256": "cded9fce0c87b8c6161203bc0237c61d00f664cd7dd4fe5614f7b39bfc292c83"
+    },
+    {
+      "path": "scenarios/06-adversarial/score.json",
+      "sha256": "5648b53bd29b09bc6692817c131fc791f8dcac3543e9c915490b29a4a0e15d45"
+    },
+    {
+      "path": "scenarios/06-adversarial/stakeholder.md",
+      "sha256": "0845cbb995e74a997fc92198541be5360a2e8156d4c3a541a16db4b547d109e5"
+    },
+    {
+      "path": "scenarios/06-adversarial/worktree-path.txt",
+      "sha256": "c45fba372a6999c13509314f2429e9ef7618c0e60670e372aa4d1b422d0d9b85"
+    },
+    {
+      "path": "scenarios/06-adversarial/worktree-status.txt",
+      "sha256": "099a6d608e3822386d16bfc287e63c9120a2994c8850ee58a1c2b2b995e47829"
+    },
+    {
+      "path": "scores.json",
+      "sha256": "15e98b8070ef2ef1b322021ad89b5a6efd98956f5caf3eeecc4206758e7893e0"
+    },
+    {
+      "path": "skills-lock.snapshot.json",
+      "sha256": "d7e349a11bbfed9ee5ef0dab87e7461baac80897276197b3a6aae756b0729a32"
+    },
+    {
+      "path": "summary.md",
+      "sha256": "69a0c128ee4eeb90fc0f48de041c64c9e145b5bd6b489aae9bed8be2c1604db6"
+    }
+  ]
+}

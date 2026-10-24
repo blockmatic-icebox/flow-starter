@@ -1,0 +1,13 @@
+{
+  "id": "S13",
+  "title": "Tiny bug fix",
+  "historicalId": "03-small-bug",
+  "openingPrompt": "The listings sort on the web app is wrong — low-to-high shows expensive items first. Please fix it.",
+  "turnCap": 4,
+  "requiresBuildAuth": false,
+  "allowProductCode": true,
+  "allowStandalonePlan": false,
+  "relevantStages": ["Build", "Review"],
+  "codeExecution": true,
+  "browserVerification": false
+}

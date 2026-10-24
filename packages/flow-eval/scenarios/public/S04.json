@@ -1,0 +1,12 @@
+{
+  "id": "S04",
+  "title": "Stakeholder who changes requirements",
+  "openingPrompt": "Continue CareBook — we already approved 24-hour cancellation in the initiative.",
+  "turnCap": 6,
+  "requiresBuildAuth": true,
+  "allowProductCode": false,
+  "allowStandalonePlan": false,
+  "relevantStages": ["Specify", "Plan"],
+  "codeExecution": false,
+  "browserVerification": false
+}

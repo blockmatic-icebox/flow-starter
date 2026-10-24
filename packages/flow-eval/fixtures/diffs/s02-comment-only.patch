@@ -1,0 +1,7 @@
+diff --git a/packages/genui/src/eval/grade-query-matrix.ts b/packages/genui/src/eval/grade-query-matrix.ts
+index 1111111..2222222 100644
+--- a/packages/genui/src/eval/grade-query-matrix.ts
++++ b/packages/genui/src/eval/grade-query-matrix.ts
+@@ -1,4 +1,5 @@
++// Cases live in query-matrix.ts
+ export function gradeQueryMatrixCase() {

@@ -47,6 +47,18 @@ export default defineConfig({
       },
     },
     {
+      files: ["packages/flow-eval/**/*.ts"],
+      rules: {
+        "eslint/no-nested-ternary": "off",
+        "eslint/prefer-destructuring": "off",
+        "eslint/sort-keys": "off",
+        "typescript/consistent-type-definitions": "off",
+        "unicorn/no-lonely-if": "off",
+        "unicorn/no-useless-undefined": "off",
+        "unicorn/text-encoding-identifier-case": "off",
+      },
+    },
+    {
       files: ["scripts/**/*.mjs"],
       rules: {
         "eslint/no-await-in-loop": "off",

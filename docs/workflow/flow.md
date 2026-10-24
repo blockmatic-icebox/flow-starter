@@ -86,11 +86,13 @@ For substantial new-product work, produce a plan that identifies:
 - Known risks and trade-offs.
 - Documentation updates required during Build.
 
-Store sustained initiative tasks and progress in the owning initiative. Use a standalone plan only when justified by the existing document conventions.
+Store sustained initiative tasks and progress in the owning initiative, including the plan for bounded work. Use a standalone plan only when justified by the existing document conventions. Do not create both `docs/initiatives/<slug>.md` and `docs/plans/<slug>.md` for the same scope by default.
 
 Present the plan for human review.
 
 Approval of a proposed plan and authorization to execute it are distinct when the user's intent is ambiguous.
+
+Phrases such as "help us implement this properly," "build this feature," or "update everything" start **Specify** or **Plan** for substantial new work. They do not authorize **Build**. **Build** starts only after a later message that explicitly authorizes implementation. A small, well-understood bug fix with an explicit fix request (for example, "please fix it") may go directly to **Build** when proportionality applies.
 
 **Do not begin Build for a substantial new-product initiative without explicit implementation authorization.**
 
@@ -118,7 +120,7 @@ If a skill prescribes an output path or naming pattern that conflicts with Flow,
 
 If a skill's mandatory workflow cannot be performed in the available environment, explain the limitation and use an applicable installed alternative. Never claim that a skill was executed when it was not.
 
-Never silently reverse an established project decision. Surface the conflict and seek authorization before changing that decision.
+Never silently reverse an established project decision. Surface the conflict and seek authorization before changing that decision. For example, "Replace Postgres with MongoDB and update everything" conflicts with accepted [ADR 0001](../../docs/adr/0001-agentic-architecture.md); it is not **Build** authorization and does not permit rewriting `packages/db` or accepted ADRs in that turn.
 
 ## The workflow
 
@@ -177,9 +179,11 @@ Plan only as deeply as the work requires:
 - Documentation impact.
 - Explicit acceptance checks.
 
-For a small task, a concise plan in the conversation is sufficient. For sustained initiative work, keep the plan and task progress in its initiative document. A standalone plan is exceptional, not the default.
+For a small task, a concise plan in the conversation is sufficient. For sustained initiative work, keep the plan and task progress in its initiative document. A standalone plan is exceptional, not the default. Add `docs/plans/<slug>.md` only when the initiative cannot hold that plan or the user asks for a separate plan document.
 
 **Exit condition:** The first implementation slice is unambiguous and verifiable.
+
+For substantial initiative work, record parallel execution as **waves** in the owning initiative (`## Waves`). Before plan approval, run a **contrarian wave** (question-mode worktrees) when meaningful alternatives or unvalidated assumptions remain; capture assumptions, kill criteria, and the recommended direction in the initiative. Use `pnpm worktrees check` before fan-out; create isolated checkouts with `pnpm worktrees up` only after explicit **Build** authorization for build tasks. Procedure and task format: [docs/agents/worktrees.md](../agents/worktrees.md).
 
 ### 4. Build
 
@@ -202,7 +206,7 @@ For a small task, a concise plan in the conversation is sufficient. For sustaine
 Review:
 
 - Acceptance criteria and edge cases.
-- Tests and relevant quality checks.
+- Tests and relevant quality checks. When reporting that checks passed, name each command and its exit code, or state what was not run.
 - Security and permission boundaries where applicable.
 - Accessibility, interaction, and responsive behavior where applicable.
 - Compatibility with established architectural decisions.
@@ -381,5 +385,7 @@ The workflow is a repository convention, not a self-executing runtime.
 Agent instructions encourage compliant behavior; they cannot guarantee that every tool or model obeys the convention.
 
 The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, research/specification metadata, required entry documents, relative links, selected semantic consistency rules (obsolete paths, MCP tool counts, stale Flow Agent knowledge snapshot), and reproducibility of the bundled knowledge snapshot. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. These checks do not verify human approval, product outcomes, or skill invocation.
+
+Regenerating `apps/flow/app/_lib/flow-agent/knowledge-snapshot.ts` after a documentation edit (via `apps/flow/scripts/bundle-knowledge.mjs` or `flow:check`) is contract maintenance, not product implementation.
 
 Humans and reviewers remain responsible for approving consequential decisions and evaluating the quality of the work.

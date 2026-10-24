@@ -1,0 +1,13 @@
+{
+  "id": "S03",
+  "title": "Founder with a complete product brief",
+  "historicalId": "02-existing-brief",
+  "openingPrompt": "See the CareBook brief in the first message of the stakeholder script (pasted by orchestrator).",
+  "turnCap": 6,
+  "requiresBuildAuth": true,
+  "allowProductCode": false,
+  "allowStandalonePlan": false,
+  "relevantStages": ["Explore", "Specify", "Plan"],
+  "codeExecution": false,
+  "browserVerification": false
+}

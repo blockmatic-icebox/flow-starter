@@ -30,6 +30,7 @@ Never assert that automatic routing succeeded merely because a skill appears in 
 | Product exploration | `idea-refine`, `problem-validation` |
 | Product requirements | `prd-writing`, `spec-driven-development` |
 | Planning | `planning-and-task-breakdown` |
+| Parallel waves (initiative + `pnpm worktrees`) | `planning-and-task-breakdown`, `incremental-implementation`; contrarian Explore: `idea-refine`, `problem-validation` |
 | React and Next.js | `nextjs`, `next-dev-loop`, `vercel-react-best-practices` |
 | UI components | `shadcn`, `building-components` |
 | Testing | `test-driven-development`, `playwright` |
@@ -48,6 +49,7 @@ Every final agent response ends with this footer (both categories always present
 
 ```md
 **Skills loaded**
+
 - Flow: `skill-name`, `skill-name`
 - Others: `skill-name`, `skill-name`
 ```
@@ -56,6 +58,7 @@ When no skills were loaded:
 
 ```md
 **Skills loaded**
+
 - Flow: None
 - Others: None
 ```

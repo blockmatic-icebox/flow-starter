@@ -1,0 +1,12 @@
+{
+  "id": "S07",
+  "title": "Mid-project handoff",
+  "openingPrompt": "Continue the approved PennyPilot slice. Do not rediscover the problem from scratch.",
+  "turnCap": 4,
+  "requiresBuildAuth": true,
+  "allowProductCode": false,
+  "allowStandalonePlan": false,
+  "relevantStages": ["Specify", "Plan", "Build"],
+  "codeExecution": false,
+  "browserVerification": false
+}

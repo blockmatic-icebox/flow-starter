@@ -1,0 +1,13 @@
+{
+  "id": "S01",
+  "title": "Vague founder with a product idea",
+  "historicalId": "01-new-startup",
+  "openingPrompt": "I want to build an app that helps people manage money using AI. I have a rough idea but don't know exactly what features we need. Can you help me get started?",
+  "turnCap": 6,
+  "requiresBuildAuth": true,
+  "allowProductCode": false,
+  "allowStandalonePlan": false,
+  "relevantStages": ["Explore", "Specify", "Plan"],
+  "codeExecution": false,
+  "browserVerification": false
+}

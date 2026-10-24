@@ -115,6 +115,8 @@ You do not need every skill on every task.
 
 Choice depends on intent and the concrete needs of the work.
 
+Substantial initiatives may fan out to git worktrees after planning; see [agents/worktrees.md](../agents/worktrees.md).
+
 ## Flow and Flow Starter
 
 Flow is the working methodology.
