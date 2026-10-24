@@ -96,22 +96,74 @@ Tier 1–2 paths are fully testable without network access. Tier 3 is optional (
 
 The registry is not a completed approval workflow or cross-channel authorization system. The adopting product still implements identity, resource ownership, and privileged execution. See [ADR 0011](docs/adr/0011-api-and-agent-security-boundaries.md) and [docs/security/security-model.md](docs/security/security-model.md).
 
-## 6. API surface (implemented)
+## 6. Implemented Flow application surfaces
 
-| Endpoint | Method | Role |
+The current demo APIs belong to `apps/flow`, not `apps/web`.
+
+The product-neutral `apps/web` application does not ship the Flow Agent, GenUI demo routes, or MCP endpoint.
+
+| Surface | Method | Responsibility |
 | --- | --- | --- |
-| `/api/genui/compose` | POST | Body: `{ query, clientRequestId?, version? }`. Returns `application/x-ndjson` stream. |
-| `/api/chat` | POST | Site consultant: AI SDK UI message stream; optional AI Gateway; deterministic fallback without credentials. |
-| `/api/mcp` | GET, POST, DELETE | Read-only MCP (Streamable HTTP) for external agents; same consultant tools as chat. |
-| `/genui-demo` | GET | Client demo calling the compose API |
+| `/` | GET | Flow GenUI experience and Flow Agent shell |
+| `/api/genui/compose` | POST | Validated GenUI composition over NDJSON streaming |
+| `/api/chat` | POST | Flow Agent conversation using AI SDK UI streams |
+| `/api/mcp` | GET, POST, DELETE, OPTIONS | Read-only Flow Agent MCP endpoint with access controls |
+| `/genui-lab/fixtures/[fixtureId]` | GET | GenUI fixture inspection and browser regression coverage |
 
-Public JSON routes read a bounded body (`apps/web/lib/security/read-json-request.ts`) and validate it before work: compose is limited to 16 KiB and chat to 128 KiB. Compose accepts `{ query, clientRequestId?, version? }` and rejects extra fields. Chat accepts the AI SDK UI message envelope, rejects client system instructions, and does not forward raw model reasoning (`sendReasoning: false`). Consultant responses use `stepCountIs(5)` and an 800-token output bound. Without `AI_GATEWAY_API_KEY`, chat stays on the deterministic fallback.
+These paths are relative to the `apps/flow` application's origin.
 
-Rate limits are 60 compose requests and 120 consultant requests per UTC day per trusted subject (`admitCompose`, `admitChat`). Enforcement follows server configuration, not the request hostname. Production requires Upstash Redis (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`) and returns 503 when that configuration or the store is unavailable. Development uses a process-local memory counter. A forwarded IP is a quota subject only when `RATE_LIMIT_TRUSTED_IP_HEADER` names a header the ingress overwrites. Otherwise callers share one bucket. IP addresses are not authentication.
+The principal implementations are:
 
-`/api/mcp` allows unauthenticated local access only when `NODE_ENV=development`, and only for loopback and `flow.localhost`. Production requires `APP_ORIGIN` plus either `CONSULTANT_MCP_BEARER` or `CONSULTANT_MCP_PUBLIC_READ_ONLY=1`. A present `Origin` must match the application origin or `CONSULTANT_MCP_ALLOWED_ORIGINS`. A matching origin is not authentication. The public mode exposes the same three read-only consultant tools. In-app chat may still invoke `open_genui_demo` and `toggle_theme`. See [ADR 0006](docs/adr/0006-external-invocation-is-read-only.md) and [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md).
+- `apps/flow/app/page.tsx`
+- `apps/flow/app/api/genui/compose/route.ts`
+- `apps/flow/app/api/chat/route.ts`
+- `apps/flow/app/api/mcp/route.ts`
+- `apps/flow/app/_lib/flow-agent/`
+- `apps/flow/app/_lib/genui/`
+- `apps/flow/app/_lib/security/`
 
-Database clients validate TLS certificates. `DATABASE_TLS_INSECURE_LOCAL=1` applies only outside production and only for an explicit loopback proxy. Production never disables certificate verification because a URL contains `localhost`.
+The GenUI experience is served at the Flow application's root path. There is no current `/genui-demo` route.
+
+The chat implementation uses approved Flow knowledge tools and can call an AI Gateway-backed model when configured. A deterministic fallback is available without model credentials.
+
+MCP uses the official MCP SDK and exposes four approved read-only tools:
+
+- `describe_architecture`
+- `describe_technologies`
+- `describe_capabilities`
+- `describe_workflow`
+
+The chat tool registry additionally supports bounded knowledge access and host-controlled interface actions. These additional chat capabilities must not be confused with the externally exposed MCP tool list.
+
+The Flow Agent knowledge snapshot is generated from approved repository documentation by `apps/flow/scripts/bundle-knowledge.mjs`. The generated file is `apps/flow/app/_lib/flow-agent/knowledge-snapshot.ts`.
+
+### Input and execution boundaries
+
+Public JSON routes use the bounded reader in `apps/flow/app/_lib/security/read-json-request.ts`.
+
+Compose accepts a bounded `{ query, clientRequestId?, version? }` request and streams validated composition events.
+
+The chat route validates the AI SDK message envelope, limits execution, and does not expose raw model reasoning.
+
+GenUI output is compiled and validated before reaching the React rendering layer. Model output cannot register privileged actions or bypass host-owned authorization policies.
+
+Rate-limit admission is implemented for chat and composition. Production requires the configured persistent rate-limit store and fails closed when the required store is unavailable.
+
+MCP production access requires the configured application origin and approved bearer-token or explicitly enabled public read-only mode. Origin checking is not authentication.
+
+The database layer preserves TLS verification and applies the documented local-development restrictions.
+
+For authoritative security requirements and detailed implementation limits, use [the security model](docs/security/security-model.md) and [ADR 0011](docs/adr/0011-api-and-agent-security-boundaries.md).
+
+### Important limitations
+
+The implemented Flow Agent is not the planned full Eve-based product agent runtime.
+
+The read-only MCP server is not a complete authenticated business-action layer.
+
+The product app has no inherited requirement to render a chat sidebar.
+
+A production product must establish its own domain capabilities, persistence, authentication, authorization, and agent actions according to its actual requirements.
 
 ## 7. Planned platform integrations
 
@@ -126,7 +178,7 @@ These are specified for adopters building a full workspace; they are **not requi
 | Docs / retrieval | Fumadocs, bounded repo reads, revision-aware citations |
 | External clients | Read-only invocation boundary (ADR 006) |
 
-Site consultant chat and read-only MCP are implemented per [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md). Eve workspace voice (ADR 004) and `/dev` placement (ADR 005) apply when those features are implemented.
+Flow Agent chat and read-only MCP are implemented in `apps/flow`, following the historical integration decision in [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md) and the current application split in [ADR 0012](docs/adr/0012-flow-and-web-applications.md). Eve workspace voice (ADR 004) and `/dev` placement (ADR 005) apply only when those features are implemented.
 
 ## 8. Quality and CI
 
@@ -139,7 +191,7 @@ Local gates:
 
 GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and [`.github/workflows/security.yml`](.github/workflows/security.yml) run on pull requests and pushes to `main`. Pull request builds use `pull_request` and do not receive deployment or model secrets. [`.github/workflows/pr-title.yml`](.github/workflows/pr-title.yml) enforces Conventional Commits on PR titles. DeepSec stays manual in [`.github/workflows/deepsec.yml`](.github/workflows/deepsec.yml).
 
-GenUI unit tests and graded prompt matrix: `pnpm --filter @repo/genui test` (`packages/genui/src/eval/query-matrix.ts`, offline: `pnpm eval:genui:offline`). Consultant MCP protocol tests: `pnpm --filter web test`. Browser fixture lab and shell smokes: `pnpm test:browser` (see [docs/specs/genui/readme.md](docs/specs/genui/readme.md#tests)).
+GenUI unit tests and graded prompt matrix: `pnpm --filter @repo/genui test` (`packages/genui/src/eval/query-matrix.ts`, offline: `pnpm eval:genui:offline`). Flow Agent MCP protocol tests: `pnpm --filter flow-app test`. Browser fixture lab and shell smokes: `pnpm test:browser` (see [docs/specs/genui/readme.md](docs/specs/genui/readme.md#tests)).
 
 ### Local Neon database
 

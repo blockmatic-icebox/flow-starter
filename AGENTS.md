@@ -6,6 +6,31 @@ The checkout is a starter baseline. Root contracts describe intended direction. 
 
 [docs/workflow/flow.md](docs/workflow/flow.md) defines the agent-agnostic workflow, skill-selection rules, and documentation conventions. Load the relevant sections when planning substantial work, using specialized skills, or changing documentation. Skills provide methods; Flow owns document locations, naming, and lifecycle. Use progressive disclosure: do not read every linked document by default.
 
+## New-product initiation
+
+When a user provides a new, substantial product problem or business brief, begin with Explore unless the user has explicitly established a different authorized stage.
+
+Treat supplied requirements as evidence and context, not as proof that all product decisions are resolved.
+
+For new-product work:
+
+1. Read the supplied problem and only the relevant existing project documents.
+2. Separate explicit requirements, accepted decisions, assumptions, and open questions.
+3. Choose the smallest applicable installed skill set using the user's intent and the current Flow phase.
+4. Ask focused, consequential discovery questions before fixing ambiguous product decisions.
+5. Summarize proposed decisions and request approval before treating them as accepted.
+6. Update canonical documents during Specify, not speculatively during Explore.
+7. Prepare a verifiable implementation plan after the necessary requirements have been accepted.
+8. Stop before Build until implementation is explicitly authorized.
+
+Natural-language requests activate the same workflow as explicit skill invocations. Slash commands are not required.
+
+A standalone setup instruction is not automatically a product-discovery request. Perform explicitly requested repository setup without starting an unrelated discovery interview.
+
+Small, well-understood changes may still follow the proportional workflow in docs/workflow/flow.md.
+
+Do not present documented or planned capabilities as implemented. Do not claim a skill was executed without loading and applying its actual instructions.
+
 ## Decisions
 
 If a proposed change conflicts with or modifies an established documented decision, request approval before implementing it. Otherwise, proceed autonomously.

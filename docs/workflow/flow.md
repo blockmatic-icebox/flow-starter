@@ -18,6 +18,94 @@ Use the least process necessary to learn or deliver something valuable.
 
 A small, well-understood bug fix may go directly to Build → Review → Ship. A new product direction may require exploration and several rounds of specification before implementation.
 
+## Natural-language initiation and human approval
+
+Flow stages are selected by intent, existing context, uncertainty, and explicit authorization. They are not selected exclusively by keywords or slash commands.
+
+A new substantial product problem normally begins in Explore, even when the user supplies an existing assessment, request for proposal, or extensive business brief.
+
+A standalone repository setup instruction is handled as setup. It does not automatically trigger product discovery.
+
+### Starting from an existing brief
+
+1. Read the supplied source material before interviewing the user.
+2. Extract explicit requirements without silently expanding or rewriting them.
+3. Identify already accepted decisions and preserve them.
+4. Distinguish missing information from implementation details that can safely remain undecided.
+5. Identify consequential uncertainty about users, jobs to be done, permissions, workflows, success criteria, constraints, and risks.
+6. Ask a small group of prioritized questions that materially affect product decisions.
+7. Avoid questions already answered by the brief or repository.
+8. Use research when it can resolve consequential uncertainty; record source-backed findings when they are worth preserving.
+
+Do not automatically convert every open question into a blocking question. Make reasonable technical recommendations when appropriate, label assumptions, and request decisions only when they matter.
+
+### Explore approval checkpoint
+
+Before advancing a substantial new-product initiative to Specify, present a concise decision summary containing:
+
+- The problem and intended outcome.
+- Known users and their primary jobs.
+- Explicit requirements.
+- Proposed scope and non-goals.
+- Proposed decisions requiring human approval.
+- Unresolved assumptions or risks.
+- The recommended next stage.
+
+A proposal is not an accepted decision merely because an agent wrote it.
+
+Request explicit approval when the proposed decision is consequential or changes accepted direction.
+
+If the user has already approved particular decisions, preserve them without asking again.
+
+Explore may iterate until enough information is available. It does not require documentation generation by default.
+
+### Specify approval checkpoint
+
+After the relevant decisions are approved:
+
+1. Update the owning canonical documents.
+2. Record bounded initiative requirements in the initiative document when justified.
+3. Create a separate specification only when its detail cannot be represented clearly in the owning document.
+4. Define functional and nonfunctional requirements, meaningful edge cases, and observable acceptance criteria.
+5. Identify outstanding decisions that prevent implementation.
+6. Request approval of the proposed scope and requirements before planning substantial implementation work.
+
+Do not create multiple PRDs, specifications, or decisions that describe the same facts.
+
+### Plan approval checkpoint
+
+For substantial new-product work, produce a plan that identifies:
+
+- The smallest useful vertical slice.
+- Implementation boundaries and likely files.
+- Dependencies and execution order.
+- Data, identity, authorization, and integration considerations.
+- Applicable agent and API capabilities.
+- Automated tests and human verification.
+- Measurable acceptance criteria.
+- Known risks and trade-offs.
+- Documentation updates required during Build.
+
+Store sustained initiative tasks and progress in the owning initiative. Use a standalone plan only when justified by the existing document conventions.
+
+Present the plan for human review.
+
+Approval of a proposed plan and authorization to execute it are distinct when the user's intent is ambiguous.
+
+**Do not begin Build for a substantial new-product initiative without explicit implementation authorization.**
+
+If the user requests modifications to the plan, remain in Plan.
+
+### Proportionality and continuation
+
+These checkpoints apply to substantial new-product work and consequential changes. They do not require a discovery interview, initiative file, or approval ceremony for every small bug fix.
+
+At the end of a discovery, specification, or planning response, make the current stage, accepted decisions, unresolved questions, and next approval or action clear.
+
+If new evidence invalidates an accepted decision, return to the relevant earlier stage and request authorization to revise it.
+
+Do not manufacture certainty or claim that repository instructions can technically force a model to obey these rules. Verify actual agent behavior separately.
+
 ## Authority and responsibilities
 
 - **Human intent:** Explicit requests, approvals, and accepted project decisions determine what work is authorized.

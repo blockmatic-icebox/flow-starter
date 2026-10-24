@@ -74,6 +74,6 @@ export const describeWorkflow = () =>
     flowStarterFacts.workflow,
     "",
     "Authority: human intent, PRODUCT.md / DESIGN.md / ARCHITECTURE.md, this workflow (docs/workflow/flow.md), installed skills, then code and tests.",
-    "Stages are activities — use the least process needed. Small fixes may go Build → Review → Ship; new capabilities may need Explore and Specify first.",
+    "Stages are activities — use the least process needed. Small fixes may go Build → Review → Ship. A substantial new product begins with discovery of unresolved decisions, progresses through approved requirements and a verifiable plan, and must not enter Build without explicit implementation authorization.",
     "Use docs/workflow/flow.md for stage inputs, outputs, and documentation expectations.",
   ].join("\n");

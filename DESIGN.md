@@ -1,56 +1,84 @@
 # Design template
 
-> Replace this file with your visual and interaction contract. Functional scope lives in [PRODUCT.md](PRODUCT.md).
+> Replace this file with the product's approved visual and interaction contract. Functional requirements belong in [PRODUCT.md](PRODUCT.md). Technical architecture belongs in [ARCHITECTURE.md](ARCHITECTURE.md). Follow the [Flow workflow](docs/workflow/flow.md).
+
+## Experience vision
+
+_Describe how the product should feel to its users and what makes the experience useful, clear, and distinctive._
+
+## Experience principles
+
+_Define a small set of decisions that should guide interaction, layout, information hierarchy, and accessibility._
+
+## Users and contexts
+
+_Identify the primary user contexts, devices, accessibility needs, and relevant constraints._
+
+## Information architecture
+
+_Describe the main destinations, navigation model, content hierarchy, and primary user journeys._
+
+_Do not invent routes before the product's navigation requirements are established._
+
+## Core experiences
+
+| Experience | User goal | Expected interaction | Important states |
+| --- | --- | --- | --- |
+| _To be defined_ | _User outcome_ | _Primary interaction_ | _Loading, empty, error, success_ |
 
 ## Visual direction
 
-Neutral ChatGPT-like surfaces until adopters define brand tokens. The site shell pairs primary content with a consultant chat on the right.
+_Describe the visual language, design references, brand personality, and hierarchy._
 
-## Brand and color
+Use the inherited `@repo/ui` design system as the baseline. Extend it deliberately rather than introducing competing component conventions.
 
-| Token              | Light   | Dark    | Use             |
-| ------------------ | ------- | ------- | --------------- |
-| `background`       | _value_ | _value_ | Page background |
-| `foreground`       | _value_ | _value_ | Primary text    |
-| `primary`          | _value_ | _value_ | Primary actions |
-| `muted-foreground` | _value_ | _value_ | Secondary text  |
-| `border`           | _value_ | _value_ | Dividers        |
+## Brand and design tokens
 
-_Map tokens to CSS variables in `packages/ui` (shadcn + Tailwind). Avoid scattering raw hex in components._
+_Document approved typography, color, spacing, radius, and component treatments._
 
-## Typography
+Map visual decisions to the established shared design tokens and Tailwind conventions.
 
-- Sans family for UI and reading (Geist in the default app).
-- Monospace for code and tabular data.
-- Body and UI at `text-sm`; metadata at `text-xs`.
+Do not introduce arbitrary hardcoded values across application components.
 
-## Layout
+## Layout and responsiveness
 
-- **Site shell:** main content flex-grows; consultant chat in a fixed-width right panel on `md+`.
-- **Narrow viewports:** chat opens in a sheet; a floating control toggles it.
-- Spacing follows Tailwind scale; radius from shadcn defaults.
+_Describe desktop, mobile, and intermediate viewport behavior for the approved product experiences._
 
-## Core surfaces
+Prefer responsive layouts that preserve hierarchy and functionality.
 
-| Surface | Behavior |
-| --- | --- |
-| Consultant sidebar | `useChat` stream; reasoning and tool parts visible while the agent runs. |
-| Composer | Textarea, submit, optional speech input (Web Speech API). |
-| GenUI demo | Existing `/genui-demo` route inside the main column. |
-| Settings / auth | Not shipped in this slice. |
+## Interaction and state
 
-## Motion and accessibility
+_Define meaningful interaction patterns, feedback, navigation state, forms, keyboard behavior, and error handling._
 
-- Respect `prefers-reduced-motion`; avoid decorative motion in the consultant panel.
-- Consultant status uses a restrained `aria-live="polite"` region for errors and completion.
-- Focus, contrast, and keyboard targets (target WCAG 2.2 AA).
-- Speech input requires microphone permission; text input remains available.
+Use the established React and Next.js architecture. Use URL-addressable state when sharing and navigation benefit from it.
 
-## Content and generative UI
+## Agentic and generative experiences
 
-- Consultant answers cite curated starter facts only; GenUI compose rules unchanged in `@repo/genui`.
-- Client actions are allowlisted (`open-genui-demo`, `toggle-theme`); the model cannot register new actions.
+_Complete this section only if the product actually requires conversational agents, agent actions, or generative interfaces._
 
-## Verification checklist
+When applicable, define:
 
-- Light/dark, mobile sheet + desktop sidebar, keyboard submit, long transcripts, tool error states, denied microphone.
+- Human and agent entry points.
+- What the user can inspect, request, and approve.
+- The relationship between deterministic UI and generative presentation.
+- Authorized actions and confirmation boundaries.
+- Empty, loading, streaming, failure, and recovery states.
+- How results remain understandable and trustworthy.
+
+Do not assume every adopted product requires a chat sidebar or GenUI interface.
+
+## Accessibility
+
+Target WCAG 2.2 AA where applicable.
+
+Define keyboard interaction, focus treatment, contrast, reduced motion, announcements, and other product-specific accessibility requirements.
+
+## Verification
+
+_Describe the important visual and interaction acceptance checks._
+
+Verify relevant changes in a real browser using the repository's established tooling.
+
+## Open design decisions
+
+_List only unresolved choices that materially affect the experience._
