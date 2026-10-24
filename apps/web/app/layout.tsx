@@ -8,8 +8,8 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export const metadata: Metadata = {
   description:
-    "Product starter — replace PRODUCT.md and DESIGN.md with your product.",
-  title: "Product",
+    "Feature Intelligence — requests, support, and AI-assisted triage.",
+  title: "Feature Intelligence",
 };
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });

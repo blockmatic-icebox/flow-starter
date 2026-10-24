@@ -1,0 +1,79 @@
+import { generateObject } from "ai";
+import { z } from "zod";
+
+import { getRequest, listRequests } from "@/app/_lib/features/repository";
+import { fixtureTriage } from "@/app/_lib/features/triage";
+
+export const runtime = "nodejs";
+export const maxDuration = 30;
+
+const triageSchema = z.object({
+  priority: z.enum(["low", "medium", "high"]),
+  rationale: z.string().min(20).max(1200),
+  relatedIds: z.array(z.string()).max(5),
+  suggestedTheme: z.string().min(2).max(80),
+});
+
+const publicFailure = "Triage could not be completed.";
+
+export const POST = async (request: Request) => {
+  let body: { id?: string };
+  try {
+    body = (await request.json()) as { id?: string };
+  } catch {
+    return Response.json({ message: "Invalid JSON body." }, { status: 400 });
+  }
+
+  const id = body.id?.trim();
+  if (!id)
+    return Response.json({ message: "Missing request id." }, { status: 400 });
+
+  const feature = await getRequest({ id });
+  if (!feature)
+    return Response.json({ message: "Request not found." }, { status: 404 });
+
+  const catalog = await listRequests();
+  const apiKey = process.env.AI_GATEWAY_API_KEY?.trim();
+
+  if (!apiKey) {
+    const suggestion = fixtureTriage({ request: feature, requests: catalog });
+    return Response.json({ ok: true, triage: suggestion });
+  }
+
+  const model =
+    process.env.FEATURE_TRIAGE_MODEL?.trim() ||
+    process.env.GENUI_MODEL?.trim() ||
+    "anthropic/claude-sonnet-4";
+
+  const catalogSummary = catalog
+    .filter((item) => item.id !== id)
+    .map(
+      (item) =>
+        `- ${item.id}: ${item.title} (theme=${item.theme}, support=${item.supportCount})`
+    )
+    .join("\n");
+
+  try {
+    const result = await generateObject({
+      model,
+      prompt: `You triage product feature requests for prioritization.
+Request:
+Title: ${feature.title}
+Description: ${feature.description}
+Support count: ${feature.supportCount}
+
+Existing catalog (id, title, theme, support):
+${catalogSummary || "(empty)"}
+
+Return JSON with suggestedTheme (short slug), priority, relatedIds from the catalog (may be empty), and a concise rationale for a human reviewer.`,
+      schema: triageSchema,
+    });
+
+    return Response.json({
+      ok: true,
+      triage: { ...result.object, mode: "ai" as const },
+    });
+  } catch {
+    return Response.json({ message: publicFailure }, { status: 500 });
+  }
+};
