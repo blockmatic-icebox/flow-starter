@@ -27,8 +27,10 @@ apps/web/
   app/genui-demo/           # integration example
 packages/
   genui/                    # @repo/genui — compiler, orchestration, React adapter
+  db/                       # @repo/db — Drizzle schema, client, migrations
   ui/                       # design system (shadcn + Base UI)
   ts/                       # shared TypeScript config
+docker-compose.yml          # Neon Local proxy (optional local Postgres endpoint)
 docs/
   adr/                      # architecture decision records
   pdr/                      # product decision records
@@ -115,7 +117,8 @@ These are specified for adopters building a full workspace; they are **not requi
 | --- | --- |
 | Agent runtime | **eve** — single agent, `defineTool` adapters to shared actions |
 | Identity | **Better Auth** with GitHub OAuth |
-| Persistence | **Neon** + **Drizzle** via Vercel integration |
+| Persistence (product) | Application tables, auth data, and preview **branch-per-PR** automation (planned) |
+| Persistence (baseline) | **@repo/db** — Drizzle + `postgres.js`, committed migrations, **Neon Local** via `pnpm db:start`; previews use `DATABASE_URL` from Neon or Vercel |
 | Docs / retrieval | Fumadocs, bounded repo reads, revision-aware citations |
 | External clients | Read-only invocation boundary (ADR 006) |
 
@@ -123,18 +126,27 @@ Site consultant chat and read-only MCP are implemented per [ADR 0010](docs/adr/0
 
 ## 8. Quality and CI
 
-Local gates: `pnpm flow:test` validates Flow naming rules, `pnpm architecture:test` and `pnpm architecture:check` enforce objective React monorepo boundaries, `pnpm qa` runs non-mutating documentation, architecture, lint, type, and unit checks, and `pnpm ci:local` additionally performs a production build.
+Local gates:
 
-GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and [`.github/workflows/genui-quality.yml`](.github/workflows/genui-quality.yml) — **disabled for push/PR** until uncommented. Optional DeepSec workflow remains separate.
+- `pnpm qa` — Flow docs, React architecture boundaries, lint, knip, sherif, types, unit tests, and `drizzle-kit check` for `@repo/db` (no database required).
+- `pnpm hooks:pre-commit` — staged secret-file block, gitleaks on staged changes, then `pnpm qa` (non-mutating).
+- `pnpm security:check` — full gitleaks, OSV, and `pnpm audit` (requires gitleaks and osv-scanner; see `pnpm setup`).
+- `pnpm ci:local` — `pnpm qa`, `pnpm test:scripts`, `pnpm security:check`, and production build.
+
+GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and [`.github/workflows/security.yml`](.github/workflows/security.yml) mirror the local gates but remain **disabled for push/PR** on CI until uncommented. [`.github/workflows/pr-title.yml`](.github/workflows/pr-title.yml) enforces Conventional Commits on PR titles. DeepSec stays manual in [`.github/workflows/deepsec.yml`](.github/workflows/deepsec.yml).
 
 GenUI unit tests: `pnpm --filter @repo/genui test`. Eval matrix: `packages/genui/src/eval/query-matrix.ts`.
+
+### Local Neon database
+
+Neon Local is a Docker proxy to a cloud branch (not an offline Postgres engine). Copy `.env.defaults.example` to `.env`, set `NEON_API_KEY` and `NEON_PROJECT_ID`, then `pnpm db:start`, `pnpm db:migrate`, and `pnpm db:ping`. Default URL: `postgres://neon:npg@localhost:5432/neondb?sslmode=require`. The GenUI demo does not connect to the database until adopters wire `@repo/db` into application features.
 
 ## 9. Adoption path
 
 1. Fork and replace **PRODUCT.md** / **DESIGN.md**.
 2. Swap Acme fixtures and routing keywords for your domain.
 3. Extend `packages/genui` component registry and React views.
-4. Add auth, persistence, and eve tools when the workspace ships.
+4. Add auth, product schema, and eve tools when the workspace ships (database baseline is already in `@repo/db`).
 5. Enable CI triggers when the remote repository is ready.
 
 ## 10. Delivery status

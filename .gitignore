@@ -48,3 +48,6 @@ __dev
 # Agent and editor local installations
 .agents/skills/
 .cursor/
+
+# Neon Local metadata
+.neon_local/

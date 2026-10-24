@@ -147,7 +147,7 @@ Flow Starter adapts these examples to its selected stack:
 
 - Next.js App Router for the application.
 - nuqs for URL state.
-- Neon and Drizzle for planned PostgreSQL persistence.
+- `@repo/db` for Neon + Drizzle (baseline schema and migrations); product persistence wiring in `apps/web` is planned per feature.
 - TanStack Query when a feature needs client-managed remote state.
 - viem and wagmi only for products implementing EVM functionality.
 - Shared authorized capabilities for APIs, MCP tools and agent operations.

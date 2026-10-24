@@ -21,23 +21,35 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - uses: ./.github/actions/setup-pnpm
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: pnpm
+      - name: Install gitleaks
+        run: |
+          wget -q -O /tmp/gitleaks.tar.gz "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz"
+          tar -xzf /tmp/gitleaks.tar.gz -C /tmp
+          sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
 
-      - run: pnpm install --frozen-lockfile
+      - name: Install OSV Scanner
+        run: |
+          wget -q -O /tmp/osv-scanner "https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64"
+          chmod +x /tmp/osv-scanner
+          sudo mv /tmp/osv-scanner /usr/local/bin/osv-scanner
+
       - run: pnpm flow:test
       - run: pnpm flow:check
       - run: pnpm architecture:test
       - run: pnpm architecture:check
       - run: pnpm lint
+      - run: pnpm knip
+      - run: pnpm sherif
       - run: pnpm check-types
       - run: pnpm test
+      - run: pnpm --filter @repo/db db:check
+      - run: pnpm test:scripts
+      - run: pnpm security:check
       - run: pnpm build

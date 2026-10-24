@@ -1,0 +1,60 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "rules": {
+    "binaries": "off",
+    "duplicates": "off",
+    "enumMembers": "off",
+    "namespaceMembers": "off",
+    "nsExports": "off",
+    "nsTypes": "off",
+    "optionalPeerDependencies": "off",
+    "types": "off",
+    "unlisted": "off",
+    "unresolved": "off"
+  },
+  "workspaces": {
+    ".": {
+      "entry": ["scripts/*.{mjs,ts}", "oxlint.config.ts"],
+      "project": ["scripts/**/*.{mjs,ts}"]
+    },
+    "apps/web": {
+      "entry": [
+        "app/**/*.{ts,tsx}",
+        "components/**/*.{ts,tsx}",
+        "lib/**/*.{ts,tsx}"
+      ],
+      "project": ["**/*.{ts,tsx,mjs}"]
+    },
+    "packages/genui": {
+      "entry": ["src/**/*.{ts,tsx}"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "packages/ui": {
+      "entry": ["src/**/*.{ts,tsx}"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "packages/db": {
+      "entry": ["src/**/*.ts", "drizzle.config.ts"],
+      "project": ["src/**/*.ts", "drizzle.config.ts", "scripts/**/*.mjs"]
+    },
+    "packages/ts": {
+      "entry": [],
+      "project": []
+    }
+  },
+  "ignore": [
+    "**/*.test.ts",
+    "**/*.test.mjs",
+    ".agents/skills/**",
+    "packages/ui/src/components/**",
+    "packages/genui/src/fixtures/**",
+    "apps/web/hooks/use-highlighted-code.ts"
+  ],
+  "ignoreDependencies": [
+    "@tailwindcss/postcss",
+    "next-themes",
+    "postcss-load-config",
+    "zod"
+  ],
+  "ignoreBinaries": ["simple-git-hooks", "gitleaks", "osv-scanner", "deepsec"]
+}

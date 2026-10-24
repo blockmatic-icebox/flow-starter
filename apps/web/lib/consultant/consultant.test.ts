@@ -16,6 +16,8 @@ describe("consultant facts", () => {
     const planned = consultantFacts.planned.join(" ").toLowerCase();
     assert.match(planned, /eve/u);
     assert.match(planned, /\/dev/u);
+    assert.match(shipped, /@repo\/db/u);
+    assert.match(shipped, /neon local/u);
   });
 });
 

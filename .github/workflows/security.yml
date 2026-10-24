@@ -1,0 +1,56 @@
+name: Security
+
+# Remote auto-run is off until you uncomment `push` / `pull_request` below.
+# Local parity: `pnpm security:check`
+# Manual on GitHub: `gh workflow run Security`
+
+on:
+  workflow_dispatch:
+  # pull_request:
+  # push:
+  #   branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  security:
+    name: Security checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-pnpm
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-path: .gitleaks.toml
+          redact: true
+          verbose: true
+          exit-code: 1
+          fail: true
+
+      - name: Install OSV Scanner
+        run: |
+          ARCH=$(uname -m)
+          if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; fi
+          wget -q -O /tmp/osv-scanner "https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_${ARCH}"
+          chmod +x /tmp/osv-scanner
+          sudo mv /tmp/osv-scanner /usr/local/bin/osv-scanner
+          osv-scanner --version
+
+      - name: Run OSV Scanner
+        run: pnpm security:osv
+
+      - name: Run pnpm audit
+        run: pnpm security:audit

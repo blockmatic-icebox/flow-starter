@@ -291,7 +291,7 @@ The exact automation and integration must be implemented and verified before bei
 - Connection behavior and concurrency constraints.
 - Production migration safety remains the application's responsibility.
 
-**Status:** Selected for future integration; not yet an implemented database in the starter.
+**Status:** Baseline implemented in `@repo/db` with Neon Local for development; preview branch automation and product schema remain planned.
 
 **Alternatives:** Self-hosted PostgreSQL, managed PostgreSQL from other providers, and alternative persistence systems where product needs justify them.
 
@@ -313,7 +313,7 @@ The exact automation and integration must be implemented and verified before bei
 - ORM types do not replace database constraints.
 - Driver and transaction behavior depend on the selected connection strategy.
 
-**Status:** Planned; not implemented in the current application baseline.
+**Status:** Baseline implemented in `@repo/db` (schema, migrations, client); application routes do not require persistence until adopters add product tables.
 
 ### Better Auth — planned application identity
 
@@ -446,7 +446,7 @@ Turborepo is maintained by Vercel but does not require Vercel hosting.
 
 **Selection:** Existing lint, formatting, TypeScript, testing, and security tooling.
 
-Includes oxlint, oxfmt, the Node.js test runner, browser testing when needed, and the configured DeepSec workspace.
+Includes oxlint, oxfmt, knip, sherif, gitleaks, OSV Scanner, `pnpm audit`, the Node.js test runner, browser testing when needed, and the configured DeepSec workspace.
 
 **Why:**
 
@@ -461,7 +461,7 @@ Includes oxlint, oxfmt, the Node.js test runner, browser testing when needed, an
 - AI-assisted scanning may require paid processing and may produce false positives.
 - Browser and integration testing require appropriate environments.
 
-**Status:** Mixed; distinguish installed/configured capabilities from actual completed scans or browser verifications.
+**Status:** Local gates and manual GitHub Actions workflows are configured; automatic push/PR CI remains disabled until adopters enable it. Distinguish installed tooling from completed DeepSec or browser verification runs.
 
 ### Agent skills and Flow documentation
 

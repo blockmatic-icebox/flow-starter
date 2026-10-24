@@ -1,0 +1,8 @@
+title = "Flow Starter security scan"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Committed env templates only"
+paths = ['''\.env\.[^/]+\.example$''']

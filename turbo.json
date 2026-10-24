@@ -10,6 +10,9 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
+    "db:check": {
+      "dependsOn": ["^db:check"]
+    },
     "dev": {
       "cache": false,
       "persistent": true,
