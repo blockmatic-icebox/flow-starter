@@ -37,7 +37,7 @@ Use [docs/workflow/flow.md](docs/workflow/flow.md) for Explore → Specify → P
 - Run the checks that match the change. Report the commands and results. Do not bypass quality gates or misrepresent results.
 - React application changes must preserve server/client boundaries and the established fractal component architecture. Use relevant installed skills, not all technical skills at once.
 - For Next.js development issues, use the framework's runtime MCP diagnostics when available; then verify relevant behavior in the browser. If runtime tools are unavailable, report that limitation and use the established CLI/browser fallback.
-- Pre-commit runs the non-mutating `pnpm qa` checks. Format code deliberately with `pnpm lint:fix` before staging. Hooks must never stage files or reformat unrelated working-tree changes automatically.
+- Pre-commit runs `pnpm security:block-files`, `pnpm security:secrets`, then non-mutating `pnpm qa`. Install gitleaks via `pnpm setup:gitleaks` before committing. Format deliberately with `pnpm lint:fix` before staging. Hooks must never stage files or reformat unrelated working-tree changes automatically.
 
 ## Agent skills
 

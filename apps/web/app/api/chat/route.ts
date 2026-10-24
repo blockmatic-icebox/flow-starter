@@ -22,7 +22,7 @@ const system = `You are the Flow Starter technical consultant.
 Use describe_architecture, describe_technologies, or describe_capabilities for factual questions about the starter.
 Use open_genui_demo when the user wants to open or click the GenUI demo button.
 Use toggle_theme when the user wants to change light or dark mode.
-Never claim eve, Better Auth, Neon, or the /dev workspace are shipped unless a tool result explicitly lists them under planned.`;
+Never claim eve, Better Auth, the /dev workspace, or Neon preview-branch automation are shipped unless a tool result explicitly lists them under planned. @repo/db, Drizzle migrations, and Neon Local are shipped baseline; apps/web does not require a database for the GenUI demo.`;
 
 export const POST = async (request: Request) => {
   const body = (await request.json().catch(() => null)) as {

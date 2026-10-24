@@ -13,7 +13,10 @@ Technical constraints and system architecture belong in [ARCHITECTURE.md](ARCHIT
 - `/genui-demo`: web integration example.
 - Site consultant: right-hand chat sidebar on the site shell, `POST /api/chat`, read-only `GET|POST|DELETE /api/mcp` ([ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md)).
 - Optional AI Gateway-backed tier-3 answers and consultant chat, with a grounded deterministic fallback when credentials are absent.
-- Local quality commands and manual GitHub Actions workflows.
+- `@repo/db`: Drizzle schema, `postgres.js` client, committed migrations, and `drizzle-kit check` in `pnpm qa`.
+- Neon Local via `docker-compose.yml` and `pnpm db:start` / `db:migrate` / `db:ping` (requires Neon credentials and Docker).
+- Security and workspace hygiene: gitleaks, OSV, knip, sherif, `pnpm security:check`, and expanded pre-commit gates.
+- Local quality commands and manual GitHub Actions workflows (CI and Security workflows; PR title check active on GitHub).
 - Flow workflow documentation and agent skills integration.
 
 "Shipped" here means implemented in the starter, not production validated for an adopter's application.

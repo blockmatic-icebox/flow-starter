@@ -42,6 +42,10 @@ Read-only technical guide for Flow Starter: how the repo is built, which technol
 
 Vocabulary for the event stream between an agent backend and the interactive client (run lifecycle, reasoning, tool calls, text). In this starter the AI SDK UI message stream implements that layer in the consultant sidebar. Distinct from MCP tool transport.
 
+## Neon Local
+
+Docker proxy (`neondatabase/neon_local`) that exposes a Neon cloud branch at `localhost:5432`. Flow Starter uses it for local development (`pnpm db:start`). It is not an offline Postgres engine; it requires Neon API credentials and network access.
+
 ## External invocation (planned)
 
 Authenticated non-browser clients limited to cited answers and optional validated specs—no session canvas mutation. The shipped MCP endpoint is read-only consultant access; full external invocation remains planned. See [docs/adr/0006-external-invocation-is-read-only.md](docs/adr/0006-external-invocation-is-read-only.md).

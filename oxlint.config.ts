@@ -24,6 +24,19 @@ export default defineConfig({
         "promise/prefer-await-to-then": "off",
       },
     },
+    {
+      files: ["scripts/**/*.mjs"],
+      rules: {
+        "eslint/no-await-in-loop": "off",
+        "eslint/prefer-destructuring": "off",
+        "eslint/prefer-named-capture-group": "off",
+        "eslint/require-unicode-regexp": "off",
+        "promise/prefer-await-to-callbacks": "off",
+        "promise/prefer-await-to-then": "off",
+        "unicorn/import-style": "off",
+        "unicorn/no-await-expression-member": "off",
+      },
+    },
   ],
   rules: {
     curly: "off",

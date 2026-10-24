@@ -10,7 +10,7 @@ export const consultantFacts = {
   planned: [
     "eve agent runtime with defineTool adapters to shared actions",
     "Better Auth with GitHub OAuth",
-    "Neon Postgres + Drizzle persistence",
+    "Neon branch-per-preview automation and Vercel preview database wiring",
     "Authenticated /dev workspace (conversation, canvas) per ADR 005",
     "Full external invocation boundary beyond public read-only MCP",
   ],
@@ -23,6 +23,7 @@ export const consultantFacts = {
     "Site consultant chat sidebar and read-only MCP (ADR 0010)",
     "Shared UI package (shadcn + Base UI)",
     "pnpm + Turborepo workspace, Flow workflow docs, agent skills manifest",
+    "@repo/db: Neon + Drizzle baseline, migrations, and Neon Local proxy (pnpm db:start)",
   ],
   summary:
     "An opinionated Next.js and React monorepo baseline for agentic applications with OpenUI Lang GenUI, composition tiers, and Vercel-friendly defaults.",

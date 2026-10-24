@@ -4,14 +4,14 @@ Flow Starter is an opinionated **Next.js and React** starter for building agenti
 
 Generative UI follows **select → compile → render**, with shared action boundaries and Vercel-friendly defaults. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are **templates**—replace them with your product. System shape is in [ARCHITECTURE.md](ARCHITECTURE.md); delivery order in [ROADMAP.md](ROADMAP.md). Decisions live in [docs/adr/](docs/adr/).
 
-Flow Starter follows the [Agentic Architecture foundation](docs/adr/0001-agentic-architecture.md) and a [product-agnostic, capability-first and agent-ready approach](docs/pdr/0001-agnostic-api-first.md). The application, GenUI demonstration, site consultant chat, and read-only consultant MCP are implemented; identity, persistence, and the `/dev` workspace remain planned ([ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md)).
+Flow Starter follows the [Agentic Architecture foundation](docs/adr/0001-agentic-architecture.md) and a [product-agnostic, capability-first and agent-ready approach](docs/pdr/0001-agnostic-api-first.md). The application, GenUI demonstration, site consultant chat, read-only consultant MCP, and `@repo/db` (Neon + Drizzle baseline) are implemented; identity, product schema in the app, and the `/dev` workspace remain planned ([ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md)).
 
 ## Quick start
 
 Prerequisites: Node.js 24+, [pnpm](https://pnpm.io/) 12+.
 
 ```sh
-pnpm install
+pnpm setup   # install, skills, gitleaks, osv-scanner, env template, portless, deepsec
 pnpm dev
 ```
 
@@ -23,13 +23,17 @@ Open the demo at `/genui-demo` (local URL from the dev server, or `https://flow.
 | `pnpm build` | Production build |
 | `pnpm lint` | oxlint + oxfmt |
 | `pnpm check-types` | TypeScript |
-| `pnpm test` | `@repo/genui` and `apps/web` unit tests |
+| `pnpm test` | `@repo/genui`, `apps/web`, and `@repo/db` unit tests |
 | `pnpm flow:check` | Flow documentation path and naming validation |
 | `pnpm flow:test` | Unit tests for Flow documentation validation |
 | `pnpm architecture:check` | Objective React monorepo boundary validation |
 | `pnpm architecture:test` | Unit tests for architecture boundary validation |
-| `pnpm qa` | Non-mutating Flow, architecture, lint, type, and tests |
-| `pnpm ci:local` | Full local CI including architecture checks and build |
+| `pnpm qa` | Flow, architecture, lint, knip, sherif, types, tests, Drizzle check |
+| `pnpm security:check` | gitleaks, OSV, and `pnpm audit` (high+) |
+| `pnpm ci:local` | `pnpm qa`, script tests, `pnpm security:check`, and build |
+| `pnpm db:start` | Start Neon Local (Docker + Neon API key in `.env`) |
+| `pnpm db:migrate` | Apply Drizzle migrations to the active database |
+| `pnpm db:ping` | `select 1` against `DATABASE_URL` or the local proxy URL |
 | `pnpm mcp:next` | Next.js DevTools MCP bridge (dev server must be running) |
 
 The site shell includes a right-hand **consultant** chat (`POST /api/chat`) on every route. External agents can use read-only tools at `/api/mcp` (Streamable HTTP; optional `CONSULTANT_MCP_BEARER` when not on `flow.localhost`). ChatGPT and other MCP hosts need a public HTTPS URL to connect.
@@ -133,11 +137,24 @@ Accepted direction lives in current contracts and decision records. Research pre
 | --- | --- |
 | `apps/web` | Next.js app (`/`, `/genui-demo`, `POST /api/genui/compose`) |
 | `packages/genui` | OpenUI compiler, orchestration, React renderer |
+| `packages/db` | Drizzle schema, client, migrations, Neon Local workflow |
 | `packages/ui` | Shared shadcn + Base UI components |
+
+## Local Neon database
+
+Neon Local is a Docker proxy to a Neon cloud branch (not offline Postgres). Copy `.env.defaults.example` to `.env` (or run `pnpm setup:env`), set `NEON_API_KEY` and `NEON_PROJECT_ID`, then:
+
+```sh
+pnpm db:start
+pnpm db:migrate
+pnpm db:ping
+```
+
+Default connection: `postgres://neon:npg@localhost:5432/neondb?sslmode=require`. Stop with `pnpm db:stop`. The GenUI demo runs without a database until you wire `@repo/db` into application code.
 
 ## Git hooks
 
-After `pnpm install`, `prepare` installs `simple-git-hooks`. Pre-commit runs the non-mutating `pnpm qa` checks. Hooks do not automatically format or stage files.
+After `pnpm install`, `prepare` installs `simple-git-hooks`. Pre-commit runs secret checks then non-mutating `pnpm qa`. Hooks do not automatically format or stage files.
 
 Run `pnpm lint:fix` deliberately before staging changes that need formatting.
 
@@ -145,7 +162,7 @@ Run `pnpm lint:fix` deliberately before staging changes that need formatting.
 
 Local (matches [`.github/workflows/ci.yml`](.github/workflows/ci.yml)): `pnpm ci:local` (not `pnpm ci` — that is pnpm’s frozen install).
 
-Remote manual run after push: `gh workflow run CI` or `gh workflow run "GenUI quality"`. Local Actions runner: [act](https://github.com/nektos/act) with `act workflow_dispatch -W .github/workflows/ci.yml` (requires Docker).
+Remote manual run after push: `gh workflow run CI` or `gh workflow run Security`. PR titles are checked automatically via the PR title workflow. Local Actions runner: [act](https://github.com/nektos/act) with `act workflow_dispatch -W .github/workflows/ci.yml` (requires Docker).
 
 ## Local HTTPS (Portless)
 
