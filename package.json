@@ -15,7 +15,7 @@
     "flow:test": "node --test scripts/check-flow-docs.test.mjs",
     "architecture:check": "node scripts/check-react-architecture.mjs",
     "architecture:test": "node --test scripts/check-react-architecture.test.mjs",
-    "test": "pnpm --filter @repo/genui test",
+    "test": "pnpm --filter @repo/genui test && pnpm --filter web test",
     "lint": "oxlint . && oxfmt --check .",
     "lint:fix": "oxlint --fix . && oxfmt --write --no-error-on-unmatched-pattern .",
     "format": "oxfmt --write --no-error-on-unmatched-pattern .",

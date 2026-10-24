@@ -4,7 +4,7 @@ Flow Starter is an opinionated **Next.js and React** starter for building agenti
 
 Generative UI follows **select → compile → render**, with shared action boundaries and Vercel-friendly defaults. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are **templates**—replace them with your product. System shape is in [ARCHITECTURE.md](ARCHITECTURE.md); delivery order in [ROADMAP.md](ROADMAP.md). Decisions live in [docs/adr/](docs/adr/).
 
-Flow Starter follows the [Agentic Architecture foundation](docs/adr/0001-agentic-architecture.md) and a [product-agnostic, capability-first and agent-ready approach](docs/pdr/0001-agnostic-api-first.md). The application and GenUI demonstration are implemented; identity, persistence, a full agent workspace, and MCP host integration are planned rather than shipped.
+Flow Starter follows the [Agentic Architecture foundation](docs/adr/0001-agentic-architecture.md) and a [product-agnostic, capability-first and agent-ready approach](docs/pdr/0001-agnostic-api-first.md). The application, GenUI demonstration, site consultant chat, and read-only consultant MCP are implemented; identity, persistence, and the `/dev` workspace remain planned ([ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md)).
 
 ## Quick start
 
@@ -23,7 +23,7 @@ Open the demo at `/genui-demo` (local URL from the dev server, or `https://flow.
 | `pnpm build` | Production build |
 | `pnpm lint` | oxlint + oxfmt |
 | `pnpm check-types` | TypeScript |
-| `pnpm test` | `@repo/genui` unit tests |
+| `pnpm test` | `@repo/genui` and `apps/web` unit tests |
 | `pnpm flow:check` | Flow documentation path and naming validation |
 | `pnpm flow:test` | Unit tests for Flow documentation validation |
 | `pnpm architecture:check` | Objective React monorepo boundary validation |
@@ -32,7 +32,9 @@ Open the demo at `/genui-demo` (local URL from the dev server, or `https://flow.
 | `pnpm ci:local` | Full local CI including architecture checks and build |
 | `pnpm mcp:next` | Next.js DevTools MCP bridge (dev server must be running) |
 
-Optional tier-3 model answers: set `AI_GATEWAY_API_KEY` (and optionally `GENUI_MODEL`) in `apps/web/.env.local`. See [docs/adr/0002-vercel-ai-sdk-for-tier-3.md](docs/adr/0002-vercel-ai-sdk-for-tier-3.md). Tier-3 model responses in this starter are general, non-source-grounded answers. They must not display fixture document references as citations. Verified catalog sources are attached only when the response is supported by those records. Compose rate limits: off on `flow.localhost` by default; set `GENUI_ENFORCE_RATE_LIMIT=1` to test 429 behavior locally.
+The site shell includes a right-hand **consultant** chat (`POST /api/chat`) on every route. External agents can use read-only tools at `/api/mcp` (Streamable HTTP; optional `CONSULTANT_MCP_BEARER` when not on `flow.localhost`). ChatGPT and other MCP hosts need a public HTTPS URL to connect.
+
+Optional tier-3 and consultant model answers: set `AI_GATEWAY_API_KEY` (and optionally `GENUI_MODEL` or `CONSULTANT_MODEL`) in `apps/web/.env.local`. See [docs/adr/0002-vercel-ai-sdk-for-tier-3.md](docs/adr/0002-vercel-ai-sdk-for-tier-3.md). Tier-3 model responses in this starter are general, non-source-grounded answers. They must not display fixture document references as citations. Verified catalog sources are attached only when the response is supported by those records. Compose rate limits: off on `flow.localhost` by default; set `GENUI_ENFORCE_RATE_LIMIT=1` to test 429 behavior locally.
 
 ## Flow workflow
 
@@ -111,7 +113,7 @@ React and Next.js work is not complete when code merely compiles. Use proportion
 7. Run `pnpm architecture:check`, typechecking, tests, and relevant builds.
 8. Report actual results and any verification that was unavailable.
 
-Application MCP tools for product capabilities remain separate from Next.js development introspection.
+Product MCP (`/api/mcp`) exposes consultant tools only. Next.js DevTools MCP (`pnpm mcp:next`) is development introspection, not the product surface.
 
 ## Architectural decisions
 

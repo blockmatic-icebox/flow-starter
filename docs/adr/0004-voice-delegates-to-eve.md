@@ -16,3 +16,4 @@ When implemented, the speech model handles listening and presentation only. Grou
 
 - Voice is follow-on work under [PRODUCT.md](../../PRODUCT.md).
 - See [ARCHITECTURE.md](../../ARCHITECTURE.md) §7 and [voice-surfaces research](../research/20261017-voice-surfaces.md).
+- The site shell sidebar ([ADR 0010](0010-site-consultant-chat-and-mcp.md)) uses transcription and AI SDK chat first; eve voice templates remain the path for durable workspace voice later.

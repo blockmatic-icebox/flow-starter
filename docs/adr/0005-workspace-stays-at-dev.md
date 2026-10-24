@@ -15,3 +15,4 @@ All workspace generation, chat, canvas updates, and voice stay on one route (`/d
 ## Consequences
 
 - Scope and journeys belong in [PRODUCT.md](../../PRODUCT.md) once the workspace ships.
+- The public site shell may include a consultant chat sidebar on all routes ([ADR 0010](0010-site-consultant-chat-and-mcp.md)); that is not the `/dev` workspace.
