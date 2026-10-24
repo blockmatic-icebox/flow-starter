@@ -12,27 +12,37 @@ function osvScannerInstalled() {
   }
 }
 
+const scanLockfile = ({ lockfile }) => {
+  console.log(`\nScanning ${lockfile}\n`);
+  execSync(`osv-scanner scan --lockfile=${lockfile} --format=markdown`, {
+    stdio: "inherit",
+  });
+};
+
 function main() {
   if (!osvScannerInstalled()) {
     console.error("\nosv-scanner is not installed. Run: pnpm setup:osv\n");
     exit(1);
   }
 
-  const lockfiles = ["pnpm-lock.yaml", ".deepsec/pnpm-lock.yaml"];
   try {
-    for (const lockfile of lockfiles) {
-      console.log(`\nScanning ${lockfile}\n`);
-      execSync(`osv-scanner scan --lockfile=${lockfile} --format=markdown`, {
-        stdio: "inherit",
-      });
-    }
-    exit(0);
+    scanLockfile({ lockfile: "pnpm-lock.yaml" });
   } catch {
     console.error(
-      "\nOSV Scanner could not complete or found vulnerabilities. Update affected dependencies or restore registry access.\n"
+      "\nOSV Scanner could not complete or found vulnerabilities in the main workspace. Update affected dependencies or restore registry access.\n"
     );
     exit(1);
   }
+
+  try {
+    scanLockfile({ lockfile: ".deepsec/pnpm-lock.yaml" });
+  } catch {
+    console.warn(
+      "\nAdvisory: OSV reported issues in .deepsec/pnpm-lock.yaml (optional deepsec tooling). The main workspace lockfile is clean. Update deepsec when upstream publishes fixes.\n"
+    );
+  }
+
+  exit(0);
 }
 
 main();

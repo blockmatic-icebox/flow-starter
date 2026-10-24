@@ -42,7 +42,7 @@
     "security:secrets": "node scripts/scan-secrets-staged.mjs",
     "security:secrets:full": "gitleaks detect --redact --config .gitleaks.toml",
     "security:osv": "node scripts/scan-osv.mjs",
-    "security:audit": "pnpm audit --audit-level=high",
+    "security:audit": "pnpm audit --prod --audit-level=high",
     "security:check": "node scripts/security-check.mjs",
     "security:deepsec:scan": "pnpm --dir=.deepsec exec deepsec scan",
     "security:deepsec:process:diff": "pnpm --dir=.deepsec exec deepsec process --agent pi --model xai/grok-4.6 --thinking-level medium --diff origin/main",

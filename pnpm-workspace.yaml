@@ -1,6 +1,9 @@
 packages:
   - "apps/*"
   - "packages/*"
+overrides:
+  body-parser: ">=2.4.0"
+  zod: ">=4.6.6"
 allowBuilds:
   "@openuidev/lang-core": true
   esbuild: true

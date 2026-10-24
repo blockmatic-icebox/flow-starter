@@ -2,7 +2,13 @@
 
 import { Button } from "@repo/ui/components/button";
 import { MicIcon, MicOffIcon } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 interface SpeechRecognitionInstance extends EventTarget {
   abort: () => void;
@@ -22,6 +28,22 @@ const getSpeechRecognitionCtor = () => {
   return win.SpeechRecognition ?? win.webkitSpeechRecognition;
 };
 
+const speechPlaceholderClass =
+  "inline-flex size-8 shrink-0 items-center justify-center";
+
+const speechRecognitionAvailable = () => Boolean(getSpeechRecognitionCtor());
+
+const speechRecognitionSubscribe = (onStoreChange: () => void) => () => {
+  void onStoreChange;
+};
+
+const useSpeechRecognitionAvailable = () =>
+  useSyncExternalStore(
+    speechRecognitionSubscribe,
+    speechRecognitionAvailable,
+    () => false
+  );
+
 export const FlowAgentSpeechInputButton = ({
   disabled,
   onTranscript,
@@ -30,8 +52,12 @@ export const FlowAgentSpeechInputButton = ({
   onTranscript: (text: string) => void;
 }) => {
   const [listening, setListening] = useState(false);
+  const speechAvailable = useSpeechRecognitionAvailable();
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
-  const SpeechRecognitionCtor = getSpeechRecognitionCtor();
+
+  const SpeechRecognitionCtor = speechAvailable
+    ? getSpeechRecognitionCtor()
+    : undefined;
 
   useEffect(() => {
     if (!SpeechRecognitionCtor) return;
@@ -84,7 +110,9 @@ export const FlowAgentSpeechInputButton = ({
     recognition.start();
   }, [listening]);
 
-  if (!SpeechRecognitionCtor) return null;
+  if (!speechAvailable || !SpeechRecognitionCtor) {
+    return <span aria-hidden className={speechPlaceholderClass} />;
+  }
 
   return (
     <Button

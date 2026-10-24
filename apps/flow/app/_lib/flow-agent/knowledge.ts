@@ -1,6 +1,8 @@
 import { flowKnowledgeSections } from "./knowledge-snapshot";
 
-const knowledgeByPath = new Map(
+type KnowledgeSection = (typeof flowKnowledgeSections)[number];
+
+const knowledgeByPath = new Map<string, KnowledgeSection>(
   flowKnowledgeSections.map((section) => [section.path, section])
 );
 
