@@ -4,15 +4,21 @@ import { pathToFileURL } from "node:url";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const slug = "[a-z0-9]+(?:-[a-z0-9]+)*";
+const slugFilePattern = new RegExp(`^${slug}\\.md$`, "u");
+const researchFilePattern = new RegExp(
+  `^\\d{4}-\\d{2}-\\d{2}-${slug}\\.md$`,
+  "u"
+);
+const decisionFilePattern = new RegExp(`^\\d{4}-${slug}\\.md$`, "u");
 
 const rules = [
-  ["docs/ideas", new RegExp(`^${slug}\\.md$`, "u")],
-  ["docs/initiatives", new RegExp(`^${slug}\\.md$`, "u")],
-  ["docs/plans", new RegExp(`^${slug}\\.md$`, "u")],
-  ["docs/specs", new RegExp(`^${slug}\\.md$`, "u")],
-  ["docs/research", new RegExp(`^\\d{4}-\\d{2}-\\d{2}-${slug}\\.md$`, "u")],
-  ["docs/adr", new RegExp(`^\\d{4}-${slug}\\.md$`, "u")],
-  ["docs/pdr", new RegExp(`^\\d{4}-${slug}\\.md$`, "u")],
+  ["docs/ideas", slugFilePattern, "ideas"],
+  ["docs/initiatives", slugFilePattern, "initiatives"],
+  ["docs/plans", slugFilePattern, "plans"],
+  ["docs/specs", slugFilePattern, "specs"],
+  ["docs/research", researchFilePattern, "research"],
+  ["docs/adr", decisionFilePattern, "adr"],
+  ["docs/pdr", decisionFilePattern, "pdr"],
 ];
 
 const legacyPaths = new Set([
@@ -53,7 +59,7 @@ function relativePath(root, filename) {
 }
 
 function decisionNumber(filename) {
-  const match = /^(?<num>\d{3,4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/u.exec(
+  const match = new RegExp(`^(?<num>\\d{3,4})-${slug}\\.md$`, "u").exec(
     path.basename(filename)
   );
 
@@ -75,16 +81,42 @@ function validDate(filename) {
   );
 }
 
+function seedLegacyDecisionNumbers({ numbers, root }) {
+  for (const relative of legacyPaths) {
+    if (!existsSync(path.join(root, relative))) {
+      continue;
+    }
+
+    let category = null;
+
+    if (relative.startsWith("docs/adr/")) {
+      category = "adr";
+    } else if (relative.startsWith("docs/pdr/")) {
+      category = "pdr";
+    }
+
+    if (!category) {
+      continue;
+    }
+
+    const number = decisionNumber(path.basename(relative));
+
+    if (number !== null) {
+      numbers[category].set(number, relative);
+    }
+  }
+}
+
 export function validateFlowDocs(root = repositoryRoot) {
   const errors = [];
   const documents = [];
 
-  for (const [directory, pattern] of rules) {
+  for (const [directory, pattern, category] of rules) {
     const fullDirectory = path.join(root, directory);
 
     for (const filename of markdownFiles(fullDirectory)) {
       documents.push({
-        category: path.basename(directory),
+        category,
         directory,
         filename,
         pattern,
@@ -100,24 +132,7 @@ export function validateFlowDocs(root = repositoryRoot) {
     pdr: new Map(),
   };
 
-  // Reserve identifiers occupied by historical decisions.
-  // An exception to filename formatting is not an exception
-  // to decision identity or uniqueness.
-  for (const document of documents) {
-    if (!legacyPaths.has(document.relative)) {
-      continue;
-    }
-
-    if (document.category !== "adr" && document.category !== "pdr") {
-      continue;
-    }
-
-    const number = decisionNumber(document.filename);
-
-    if (number !== null) {
-      numbers[document.category].set(number, document.relative);
-    }
-  }
+  seedLegacyDecisionNumbers({ numbers, root });
 
   for (const document of documents) {
     const { category, directory, filename, relative, pattern } = document;
@@ -148,7 +163,7 @@ export function validateFlowDocs(root = repositoryRoot) {
     if (category === "adr" || category === "pdr") {
       const number = decisionNumber(filename);
 
-      if (number === null || number === 0) {
+      if (number === 0) {
         errors.push(`${relative}: invalid decision identifier`);
         continue;
       }
