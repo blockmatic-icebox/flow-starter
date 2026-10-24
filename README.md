@@ -2,6 +2,8 @@
 
 An AI-first monorepo starter: generative UI (**select → compile → render**), shared action boundaries, and Vercel-friendly defaults. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are **templates**—replace them with your product. System shape is in [ARCHITECTURE.md](ARCHITECTURE.md); delivery order in [ROADMAP.md](ROADMAP.md). Decisions live in [docs/adr/](docs/adr/).
 
+Flow Starter follows a [product-agnostic, capability-first and agent-ready approach](docs/pdr/0001-agnostic-api-first.md). Its [Vercel-aligned platform direction](docs/adr/0007-monorepo-vercel-stack.md) and [pnpm/Turborepo monorepo](docs/adr/0008-monorepo-turborepo-pnpm.md) are independent architectural decisions. The application and GenUI demonstration are implemented; identity, persistence, a full agent workspace, and MCP host integration are planned rather than shipped.
+
 ## Quick start
 
 Prerequisites: Node.js 24+, [pnpm](https://pnpm.io/) 12+.
@@ -25,7 +27,7 @@ Open the demo at `/genui-demo` (local URL from the dev server, or `https://flow.
 | `pnpm qa`          | Non-mutating Flow, lint, type, and test checks          |
 | `pnpm ci:local`    | Full local CI including Flow tests and production build |
 
-Optional tier-3 model answers: set `AI_GATEWAY_API_KEY` (and optionally `GENUI_MODEL`) in `apps/web/.env.local`. See [docs/adr/002-vercel-ai-sdk-for-tier-3.md](docs/adr/002-vercel-ai-sdk-for-tier-3.md). Compose rate limits: off on `flow.localhost` by default; set `GENUI_ENFORCE_RATE_LIMIT=1` to test 429 behavior locally.
+Optional tier-3 model answers: set `AI_GATEWAY_API_KEY` (and optionally `GENUI_MODEL`) in `apps/web/.env.local`. See [docs/adr/002-vercel-ai-sdk-for-tier-3.md](docs/adr/002-vercel-ai-sdk-for-tier-3.md). Tier-3 model responses in this starter are general, non-source-grounded answers. They must not display fixture document references as citations. Verified catalog sources are attached only when the response is supported by those records. Compose rate limits: off on `flow.localhost` by default; set `GENUI_ENFORCE_RATE_LIMIT=1` to test 429 behavior locally.
 
 ## Flow workflow
 
@@ -59,6 +61,10 @@ pnpm skills:update
 
 Skill sources and installed versions are recorded by `skills-lock.json`. The starter uses selected skills from Addy Osmani, Matt Pocock, and ProductSkills. Flow Skills itself is still developing its own reusable skills.
 
+Technical skills complement Flow's methodology skills. The collection covers implemented technologies and selected future integrations. Choose the smallest relevant skill set for each task; do not load all skills by default. Installed skills provide implementation guidance, not permission to change the architecture, add dependencies, or deploy services.
+
+`skills-lock.json` is the reproducible source manifest. Local agent-specific installation directories are not part of the shared repository contract. The starter remains coding-agent agnostic.
+
 ### Working on a feature
 
 Ask your coding agent naturally, for example:
@@ -86,6 +92,16 @@ The check is part of `pnpm qa` and `pnpm ci:local`, and runs in the existing man
 `pnpm flow:test` tests the validator itself, including legacy numbering collisions and invalid filenames.
 
 The validator checks document paths and filenames; it does not replace engineering review, verify product decisions, or guarantee skill execution.
+
+## Architectural decisions
+
+- [PDR 0001 — Product and agent agnosticity](docs/pdr/0001-agnostic-api-first.md)
+- [ADR 0007 — Vercel platform and AI infrastructure](docs/adr/0007-monorepo-vercel-stack.md)
+- [ADR 0008 — Monorepo with Turborepo and pnpm](docs/adr/0008-monorepo-turborepo-pnpm.md)
+- [ADR 003 — Generative UI with OpenUI Lang](docs/adr/003-genui-openui-foundation.md)
+- [GenUI technology comparison](docs/research/2026-10-24-genui-json-vs-openui.md)
+
+Accepted direction lives in current contracts and decision records. Research preserves evidence and alternatives.
 
 ## Packages
 
