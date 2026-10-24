@@ -2,6 +2,8 @@
 
 > Generic technical contract for Flow Starter. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are adopter-owned templates. [docs/adr/](docs/adr/) records decisions.
 
+This project is managed as a **Turborepo monorepo** containing the web app, GenUI package, and shared libs. We leverage the **Vercel platform** extensively (Next.js for React, Vercel AI/Gateway for LLM-backed features, serverless and edge functions, CI/CD). These choices are documented in [ADR 0007](docs/adr/0007-monorepo-vercel-stack.md).
+
 ## 1. Goals
 
 Flow Starter demonstrates how to build **agentic applications** with:
@@ -26,6 +28,7 @@ packages/
   ts/                       # shared TypeScript config
 docs/
   adr/                      # architecture decision records
+  pdr/                      # product decision records
   specs/genui/              # GenUI extraction notes and inventory
 ```
 
@@ -43,7 +46,7 @@ Do not import server-only modules from client renderers. Share serializable type
 
 **Fixtures:** the demo uses fictional **Acme Analytics** catalog data under `packages/genui/src/fixtures/`. Adopters swap in their own record providers.
 
-**Foundation:** OpenUI Lang (`@openuidev/lang-core`, `@openuidev/react-lang`). json-render is documented research only (ADR 003).
+**Foundation:** OpenUI Lang (`@openuidev/lang-core`, `@openuidev/react-lang`). json-render is documented research only ([ADR 003](docs/adr/003-genui-openui-foundation.md), [2026-10-24 GenUI research](docs/research/2026-10-24-genui-json-vs-openui.md)).
 
 ## 4. Composition tiers
 
