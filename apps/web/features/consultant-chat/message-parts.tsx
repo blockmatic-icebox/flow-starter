@@ -62,59 +62,32 @@ const ToolPart = ({ part }: { part: ToolUIPart | DynamicToolUIPart }) => {
   );
 };
 
-export const ConsultantMessageParts = ({
-  message,
-  isStreaming,
-}: {
-  message: UIMessage;
-  isStreaming: boolean;
-}) => {
-  const reasoningParts = message.parts.filter(
-    (part) => part.type === "reasoning"
-  );
-  const reasoningText = reasoningParts
-    .map((part) => (part.type === "reasoning" ? part.text : ""))
-    .join("\n\n");
-
-  return (
-    <Message align={message.role === "user" ? "end" : "start"}>
-      <MessageContent>
-        {reasoningText && (
-          <Collapsible
-            defaultOpen={isStreaming}
-            className="mb-2 rounded-md border px-3 py-2 text-xs"
-          >
-            <CollapsibleTrigger className="flex w-full items-center justify-between font-medium">
-              Reasoning
-              {isStreaming && <Spinner className="size-3" />}
-            </CollapsibleTrigger>
-            <CollapsibleContent className="text-muted-foreground mt-2 whitespace-pre-wrap">
-              {reasoningText}
-            </CollapsibleContent>
-          </Collapsible>
-        )}
-        {message.parts.map((part, index) => {
-          if (part.type === "text") {
-            return (
-              <p
-                key={`${message.id}-text-${index}`}
-                className="whitespace-pre-wrap"
-              >
-                {part.text}
-              </p>
-            );
-          }
-          if (part.type.startsWith("tool-") || part.type === "dynamic-tool") {
-            return (
-              <ToolPart
-                key={`${message.id}-tool-${index}`}
-                part={part as ToolUIPart | DynamicToolUIPart}
-              />
-            );
-          }
+export const ConsultantMessageParts = ({ message }: { message: UIMessage }) => (
+  <Message align={message.role === "user" ? "end" : "start"}>
+    <MessageContent>
+      {message.parts.map((part, index) => {
+        if (part.type === "reasoning" || part.type === "reasoning-file")
           return null;
-        })}
-      </MessageContent>
-    </Message>
-  );
-};
+        if (part.type === "text") {
+          return (
+            <p
+              key={`${message.id}-text-${index}`}
+              className="whitespace-pre-wrap"
+            >
+              {part.text}
+            </p>
+          );
+        }
+        if (part.type.startsWith("tool-") || part.type === "dynamic-tool") {
+          return (
+            <ToolPart
+              key={`${message.id}-tool-${index}`}
+              part={part as ToolUIPart | DynamicToolUIPart}
+            />
+          );
+        }
+        return null;
+      })}
+    </MessageContent>
+  </Message>
+);

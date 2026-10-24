@@ -223,6 +223,33 @@ function validateGenuiPackage(root, violations) {
   }
 }
 
+function validateClientSecurityBoundary(root, violations) {
+  const directory = path.join(root, webAppRoot);
+
+  for (const absolute of walkSourceFiles(directory)) {
+    if (!hasTopLevelUseClient(absolute)) continue;
+    const relative = relativeFromRoot(absolute, root);
+    const sourceFile = parseSourceFile(absolute);
+
+    for (const { isTypeOnly, specifier } of collectModuleSpecifiers(
+      sourceFile
+    )) {
+      if (isTypeOnly) continue;
+      if (
+        specifier.startsWith("@/lib/security/") ||
+        specifier.includes("/lib/security/")
+      ) {
+        violations.push({
+          expected: "Client Components must not import server security helpers",
+          import: specifier,
+          path: relative,
+          rule: "client-no-server-security",
+        });
+      }
+    }
+  }
+}
+
 function validateWebImports(root, violations) {
   const directory = path.join(root, webAppRoot);
 
@@ -422,6 +449,7 @@ export function validateReactArchitecture(root = repositoryRoot) {
   validateUiPackage(root, violations);
   validateGenuiPackage(root, violations);
   validateWebImports(root, violations);
+  validateClientSecurityBoundary(root, violations);
   validateRootLayout(root, violations);
   validatePackageGraph(root, violations);
 

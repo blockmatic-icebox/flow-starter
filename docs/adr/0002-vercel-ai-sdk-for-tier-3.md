@@ -6,14 +6,14 @@ Date: 2026-10-24
 
 ## Context
 
-gaboesquivel.com uses the Vercel AI SDK (`ai`) with AI Gateway for planners, semantic synthesis, and streaming agent turns. Flow Starter’s `@repo/genui` package implements tier 1 (controlled intents) and tier 2 (declarative stacks) deterministically. Tier 3 (open-ended answers) needs the same provider surface without copying portfolio-specific planners.
+The extraction source used the Vercel AI SDK (`ai`) with AI Gateway for planners, semantic synthesis, and streaming agent turns. Flow Starter’s `@repo/genui` package implements tier 1 (controlled intents) and tier 2 (declarative stacks) deterministically. Tier 3 (open-ended answers) needs the same provider surface without copying site-specific planners.
 
 ## Decision
 
 - Add **`ai`** to `@repo/genui` and route tier-3 fallback answers through `generateText` when `AI_GATEWAY_API_KEY` is present.
 - Default model id: `anthropic/claude-sonnet-4` via AI Gateway; override with `GENUI_MODEL`.
 - When no gateway key is configured, tier 3 returns a transparent Answer fallback without making an external model call. The fallback must not attach unrelated fixture records as citations.
-- The starter ships a minimal **capability context** (`composeContextFromRequest`) and in-memory per-IP compose rate limits (`apps/web/lib/genui/`); adopters swap the cap store and add telemetry like gaboesquivel.com.
+- The starter ships a minimal **capability context** (`composeContextFromRequest`) and in-memory per-IP compose rate limits (`apps/web/lib/genui/`); adopters swap the cap store and add production telemetry as needed.
 
 ## Consequences
 

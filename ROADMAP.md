@@ -9,14 +9,14 @@ Technical constraints and system architecture belong in [ARCHITECTURE.md](ARCHIT
 ## Shipped baseline
 
 - `@repo/genui`: OpenUI Lang contracts, compiler, controlled and declarative composition, React adapter, and fictional Acme fixtures.
-- `POST /api/genui/compose`: NDJSON streaming with optional local rate limits.
+- `POST /api/genui/compose`: bounded NDJSON streaming. Compositions are validated before renderable events. Production rate limits use Upstash Redis and fail closed.
 - `/genui-demo`: web integration example.
-- Site consultant: right-hand chat sidebar on the site shell, `POST /api/chat`, read-only `GET|POST|DELETE /api/mcp` ([ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md)).
+- Site consultant: right-hand chat sidebar on the site shell, bounded `POST /api/chat`, and read-only `GET|POST|DELETE /api/mcp` with origin checks and explicit production access configuration ([ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md), [ADR 0011](docs/adr/0011-api-and-agent-security-boundaries.md)).
 - Optional AI Gateway-backed tier-3 answers and consultant chat, with a grounded deterministic fallback when credentials are absent.
 - `@repo/db`: Drizzle schema, `postgres.js` client, committed migrations, and `drizzle-kit check` in `pnpm qa`.
 - Neon Local via `docker-compose.yml` and `pnpm db:start` / `db:migrate` / `db:ping` (requires Neon credentials and Docker).
-- Security and workspace hygiene: gitleaks, OSV, knip, sherif, `pnpm security:check`, and expanded pre-commit gates.
-- Local quality commands and manual GitHub Actions workflows (CI and Security workflows; PR title check active on GitHub).
+- Security and workspace hygiene: gitleaks with a detection canary, OSV, knip, sherif, `pnpm security:check`, and a diff-scoped pre-commit gate.
+- CI and Security workflows run on pull requests and pushes to `main`. The PR title check is active. DeepSec remains manual.
 - Flow workflow documentation and agent skills integration.
 
 "Shipped" here means implemented in the starter, not production validated for an adopter's application.

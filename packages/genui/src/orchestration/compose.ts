@@ -114,6 +114,33 @@ const controlledDocument = ({
   });
 };
 
+export const publishComposition = ({
+  emit,
+  envelope,
+  requestId,
+  sequence,
+}: {
+  emit: (event: ComposeStreamEvent) => void;
+  envelope: CompositionEnvelope;
+  requestId: string;
+  sequence: number;
+}) => {
+  const validated = validateCompositionEnvelope({ envelope });
+  if (!validated.ok) {
+    emit({
+      message: "Composition failed validation.",
+      requestId,
+      sequence,
+      type: "error",
+    });
+    return { ok: false as const, reason: validated.reason };
+  }
+
+  emit({ envelope, requestId, sequence, type: "partial" });
+  emit({ envelope, requestId, sequence: sequence + 1, type: "complete" });
+  return { compiled: validated.compiled, ok: true as const };
+};
+
 const declarativeCompound = ({
   query,
   requestId,
@@ -214,36 +241,26 @@ export const composeQuery = async ({
     });
   }
 
-  emit({ envelope, requestId, sequence, type: "partial" });
-  sequence += 1;
-
-  const validated = validateCompositionEnvelope({ envelope });
-  if (!validated.ok) {
-    emit({
-      message: "Composition failed validation.",
-      requestId,
-      sequence,
-      type: "error",
-    });
+  const published = publishComposition({
+    emit,
+    envelope,
+    requestId,
+    sequence,
+  });
+  if (!published.ok) {
     return {
       events,
-      metadata: {
-        tier,
-        validationOk: false,
-      },
+      metadata: { tier, validationOk: false },
       modelCalls: 0,
       parseErrors: 1,
     };
   }
 
-  emit({ envelope, requestId, sequence, type: "complete" });
-  sequence += 1;
-
   return {
     events,
     metadata: {
-      component: validated.compiled.component,
-      composite: validated.compiled.composite,
+      component: published.compiled.component,
+      composite: published.compiled.composite,
       tier,
       validationOk: true,
     },

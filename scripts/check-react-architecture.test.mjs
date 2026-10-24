@@ -241,6 +241,23 @@ export const Typed = (_: CompositionEnvelope) => null;
   assert.equal(rules.includes("shared-ui-no-genui"), false);
 });
 
+test("rejects client imports of server security helpers", (t) => {
+  const root = fixture(t, {
+    ...basePackages(),
+    "apps/web/app/demo/client.tsx": `"use client";
+import { readJsonRequest } from "@/lib/security/read-json-request";
+export const Demo = () => readJsonRequest;
+`,
+  });
+
+  assert.match(
+    validateReactArchitecture(root)
+      .map((violation) => violation.rule)
+      .join(","),
+    /client-no-server-security/u
+  );
+});
+
 test("detects static dynamic imports", (t) => {
   const root = fixture(t, {
     ...basePackages(),

@@ -126,6 +126,16 @@ A working implementation does not itself prove that the feature created customer
 
 **Exit condition:** Important issues are addressed or explicitly disclosed.
 
+#### Diff-scoped review before an authorized commit
+
+Before an explicitly authorized commit, inspect the staged diff and changed-file list. Read only the product, design, architecture and decision contracts affected by those changes. Check for contradictions, unrelated modifications, missing tests, undocumented behavior changes and secrets. Run applicable deterministic checks. Do not expand the review to the entire repository without evidence that the change crosses a broader boundary. Never commit or push without explicit authorization.
+
+Security-sensitive changes — request boundaries, authorization, secrets, GenUI validation, database credentials — also require the [security model](../security/security-model.md) and the tests that cover the changed boundary.
+
+Automatic checks prove deterministic behavior. They do not replace judgment about product intent, threat model, or whether a change belongs in the commit.
+
+Do not execute a model to validate behavior that a deterministic test, compiler, or schema can decide.
+
 ### 6. Ship
 
 **Purpose:** Deliver the agreed change and preserve enough context for continued work.
@@ -280,6 +290,6 @@ The workflow is a repository convention, not a self-executing runtime.
 
 Agent instructions encourage compliant behavior; they cannot guarantee that every tool or model obeys the convention.
 
-The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, and research/specification metadata. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. These checks do not verify semantic correctness, approval, product outcomes, or skill invocation.
+The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, research/specification metadata, required entry documents, and relative links under the canonical documents and `docs/`. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. These checks do not verify semantic correctness, approval, product outcomes, or skill invocation.
 
 Humans and reviewers remain responsible for approving consequential decisions and evaluating the quality of the work.

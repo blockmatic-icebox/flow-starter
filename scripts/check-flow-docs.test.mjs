@@ -27,20 +27,35 @@ function defaultMarkdownContent(relative) {
   return "# Example\n";
 }
 
-function fixture(t, filenames, contents = {}) {
+const requiredDocuments = {
+  "AGENTS.md": "# Agents\n",
+  "ARCHITECTURE.md": "# Architecture\n",
+  "docs/readme.md": "# Foundation\n",
+  "docs/workflow/flow.md": "# Contract\n",
+  "docs/workflow/readme.md": "# Flow\n",
+};
+
+function fixture(t, filenames, contents = {}, options = {}) {
   const root = mkdtempSync(path.join(os.tmpdir(), "flow-docs-"));
 
   t.after(() => {
     rmSync(root, { force: true, recursive: true });
   });
 
-  for (const filename of filenames) {
+  const names = new Set(filenames);
+  if (!options.omitRequired) {
+    for (const filename of Object.keys(requiredDocuments)) names.add(filename);
+  }
+
+  for (const filename of names) {
     const absolute = path.join(root, filename);
 
     mkdirSync(path.dirname(absolute), { recursive: true });
     writeFileSync(
       absolute,
-      contents[filename] ?? defaultMarkdownContent(filename),
+      contents[filename] ??
+        requiredDocuments[filename] ??
+        defaultMarkdownContent(filename),
       "utf-8"
     );
   }
@@ -220,6 +235,54 @@ test("rejects spec missing status", (t) => {
     validateFlowDocs(root).join("\n"),
     /missing or invalid \*\*Status:\*\*/u
   );
+});
+
+test("requires canonical documents", (t) => {
+  const root = fixture(t, [], {}, { omitRequired: true });
+  assert.match(
+    validateFlowDocs(root).join("\n"),
+    /missing canonical document AGENTS.md/u
+  );
+});
+
+test("reports a broken relative link with its source file", (t) => {
+  const root = fixture(t, ["docs/ideas/customer-problem.md"], {
+    "docs/ideas/customer-problem.md": `${defaultMarkdownContent("docs/ideas/customer-problem.md")}\n[Missing](./missing.md)\n`,
+  });
+  assert.match(
+    validateFlowDocs(root).join("\n"),
+    /docs\/ideas\/customer-problem.md: broken link \.\/missing.md/u
+  );
+});
+
+test("accepts relative, encoded, directory, and fragment links", (t) => {
+  const root = fixture(
+    t,
+    ["docs/my file.md", "docs/ideas/customer-problem.md"],
+    {
+      "docs/ideas/customer-problem.md": `${defaultMarkdownContent("docs/ideas/customer-problem.md")}
+[Architecture](../../ARCHITECTURE.md)
+[Encoded](../my%20file.md)
+[Workflow](../workflow/)
+[Fragment](../workflow/flow.md#review)
+[External](https://example.com/docs)
+[Mail](mailto:security@example.invalid)
+`,
+      "docs/my file.md": "# Notes\n",
+    }
+  );
+  assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("ignores links inside fenced code", (t) => {
+  const root = fixture(t, ["docs/ideas/customer-problem.md"], {
+    "docs/ideas/customer-problem.md": `${defaultMarkdownContent("docs/ideas/customer-problem.md")}
+\`\`\`md
+[Missing](./missing.md)
+\`\`\`
+`,
+  });
+  assert.deepEqual(validateFlowDocs(root), []);
 });
 
 test("validates historical nested GenUI spec metadata", (t) => {

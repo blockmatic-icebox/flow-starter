@@ -4,7 +4,7 @@ Project-specific terms for this starter. Generic platform vocabulary (OpenUI Lan
 
 ## GenUI
 
-Generative UI in this repo: **select → compile → render**. User text is routed to a composition tier, compiled into validated OpenUI Lang, then rendered through an allowlisted React catalog (`@repo/genui`).
+Generative UI in this repo: **select → compile → validate → render**. User text is routed to a composition tier, compiled into OpenUI Lang, validated, then rendered through an allowlisted React catalog (`@repo/genui`).
 
 ## Composition tier
 
@@ -20,7 +20,7 @@ Serializable bundle of `openuiText`, grounded `records`, and metadata. The compo
 
 ## Shared action
 
-An authorized operation registered by the host (`createActionRegistry`), callable from UI and (when eve ships) from agent tools. Model output does not define privileged actions.
+An authorized operation registered by the host (`createActionRegistry`), callable from UI and (when eve ships) from agent tools. Authentication and approval requirements belong to that registration. Model output and callers do not define them.
 
 ## Acme fixtures
 

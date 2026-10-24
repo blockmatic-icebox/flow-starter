@@ -1,4 +1,10 @@
 import type { CompositionEnvelope } from "../core/envelope";
+import {
+  NDJSON_MAX_EVENTS,
+  NDJSON_MAX_LINE_BYTES,
+  NDJSON_MAX_RESPONSE_BYTES,
+  parseComposeStreamEvent,
+} from "./stream-schema";
 
 export type ComposeStreamEvent =
   | { requestId: string; sequence: number; type: "start" }
@@ -10,29 +16,73 @@ export type ComposeStreamEvent =
     }
   | { message: string; requestId: string; sequence: number; type: "error" };
 
-export type NdjsonParseResult =
-  | { ok: true; events: Record<string, unknown>[] }
-  | { ok: false; error: "malformed_line" | "empty_stream"; line?: string };
+export type NdjsonFailureReason =
+  | "empty_stream"
+  | "invalid_event"
+  | "malformed_line"
+  | "no_body"
+  | "oversized_line"
+  | "oversized_response"
+  | "too_many_events"
+  | "truncated_stream";
 
-const parseNdjsonLine = (
-  line: string
-): { ok: true; event: Record<string, unknown> } | { ok: false } => {
+export type NdjsonConsumeResult =
+  | { ok: true }
+  | { ok: false; reason: NdjsonFailureReason };
+
+const encoder = new TextEncoder();
+
+export const utf8ByteLength = (value: string) =>
+  encoder.encode(value).byteLength;
+
+const parseLine = (line: string) => {
+  if (utf8ByteLength(line) > NDJSON_MAX_LINE_BYTES)
+    return { ok: false as const, reason: "oversized_line" as const };
+  let value: unknown;
   try {
-    return { event: JSON.parse(line) as Record<string, unknown>, ok: true };
+    value = JSON.parse(line) as unknown;
   } catch {
-    return { ok: false };
+    return { ok: false as const, reason: "malformed_line" as const };
   }
+  const parsed = parseComposeStreamEvent(value);
+  if (!parsed.ok)
+    return { ok: false as const, reason: "invalid_event" as const };
+  return { event: parsed.event, ok: true as const };
 };
 
-export const parseNdjsonText = (text: string): NdjsonParseResult => {
-  const events: Record<string, unknown>[] = [];
-  for (const line of text.split("\n")) {
+export const parseNdjsonText = (
+  text: string
+):
+  | { events: ComposeStreamEvent[]; ok: true }
+  | { ok: false; reason: NdjsonFailureReason } => {
+  if (utf8ByteLength(text) > NDJSON_MAX_RESPONSE_BYTES)
+    return { ok: false, reason: "oversized_response" };
+  const events: ComposeStreamEvent[] = [];
+  const lines = text.split("\n");
+  const completeLines = text.endsWith("\n")
+    ? lines.slice(0, -1)
+    : lines.slice(0, -1);
+  const trailing = lines.at(-1) ?? "";
+  for (const line of completeLines) {
     if (!line.trim()) continue;
-    const parsed = parseNdjsonLine(line);
-    if (!parsed.ok) return { error: "malformed_line", line, ok: false };
+    const parsed = parseLine(line);
+    if (!parsed.ok) return parsed;
+    events.push(parsed.event);
+    if (events.length > NDJSON_MAX_EVENTS)
+      return { ok: false, reason: "too_many_events" };
+  }
+  if (trailing.trim()) {
+    const parsed = parseLine(trailing);
+    if (!parsed.ok) {
+      return text.endsWith("\n")
+        ? parsed
+        : { ok: false, reason: "truncated_stream" };
+    }
     events.push(parsed.event);
   }
-  if (!events.length) return { error: "empty_stream", ok: false };
+  if (events.length > NDJSON_MAX_EVENTS)
+    return { ok: false, reason: "too_many_events" };
+  if (!events.length) return { ok: false, reason: "empty_stream" };
   return { events, ok: true };
 };
 
@@ -40,41 +90,70 @@ export const consumeNdjsonResponse = async ({
   onEvent,
   response,
 }: {
-  onEvent: (event: Record<string, unknown>) => void;
+  onEvent: (event: ComposeStreamEvent) => void;
   response: Response;
-}) => {
+}): Promise<NdjsonConsumeResult> => {
   const reader = response.body?.getReader();
-  if (!reader) return { ok: false as const, reason: "no_body" as const };
+  if (!reader) return { ok: false, reason: "no_body" };
   const decoder = new TextDecoder();
-  let buffer = "";
-  const pump = async (): Promise<{
-    ok: false;
-    reason: "malformed_line";
-  } | null> => {
-    const { done, value } = await reader.read();
-    if (done) return null;
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? "";
-    for (const line of lines) {
-      if (!line.trim()) continue;
-      const parsed = parseNdjsonLine(line);
-      if (!parsed.ok) {
-        return { ok: false as const, reason: "malformed_line" as const };
-      }
-      onEvent(parsed.event);
+  let pending = "";
+  let totalBytes = 0;
+  let events = 0;
+
+  const emitLine = (line: string): NdjsonConsumeResult | null => {
+    if (!line.trim()) return null;
+    if (utf8ByteLength(line) > NDJSON_MAX_LINE_BYTES) {
+      return { ok: false, reason: "oversized_line" };
     }
-    return pump();
+    const parsed = parseLine(line);
+    if (!parsed.ok) return parsed;
+    events += 1;
+    if (events > NDJSON_MAX_EVENTS)
+      return { ok: false, reason: "too_many_events" };
+    onEvent(parsed.event);
+    return null;
   };
-  const streamError = await pump();
-  if (streamError) return streamError;
-  const trailing = buffer.trim();
-  if (trailing) {
-    const parsed = parseNdjsonLine(trailing);
-    if (!parsed.ok) {
-      return { ok: false as const, reason: "malformed_line" as const };
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > NDJSON_MAX_RESPONSE_BYTES) {
+        await reader.cancel();
+        return { ok: false, reason: "oversized_response" };
+      }
+      pending += decoder.decode(value, { stream: true });
+      let newline = pending.indexOf("\n");
+      while (newline !== -1) {
+        const line = pending.slice(0, newline);
+        pending = pending.slice(newline + 1);
+        const failure = emitLine(line);
+        if (failure) {
+          await reader.cancel();
+          return failure;
+        }
+        newline = pending.indexOf("\n");
+      }
+      if (utf8ByteLength(pending) > NDJSON_MAX_LINE_BYTES) {
+        await reader.cancel();
+        return { ok: false, reason: "oversized_line" };
+      }
     }
+    pending += decoder.decode();
+  } catch {
+    return { ok: false, reason: "truncated_stream" };
+  }
+
+  if (pending.trim()) {
+    const parsed = parseLine(pending);
+    if (!parsed.ok) return { ok: false, reason: "truncated_stream" };
+    events += 1;
+    if (events > NDJSON_MAX_EVENTS)
+      return { ok: false, reason: "too_many_events" };
     onEvent(parsed.event);
   }
-  return { ok: true as const };
+
+  if (events === 0) return { ok: false, reason: "empty_stream" };
+  return { ok: true };
 };

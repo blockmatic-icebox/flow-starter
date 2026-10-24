@@ -5,12 +5,12 @@ node_modules
 .pnp
 .pnp.js
 
-# Local env files
+# Local env files. Templates such as .env.example stay tracked.
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
+!.env.*.example
+!.env.schema
 
 # Testing
 coverage
@@ -40,6 +40,11 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.*
 __dev
 
 # DeepSec scan output and credentials (config and INFO.md are committed)

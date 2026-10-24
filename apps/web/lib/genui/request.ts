@@ -1,30 +1,29 @@
-const LOCAL_DEV_HOSTS = new Set([
-  "localhost",
-  "127.0.0.1",
-  "::1",
-  "flow.localhost",
-]);
+const SHARED_SUBJECT = "shared";
 
-export const requestHost = (request: Request) =>
-  new URL(request.url).hostname.toLowerCase();
-
-export const isLocalDevHost = (host: string) =>
-  LOCAL_DEV_HOSTS.has(host.toLowerCase());
-
-/** Off on local dev hosts unless `GENUI_ENFORCE_RATE_LIMIT=1`. */
-export const composeRateLimitEnforced = ({ host }: { host: string }) => {
-  if (process.env.GENUI_ENFORCE_RATE_LIMIT === "1") return true;
-  if (process.env.GENUI_ENFORCE_RATE_LIMIT === "0") return false;
-  return !isLocalDevHost(host);
+/** Trusted server configuration. Never derived from a caller-controlled host. */
+export const rateLimitEnforced = ({ env }: { env: NodeJS.ProcessEnv }) => {
+  if (env.GENUI_ENFORCE_RATE_LIMIT === "0") return false;
+  if (env.GENUI_ENFORCE_RATE_LIMIT === "1") return true;
+  return env.NODE_ENV === "production";
 };
 
-export const readRequestIp = (request: Request) => {
-  const forwarded = request.headers
-    .get("x-forwarded-for")
-    ?.split(",")[0]
-    ?.trim();
-  if (forwarded) return forwarded;
-  const real = request.headers.get("x-real-ip")?.trim();
-  if (real) return real;
-  return "unknown";
+/**
+ * Subject for unauthenticated demo quotas.
+ * A forwarded IP header is used only when the deployment names the header its
+ * ingress overwrites. Otherwise every caller shares one bucket so a spoofed
+ * header cannot mint new quotas.
+ */
+export const rateLimitSubject = ({
+  env,
+  request,
+}: {
+  env: NodeJS.ProcessEnv;
+  request: Request;
+}) => {
+  const headerName = env.RATE_LIMIT_TRUSTED_IP_HEADER?.trim();
+  if (!headerName) return SHARED_SUBJECT;
+  const candidate =
+    request.headers.get(headerName)?.split(",")[0]?.trim() ?? "";
+  if (!/^[\d.a-fA-F:]{1,64}$/u.test(candidate)) return SHARED_SUBJECT;
+  return candidate;
 };

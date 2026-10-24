@@ -1,49 +1,71 @@
 import { composeQuery } from "@repo/genui";
 import { NextResponse } from "next/server";
 
-import { admitCompose } from "@/lib/genui/admit-compose";
-import { memoryCapStore } from "@/lib/genui/cap-store";
 import { composeContextFromRequest } from "@/lib/genui/compose-context";
 import {
-  composeRateLimitEnforced,
-  readRequestIp,
-  requestHost,
-} from "@/lib/genui/request";
+  composeRequestErrorMessage,
+  composeRequestSchema,
+} from "@/lib/genui/compose-request-schema";
+import type { CreateCapStoreResult } from "@/lib/genui/create-cap-store";
+import { enforceDailyCap } from "@/lib/genui/enforce-daily-cap";
+import { rateLimitSubject } from "@/lib/genui/request";
+import {
+  jsonRequestMessage,
+  jsonRequestStatus,
+  readJsonRequest,
+} from "@/lib/security/read-json-request";
 
 export const runtime = "nodejs";
 
 const DEADLINE_MS = 15_000;
-const capStore = memoryCapStore();
+export const COMPOSE_MAX_BODY_BYTES = 16 * 1024;
 
-export const POST = async (request: Request) => {
-  const body = (await request.json().catch(() => null)) as {
-    clientRequestId?: string;
-    query?: string;
-    version?: number;
-  } | null;
-  const query = body?.query?.trim() ?? "";
-  if (!query) {
-    return NextResponse.json(
-      { message: "Query is required." },
-      { status: 400 }
-    );
-  }
+const jsonError = ({ message, status }: { message: string; status: number }) =>
+  NextResponse.json({ message }, { status });
 
-  const ip = readRequestIp(request);
-  const host = requestHost(request);
-  const correlationId = body?.clientRequestId?.trim() || crypto.randomUUID();
-  const context = composeContextFromRequest({ correlationId, ip });
-
-  const admitted = await admitCompose({
-    enforce: composeRateLimitEnforced({ host }),
-    ip,
-    now: context.clock,
-    store: capStore,
+export const handleComposePost = async ({
+  createStore,
+  env = process.env,
+  now = new Date(),
+  request,
+}: {
+  createStore?: (input: { env: NodeJS.ProcessEnv }) => CreateCapStoreResult;
+  env?: NodeJS.ProcessEnv;
+  now?: Date;
+  request: Request;
+}) => {
+  const body = await readJsonRequest({
+    maxBytes: COMPOSE_MAX_BODY_BYTES,
+    request,
   });
-  if (!admitted.ok) {
-    return NextResponse.json({ message: admitted.message }, { status: 429 });
-  }
+  if (!body.ok)
+    return jsonError({
+      message: jsonRequestMessage(body.error),
+      status: jsonRequestStatus(body.error),
+    });
 
+  const parsed = composeRequestSchema.safeParse(body.value);
+  if (!parsed.success)
+    return jsonError({
+      message: composeRequestErrorMessage(parsed.error),
+      status: 400,
+    });
+
+  const admitted = await enforceDailyCap({
+    createStore,
+    env,
+    kind: "compose",
+    now,
+    request,
+  });
+  if (!admitted.ok)
+    return jsonError({ message: admitted.message, status: admitted.status });
+
+  const correlationId = parsed.data.clientRequestId ?? crypto.randomUUID();
+  const context = composeContextFromRequest({
+    correlationId,
+    subject: rateLimitSubject({ env, request }),
+  });
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -56,8 +78,8 @@ export const POST = async (request: Request) => {
         await composeQuery({
           input: {
             clientRequestId: context.correlationId,
-            query,
-            version: body?.version ?? 1,
+            query: parsed.data.query,
+            version: parsed.data.version ?? 1,
           },
           onEvent: (event) => {
             if (abortController.signal.aborted) return;
@@ -91,3 +113,5 @@ export const POST = async (request: Request) => {
     },
   });
 };
+
+export const POST = (request: Request) => handleComposePost({ request });

@@ -4,7 +4,7 @@
 
 **Status:** Current
 
-Evidence-based extraction from gaboesquivel.com (read-only source) into `@repo/genui`. See [inventory.md](./inventory.md) for historical source-to-target mappings and snapshot evidence.
+Historical source mapping is recorded in [inventory.md](./inventory.md).
 
 ## Three-level strategy
 
@@ -16,7 +16,7 @@ Evidence-based extraction from gaboesquivel.com (read-only source) into `@repo/g
 
 Tier 3 is not arbitrary runtime generation of React components or unconstrained interface trees. The implementation keeps presentation within approved OpenUI Lang contracts and host-controlled renderers.
 
-Pipeline: **route → build OpenUI text → `compileCompositionEnvelope` → stream NDJSON → React `Renderer`**.
+Pipeline: **select → build OpenUI text → compile and validate → emit validated NDJSON → validate the inbound stream → render**. An invalid envelope is not emitted as `partial` or `complete`, and `GenuiRenderer` refuses an envelope the compiler rejects. The demo aborts the previous submission and ignores events for older request ids.
 
 ## Package layout
 
@@ -59,11 +59,11 @@ pnpm test:browser
 
 | Layer | Location | What it proves |
 | --- | --- | --- |
-| Contract + compose | `packages/genui/src/**/*.test.ts` | Compiler, routing, `composeQuery`, 100+ prompt matrix (no API keys) |
+| Contract + compose | `packages/genui/src/**/*.test.ts` | Compiler, routing, validation-before-emit, NDJSON limits, `composeQuery`, 100+ graded prompts (no API keys) |
 | Offline eval | `pnpm eval:genui:offline` | Same matrix as a JSON report |
-| MCP protocol | `apps/web/lib/consultant/mcp-protocol.test.ts` | JSON-RPC on the same handler as `/api/mcp` |
+| MCP protocol | `apps/web/lib/consultant/mcp-protocol.test.ts` and `apps/web/lib/security/mcp-access.test.ts` | JSON-RPC on the handler, plus the HTTP access policy |
 | Fixture lab | `apps/web/tests/browser/fixture-lab.spec.ts` | Acme envelopes render without horizontal overflow |
-| Product shell | `genui-demo.spec.ts`, `consultant-shell.spec.ts` | Demo + consultant chrome (compose mocked where needed) |
+| Product shell | `genui-demo.spec.ts`, `consultant-shell.spec.ts` | Demo submission, overlapping requests, invalid streams, consultant chrome and deterministic fallback |
 
 **Fixture lab:** `/__genui__/fixtures/:fixtureId` when `GENUI_FIXTURE_LAB=1` (not on Vercel). IDs in `packages/genui/src/fixtures/lab-fixtures.ts`. Playwright uses port **3199** (`apps/web/scripts/playwright-webserver.sh`).
 

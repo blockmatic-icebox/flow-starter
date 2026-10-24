@@ -17,6 +17,7 @@ Update the owning document in the same change. Use a PDR in `docs/pdr/` for a co
 - Product behavior, scope, or acceptance → [PRODUCT.md](PRODUCT.md)
 - UI, interaction, or visual changes → [DESIGN.md](DESIGN.md)
 - Architecture, integrations, or persistence → [ARCHITECTURE.md](ARCHITECTURE.md)
+- Security boundaries → [SECURITY.md](SECURITY.md) and [docs/security/security-model.md](docs/security/security-model.md)
 - Flow Starter's inherited foundation, goals or adoption guidance → [docs/readme.md](docs/readme.md).
 - Human-facing explanation of Flow → [docs/workflow/readme.md](docs/workflow/readme.md). Operational rules remain in [docs/workflow/flow.md](docs/workflow/flow.md).
 - Project-specific terms → [GLOSSARY.md](GLOSSARY.md)
@@ -38,13 +39,16 @@ Use [docs/workflow/flow.md](docs/workflow/flow.md) for Explore → Specify → P
 - Run the checks that match the change. Report the commands and results. Do not bypass quality gates or misrepresent results.
 - React application changes must preserve server/client boundaries and the established fractal component architecture. Use relevant installed skills, not all technical skills at once.
 - For Next.js development issues, use the framework's runtime MCP diagnostics when available; then verify relevant behavior in the browser. If runtime tools are unavailable, report that limitation and use the established CLI/browser fallback.
-- Pre-commit runs `pnpm security:block-files`, `pnpm security:secrets`, then non-mutating `pnpm qa`. Install gitleaks via `pnpm setup:gitleaks` before committing. Format deliberately with `pnpm lint:fix` before staging. Hooks must never stage files or reformat unrelated working-tree changes automatically.
+- Pre-commit runs `pnpm security:block-files`, `pnpm security:secrets`, then `node scripts/check-staged.mjs`. It does not run Playwright, the production build, or `pnpm qa`. Install gitleaks via `pnpm setup:gitleaks` before committing. Format deliberately with `pnpm lint:fix` before staging. Hooks must never stage files or reformat unrelated working-tree changes automatically.
+- Before an explicitly authorized commit, follow the diff-scoped review in [docs/workflow/flow.md](docs/workflow/flow.md).
 
 ## Agent skills
 
 ### Domain docs
 
 Single-context. See [docs/agents/domain.md](docs/agents/domain.md).
+
+Choose skills from [docs/agents/skills.md](docs/agents/skills.md). Do not load the full catalog for a task.
 
 <!-- BEGIN:turborepo-agent-rules -->
 

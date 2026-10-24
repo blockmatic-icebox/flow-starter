@@ -17,6 +17,8 @@ Install dependencies:
 pnpm install
 ```
 
+`pnpm setup` also prepares environment templates. `pnpm setup:full` installs optional local tools (skills, secret scanners, Portless, DeepSec, Playwright). Scanner installation may require administrator rights. See the [foundation guide](docs/readme.md).
+
 Start the application:
 
 ```bash

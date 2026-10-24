@@ -12,7 +12,7 @@ Developers adopting the starter should not need to repeatedly select a component
 
 The architecture is informed by:
 
-[Fractal Components in React](https://gaboesquivel.com/blog/2024-11-react-fractal-compoundnents), published November 25, 2024.
+*Fractal Components in React*, published November 25, 2024.
 
 The central principles are:
 
@@ -333,7 +333,7 @@ Do not create a new ADR for every exception.
 
 ## References
 
-- [Fractal Components in React](https://gaboesquivel.com/blog/2024-11-react-fractal-compoundnents)
+- *Fractal Components in React* (November 25, 2024)
 - [Next.js App Router](https://nextjs.org/docs/app)
 - [React Server Components](https://react.dev/reference/rsc/server-components)
 - [Next.js Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)
