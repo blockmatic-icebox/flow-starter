@@ -10,10 +10,10 @@ Technical constraints and system architecture belong in [ARCHITECTURE.md](ARCHIT
 
 - `@repo/genui`: OpenUI Lang contracts, compiler, controlled and declarative composition, React adapter, and fictional Acme fixtures.
 - `POST /api/genui/compose`: bounded NDJSON streaming. Compositions are validated before renderable events. Production rate limits use Upstash Redis and fail closed.
-- `/genui-demo`: web integration example.
-- Site consultant: right-hand chat sidebar on the site shell, bounded `POST /api/chat`, and read-only `GET|POST|DELETE /api/mcp` with origin checks and explicit production access configuration ([ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md), [ADR 0011](docs/adr/0011-api-and-agent-security-boundaries.md)).
-- Optional AI Gateway-backed tier-3 answers and consultant chat, with a grounded deterministic fallback when credentials are absent.
-- `@repo/db`: Drizzle schema, `postgres.js` client, committed migrations, and `drizzle-kit check` in `pnpm qa`.
+- `apps/flow`: GenUI at `/`, Flow Agent sidebar, fixture lab, bounded `POST /api/chat`, `POST /api/genui/compose`, and read-only MCP ([ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md), [ADR 0011](docs/adr/0011-api-and-agent-security-boundaries.md), [ADR 0012](docs/adr/0012-flow-and-web-applications.md)).
+- `apps/web`: product-neutral starter without demo agents or GenUI routes.
+- Optional AI Gateway-backed tier-3 answers and Flow Agent chat, with a grounded deterministic fallback when credentials are absent.
+- `@repo/db`: Drizzle schema (including Better Auth core tables as schema-only groundwork), `postgres.js` client, committed migrations, and `drizzle-kit check` in `pnpm qa`.
 - Neon Local via `docker-compose.yml` and `pnpm db:start` / `db:migrate` / `db:ping` (requires Neon credentials and Docker).
 - Security and workspace hygiene: gitleaks with a detection canary, OSV, knip, sherif, `pnpm security:check`, and a diff-scoped pre-commit gate.
 - CI and Security workflows run on pull requests and pushes to `main`. The PR title check is active. DeepSec remains manual.
@@ -25,11 +25,12 @@ Technical constraints and system architecture belong in [ARCHITECTURE.md](ARCHIT
 
 | Order | Capability | Status | Verification goal |
 | --- | --- | --- | --- |
-| 1 | Foundation integration spike | Planned | Eve, authentication, persistence, streaming, cancellation, authorization and deployment work together in one vertical slice |
-| 2 | `/dev` workspace | Planned | Conversation, selection context, responsive layout and validated result surfaces function together |
-| 3 | Shared-action slice | Planned | A human and an agent can invoke the same authorized action with consistent validation and results |
-| 4 | Grounded explorer | Planned | Bounded retrieval produces source-backed answers and validated presentation |
-| 5 | Adoption proof | Planned | A fork can replace product context and fixtures, extend the system, pass the checks and deploy a working slice |
+| 1 | Better Auth runtime | Planned | OAuth, sessions, and protected routes on top of generated `@repo/db` auth tables (schema shipped; no login UI yet) |
+| 2 | Foundation integration spike | Planned | Eve, authentication, persistence, streaming, cancellation, authorization and deployment work together in one vertical slice |
+| 3 | `/dev` workspace | Planned | Conversation, selection context, responsive layout and validated result surfaces function together |
+| 4 | Shared-action slice | Planned | A human and an agent can invoke the same authorized action with consistent validation and results |
+| 5 | Grounded explorer | Planned | Bounded retrieval produces source-backed answers and validated presentation |
+| 6 | Adoption proof | Planned | A fork can replace product context and fixtures, extend the system, pass the checks and deploy a working slice |
 
 A planned integration must not be presented as existing functionality.
 

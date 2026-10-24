@@ -5,13 +5,12 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-import { SiteShell } from "@/components/site-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   description:
-    "Flow Starter — generative UI demo and implementation sequence in ARCHITECTURE.md.",
-  title: "Flow",
+    "Product starter — replace PRODUCT.md and DESIGN.md with your product.",
+  title: "Product",
 };
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
@@ -39,9 +38,7 @@ export default function RootLayout({
     >
       <body>
         <NuqsAdapter>
-          <ThemeProvider>
-            <SiteShell>{children}</SiteShell>
-          </ThemeProvider>
+          <ThemeProvider>{children}</ThemeProvider>
         </NuqsAdapter>
       </body>
     </html>

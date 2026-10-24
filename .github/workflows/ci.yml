@@ -43,7 +43,7 @@ jobs:
       - run: pnpm eval:genui:offline
 
       - name: Install Playwright Chromium
-        run: pnpm --filter web exec playwright install --with-deps chromium
+        run: pnpm setup:playwright
 
       - run: pnpm test:browser
       - run: pnpm build

@@ -18,22 +18,28 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/web/hooks/use-highlighted-code.ts"],
-      rules: {
-        "eslint/no-empty-function": "off",
-        "promise/prefer-await-to-then": "off",
-      },
-    },
-    {
-      files: ["apps/web/tests/browser/genui-demo.spec.ts"],
+      files: ["apps/flow/tests/browser/genui-demo.spec.ts"],
       rules: {
         "promise/avoid-new": "off",
       },
     },
     {
+      files: ["apps/flow/app/_lib/flow-agent/knowledge.ts"],
+      rules: {
+        "unicorn/no-array-sort": "off",
+      },
+    },
+    {
+      files: ["packages/db/src/auth-schema.ts"],
+      rules: {
+        "eslint/no-inline-comments": "off",
+        "eslint/sort-keys": "off",
+      },
+    },
+    {
       files: [
-        "apps/web/lib/security/read-json-request.ts",
-        "apps/web/lib/genui/cap-store.test.ts",
+        "apps/flow/app/_lib/security/read-json-request.ts",
+        "apps/flow/app/_lib/genui/cap-store.test.ts",
         "packages/genui/src/orchestration/stream.ts",
       ],
       rules: {

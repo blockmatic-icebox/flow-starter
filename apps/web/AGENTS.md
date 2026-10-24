@@ -1,9 +1,9 @@
-<!-- BEGIN:nextjs-agent-rules -->
+# Product application (`apps/web`)
 
-## This is NOT the Next.js you know
+Minimal Next.js starter for a new product. No Flow Agent, GenUI demo, or demo APIs.
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+- Colocate route code under `app/<route>/` (see ADR 0009).
+- Shared UI from `@repo/ui`; optional database via `@repo/db`.
+- Local hostname: `web.localhost` (Portless).
 
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
+Root `AGENTS.md` and `ARCHITECTURE.md` own monorepo-wide rules.

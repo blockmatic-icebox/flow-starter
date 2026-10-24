@@ -258,6 +258,26 @@ export const Demo = () => readJsonRequest;
   );
 });
 
+test("rejects cross-application imports", (t) => {
+  const root = fixture(t, {
+    ...basePackages(),
+    "apps/flow/app/page.tsx": `import { x } from "web/lib/x";
+export default function Page() { return null; }
+`,
+    "apps/flow/package.json": JSON.stringify({
+      dependencies: { "@repo/genui": "workspace:*", "@repo/ui": "workspace:*" },
+      name: "flow-app",
+    }),
+  });
+
+  assert.match(
+    validateReactArchitecture(root)
+      .map((v) => v.rule)
+      .join(","),
+    /no-cross-app-imports/u
+  );
+});
+
 test("detects static dynamic imports", (t) => {
   const root = fixture(t, {
     ...basePackages(),

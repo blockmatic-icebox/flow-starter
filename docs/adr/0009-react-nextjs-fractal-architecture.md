@@ -12,7 +12,7 @@ Developers adopting the starter should not need to repeatedly select a component
 
 The architecture is informed by:
 
-*Fractal Components in React*, published November 25, 2024.
+_Fractal Components in React_, published November 25, 2024.
 
 The central principles are:
 
@@ -243,37 +243,31 @@ Use AGENTS.md as the lightweight router, ARCHITECTURE.md as the current architec
 
 Keep implementation and documentation synchronized.
 
-## Recommended feature shape
+## Recommended route colocation
 
-For a substantial domain feature:
+For a substantial route, colocate implementation beside the App Router entry:
 
 ```text
-apps/web/
-  app/
-    markets/
-      page.tsx
-      loading.tsx
-
-  features/
-    markets/
-      components/
-        market-list.tsx
-        market-card.tsx
-        market-filters.tsx
-      server/
-        get-markets.ts
-      hooks/
-        use-market-filters.ts
-      search-params.ts
-      schemas.ts
-      market-list.test.ts
+apps/web/app/markets/
+  page.tsx
+  loading.tsx
+  market-list.tsx
+  get-markets.ts
+  search-params.ts
+  schemas.ts
+  market-list.test.ts
+  _components/
+    market-card.tsx
+    market-filters.tsx
+  _hooks/
+    use-market-filters.ts
 ```
 
-This structure illustrates responsibility, not mandatory placeholder files.
+Private folders such as `_components` are optional — use them when a route grows, not by default.
 
-Do not create unused folders.
+Do not create a parallel top-level `features/` tree that separates code from its route.
 
-For smaller features, colocating everything in the route segment is acceptable.
+For smaller routes, keep related files flat next to `page.tsx`.
 
 For shared primitives, use the existing `packages/ui` conventions.
 
@@ -333,7 +327,7 @@ Do not create a new ADR for every exception.
 
 ## References
 
-- *Fractal Components in React* (November 25, 2024)
+- _Fractal Components in React_ (November 25, 2024)
 - [Next.js App Router](https://nextjs.org/docs/app)
 - [React Server Components](https://react.dev/reference/rsc/server-components)
 - [Next.js Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)

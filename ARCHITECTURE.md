@@ -21,10 +21,8 @@ The checkout is a **baseline**, not a finished product. Replace fixtures, routes
 ## 2. Repository layout
 
 ```text
-apps/web/
-  app/                      # routes, API handlers
-  app/api/genui/compose/    # NDJSON compose stream
-  app/genui-demo/           # integration example
+apps/web/                   # product starter (minimal homepage)
+apps/flow/                  # Flow experience (GenUI at /, Flow Agent, APIs)
 packages/
   genui/                    # @repo/genui — compiler, orchestration, React adapter
   db/                       # @repo/db — Drizzle schema, client, migrations
@@ -47,7 +45,7 @@ React code follows [ADR 0009 — React and Next.js Fractal Architecture](docs/ad
 
 Core conventions:
 
-- Fractal, feature-oriented colocation.
+- Route-first, colocation-first organization with progressive extraction (AHA).
 - Composition over large flag-driven components.
 - AHA — Avoid Hasty Abstractions.
 - Server Components by default.
