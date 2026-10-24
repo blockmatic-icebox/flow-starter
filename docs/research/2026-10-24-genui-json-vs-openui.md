@@ -1,5 +1,11 @@
 # GenUI representation research — OpenUI Lang and json-render
 
+**Research date:** 2026-10-24
+
+**Last reviewed:** 2026-10-24
+
+**Status:** Historical
+
 **Research snapshot:** October 24, 2026
 
 **Decision:** [ADR 003 — OpenUI Lang foundation](../adr/003-genui-openui-foundation.md)

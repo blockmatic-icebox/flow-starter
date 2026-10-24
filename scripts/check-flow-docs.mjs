@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -33,6 +33,15 @@ const legacyPaths = new Set([
   "docs/specs/genui/README.md",
 ]);
 
+const researchDatePattern =
+  /^\*\*Research date:\*\*\s*(?<date>\d{4}-\d{2}-\d{2}|Unknown \(legacy\))\s*$/mu;
+const lastReviewedPattern =
+  /^\*\*Last reviewed:\*\*\s*(?<date>\d{4}-\d{2}-\d{2})\s*$/mu;
+const researchStatusPattern =
+  /^\*\*Status:\*\*\s*(?<status>Current|Historical|Exploratory)\s*$/mu;
+const specStatusPattern =
+  /^\*\*Status:\*\*\s*(?<status>Current|Historical|Draft)\s*$/mu;
+
 function markdownFiles(directory) {
   if (!existsSync(directory)) {
     return [];
@@ -65,6 +74,15 @@ function decisionNumber(filename) {
   return match ? Number(match.groups.num) : null;
 }
 
+function validCalendarDate(dateString) {
+  const date = new Date(`${dateString}T00:00:00.000Z`);
+
+  return (
+    !Number.isNaN(date.getTime()) &&
+    date.toISOString().slice(0, 10) === dateString
+  );
+}
+
 function validDate(filename) {
   const match = /^(?<date>\d{4}-\d{2}-\d{2})-/u.exec(filename);
 
@@ -72,12 +90,7 @@ function validDate(filename) {
     return false;
   }
 
-  const date = new Date(`${match.groups.date}T00:00:00.000Z`);
-
-  return (
-    !Number.isNaN(date.getTime()) &&
-    date.toISOString().slice(0, 10) === match.groups.date
-  );
+  return validCalendarDate(match.groups.date);
 }
 
 function seedLegacyDecisionNumbers({ numbers, root }) {
@@ -104,6 +117,84 @@ function seedLegacyDecisionNumbers({ numbers, root }) {
       numbers[category].set(number, relative);
     }
   }
+}
+
+function validateResearchMetadata({ content, errors, relative }) {
+  const researchDate = researchDatePattern.exec(content);
+
+  if (!researchDate) {
+    errors.push(`${relative}: missing **Research date:** metadata`);
+  } else if (
+    researchDate.groups.date !== "Unknown (legacy)" &&
+    !validCalendarDate(researchDate.groups.date)
+  ) {
+    errors.push(`${relative}: invalid **Research date:** calendar date`);
+  }
+
+  const reviewed = lastReviewedPattern.exec(content);
+
+  if (!reviewed) {
+    errors.push(`${relative}: missing **Last reviewed:** metadata`);
+  } else if (!validCalendarDate(reviewed.groups.date)) {
+    errors.push(`${relative}: invalid **Last reviewed:** calendar date`);
+  }
+
+  if (!researchStatusPattern.test(content)) {
+    errors.push(
+      `${relative}: missing or invalid **Status:** (Current, Historical, or Exploratory)`
+    );
+  }
+
+  const datedFilename = /^(?<date>\d{4}-\d{2}-\d{2})-/u.exec(
+    path.basename(relative)
+  );
+
+  if (
+    datedFilename &&
+    researchDate &&
+    researchDate.groups.date !== "Unknown (legacy)" &&
+    researchDate.groups.date !== datedFilename.groups.date
+  ) {
+    errors.push(
+      `${relative}: **Research date:** must match filename date ${datedFilename.groups.date}`
+    );
+  }
+}
+
+function validateSpecMetadata({ content, errors, relative }) {
+  const reviewed = lastReviewedPattern.exec(content);
+
+  if (!reviewed) {
+    errors.push(`${relative}: missing **Last reviewed:** metadata`);
+  } else if (!validCalendarDate(reviewed.groups.date)) {
+    errors.push(`${relative}: invalid **Last reviewed:** calendar date`);
+  }
+
+  if (!specStatusPattern.test(content)) {
+    errors.push(
+      `${relative}: missing or invalid **Status:** (Current, Historical, or Draft)`
+    );
+  }
+}
+
+function validateDocumentMetadata(root) {
+  const errors = [];
+
+  for (const filename of markdownFiles(path.join(root, "docs/research"))) {
+    const relative = relativePath(root, filename);
+    const content = readFileSync(filename, "utf-8");
+
+    validateResearchMetadata({ content, errors, relative });
+  }
+
+  for (const filename of markdownFiles(path.join(root, "docs/specs"))) {
+    const relative = relativePath(root, filename);
+    const content = readFileSync(filename, "utf-8");
+
+    validateSpecMetadata({ content, errors, relative });
+  }
+
+  return errors;
 }
 
 export function validateFlowDocs(root = repositoryRoot) {
@@ -178,6 +269,8 @@ export function validateFlowDocs(root = repositoryRoot) {
       }
     }
   }
+
+  errors.push(...validateDocumentMetadata(root));
 
   return errors;
 }

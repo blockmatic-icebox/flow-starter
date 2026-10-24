@@ -21,6 +21,7 @@ Update the owning document in the same change. Use a PDR in `docs/pdr/` for a co
 - Project-specific terms → [GLOSSARY.md](GLOSSARY.md)
 - Hard-to-reverse rationale → the relevant file in [docs/adr/](docs/adr/)
 - Architecture-wide technology choice, platform trade-offs, or major integration change → read the relevant sections of [ADR 0001](docs/adr/0001-agentic-architecture.md).
+- React components, Next.js routes, UI features, URL state, component extraction, shared UI, or GenUI rendering → read the relevant sections of [ADR 0009](docs/adr/0009-react-nextjs-fractal-architecture.md) and inspect the affected package's installed framework documentation.
 - Dated evidence → [docs/research/](docs/research/). Accepted direction stays in the root contracts and `docs/adr/`.
 
 ## Lifecycle
@@ -34,6 +35,8 @@ Use [FLOW.md](FLOW.md) for Explore → Specify → Plan → Build → Review →
 - Install skills from [skills-lock.json](skills-lock.json) (`pnpm skills:install`, `pnpm skills:update`). Do not author, copy, or commit `SKILL.md` here.
 - UI, layout, or interaction changes: verify in a running browser before finishing. Follow [Browser development](README.md#browser-development). Backend-only and docs-only changes finish without a browser pass.
 - Run the checks that match the change. Report the commands and results. Do not bypass quality gates or misrepresent results.
+- React application changes must preserve server/client boundaries and the established fractal component architecture. Use relevant installed skills, not all technical skills at once.
+- For Next.js development issues, use the framework's runtime MCP diagnostics when available; then verify relevant behavior in the browser. If runtime tools are unavailable, report that limitation and use the established CLI/browser fallback.
 - Pre-commit runs the non-mutating `pnpm qa` checks. Format code deliberately with `pnpm lint:fix` before staging. Hooks must never stage files or reformat unrelated working-tree changes automatically.
 
 ## Agent skills

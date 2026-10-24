@@ -1,6 +1,10 @@
 # Flow GenUI — portable architecture
 
-Evidence-based extraction from gaboesquivel.com (read-only source) into `@repo/genui`. See [INVENTORY.md](./INVENTORY.md) for source-to-target mappings.
+**Last reviewed:** 2026-10-24
+
+**Status:** Current
+
+Evidence-based extraction from gaboesquivel.com (read-only source) into `@repo/genui`. See [INVENTORY.md](./INVENTORY.md) for historical source-to-target mappings and snapshot evidence.
 
 ## Three-level strategy
 

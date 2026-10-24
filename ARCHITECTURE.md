@@ -6,6 +6,8 @@ Flow Starter follows the [Agentic Architecture foundation](docs/adr/0001-agentic
 
 ## 1. Goals
 
+Flow Starter is an **opinionated Next.js and React** baseline for agentic applications. The application framework is a chosen part of the starter, not an interchangeable option adopters reselect from scratch.
+
 Flow Starter demonstrates how to build **agentic applications** with:
 
 - **Generative UI** that never executes arbitrary model output—only validated OpenUI Lang documents rendered through an allowlisted component catalog.
@@ -34,6 +36,31 @@ docs/
 ```
 
 Do not import server-only modules from client renderers. Share serializable types and Zod schemas across boundaries.
+
+## React and Next.js application architecture
+
+Flow Starter provides an opinionated React/Next.js application foundation.
+
+React code follows [ADR 0009 — React and Next.js Fractal Architecture](docs/adr/0009-react-nextjs-fractal-architecture.md).
+
+Core conventions:
+
+- Fractal, feature-oriented colocation.
+- Composition over large flag-driven components.
+- AHA — Avoid Hasty Abstractions.
+- Server Components by default.
+- Client Components at necessary interactive boundaries.
+- nuqs for shareable URL state.
+- Local state for ephemeral interaction.
+- Deliberate server and client remote-data strategies.
+- Shared visual primitives from `@repo/ui`.
+- Domain-specific code retained near the owning feature.
+- Typed capability contracts for agent and application adapters.
+- GenUI renderers following the same React architecture.
+
+Adopters use this architecture rather than designing an alternative React structure from scratch.
+
+The implementation and current package boundaries are described here; the rationale and enforcement requirements belong in ADR 0009.
 
 ## 3. Generative UI: select → compile → render
 
@@ -94,7 +121,7 @@ Voice (ADR 004) and `/dev` workspace placement (ADR 005) apply when those featur
 
 ## 8. Quality and CI
 
-Local gates: `pnpm flow:test` validates Flow naming rules, `pnpm qa` runs non-mutating documentation, lint, type, and unit checks, and `pnpm ci:local` additionally performs a production build.
+Local gates: `pnpm flow:test` validates Flow naming rules, `pnpm architecture:test` and `pnpm architecture:check` enforce objective React monorepo boundaries, `pnpm qa` runs non-mutating documentation, architecture, lint, type, and unit checks, and `pnpm ci:local` additionally performs a production build.
 
 GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and [`.github/workflows/genui-quality.yml`](.github/workflows/genui-quality.yml) — **disabled for push/PR** until uncommented. Optional DeepSec workflow remains separate.
 

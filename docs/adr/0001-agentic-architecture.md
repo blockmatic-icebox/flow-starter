@@ -164,6 +164,8 @@ Status descriptions reflect the architecture at the time of this decision. Refer
 
 **Status:** Implemented.
 
+React component and feature structure is intentionally opinionated, following Fractal React Architecture, server-first Next.js boundaries, consistent URL state, and AHA. See [ADR 0009](0009-react-nextjs-fractal-architecture.md).
+
 ### TypeScript and Node.js — shared application language and runtime
 
 **Selection:** TypeScript for application, shared packages, contracts, and future agent tooling; Node.js for existing server execution.
