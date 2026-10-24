@@ -10,7 +10,7 @@ gaboesquivel.com uses the Vercel AI SDK (`ai`) with AI Gateway for planners, sem
 
 - Add **`ai`** to `@repo/genui` and route tier-3 fallback answers through `generateText` when `AI_GATEWAY_API_KEY` is present.
 - Default model id: `anthropic/claude-sonnet-4` via AI Gateway; override with `GENUI_MODEL`.
-- When no gateway key is configured, tier 3 returns a grounded **Answer** experience using catalog fixtures—no network call.
+- When no gateway key is configured, tier 3 returns a transparent Answer fallback without making an external model call. The fallback must not attach unrelated fixture records as citations.
 - The starter ships a minimal **capability context** (`composeContextFromRequest`) and in-memory per-IP compose rate limits (`apps/web/lib/genui/`); adopters swap the cap store and add telemetry like gaboesquivel.com.
 
 ## Consequences
@@ -18,3 +18,4 @@ gaboesquivel.com uses the Vercel AI SDK (`ai`) with AI Gateway for planners, sem
 - `composeQuery` is async; API routes must await composition before closing the NDJSON stream.
 - Tests remain deterministic by not setting `AI_GATEWAY_API_KEY` in CI.
 - Full semantic planners, Jev thresholds, and eve tool wiring stay follow-on work documented in `docs/specs/genui/INVENTORY.md`.
+- Model-generated general answers are not automatically source-grounded. Do not attach an Acme document identifier merely because that record exists in the response envelope. Verified citations require an actual relationship between the answer and the referenced material.

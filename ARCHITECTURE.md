@@ -2,7 +2,7 @@
 
 > Generic technical contract for Flow Starter. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are adopter-owned templates. [docs/adr/](docs/adr/) records decisions.
 
-This project is managed as a **Turborepo monorepo** containing the web app, GenUI package, and shared libs. We leverage the **Vercel platform** extensively (Next.js for React, Vercel AI/Gateway for LLM-backed features, serverless and edge functions, CI/CD). These choices are documented in [ADR 0007](docs/adr/0007-monorepo-vercel-stack.md).
+Flow Starter uses a pnpm/Turborepo monorepo, with Next.js as the existing web framework and the Vercel AI SDK for optional model-backed functionality. [ADR 0008](docs/adr/0008-monorepo-turborepo-pnpm.md) owns repository organization; [ADR 0007](docs/adr/0007-monorepo-vercel-stack.md) owns platform and infrastructure direction. Vercel hosting and several agent, identity, and persistence integrations remain deployment or implementation choices, not proven shipped capabilities.
 
 ## 1. Goals
 
@@ -12,6 +12,7 @@ Flow Starter demonstrates how to build **agentic applications** with:
 - **Composition tiers**: controlled intents, declarative multi-section stacks, and optional model-backed open-ended answers.
 - **Shared actions** (planned): UI controls and agents call the same authorized server operations; privileged actions are registered by the host, not deserialized from model text.
 - **Vercel-aligned defaults**: Next.js App Router, optional AI Gateway for models, preview-friendly builds.
+- **Capability-first interfaces:** reusable validated operations for human applications and agent consumers, exposed through HTTP, MCP, or other interfaces only when needed ([PDR 0001](docs/pdr/0001-agnostic-api-first.md)).
 
 The checkout is a **baseline**, not a finished product. Replace fixtures, routes, and templates; keep `@repo/genui` contracts.
 
@@ -64,6 +65,8 @@ Tier 1–2 paths are fully testable without network access. Tier 3 is optional (
 - Model output **does not** define privileged actions. Invocations require schema validation; sensitive operations set `requiresApproval` / `requiresAuth`.
 - Compose and render paths treat external text as untrusted: injection patterns route to safe **Answer** or **Status** experiences.
 
+Registered actions, input validation, and declared approval/authentication requirements are foundational contracts. Actual privileged execution and end-to-end user authorization must be implemented and verified by the host. The current registry is not a completed cross-channel authorization system.
+
 ## 6. API surface (implemented)
 
 | Endpoint | Method | Role |
@@ -72,6 +75,8 @@ Tier 1–2 paths are fully testable without network access. Tier 3 is optional (
 | `/genui-demo` | GET | Client demo calling the compose API |
 
 The compose route applies optional per-IP daily limits (`apps/web/lib/genui/`, off on `flow.localhost` unless `GENUI_ENFORCE_RATE_LIMIT=1`) and builds a minimal capability context (`correlationId`, `ip`, `clock`). Telemetry and Redis-backed caps follow the gaboesquivel.com pattern in `docs/specs/genui/INVENTORY.md`.
+
+The in-memory cap store is a demonstration mechanism, not a distributed production rate limiter. Its counts are process-local and may reset or diverge across instances. The request IP is derived from forwarding headers, whose trust depends on the hosting proxy configuration. Production applications must replace this with an appropriately trusted, distributed enforcement mechanism.
 
 ## 7. Planned platform integrations
 

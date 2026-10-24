@@ -23,7 +23,23 @@ values remain in the environment or `.env.local`. Use `--model-auth local`
 to rely on a machine-wide `claude`/`codex` login instead — no API key or
 env vars needed.
 
-From the monorepo root: `pnpm deepsec scan`, `pnpm deepsec process -- --diff origin/main`, `pnpm deepsec report`. Defaults are Grok 4.6 / Pi in `deepsec.config.ts`. CI uses the same model on same-repo PRs when `AI_GATEWAY_API_KEY` is set (`.github/workflows/deepsec.yml`).
+From the monorepo root: `pnpm deepsec scan`, `pnpm deepsec process -- --diff origin/main`, `pnpm deepsec report`. Defaults are Grok 4.6 / Pi in `deepsec.config.ts`.
+
+## GitHub Actions behavior
+
+The committed DeepSec workflow is manual-only.
+
+Select the branch to review and compare it with a trusted base branch (default: main). Example:
+
+```sh
+gh workflow run DeepSec \
+  --ref feature-branch \
+  --raw-field base_ref=main
+```
+
+The workflow reviews changed files, restores trusted DeepSec configuration from the base revision, and requires the repository's AI_GATEWAY_API_KEY secret for a nonempty scan.
+
+It does not automatically comment on pull requests. A separate security review is required before enabling PR-triggered scans or automated comments.
 
 ## Daily commands
 
