@@ -57,6 +57,8 @@ Do not commit screenshots or other local browser artifacts.
 
 Both can apply to the same change. Report them separately: command output for Playwright, session URL and snapshot/screenshot/console findings for agent-browser.
 
+When Playwright flakes with `net::ERR_ABORTED` against `localhost`, stop stray dev servers on the Playwright port (`PLAYWRIGHT_PORT`, default `3198`) and rerun with `CI=true` so `reuseExistingServer` does not attach to a dying process. `@repo/ui` `Button` with `render={<Link />}` exposes **button** role in the accessibility tree—prefer `getByRole("button", { name })` or navigate by URL in specs.
+
 ## Next.js runtime diagnostics
 
 When behavior is unclear (RSC boundaries, caching, server errors), use `pnpm mcp:next` with the dev server running, then confirm the fix in the browser.
