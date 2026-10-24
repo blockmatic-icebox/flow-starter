@@ -36,6 +36,5 @@ Create a new ADR only when a consequential architectural trade-off merits durabl
 - [PRODUCT.md](../../PRODUCT.md): product intent and scope.
 - [DESIGN.md](../../DESIGN.md): experience and interaction direction.
 - [ARCHITECTURE.md](../../ARCHITECTURE.md): system boundaries.
-- [ROADMAP.md](../../ROADMAP.md): delivery priorities and progress.
 
 Read only the relevant context for the task.

@@ -23,5 +23,5 @@ Speech in the sidebar uses browser transcription (`SpeechInput` / Web Speech API
 
 - [ARCHITECTURE.md](../../ARCHITECTURE.md) §6 documents `/api/chat` and `/api/mcp`.
 - [ADR 005](0005-workspace-stays-at-dev.md) still reserves the full workspace to `/dev`; the site sidebar is not that workspace.
-- [ROADMAP.md](../../ROADMAP.md) records this slice as shipped when verified.
+- [ARCHITECTURE.md](../../ARCHITECTURE.md) §6 documents the implemented consultant chat and MCP surface.
 - Wispr Flow desktop dictation may fill the composer; embedded Wispr API is out of scope until access is granted.

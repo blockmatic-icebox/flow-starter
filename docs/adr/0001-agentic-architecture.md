@@ -113,7 +113,7 @@ Evaluate portability based on real needs and measurable switching costs.
 
 The following decisions explain the intended technical stack.
 
-Status descriptions reflect the architecture at the time of this decision. Refer to [ARCHITECTURE.md](../../ARCHITECTURE.md) and [ROADMAP.md](../../ROADMAP.md) for current implementation status.
+Status descriptions reflect the architecture at the time of this decision. Refer to [ARCHITECTURE.md](../../ARCHITECTURE.md) for current implementation status.
 
 ### Vercel — preferred agentic infrastructure
 
@@ -548,7 +548,7 @@ This ADR owns the architectural vision and the reasons for choosing the technolo
 
 [ARCHITECTURE.md](../../ARCHITECTURE.md) owns current technical boundaries and implementation status.
 
-[ROADMAP.md](../../ROADMAP.md) owns planned delivery order and progress.
+[ARCHITECTURE.md](../../ARCHITECTURE.md) describes current technical boundaries and implementation status.
 
 [PDR 0001](../pdr/0001-agnostic-api-first.md) owns product-agnostic and capability-first product-engineering principles.
 
