@@ -31,7 +31,19 @@ export const writeScenarioReport = ({
   const qualityLine =
     grade.quality === null
       ? "withheld (not official-eligible or gate failure)"
-      : `${grade.quality}`;
+      : `${grade.quality} (partial: excludes na/unverified dimensions)`;
+
+  const criterionLines = grade.scores.map((s) => {
+    const status =
+      s.score === "na"
+        ? "na"
+        : s.score === "unverified"
+          ? "missing"
+          : s.score === 0
+            ? "not-met"
+            : "met";
+    return `- ${s.id}: ${status} (score=${String(s.score)}, origin=${s.origin})`;
+  });
 
   const md = `# Scenario ${scenarioId}
 
@@ -50,6 +62,12 @@ Blockers: ${grade.blockers.join(", ") || "none"}
 Excluded dimensions: ${grade.excludedDimensions.join(", ") || "none"}
 
 Unverified dimensions: ${grade.unverifiedDimensions.join(", ") || "none"}
+
+## Criteria (shared outcome vs Flow conformance)
+
+Flow conformance (stage labels, doc paths) is judged separately from shared safety/outcome gates.
+
+${criterionLines.join("\n")}
 `;
 
   writeFileSync(

@@ -27,28 +27,39 @@ export type RegressionVerdict =
 export const manifestsCompatible = ({
   baseline,
   current,
+  remediationMode = false,
 }: {
   baseline: RunManifest;
   current: RunManifest;
+  remediationMode?: boolean;
 }) => {
   const issues: string[] = [];
-  if (baseline.sourceSha !== current.sourceSha)
-    issues.push("sourceSha mismatch");
+  const notes: string[] = [];
+  if (baseline.sourceSha !== current.sourceSha) {
+    if (remediationMode)
+      notes.push(
+        `sourceSha differs (baseline ${baseline.sourceSha.slice(0, 7)} → current ${current.sourceSha.slice(0, 7)})`
+      );
+    else issues.push("sourceSha mismatch");
+  }
   if (baseline.modelId !== current.modelId) issues.push("modelId mismatch");
   if (baseline.rubricVersion !== current.rubricVersion)
     issues.push("rubricVersion mismatch");
   if (baseline.protocol !== current.protocol) issues.push("protocol mismatch");
   if (baseline.sandboxEnabled !== current.sandboxEnabled)
     issues.push("sandbox mismatch");
-  return { compatible: issues.length === 0, issues };
+  if (baseline.arm !== current.arm) issues.push("arm mismatch");
+  return { compatible: issues.length === 0, issues, notes };
 };
 
 export const compareRuns = ({
   baselineDir,
   currentDir,
+  remediationMode = false,
 }: {
   baselineDir: string;
   currentDir: string;
+  remediationMode?: boolean;
 }) => {
   const baseline = readGrades(baselineDir);
   const current = readGrades(currentDir);
@@ -66,19 +77,24 @@ export const compareRuns = ({
       verdict: "inconclusive" as const,
     };
 
+  const manifestNotes: string[] = [];
   if (baseManifest && curManifest) {
-    const { compatible, issues } = manifestsCompatible({
+    const { compatible, issues, notes } = manifestsCompatible({
       baseline: baseManifest,
       current: curManifest,
+      remediationMode,
     });
+    manifestNotes.push(...notes);
     if (!compatible)
       return {
         changes: issues,
         details: issues,
         improved: 0,
+        manifestNotes,
         missingInCurrent: [],
         missingInBaseline: [],
         regressed: 0,
+        remediationMode,
         verdict: "inconclusive" as const,
       };
   }
@@ -123,12 +139,14 @@ export const compareRuns = ({
   else if (improved > regressed) verdict = "improved";
 
   return {
-    changes,
-    details: changes,
+    changes: [...manifestNotes, ...changes],
+    details: [...manifestNotes, ...changes],
     improved,
+    manifestNotes,
     missingInBaseline,
     missingInCurrent,
     regressed,
+    remediationMode,
     verdict,
   };
 };
@@ -147,6 +165,8 @@ export const controlArmValid = ({
   const residuals = worktreePaths.flatMap((p) =>
     listControlResiduals({ worktreePath: p })
   );
-  const accepted = acceptedControlResiduals();
-  return { accepted, blocking: [...new Set(residuals)], residuals };
+  const accepted = new Set(acceptedControlResiduals());
+  const unique = [...new Set(residuals)];
+  const blocking = unique.filter((r) => !accepted.has(r));
+  return { accepted: [...accepted], blocking, residuals: unique };
 };

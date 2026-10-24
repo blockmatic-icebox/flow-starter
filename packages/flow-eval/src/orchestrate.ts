@@ -28,6 +28,7 @@ import {
   loadScenarioOracle,
   scenarioOracleHash,
 } from "./scenarios.ts";
+import { skillsLockHash } from "./skills-lock.ts";
 import { isBuildAuthorized, stakeholderReply } from "./stakeholder.ts";
 import { PROTOCOL_ID } from "./trace.ts";
 import type { EvalArm, EvalEvent, RunManifest, TokenUsage } from "./types.ts";
@@ -284,6 +285,7 @@ const buildBatchManifest = ({
   repetition,
   rubricVersion,
   runId,
+  skillsLockHash: skillsLockHash(),
   sandboxEnabled: true,
   scenarioIds,
   sourceSha: currentFlowSha(),

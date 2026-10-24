@@ -65,7 +65,7 @@ const scoreArtifact = ({
   input: ScenarioGradeInput;
   requiredDiffOk: boolean;
 }): DimensionScore["score"] =>
-  forbiddenDiff || input.diff.includes("docs/plans/")
+  forbiddenDiff
     ? 1
     : requiredDiffOk
       ? 3

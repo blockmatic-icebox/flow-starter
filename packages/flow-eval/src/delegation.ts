@@ -22,6 +22,7 @@ export interface DelegationSignals {
   buildRequested?: boolean;
   adrConflict?: boolean;
   securitySensitive?: boolean;
+  authenticationSensitive?: boolean;
   docsOnly?: boolean;
   smallWellUnderstood?: boolean;
   needsSpecification?: boolean;
@@ -86,6 +87,13 @@ const researchSkills = (signals: DelegationSignals) => {
   return ["problem-validation"];
 };
 
+const securityReviewSkills = (signals: DelegationSignals) => {
+  const base = ["code-review-and-quality"];
+  if (signals.authenticationSensitive)
+    return ["better-auth-security-best-practices", ...base];
+  return base;
+};
+
 const parallelResearchers = ({
   signals,
   skills,
@@ -94,15 +102,24 @@ const parallelResearchers = ({
   signals: DelegationSignals;
   skills: string[];
   count?: number;
-}): DelegationResult => ({
-  executionMode: "parallel-investigation",
-  workerCount: Math.max(2, count ?? signals.independentResearchCount ?? 2),
-  roles: ["researcher", "researcher"],
-  writable: false,
-  skills,
-  humanGate: false,
-  allowBuild: false,
-});
+}): DelegationResult => {
+  const workerCount = Math.max(
+    2,
+    count ?? signals.independentResearchCount ?? 2
+  );
+  return {
+    executionMode: "parallel-investigation",
+    workerCount,
+    roles: Array.from(
+      { length: workerCount },
+      () => "researcher" as WorkerRole
+    ),
+    writable: false,
+    skills,
+    humanGate: false,
+    allowBuild: false,
+  };
+};
 
 const matchBlocked = (
   signals: DelegationSignals
@@ -136,15 +153,14 @@ const matchSecurity = (
   signals: DelegationSignals
 ): DelegationResult | undefined => {
   if (!signals.securitySensitive) return undefined;
-  const skills = [
-    "better-auth-security-best-practices",
-    "code-review-and-quality",
-  ];
+  const skills = securityReviewSkills(signals);
   if (signals.flowStage === "Review" || signals.needsFunctionalReview)
     return {
       executionMode: "independent-verification",
       workerCount: signals.needsUiReview ? 2 : 1,
-      roles: signals.needsUiReview ? ["verifier", "verifier"] : ["verifier"],
+      roles: signals.needsUiReview
+        ? (["verifier", "verifier"] as WorkerRole[])
+        : ["verifier"],
       writable: false,
       skills: signals.needsUiReview ? [...skills, "agent-browser"] : skills,
       humanGate: true,
@@ -181,10 +197,12 @@ const matchSpecifyExplore = (
       skills: ["spec-driven-development"],
     });
   if (signals.conflictingResearch)
-    return parallelResearchers({
+    return soloResult({
       signals,
       skills: researchSkills(signals),
-      count: 2,
+      humanGate: true,
+      humanGateReason: "conflicting-research",
+      allowBuild: false,
     });
   if (signals.flowStage === "Explore")
     return parallelResearchers({ signals, skills: ["idea-refine"] });
@@ -201,16 +219,10 @@ const matchBuild = (
     !signals.overlappingWrites
   ) {
     const builders = signals.parallelBuilderCount;
-    const total = signals.waveGraph?.taskCount ?? builders + 3;
     return {
       executionMode: "parallel-implementation",
-      workerCount: total,
-      roles: [
-        "builder",
-        ...Array.from({ length: builders }, () => "builder" as WorkerRole),
-        "coordinator",
-        "verifier",
-      ],
+      workerCount: builders,
+      roles: Array.from({ length: builders }, () => "builder" as WorkerRole),
       writable: true,
       skills: ["incremental-implementation", "test-driven-development"],
       humanGate: false,
@@ -237,7 +249,9 @@ const matchReviewPlan = (
     return {
       executionMode: "independent-verification",
       workerCount: signals.needsUiReview ? 2 : 1,
-      roles: signals.needsUiReview ? ["verifier", "verifier"] : ["verifier"],
+      roles: signals.needsUiReview
+        ? (["verifier", "verifier"] as WorkerRole[])
+        : ["verifier"],
       writable: false,
       skills: signals.needsUiReview
         ? ["code-review-and-quality", "agent-browser"]
@@ -245,17 +259,20 @@ const matchReviewPlan = (
       humanGate: false,
       allowBuild: false,
     };
-  if (signals.flowStage === "Plan" && signals.waveGraph)
-    return {
-      executionMode: "parallel-implementation",
-      workerCount: signals.waveGraph.taskCount,
-      roles: ["coordinator"],
-      writable: false,
+  if (signals.flowStage === "Plan" && signals.waveGraph) {
+    const researchCount = signals.independentResearchCount ?? 0;
+    if (researchCount > 1)
+      return parallelResearchers({
+        signals,
+        skills: ["planning-and-task-breakdown"],
+        count: researchCount,
+      });
+    return soloResult({
+      signals,
       skills: ["planning-and-task-breakdown"],
-      humanGate: false,
       allowBuild: false,
-      maxConcurrent: signals.waveGraph.maxConcurrent,
-    };
+    });
+  }
   return undefined;
 };
 
@@ -267,6 +284,24 @@ const deriveCore = (signals: DelegationSignals): DelegationResult =>
   matchReviewPlan(signals) ??
   soloResult({ signals, skills: [] });
 
+const soloFromCore = ({
+  signals,
+  core,
+  fallback,
+}: {
+  signals: DelegationSignals;
+  core: DelegationResult;
+  fallback?: string;
+}) =>
+  soloResult({
+    signals,
+    skills: core.skills,
+    humanGate: core.humanGate,
+    humanGateReason: core.humanGateReason,
+    allowBuild: core.allowBuild,
+    fallback,
+  });
+
 const applyPolicy = ({
   policy,
   signals,
@@ -276,51 +311,37 @@ const applyPolicy = ({
   signals: DelegationSignals;
   core: DelegationResult;
 }): DelegationResult => {
-  if (!signals.subagentsAvailable)
+  if (!signals.subagentsAvailable) {
+    if (policy === "solo") return soloFromCore({ signals, core });
     return {
-      ...soloResult({
-        signals,
-        skills: core.skills,
-        allowBuild: core.allowBuild && signals.buildAuthorized === true,
-        humanGate: core.humanGate,
-        humanGateReason: core.humanGateReason,
-      }),
+      ...soloFromCore({ signals, core, fallback: "subagents-unavailable" }),
       fallback: "subagents-unavailable",
     };
-
-  if (policy === "solo")
-    return soloResult({
-      signals,
-      skills: core.skills,
-      humanGate: core.humanGate,
-      humanGateReason: core.humanGateReason,
-      allowBuild: core.allowBuild,
-    });
-
-  if (policy === "adaptive" && signals.overheadDominates) {
-    const tinyParallel =
-      (signals.independentResearchCount ?? 0) === 2 &&
-      signals.flowStage === "Build" &&
-      signals.smallWellUnderstood;
-    if (tinyParallel)
-      return soloResult({
-        signals,
-        skills: core.skills.length ? core.skills : ["test-driven-development"],
-        allowBuild: signals.buildAuthorized === true,
-      });
   }
+
+  if (policy === "solo") return soloFromCore({ signals, core });
+
+  if (core.humanGate) return core;
+
+  if (policy === "adaptive" && signals.overheadDominates)
+    return soloFromCore({ signals, core });
 
   if (policy === "max-safe" && signals.overheadDominates) {
     const count = signals.independentResearchCount ?? 2;
-    if (count > 1 && signals.flowStage === "Build")
+    if (
+      count > 1 &&
+      signals.flowStage === "Build" &&
+      core.allowBuild &&
+      !core.humanGate
+    )
       return {
         executionMode: "parallel-implementation",
         workerCount: count,
         roles: Array.from({ length: count }, () => "builder" as WorkerRole),
-        writable: signals.buildAuthorized === true,
+        writable: true,
         skills: ["incremental-implementation"],
         humanGate: false,
-        allowBuild: signals.buildAuthorized === true,
+        allowBuild: true,
         maxConcurrent: count,
       };
   }

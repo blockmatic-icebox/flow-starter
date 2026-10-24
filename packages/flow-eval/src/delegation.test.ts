@@ -84,6 +84,49 @@ describe("delegation policy oracle", () => {
     assert.equal(adaptive.fallback, "subagents-unavailable");
   });
 
+  it("preserves ADR human gate under adaptive overhead on Build", () => {
+    const actual = classifyDelegation({
+      policy: "adaptive",
+      signals: {
+        flowStage: "Build",
+        adrConflict: true,
+        buildAuthorized: true,
+        overheadDominates: true,
+        independentResearchCount: 2,
+        smallWellUnderstood: true,
+        subagentsAvailable: true,
+      },
+    });
+    assert.equal(actual.humanGate, true);
+    assert.equal(actual.humanGateReason, "adr-conflict");
+    assert.equal(actual.allowBuild, false);
+  });
+
+  it("preserves build-not-authorized gate under max-safe overhead", () => {
+    const actual = classifyDelegation({
+      policy: "max-safe",
+      signals: {
+        flowStage: "Build",
+        buildRequested: true,
+        buildAuthorized: false,
+        overheadDominates: true,
+        independentResearchCount: 2,
+        subagentsAvailable: true,
+      },
+    });
+    assert.equal(actual.humanGate, true);
+    assert.equal(actual.allowBuild, false);
+  });
+
+  it("D01 parallel researchers have matching role count", () => {
+    const card = loadDelegationScenario({ id: "D01" });
+    const actual = classifyDelegation({
+      policy: "adaptive",
+      signals: card.signals,
+    });
+    assert.equal(actual.workerCount, actual.roles.length);
+  });
+
   it("adaptive stays solo on D14 while max-safe fans out", () => {
     const card = loadDelegationScenario({ id: "D14" });
     const adaptive = classifyDelegation({

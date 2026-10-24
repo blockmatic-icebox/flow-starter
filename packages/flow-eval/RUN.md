@@ -12,7 +12,12 @@ pnpm --filter @repo/flow-eval eval run --scenarios S01,S02,S05,S09,S13 --arm flo
 pnpm --filter @repo/flow-eval eval run --scenarios S01 --dry-run
 pnpm --filter @repo/flow-eval eval compare --baseline run-a --current run-b
 pnpm --filter @repo/flow-eval eval handoff --variant C1 --model composer-2.5
+pnpm --filter @repo/flow-eval eval pilot-loop --dry-run
+pnpm --filter @repo/flow-eval eval run --scenarios S13,S16 --repetition 2
+pnpm --filter @repo/flow-eval eval compare --baseline run-a --current run-b --remediation
 ```
+
+Blind subjective scores: `__dev/flow-evals/<runId>/blind-reviews/<scenarioId>.json` (see `src/blind-review.ts`). Not copied into executor worktrees.
 
 Official scored runs require `agent login` or `CURSOR_API_KEY`. Without auth, the CLI writes `__dev/flow-evals/cli-auth-blocker.json` and exits.
 

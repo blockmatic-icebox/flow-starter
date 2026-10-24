@@ -1,0 +1,8 @@
+{
+  "scenarioId": "S16",
+  "expectsTools": true,
+  "expectsCommands": true,
+  "requiresPassingTestCommand": true,
+  "requiredDiffPatterns": ["listings-sort"],
+  "allowsProductCode": true
+}

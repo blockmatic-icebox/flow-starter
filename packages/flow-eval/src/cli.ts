@@ -1,7 +1,8 @@
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
 
 import { assertAgentAuth } from "./agent.ts";
+import { mergeBlindScores, loadBlindReview } from "./blind-review.ts";
 import { compareRuns } from "./compare.ts";
 import { extractCommands } from "./evidence.ts";
 import { gradeScenario } from "./grade.ts";
@@ -26,7 +27,8 @@ Usage:
   pnpm --filter @repo/flow-eval eval grade --run <runId> --scenario <id>
   pnpm --filter @repo/flow-eval eval pilot [--model <id>]
   pnpm --filter @repo/flow-eval eval run --scenarios S01,S02 [--arm flow] [--model <id>] [--dry-run]
-  pnpm --filter @repo/flow-eval eval compare --baseline <runId> --current <runId>
+  pnpm --filter @repo/flow-eval eval compare --baseline <runId> --current <runId> [--remediation]
+  pnpm --filter @repo/flow-eval eval pilot-loop [--model <id>] [--dry-run]
   pnpm --filter @repo/flow-eval eval compare-arms [--scenarios S05,S09,S13] [--dry-run]
   pnpm --filter @repo/flow-eval eval handoff --variant C1 [--model <id>] [--dry-run]
 `);
@@ -118,7 +120,8 @@ const cmdGrade = ({
   const manifest = existsSync(manifestPath)
     ? JSON.parse(readFileSync(manifestPath, "utf-8"))
     : { harness: "cursor-cli" };
-  const grade = gradeScenario({
+  const blind = loadBlindReview({ runId, scenarioId });
+  const baseGrade = gradeScenario({
     input: {
       buildAuthorized: isBuildAuthorized({ events, hidden }),
       card,
@@ -135,11 +138,135 @@ const cmdGrade = ({
       scenarioId,
     },
   });
+  const grade = blind
+    ? gradeScenario({
+        input: {
+          buildAuthorized: isBuildAuthorized({ events, hidden }),
+          card,
+          commands: commands as ReturnType<typeof extractCommands>,
+          completeness: events.some((e) => e.kind === "result")
+            ? "complete"
+            : "partial",
+          diff,
+          events,
+          harness: manifest.harness ?? "cursor-cli",
+          hidden,
+          oracle: loadScenarioOracle({ id: scenarioId }),
+          protocolVerified: true,
+          scenarioId,
+        },
+        scoresOverride: mergeBlindScores({
+          base: baseGrade.scores,
+          blind,
+        }),
+      })
+    : baseGrade;
   console.log(JSON.stringify(grade, null, 2));
   if (grade.gate === "fail" || !grade.officialEligible) process.exit(1);
 };
 
 const defaultModel = "composer-2.5";
+
+const writeRemediationProposal = ({
+  runId,
+  findings,
+}: {
+  runId: string;
+  findings: { id: string; status: string; summary: string }[];
+}) => {
+  const runDir = path.join(devEvalsRoot, runId);
+  mkdirSync(runDir, { recursive: true });
+  const lines = [
+    "# Remediation proposal",
+    "",
+    `Run: ${runId}`,
+    "",
+    "Review before any workflow or skill edits. Implementation requires explicit finding-id authorization.",
+    "",
+    ...findings.map(
+      (f) => `## ${f.id}\n\n**Status:** ${f.status}\n\n${f.summary}\n`
+    ),
+  ];
+  writeFileSync(
+    path.join(runDir, "remediation-proposal.md"),
+    `${lines.join("\n")}\n`
+  );
+};
+
+const cmdPilotLoop = ({
+  model,
+  dryRun,
+  repetition,
+}: {
+  model: string;
+  dryRun: boolean;
+  repetition: number;
+}) => {
+  const ts = Date.now();
+  const runId = `pilot-loop-${ts}`;
+  const official = !dryRun;
+  if (official) {
+    const auth = assertAgentAuth();
+    if (!auth.ok) {
+      writeFileSync(
+        path.join(devEvalsRoot, "cli-auth-blocker.json"),
+        `${JSON.stringify({ runId, reason: auth.reason, at: new Date().toISOString() }, null, 2)}\n`
+      );
+      writeRemediationProposal({
+        runId,
+        findings: [
+          {
+            id: "F-pilot-auth",
+            status: "blocked",
+            summary:
+              "Official pilot requires `agent login` or CURSOR_API_KEY. Re-run `eval pilot-loop` after auth.",
+          },
+          {
+            id: "F-deleg-001",
+            status: "addressed-in-code",
+            summary:
+              "Delegation oracle no longer clears ADR/build-not-authorized gates via applyPolicy (WP1).",
+          },
+        ],
+      });
+      console.error(auth.reason);
+      process.exit(2);
+    }
+  }
+
+  const flowScenarios = ["S13", "S16", "S17", "S09", "S01"];
+  const controlScenarios = ["S13", "S16", "S09"];
+  runBatch({
+    arm: "flow",
+    modelId: model,
+    official,
+    repetition,
+    runId: `${runId}-flow`,
+    scenarioIds: flowScenarios,
+  });
+  runBatch({
+    arm: "control",
+    modelId: model,
+    official,
+    repetition,
+    runId: `${runId}-control`,
+    scenarioIds: controlScenarios,
+  });
+  writeRemediationProposal({
+    runId,
+    findings: [
+      {
+        id: "F-pilot-complete",
+        status: dryRun ? "dry-run" : "pending-review",
+        summary: dryRun
+          ? "Dry-run recorded stakeholder turns only; not evidence of agent compliance."
+          : "Live pilot artifacts under flow/control run ids; human review required before WP3 doc edits.",
+      },
+    ],
+  });
+  console.log(`Pilot loop ${dryRun ? "dry-run" : "run"} recorded: ${runId}`);
+  if (dryRun) console.log("Dry-run: not evidence of agent compliance.");
+};
 
 const cmdPilot = ({ model }: { model: string }) => {
   const runId = `pilot-${Date.now()}`;
@@ -178,11 +305,13 @@ const cmdRun = ({
   arm,
   model,
   dryRun,
+  repetition,
 }: {
   scenarios: string[];
   arm: EvalArm;
   model: string;
   dryRun: boolean;
+  repetition?: number;
 }) => {
   assertScenarioIds({ ids: scenarios });
   assertArm({ arm });
@@ -205,6 +334,7 @@ const cmdRun = ({
     arm,
     modelId: model,
     official,
+    repetition: repetition ?? 1,
   });
   if (errors.length) {
     console.error(errors.join("\n"));
@@ -222,13 +352,16 @@ const cmdRun = ({
 const cmdCompare = ({
   baseline,
   current,
+  remediationMode,
 }: {
   baseline: string;
   current: string;
+  remediationMode?: boolean;
 }) => {
   const result = compareRuns({
     baselineDir: path.join(devEvalsRoot, baseline),
     currentDir: path.join(devEvalsRoot, current),
+    remediationMode,
   });
   console.log(JSON.stringify(result, null, 2));
   if (result.verdict === "inconclusive") process.exit(1);
@@ -346,55 +479,73 @@ const scenarioList = (value: string | undefined, fallback: string) =>
     .map((s) => s.trim())
     .filter(Boolean);
 
+const dispatchGradeCli = (flags: Record<string, unknown>) => {
+  if (!flags.run || !flags.scenario) {
+    console.error("grade requires --run and --scenario");
+    process.exit(3);
+  }
+  cmdGrade({
+    runId: String(flags.run),
+    scenarioId: String(flags.scenario),
+  });
+};
+
+const dispatchCompareCli = (flags: Record<string, unknown>) => {
+  if (!flags.baseline || !flags.current) {
+    console.error("compare requires --baseline and --current");
+    process.exit(3);
+  }
+  cmdCompare({
+    baseline: String(flags.baseline),
+    current: String(flags.current),
+    remediationMode: Boolean(flags.remediation),
+  });
+};
+
 const dispatchCli = (command: string, flags: Record<string, unknown>) => {
-  if (command === "preserve") return cmdPreserve();
-  if (command === "grade") {
-    if (!flags.run || !flags.scenario) {
-      console.error("grade requires --run and --scenario");
-      process.exit(3);
-    }
-    return cmdGrade({
-      runId: String(flags.run),
-      scenarioId: String(flags.scenario),
-    });
+  const handlers: Record<string, () => void> = {
+    compare: () => dispatchCompareCli(flags),
+    "compare-arms": () =>
+      cmdCompareArms({
+        dryRun: Boolean(flags["dry-run"]),
+        model: String(flags.model ?? defaultModel),
+        scenarios: scenarioList(
+          flags.scenarios as string | undefined,
+          "S05,S09,S13"
+        ),
+      }),
+    grade: () => dispatchGradeCli(flags),
+    handoff: () =>
+      cmdHandoff({
+        dryRun: Boolean(flags["dry-run"]),
+        model: String(flags.model ?? defaultModel),
+        variant: (flags.variant as "C1" | "C2" | "C3") ?? "C1",
+      }),
+    pilot: () => cmdPilot({ model: String(flags.model ?? defaultModel) }),
+    "pilot-loop": () =>
+      cmdPilotLoop({
+        dryRun: Boolean(flags["dry-run"]),
+        model: String(flags.model ?? defaultModel),
+        repetition: Number(flags.repetition ?? 2),
+      }),
+    preserve: () => cmdPreserve(),
+    run: () =>
+      cmdRun({
+        arm: (flags.arm as EvalArm) ?? "flow",
+        dryRun: Boolean(flags["dry-run"]),
+        model: String(flags.model ?? defaultModel),
+        repetition: Number(flags.repetition ?? 1),
+        scenarios: scenarioList(
+          flags.scenarios as string | undefined,
+          "S01,S02,S05,S09,S13"
+        ),
+      }),
+  };
+  const handler = handlers[command];
+  if (handler) {
+    handler();
+    return;
   }
-  if (command === "pilot")
-    return cmdPilot({ model: String(flags.model ?? defaultModel) });
-  if (command === "run")
-    return cmdRun({
-      arm: (flags.arm as EvalArm) ?? "flow",
-      dryRun: Boolean(flags["dry-run"]),
-      model: String(flags.model ?? defaultModel),
-      scenarios: scenarioList(
-        flags.scenarios as string | undefined,
-        "S01,S02,S05,S09,S13"
-      ),
-    });
-  if (command === "compare") {
-    if (!flags.baseline || !flags.current) {
-      console.error("compare requires --baseline and --current");
-      process.exit(3);
-    }
-    return cmdCompare({
-      baseline: String(flags.baseline),
-      current: String(flags.current),
-    });
-  }
-  if (command === "compare-arms")
-    return cmdCompareArms({
-      dryRun: Boolean(flags["dry-run"]),
-      model: String(flags.model ?? defaultModel),
-      scenarios: scenarioList(
-        flags.scenarios as string | undefined,
-        "S05,S09,S13"
-      ),
-    });
-  if (command === "handoff")
-    return cmdHandoff({
-      dryRun: Boolean(flags["dry-run"]),
-      model: String(flags.model ?? defaultModel),
-      variant: (flags.variant as "C1" | "C2" | "C3") ?? "C1",
-    });
   usage();
   process.exit(1);
 };

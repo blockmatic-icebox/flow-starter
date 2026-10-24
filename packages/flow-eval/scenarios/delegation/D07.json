@@ -4,6 +4,7 @@
   "signals": {
     "flowStage": "Review",
     "securitySensitive": true,
+    "authenticationSensitive": true,
     "needsFunctionalReview": true,
     "subagentsAvailable": true
   },

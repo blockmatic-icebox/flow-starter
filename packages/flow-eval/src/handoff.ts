@@ -1,5 +1,3 @@
-import type { PublicScenarioCard } from "./types.ts";
-
 export type HandoffVariant = "C1" | "C2" | "C3";
 
 export const handoffAgentBPrompt = ({
@@ -25,26 +23,12 @@ export const handoffMetrics = ({
 }) => ({
   contradictionsIntroduced: contradictions,
   irrelevantDocsOpened: docsRead.filter(
-    (p) => !/initiatives|PRODUCT|flow\.md/u.test(p)
+    (p) => !/initiatives|PRODUCT|flow\.md|ARCHITECTURE\.md/u.test(p)
   ),
   relevantDocsOpened: docsRead.filter((p) =>
-    /initiatives|PRODUCT|flow\.md/u.test(p)
+    /initiatives|PRODUCT|flow\.md|ARCHITECTURE\.md/u.test(p)
   ),
   repeatedQuestions: agentBQuestions,
 });
 
 export const continuityScenarioId = "S07";
-
-export const continuityCard = (): PublicScenarioCard => ({
-  allowProductCode: false,
-  allowStandalonePlan: false,
-  browserVerification: false,
-  codeExecution: false,
-  id: "S07",
-  openingPrompt:
-    "I want to build PennyPilot — help me explore the product idea with realistic scope.",
-  relevantStages: ["Explore", "Specify", "Plan"],
-  requiresBuildAuth: true,
-  title: "Mid-project handoff",
-  turnCap: 8,
-});

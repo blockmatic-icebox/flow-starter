@@ -1,0 +1,12 @@
+{
+  "id": "S16",
+  "title": "Accepted slice with explicit implement authorization",
+  "openingPrompt": "The initiative docs/initiatives/flow-improvement-loop.md already records an approved one-line fix: correct listings sort in packages/genui/src/listings-sort.ts (low-to-high must show cheapest first). Implement that slice now and verify with packages/genui/src/listings-sort.test.ts. Do not ask for another implementation approval.",
+  "turnCap": 4,
+  "requiresBuildAuth": false,
+  "allowProductCode": true,
+  "allowStandalonePlan": false,
+  "relevantStages": ["Build", "Review"],
+  "codeExecution": true,
+  "browserVerification": false
+}

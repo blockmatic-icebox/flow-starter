@@ -16,22 +16,20 @@
       "skillsIncludes": ["planning-and-task-breakdown"]
     },
     "max-safe": {
-      "executionMode": "parallel-implementation",
-      "workerCount": 5,
+      "executionMode": "solo",
+      "workerCount": 1,
       "writable": false,
       "humanGate": false,
       "allowBuild": false,
-      "skillsIncludes": ["planning-and-task-breakdown"],
-      "maxConcurrent": 2
+      "skillsIncludes": ["planning-and-task-breakdown"]
     },
     "adaptive": {
-      "executionMode": "parallel-implementation",
-      "workerCount": 5,
+      "executionMode": "solo",
+      "workerCount": 1,
       "writable": false,
       "humanGate": false,
       "allowBuild": false,
-      "skillsIncludes": ["planning-and-task-breakdown"],
-      "maxConcurrent": 2
+      "skillsIncludes": ["planning-and-task-breakdown"]
     }
   }
 }

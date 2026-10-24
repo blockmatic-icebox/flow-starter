@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 import type { DimensionId } from "./types.ts";
 
-export const rubricVersion = "2026-10-24-v0.2";
+export const rubricVersion = "2026-10-24-v0.3";
 
 export const rubricVersionHash = () =>
   createHash("sha256").update(rubricVersion).digest("hex").slice(0, 12);

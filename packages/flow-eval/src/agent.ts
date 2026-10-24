@@ -69,13 +69,14 @@ export const runAgentTurn = ({
   const protocolVerified = isProtocolVerified({ agentCliVersion: cliVersion });
 
   const userSeq = startSeq + 1;
+  const redactedPrompt = redactOrThrow({ text: prompt });
   const userEvent: EvalEvent = {
     id: `${scenarioId}-u${turn}`,
     kind: "user",
     origin: "observed",
     scenarioId,
     seq: userSeq,
-    text: prompt,
+    text: redactedPrompt,
     ts: new Date().toISOString(),
     turn,
   };
@@ -93,7 +94,7 @@ export const runAgentTurn = ({
     modelId,
   ];
   if (sessionId) args.push("--resume", sessionId);
-  args.push(prompt);
+  args.push(redactedPrompt);
 
   const result = spawnSync("agent", args, {
     encoding: "utf-8",

@@ -48,6 +48,7 @@ export interface RunManifest {
   completeness: Completeness;
   rubricVersion: string;
   protocol: string;
+  skillsLockHash?: string;
   sourceSha: string;
   sandboxEnabled: boolean;
   trustEnabled: boolean;
@@ -134,6 +135,7 @@ export interface GradeResult {
 export interface PublicScenarioCard {
   id: string;
   title: string;
+  heldOut?: boolean;
   historicalId?: string;
   openingPrompt: string;
   turnCap: number;

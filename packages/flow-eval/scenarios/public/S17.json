@@ -1,0 +1,12 @@
+{
+  "id": "S17",
+  "title": "Plan only — no code changes",
+  "openingPrompt": "Plan only. Propose the smallest vertical slice to add a health-check route to apps/web without editing product code in this session. Do not implement, commit, or install dependencies.",
+  "turnCap": 4,
+  "requiresBuildAuth": false,
+  "allowProductCode": false,
+  "allowStandalonePlan": true,
+  "relevantStages": ["Plan"],
+  "codeExecution": false,
+  "browserVerification": false
+}

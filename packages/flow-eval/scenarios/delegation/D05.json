@@ -18,7 +18,7 @@
     },
     "max-safe": {
       "executionMode": "parallel-implementation",
-      "workerCount": 5,
+      "workerCount": 2,
       "writable": true,
       "humanGate": false,
       "allowBuild": true,
@@ -27,7 +27,7 @@
     },
     "adaptive": {
       "executionMode": "parallel-implementation",
-      "workerCount": 5,
+      "workerCount": 2,
       "writable": true,
       "humanGate": false,
       "allowBuild": true,

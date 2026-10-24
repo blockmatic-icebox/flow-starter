@@ -8,6 +8,8 @@ Date: 2026-10-24
 
 Measure whether Flow improves agent behavior on real software tasks using isolated worktrees, hidden stakeholder scripts, deterministic gates, and blinded grading.
 
+Continuous improvement loop (review, remediation batches, accept/revert): [flow-improvement-loop.md](flow-improvement-loop.md).
+
 ## Scope
 
 - Package `@repo/flow-eval` (CLI, gates, reports, public scenario cards)

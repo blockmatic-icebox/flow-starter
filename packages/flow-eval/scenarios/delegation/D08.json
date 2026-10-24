@@ -11,23 +11,26 @@
       "executionMode": "solo",
       "workerCount": 1,
       "writable": false,
-      "humanGate": false,
+      "humanGate": true,
+      "humanGateReason": "conflicting-research",
       "allowBuild": false,
       "skillsIncludes": ["idea-refine"]
     },
     "max-safe": {
-      "executionMode": "parallel-investigation",
-      "workerCount": 2,
+      "executionMode": "solo",
+      "workerCount": 1,
       "writable": false,
-      "humanGate": false,
+      "humanGate": true,
+      "humanGateReason": "conflicting-research",
       "allowBuild": false,
       "skillsIncludes": ["idea-refine"]
     },
     "adaptive": {
-      "executionMode": "parallel-investigation",
-      "workerCount": 2,
+      "executionMode": "solo",
+      "workerCount": 1,
       "writable": false,
-      "humanGate": false,
+      "humanGate": true,
+      "humanGateReason": "conflicting-research",
       "allowBuild": false,
       "skillsIncludes": ["idea-refine"]
     }

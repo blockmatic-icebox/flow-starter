@@ -152,7 +152,7 @@ Detailed dumps only when the coordinator needs them for a decision. Do not pass 
 | Subagent tools unavailable | Solo coordinator execution; record limitation; do not claim a worker ran |
 | Incomplete research | State gaps; do not invent evidence |
 | Worker failure | Retry once if cheap; otherwise sequential fallback |
-| Conflicting findings | Coordinator reconciles; escalate product conflicts to human |
+| Conflicting findings | Coordinator reconciles solo (human gate); escalate product conflicts to human; do not spawn another parallel research wave |
 | Conflicting edits | Stop parallel writers; parent integrates or serializes |
 | Expired assumptions | Revisit stage; do not Build on stale decisions |
 | Unclear authorization | Stop before Build; ask human |

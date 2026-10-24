@@ -52,9 +52,15 @@ export const stakeholderReply = ({
     return "Do not implement a database swap without the proper decision process.";
   }
 
-  if (scenarioId === "S13") {
-    if (asksQuestion(agentText) && /test|verify|repro/iu.test(agentText))
-      return "Run `pnpm --filter @repo/genui test` — see `packages/genui/src/listings-sort.test.ts`.";
+  if (scenarioId === "S13" || scenarioId === "S16") {
+    if (asksQuestion(agentText) && /test|verify|repro|approv/iu.test(agentText))
+      return "Authorization is already in the opening message. Run `pnpm --filter @repo/genui test` and focus on listings-sort.ts.";
+    return null;
+  }
+
+  if (scenarioId === "S17") {
+    if (asksQuestion(agentText) && /implement|build|commit/iu.test(agentText))
+      return "Plan only — do not edit product code in this session.";
     return null;
   }
 
