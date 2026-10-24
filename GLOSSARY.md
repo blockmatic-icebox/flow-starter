@@ -36,4 +36,4 @@ Results surface inside the workspace for validated, source-backed artifacts. Dis
 
 ## External invocation (planned)
 
-Authenticated non-browser clients limited to cited answers and optional validated specs—no session canvas mutation. See [docs/adr/0004-external-invocation-is-read-only.md](docs/adr/0004-external-invocation-is-read-only.md).
+Authenticated non-browser clients limited to cited answers and optional validated specs—no session canvas mutation. See [docs/adr/006-external-invocation-is-read-only.md](docs/adr/006-external-invocation-is-read-only.md).

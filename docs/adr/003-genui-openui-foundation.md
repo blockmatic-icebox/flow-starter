@@ -1,4 +1,4 @@
-# ADR 0005 — GenUI foundation uses OpenUI Lang
+# ADR 003 — GenUI foundation uses OpenUI Lang
 
 **Status:** Accepted · October 24, 2026
 
@@ -18,4 +18,4 @@ This extraction task generalizes that architecture for adopters without copying 
 
 - Apps import `@repo/genui` for compose/validate APIs and `@repo/genui/react` for rendering.
 - Model-backed tier-3 composition and eve tool wiring remain follow-on work; tier 1–2 paths are deterministic and testable today.
-- ARCHITECTURE.md generative presentation language is updated to name OpenUI Lang as the initial implemented contract.
+- ARCHITECTURE.md generative presentation language names OpenUI Lang as the initial implemented contract.

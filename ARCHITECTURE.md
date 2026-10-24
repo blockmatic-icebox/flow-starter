@@ -43,7 +43,7 @@ Do not import server-only modules from client renderers. Share serializable type
 
 **Fixtures:** the demo uses fictional **Acme Analytics** catalog data under `packages/genui/src/fixtures/`. Adopters swap in their own record providers.
 
-**Foundation:** OpenUI Lang (`@openuidev/lang-core`, `@openuidev/react-lang`). json-render is documented research only (ADR 0005).
+**Foundation:** OpenUI Lang (`@openuidev/lang-core`, `@openuidev/react-lang`). json-render is documented research only (ADR 003).
 
 ## 4. Composition tiers
 
@@ -68,7 +68,7 @@ Tier 1–2 paths are fully testable without network access. Tier 3 is optional (
 | `/api/genui/compose` | POST | Body: `{ query, clientRequestId?, version? }`. Returns `application/x-ndjson` stream. |
 | `/genui-demo` | GET | Client demo calling the compose API |
 
-Rate limiting, capability context, and telemetry hooks are **host responsibilities**—see gaboesquivel.com compose route as a reference pattern in `docs/specs/genui/INVENTORY.md`.
+The compose route applies optional per-IP daily limits (`apps/web/lib/genui/`, off on `flow.localhost` unless `GENUI_ENFORCE_RATE_LIMIT=1`) and builds a minimal capability context (`correlationId`, `ip`, `clock`). Telemetry and Redis-backed caps follow the gaboesquivel.com pattern in `docs/specs/genui/INVENTORY.md`.
 
 ## 7. Planned platform integrations
 
@@ -80,15 +80,15 @@ These are specified for adopters building a full workspace; they are **not requi
 | Identity | **Better Auth** with GitHub OAuth |
 | Persistence | **Neon** + **Drizzle** via Vercel integration |
 | Docs / retrieval | Fumadocs, bounded repo reads, revision-aware citations |
-| External clients | Read-only invocation boundary (ADR 0004) |
+| External clients | Read-only invocation boundary (ADR 006) |
 
-Voice (ADR 0002) and `/dev` workspace placement (ADR 0003) apply when those features are implemented.
+Voice (ADR 004) and `/dev` workspace placement (ADR 005) apply when those features are implemented.
 
 ## 8. Quality and CI
 
 Local gate: `pnpm qa` (lint, types, unit tests) and `pnpm build`.
 
-GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — **disabled for push/PR** until uncommented. Optional DeepSec workflow remains separate.
+GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and [`.github/workflows/genui-quality.yml`](.github/workflows/genui-quality.yml) — **disabled for push/PR** until uncommented. Optional DeepSec workflow remains separate.
 
 GenUI unit tests: `pnpm --filter @repo/genui test`. Eval matrix: `packages/genui/src/eval/query-matrix.ts`.
 
@@ -113,4 +113,6 @@ Ordered work for this repository. Close each step with evidence (`pnpm qa`, prev
 | 4. Grounded explorer | Pending | Bounded repo/docs retrieval with citations; extend OpenUI catalog (text, tables, diagrams) — not a parallel json-render path |
 | 5. Adoption proof | Pending | Extension guide against real files; versioned eval set; preview deploy + recovery rehearsal |
 
-**Follow-on** (after the table above): external read-only invocation (ADR 0004), voice via eve (ADR 0002), dependency/video/charts only when a concrete adopter task exists.
+**Follow-on** (after the table above): external read-only invocation (ADR 006), voice via eve (ADR 004), dependency/video/charts only when a concrete adopter task exists.
+
+Delivery order summary: [ROADMAP.md](ROADMAP.md).
