@@ -8,8 +8,7 @@ const repositoryRoot = path.resolve(import.meta.dirname, "..");
 
 const uiSourceRoot = "packages/ui/src";
 const genuiSourceRoot = "packages/genui/src";
-const webAppRoot = "apps/web";
-const rootLayoutRelative = "apps/web/app/layout.tsx";
+const applicationRoots = ["apps/web", "apps/flow"];
 
 const uiForbiddenModules = new Set([
   "@repo/genui",
@@ -104,19 +103,33 @@ function isAppAlias(specifier) {
   return specifier === "@" || specifier.startsWith("@/");
 }
 
-function isAppPathImport(specifier) {
-  return (
-    specifier.includes("apps/web") ||
-    specifier.includes("/apps/web/") ||
-    /^(?<dots>\.\.\/)+apps\/web/u.test(specifier)
-  );
+function isAppPathImport(specifier, appRoot) {
+  const otherApps = applicationRoots.filter((root) => root !== appRoot);
+  for (const other of otherApps) {
+    const short = other.replace("apps/", "");
+    if (
+      specifier.includes(other) ||
+      specifier.includes(`/${other}/`) ||
+      new RegExp(`^(?:\\.\\./)+${other.replace("/", "\\/")}`, "u").test(
+        specifier
+      ) ||
+      specifier === short ||
+      specifier.startsWith(`${short}/`)
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function violatesUiImport({ specifier }) {
-  if (isAppAlias(specifier) || isAppPathImport(specifier)) {
+  if (
+    isAppAlias(specifier) ||
+    applicationRoots.some((root) => isAppPathImport(specifier, root))
+  ) {
     return {
       expected:
-        "@repo/ui must not import application code or @/ application aliases",
+        "@repo/ui must not import application code or application aliases",
       rule: "shared-ui-no-app-imports",
     };
   }
@@ -149,10 +162,12 @@ function violatesUiImport({ specifier }) {
 }
 
 function violatesGenuiImport({ specifier }) {
-  if (isAppAlias(specifier) || isAppPathImport(specifier)) {
+  if (
+    isAppAlias(specifier) ||
+    applicationRoots.some((root) => isAppPathImport(specifier, root))
+  ) {
     return {
-      expected:
-        "@repo/genui must remain independent from apps/web application source",
+      expected: "@repo/genui must remain independent from application source",
       rule: "genui-no-app-imports",
     };
   }
@@ -175,6 +190,16 @@ function violatesDeepPackageImport({ specifier }) {
   return null;
 }
 
+function violatesCrossAppImport({ specifier, appRoot }) {
+  if (isAppPathImport(specifier, appRoot)) {
+    return {
+      expected: "Applications must not import each other",
+      rule: "no-cross-app-imports",
+    };
+  }
+  return null;
+}
+
 function validateUiPackage(root, violations) {
   const directory = path.join(root, uiSourceRoot);
 
@@ -185,9 +210,7 @@ function validateUiPackage(root, violations) {
     for (const { isTypeOnly, specifier } of collectModuleSpecifiers(
       sourceFile
     )) {
-      if (isTypeOnly) {
-        continue;
-      }
+      if (isTypeOnly) continue;
 
       const violation = violatesUiImport({ specifier });
 
@@ -223,8 +246,8 @@ function validateGenuiPackage(root, violations) {
   }
 }
 
-function validateClientSecurityBoundary(root, violations) {
-  const directory = path.join(root, webAppRoot);
+function validateClientSecurityBoundary(appRoot, root, violations) {
+  const directory = path.join(root, appRoot);
 
   for (const absolute of walkSourceFiles(directory)) {
     if (!hasTopLevelUseClient(absolute)) continue;
@@ -236,8 +259,8 @@ function validateClientSecurityBoundary(root, violations) {
     )) {
       if (isTypeOnly) continue;
       if (
-        specifier.startsWith("@/lib/security/") ||
-        specifier.includes("/lib/security/")
+        specifier.includes("/security/") ||
+        specifier.includes("/_lib/security/")
       ) {
         violations.push({
           expected: "Client Components must not import server security helpers",
@@ -250,22 +273,22 @@ function validateClientSecurityBoundary(root, violations) {
   }
 }
 
-function validateWebImports(root, violations) {
-  const directory = path.join(root, webAppRoot);
+function validateApplicationImports(appRoot, root, violations) {
+  const directory = path.join(root, appRoot);
 
   for (const absolute of walkSourceFiles(directory)) {
     const relative = relativeFromRoot(absolute, root);
     const sourceFile = parseSourceFile(absolute);
 
     for (const { specifier } of collectModuleSpecifiers(sourceFile)) {
-      const violation = violatesDeepPackageImport({ specifier });
+      const deep = violatesDeepPackageImport({ specifier });
+      if (deep) {
+        violations.push({ ...deep, import: specifier, path: relative });
+      }
 
-      if (violation) {
-        violations.push({
-          ...violation,
-          import: specifier,
-          path: relative,
-        });
+      const cross = violatesCrossAppImport({ appRoot, specifier });
+      if (cross) {
+        violations.push({ ...cross, import: specifier, path: relative });
       }
     }
   }
@@ -295,20 +318,21 @@ function hasTopLevelUseClient(absolutePath) {
   return false;
 }
 
-function validateRootLayout(root, violations) {
-  const layoutPath = path.join(root, rootLayoutRelative);
+function validateRootLayouts(root, violations) {
+  for (const appRoot of applicationRoots) {
+    const layoutPath = path.join(root, appRoot, "app/layout.tsx");
+    const layoutRelative = `${appRoot}/app/layout.tsx`;
 
-  if (!existsSync(layoutPath)) {
-    return;
-  }
+    if (!existsSync(layoutPath)) continue;
 
-  if (hasTopLevelUseClient(layoutPath)) {
-    violations.push({
-      expected: "apps/web/app/layout.tsx must remain a Server Component",
-      import: '"use client"',
-      path: rootLayoutRelative,
-      rule: "server-first-root-layout",
-    });
+    if (hasTopLevelUseClient(layoutPath)) {
+      violations.push({
+        expected: `${layoutRelative} must remain a Server Component`,
+        import: '"use client"',
+        path: layoutRelative,
+        rule: "server-first-root-layout",
+      });
+    }
   }
 }
 
@@ -415,6 +439,7 @@ function detectWorkspaceCycles(graph) {
 function validatePackageGraph(root, violations) {
   const packageNames = workspacePackageNames(root);
   const graph = new Map();
+  const appPackageNames = new Set(["web", "flow-app"]);
 
   for (const [name, packageRoot] of packageNames) {
     const manifest = readPackageJson(path.join(packageRoot, "package.json"));
@@ -430,6 +455,28 @@ function validatePackageGraph(root, violations) {
         path: path.join(relative, "package.json"),
         rule: "shared-package-no-app-dependency",
       });
+    }
+
+    if (relative.startsWith("packages/") && deps.has("flow-app")) {
+      violations.push({
+        expected: "Shared packages must not depend on application packages",
+        import: "flow-app",
+        path: path.join(relative, "package.json"),
+        rule: "shared-package-no-app-dependency",
+      });
+    }
+
+    if (appPackageNames.has(name)) {
+      for (const dep of deps) {
+        if (appPackageNames.has(dep) && dep !== name) {
+          violations.push({
+            expected: "Applications must not depend on each other",
+            import: dep,
+            path: path.join(relative, "package.json"),
+            rule: "no-cross-app-dependency",
+          });
+        }
+      }
     }
   }
 
@@ -448,9 +495,13 @@ export function validateReactArchitecture(root = repositoryRoot) {
 
   validateUiPackage(root, violations);
   validateGenuiPackage(root, violations);
-  validateWebImports(root, violations);
-  validateClientSecurityBoundary(root, violations);
-  validateRootLayout(root, violations);
+
+  for (const appRoot of applicationRoots) {
+    validateApplicationImports(appRoot, root, violations);
+    validateClientSecurityBoundary(appRoot, root, violations);
+  }
+
+  validateRootLayouts(root, violations);
   validatePackageGraph(root, violations);
 
   return violations;

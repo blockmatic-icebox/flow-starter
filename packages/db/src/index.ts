@@ -3,4 +3,4 @@ export {
   resolveDatabaseConnection,
   type AppDatabase,
 } from "./client.js";
-export * from "./schema.js";
+export { account, appMeta, session, user, verification } from "./schema.js";

@@ -18,10 +18,14 @@
       "project": ["scripts/**/*.{mjs,ts}"]
     },
     "apps/web": {
+      "entry": ["app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}"],
+      "project": ["**/*.{ts,tsx,mjs}"]
+    },
+    "apps/flow": {
       "entry": [
         "app/**/*.{ts,tsx}",
-        "components/**/*.{ts,tsx}",
-        "lib/**/*.{ts,tsx}"
+        "app/_components/**/*.{ts,tsx}",
+        "app/_lib/**/*.{ts,tsx}"
       ],
       "project": ["**/*.{ts,tsx,mjs}"]
     },
@@ -48,11 +52,12 @@
     ".agents/skills/**",
     "packages/ui/src/components/**",
     "packages/genui/src/fixtures/**",
-    "apps/web/hooks/use-highlighted-code.ts"
+    "packages/db/auth.config.ts"
   ],
   "ignoreUnresolved": ["next"],
   "ignoreDependencies": [
     "@tailwindcss/postcss",
+    "better-auth",
     "next-themes",
     "postcss-load-config",
     "zod"
