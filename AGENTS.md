@@ -20,6 +20,7 @@ Update the owning document in the same change. Use a PDR in `docs/pdr/` for a co
 - Current delivery priorities and progress → [ROADMAP.md](ROADMAP.md); read [ARCHITECTURE.md](ARCHITECTURE.md) for technical boundaries.
 - Project-specific terms → [GLOSSARY.md](GLOSSARY.md)
 - Hard-to-reverse rationale → the relevant file in [docs/adr/](docs/adr/)
+- Architecture-wide technology choice, platform trade-offs, or major integration change → read the relevant sections of [ADR 0001](docs/adr/0001-agentic-architecture.md).
 - Dated evidence → [docs/research/](docs/research/). Accepted direction stays in the root contracts and `docs/adr/`.
 
 ## Lifecycle

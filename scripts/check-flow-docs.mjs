@@ -22,7 +22,6 @@ const rules = [
 ];
 
 const legacyPaths = new Set([
-  "docs/adr/001-use-flow-starter.md",
   "docs/adr/002-vercel-ai-sdk-for-tier-3.md",
   "docs/adr/003-genui-openui-foundation.md",
   "docs/adr/004-voice-delegates-to-eve.md",

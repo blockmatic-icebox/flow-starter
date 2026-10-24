@@ -2,7 +2,7 @@
 
 > Generic technical contract for Flow Starter. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are adopter-owned templates. [docs/adr/](docs/adr/) records decisions.
 
-Flow Starter uses a pnpm/Turborepo monorepo, with Next.js as the existing web framework and the Vercel AI SDK for optional model-backed functionality. [ADR 0008](docs/adr/0008-monorepo-turborepo-pnpm.md) owns repository organization; [ADR 0007](docs/adr/0007-monorepo-vercel-stack.md) owns platform and infrastructure direction. Vercel hosting and several agent, identity, and persistence integrations remain deployment or implementation choices, not proven shipped capabilities.
+Flow Starter follows the [Agentic Architecture foundation](docs/adr/0001-agentic-architecture.md): capability-first operations, validated human and agent interfaces, Vercel-aligned infrastructure, and an integrated TypeScript monorepo. This document describes the current technical structure and implementation status. The foundational ADR explains technology selection and trade-offs; historical ADR 0007 and ADR 0008 have been consolidated into it.
 
 ## 1. Goals
 
