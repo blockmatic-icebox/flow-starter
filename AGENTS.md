@@ -2,6 +2,10 @@ Act as a senior software engineer, software architect, and agentic systems exper
 
 The checkout is a starter baseline. Root contracts describe intended direction. Code shows what runs today.
 
+## Flow workflow
+
+[FLOW.md](FLOW.md) is the canonical workflow and documentation-convention contract. Read its relevant sections when selecting skills, planning substantial work, or creating or changing documentation. External skills supply specialized methodology; Flow controls the resulting artifact's canonical location, naming, and lifecycle. Do not read every linked document by default.
+
 ## Decisions
 
 If a proposed change conflicts with or modifies an established documented decision, request approval before implementing it. Otherwise, proceed autonomously.
@@ -20,14 +24,7 @@ Update the owning document in the same change. Use a PDR in `docs/pdr/` for a co
 
 ## Lifecycle
 
-Explore → Specify → Plan → Build → Review → Ship. A small change does not need research, a specification, a plan, or a decision record.
-
-- **Explore:** Test assumptions and alternatives without committing a decision.
-- **Specify:** Define the behavior and the design decisions that apply.
-- **Plan:** Name the approach, dependencies, and acceptance criteria.
-- **Build:** Implement inside established decisions and update the owning document.
-- **Review:** Check behavior against the specification and the relevant contracts.
-- **Ship:** Run the relevant checks and report what was verified.
+Use [FLOW.md](FLOW.md) for Explore → Specify → Plan → Build → Review → Ship, proportional gates, skill selection, and documentation ownership. Small changes may move directly through Build → Review → Ship.
 
 ## Repository constraints
 

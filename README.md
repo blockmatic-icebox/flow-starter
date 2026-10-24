@@ -13,17 +13,76 @@ pnpm dev
 
 Open the demo at `/genui-demo` (local URL from the dev server, or `https://flow.localhost` after [Portless setup](#local-https-portless)).
 
-| Command            | Purpose                                       |
-| ------------------ | --------------------------------------------- |
-| `pnpm dev`         | Development (Turborepo)                       |
-| `pnpm build`       | Production build                              |
-| `pnpm lint`        | oxlint + oxfmt                                |
-| `pnpm check-types` | TypeScript                                    |
-| `pnpm test`        | `@repo/genui` unit tests                      |
-| `pnpm qa`          | lint:fix + types + test (pre-commit)          |
-| `pnpm ci:local`    | same steps as GitHub Actions (includes build) |
+| Command            | Purpose                                           |
+| ------------------ | ------------------------------------------------- |
+| `pnpm dev`         | Development (Turborepo)                           |
+| `pnpm build`       | Production build                                  |
+| `pnpm lint`        | oxlint + oxfmt                                    |
+| `pnpm check-types` | TypeScript                                        |
+| `pnpm test`        | `@repo/genui` unit tests                          |
+| `pnpm flow:check`  | Flow documentation path and naming validation     |
+| `pnpm qa`          | flow:check + lint:fix + types + test (pre-commit) |
+| `pnpm ci:local`    | same steps as GitHub Actions (includes build)     |
 
 Optional tier-3 model answers: set `AI_GATEWAY_API_KEY` (and optionally `GENUI_MODEL`) in `apps/web/.env.local`. See [docs/adr/002-vercel-ai-sdk-for-tier-3.md](docs/adr/002-vercel-ai-sdk-for-tier-3.md). Compose rate limits: off on `flow.localhost` by default; set `GENUI_ENFORCE_RATE_LIMIT=1` to test 429 behavior locally.
+
+## Flow workflow
+
+This starter includes [Flow](FLOW.md), a lightweight workflow for product discovery and software delivery:
+
+**Explore → Specify → Plan → Build → Review → Ship**
+
+Flow defines documentation ownership and conventions while installed third-party skills provide specialized product, design, and engineering techniques.
+
+`AGENTS.md` is the compact router for coding agents. `FLOW.md` is the workflow contract. Read only the relevant project documents for a task.
+
+### Project skills
+
+Install or restore project skills after dependencies are installed:
+
+```sh
+pnpm skills:install
+```
+
+List the installed skills:
+
+```sh
+pnpm exec skills list
+```
+
+Update the installed skills deliberately:
+
+```sh
+pnpm skills:update
+```
+
+Skill sources and installed versions are recorded by `skills-lock.json`. The starter uses selected skills from Addy Osmani, Matt Pocock, and ProductSkills. Flow Skills itself is still developing its own reusable skills.
+
+### Working on a feature
+
+Ask your coding agent naturally, for example:
+
+- "Help me explore this product idea and identify its riskiest assumptions."
+- "Refine this feature's scope and acceptance criteria."
+- "Plan the smallest implementation slice for this capability."
+- "Implement this agreed scope and run the appropriate tests."
+- "Review this change against the specification and architecture."
+
+For larger work, the agent should use a bounded initiative document under `docs/initiatives/`. Routine small changes do not need additional planning documents.
+
+Root `PRODUCT.md`, `DESIGN.md`, and `ARCHITECTURE.md` remain the current source of truth for their respective concerns. Flow prevents external skills from scattering outputs into competing document structures.
+
+### Documentation validation
+
+Run:
+
+```sh
+pnpm flow:check
+```
+
+The check is part of `pnpm qa` and `pnpm ci:local`, and runs in the existing manual CI workflow.
+
+The validator checks document paths and filenames; it does not replace engineering review, verify product decisions, or guarantee skill execution.
 
 ## Packages
 

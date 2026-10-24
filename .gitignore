@@ -47,4 +47,9 @@ __dev
 
 # Agents
 .agents/skills/
-.cursor/
+
+# Keep local Cursor state ignored, but version the Flow rule.
+.cursor/*
+!.cursor/rules/
+.cursor/rules/*
+!.cursor/rules/flow.mdc
