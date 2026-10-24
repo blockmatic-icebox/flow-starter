@@ -15,6 +15,12 @@ export const parseNulPaths = (buffer) =>
 
 const codePattern = /\.(?:[cm]?[jt]sx?)$/u;
 
+const isOxfmtOtherFile = (file) => {
+  const base = file.split("/").pop() ?? file;
+  if (base === "pnpm-lock.yaml" || base.endsWith(".lock")) return false;
+  return /\.(?:css|json|ya?ml)$/u.test(file);
+};
+
 export const classifyStagedPaths = (paths) => {
   const code = [];
   const manifests = [];
@@ -46,7 +52,7 @@ export const classifyStagedPaths = (paths) => {
       !isCode &&
       !isManifest &&
       !isSecurity &&
-      /\.(?:css|json|ya?ml)$/u.test(file)
+      isOxfmtOtherFile(file)
     )
       other.push(file);
   }
