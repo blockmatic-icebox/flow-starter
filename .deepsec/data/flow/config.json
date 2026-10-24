@@ -1,0 +1,9 @@
+{
+  "ignorePaths": [
+    "**/.next/**",
+    "**/out/**",
+    "**/dist/**",
+    "**/.turbo/**",
+    "**/node_modules/**"
+  ]
+}
