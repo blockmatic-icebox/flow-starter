@@ -12,7 +12,7 @@ Generative UI in this repo: **select → compile → render**. User text is rout
 | --- | --- | --- |
 | 1 | Controlled | Known intents map to a single experience deterministically. |
 | 2 | Declarative | Keyword-driven stacks of approved child expressions (e.g. SectionStack). |
-| 3 | Generative | Optional model-backed prose via Vercel AI SDK + AI Gateway; falls back without credentials. |
+| 3 | Open-ended answer | Optional model-backed prose via Vercel AI SDK + AI Gateway inside a validated Answer experience; falls back without credentials. Does not generate arbitrary component trees. |
 
 ## Composition envelope
 
@@ -28,7 +28,7 @@ Fictional catalog data under `packages/genui/src/fixtures/` used by `/genui-demo
 
 ## Workspace (planned)
 
-The authenticated surface where a person and an agent share conversation, selection context, and canvas artifacts. Not shipped in the GenUI foundation slice; see [ARCHITECTURE.md](ARCHITECTURE.md) §7 and §10.
+The authenticated surface where a person and an agent share conversation, selection context, and canvas artifacts. Not shipped in the GenUI foundation slice; see [ARCHITECTURE.md](ARCHITECTURE.md) §7 and [ROADMAP.md](ROADMAP.md).
 
 ## Canvas (planned)
 

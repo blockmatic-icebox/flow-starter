@@ -51,7 +51,7 @@ Do not import server-only modules from client renderers. Share serializable type
 | --- | --- | --- |
 | 1 | Controlled | Deterministic intent routing → single experience (e.g. comparison, collection, status). |
 | 2 | Declarative | Keyword-driven **SectionStack** of approved child expressions. |
-| 3 | Generative | Optional `ai` + AI Gateway for prose; falls back to grounded **Answer** without credentials. |
+| 3 | Open-ended answer | Optional AI Gateway-backed prose inside a validated Answer experience; grounded fallback without credentials. Does not generate arbitrary component trees. |
 
 Tier 1–2 paths are fully testable without network access. Tier 3 is optional (ADR 002).
 
@@ -86,7 +86,7 @@ Voice (ADR 004) and `/dev` workspace placement (ADR 005) apply when those featur
 
 ## 8. Quality and CI
 
-Local gate: `pnpm qa` (lint, types, unit tests) and `pnpm build`.
+Local gates: `pnpm flow:test` validates Flow naming rules, `pnpm qa` runs non-mutating documentation, lint, type, and unit checks, and `pnpm ci:local` additionally performs a production build.
 
 GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) and [`.github/workflows/genui-quality.yml`](.github/workflows/genui-quality.yml) — **disabled for push/PR** until uncommented. Optional DeepSec workflow remains separate.
 
@@ -100,19 +100,8 @@ GenUI unit tests: `pnpm --filter @repo/genui test`. Eval matrix: `packages/genui
 4. Add auth, persistence, and eve tools when the workspace ships.
 5. Enable CI triggers when the remote repository is ready.
 
-## 10. Implementation sequence
+## 10. Delivery status
 
-Ordered work for this repository. Close each step with evidence (`pnpm qa`, preview smoke, or documented manual check) before expanding scope.
+Current milestone order, progress, and acceptance goals are maintained in [ROADMAP.md](ROADMAP.md).
 
-| Step | Status | Work |
-| --- | --- | --- |
-| GenUI foundation | **Done** | `@repo/genui`, `/genui-demo`, `POST /api/genui/compose`, CI workflow (local + optional remote) |
-| 1. Foundation spike | Pending | eve + Next.js + Better Auth + Neon/Drizzle in a Vercel preview; identity propagation, streaming, cancellation, persistence, cross-user rejection; lint/types/build in CI |
-| 2. `/dev` workspace | Pending | Prompt bar, chat panel, mobile tabs, selection context, activity labels, theme; fixture-driven state before live eve |
-| 3. Shared-action slice | Pending | One filter (or similar) callable from UI and eve tool; owner-scoped persistence, versions, idempotent retries |
-| 4. Grounded explorer | Pending | Bounded repo/docs retrieval with citations; extend OpenUI catalog (text, tables, diagrams) — not a parallel json-render path |
-| 5. Adoption proof | Pending | Extension guide against real files; versioned eval set; preview deploy + recovery rehearsal |
-
-**Follow-on** (after the table above): external read-only invocation (ADR 006), voice via eve (ADR 004), dependency/video/charts only when a concrete adopter task exists.
-
-Delivery order summary: [ROADMAP.md](ROADMAP.md).
+This architecture document owns technical boundaries and intended system structure, not a competing delivery task list.

@@ -45,11 +45,6 @@ __dev
 .deepsec/data/**/runs/
 .deepsec/findings/
 
-# Agents
+# Agent and editor local installations
 .agents/skills/
-
-# Keep local Cursor state ignored, but version the Flow rule.
-.cursor/*
-!.cursor/rules/
-.cursor/rules/*
-!.cursor/rules/flow.mdc
+.cursor/

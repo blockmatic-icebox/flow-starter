@@ -8,7 +8,9 @@ Evidence-based extraction from gaboesquivel.com (read-only source) into `@repo/g
 | --- | --- | --- | --- |
 | 1 | Controlled | Recognized intents | `orchestration/routing.ts` + deterministic builders |
 | 2 | Declarative | Compound or mixed requests | `SectionStack` + validated child OpenUI expressions |
-| 3 | Open-ended | Catalog insufficient | Reserved for model composition; safe Answer fallback until provider wiring |
+| 3 | Open-ended answer | No controlled or declarative match | Optional model-backed prose in a validated Answer experience; grounded fallback when AI Gateway credentials are absent |
+
+Tier 3 is not arbitrary runtime generation of React components or unconstrained interface trees. The implementation keeps presentation within approved OpenUI Lang contracts and host-controlled renderers.
 
 Pipeline: **route → build OpenUI text → `compileCompositionEnvelope` → stream NDJSON → React `Renderer`**.
 

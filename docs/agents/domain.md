@@ -1,38 +1,41 @@
-# Domain Docs
+# Domain documentation
 
-Single-context layout. Engineering skills read this when exploring the codebase. [AGENTS.md](../../AGENTS.md) routes product, design, and architecture reads.
+This repository uses one primary domain context. [AGENTS.md](../../AGENTS.md) is the universal agent router; [FLOW.md](../../FLOW.md) owns documentation conventions and lifecycle.
 
-## Before exploring, read these
+## When to read the glossary
 
-- **`GLOSSARY.md`** at the repo root for project-specific language.
-- **`docs/adr/`** when the change touches a hard-to-reverse decision. Read the ADRs for that area.
+Read [GLOSSARY.md](../../GLOSSARY.md) when work involves:
 
-If either is missing, proceed silently. The `/domain-modeling` skill creates glossary and ADR files when a term or decision is actually resolved.
+- Domain concepts or ambiguous terminology.
+- Naming new public concepts, models, or operations.
+- Reviewing behavior that depends on the meaning of an existing term.
+- Changing an established domain boundary.
 
-For product behavior, presentation, or technical boundaries, follow the pointers in `AGENTS.md`.
+Do not load the glossary merely because a task touches code.
 
-## File structure
+Use the project's established term when its meaning is relevant. Do not invent synonyms that obscure distinctions.
 
-```
-/
-├── GLOSSARY.md
-├── docs/
-│   ├── adr/
-│   └── research/          # dated evidence
-├── apps/web/
-└── packages/
-```
+## When to inspect decisions
 
-Root contracts (`PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`) sit beside this map. Application code lives under `apps/` and `packages/`.
+Read the relevant records in [docs/adr/](../adr/) when changing architecture, authorization, data boundaries, major integrations, or other consequential choices.
 
-## Use the glossary's vocabulary
+Do not load every ADR automatically.
 
-When output names a domain concept (issue title, refactor proposal, hypothesis, test name), use the term as defined in `GLOSSARY.md`, in preference to any synonym listed under `_Avoid_`.
+If the proposed change conflicts with an accepted decision, surface that conflict before changing it.
 
-If the concept you need is not in the glossary yet, either you are inventing language the project does not use (reconsider) or there is a real gap (note it for `/domain-modeling`). Follow the entry rule in `GLOSSARY.md`.
+## Maintaining language
 
-## Flag ADR conflicts
+Use the installed `domain-modeling` skill when terminology or a domain boundary actually needs clarification.
 
-If output contradicts an existing ADR, surface it explicitly rather than silently overriding:
+Record resolved project-specific meanings in GLOSSARY.md. Keep implementation details in technical specifications and code.
 
-> _Contradicts ADR 006 (external invocation is read-only), but worth reopening because…_
+Create a new ADR only when a consequential architectural trade-off merits durable rationale.
+
+## Related contracts
+
+- [PRODUCT.md](../../PRODUCT.md): product intent and scope.
+- [DESIGN.md](../../DESIGN.md): experience and interaction direction.
+- [ARCHITECTURE.md](../../ARCHITECTURE.md): system boundaries.
+- [ROADMAP.md](../../ROADMAP.md): delivery priorities and progress.
+
+Read only the relevant context for the task.

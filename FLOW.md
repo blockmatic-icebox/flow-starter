@@ -149,6 +149,7 @@ Use one authoritative home for each fact. Link related documents instead of copy
 | `PRODUCT.md` | Current product vision, audience, business context, scope, outcomes, and capabilities |
 | `DESIGN.md` | Current visual, interaction, experience, and accessibility direction |
 | `ARCHITECTURE.md` | Current technical structure, boundaries, constraints, and major system choices |
+| `ROADMAP.md` | Current delivery priorities, ordered milestones, and verified progress; replace or adapt when adopting the starter |
 | `GLOSSARY.md` | Terms with project-specific meanings and consequential distinctions |
 | `docs/ideas/<slug>.md` | Worthwhile possibilities that are not yet implementation commitments |
 | `docs/initiatives/<slug>.md` | Intentional bounded work: outcome, scope, assumptions, tasks, progress, validation, and findings |
@@ -244,12 +245,14 @@ Write for humans and agents using progressive disclosure.
 
 The source code remains discoverable. Document the non-obvious intent, trade-offs, constraints, and decisions that are costly to reconstruct.
 
+Keep ROADMAP.md as the single source of truth for delivery sequence and milestone status. ARCHITECTURE.md describes technical structure and constraints. Initiative documents own bounded implementation scope and detailed execution progress. Avoid duplicating the same task list across these documents.
+
 ## Enforcement and limits
 
 The workflow is a repository convention, not a self-executing runtime.
 
 Agent instructions encourage compliant behavior; they cannot guarantee that every tool or model obeys the convention.
 
-The repository's `flow:check` command verifies canonical documentation filenames and locations. Run it with the normal quality checks. It does not verify semantic correctness, authorization, or that a skill was invoked.
+The repository's `flow:check` command validates canonical documentation paths, filenames, and decision-number uniqueness. `flow:test` verifies the validator's behavior. These checks do not verify semantic correctness, approval, product outcomes, or skill invocation.
 
 Humans and reviewers remain responsible for approving consequential decisions and evaluating the quality of the work.
