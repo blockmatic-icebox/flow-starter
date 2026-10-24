@@ -259,7 +259,7 @@ Parallel readiness checks and honest release boundaries: [delegation.md](../agen
 
 Use one authoritative home for each fact. Link related documents instead of copying their contents.
 
-Flow Starter's mission, goals and inherited foundation are explained in docs/readme.md. The root README.md is an adopter-owned product template. Flow methodology and documentation conventions belong in docs/workflow/flow.md, with a human introduction in docs/workflow/readme.md. Current architecture belongs in ARCHITECTURE.md; durable architectural rationale belongs in ADRs. Use existing initiatives, plans and specifications only when justified by the work.
+Flow Starter's mission, goals and inherited foundation are explained in docs/readme.md. The root README.md is an adopter-owned product template. Flow methodology and documentation conventions belong in docs/workflow/flow.md, with a human introduction in docs/workflow/readme.md. Additional pages linked from that introduction (for example `working-with-flow.md`, `principles.md`, `influences-and-alternatives.md`, `project-context.md`, and `learning-and-improvement.md`) explain the methodology for people; they do not change the rules in this file. Current architecture belongs in ARCHITECTURE.md; durable architectural rationale belongs in ADRs. Use existing initiatives, plans and specifications only when justified by the work.
 
 | Location | Responsibility |
 | --- | --- |
