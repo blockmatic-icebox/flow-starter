@@ -33,6 +33,17 @@ The structure is opinionated and provided as part of the starter.
 
 Product adopters replace product context and domain implementations without reselecting the underlying React architecture.
 
+### Organizing hierarchy (route-first, not feature folders)
+
+Flow Starter does **not** use mandatory `features/`, `modules/`, `domains/`, or `services/` trees. A Next.js **route directory** is the natural organizational unit.
+
+1. **Route-local (default)** — Code used by a single route colocates beside `page.tsx`, `route.ts`, and other App Router entry files. Keep smaller routes flat.
+2. **Route-local grouping (optional)** — When a route grows, optional private folders such as `_components/`, `_lib/`, or `_hooks/` may group related files. Do not create these folders by default for every route.
+3. **Application-shared** — Code used by multiple routes in the same app lives under that app’s existing shared locations (for example `apps/web/components/`, `apps/flow/app/_lib/`). Do not duplicate the same responsibility in parallel directory trees.
+4. **Cross-application packages** — Promote to `packages/` only for reuse across apps, a stable technical contract, or a genuine boundary (`@repo/ui`, `@repo/genui`, `@repo/db`, `@repo/ts`). Do not create a package per route, screen, or component group.
+
+Extract only when justified (AHA). Do not relocate code that is already correctly colocated or legitimately shared merely to match a feature-folder template.
+
 ### 1. Fractal organization
 
 A route, feature, composite and component should follow recognizable, self-similar organizational principles.

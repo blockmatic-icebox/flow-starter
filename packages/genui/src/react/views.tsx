@@ -129,3 +129,158 @@ export const StatusMessageView = ({
     {message}
   </output>
 );
+
+export const SearchResultsView = ({
+  composite,
+  entityIds,
+  query,
+  records,
+}: {
+  composite: string;
+  entityIds: string[];
+  query: string;
+  records: GroundedRecord[];
+}) => (
+  <section className="space-y-3">
+    <header className="space-y-1">
+      <p className="text-muted-foreground text-xs tracking-wide uppercase">
+        {composite}
+      </p>
+      <p className="text-sm">
+        Results for <span className="font-medium">&ldquo;{query}&rdquo;</span>
+      </p>
+    </header>
+    <ul className="grid gap-3 sm:grid-cols-2">
+      {entityIds.map((id) => (
+        <li className="border-border rounded-lg border p-3" key={id}>
+          <h3 className="font-medium">{recordTitle(records, id)}</h3>
+        </li>
+      ))}
+    </ul>
+  </section>
+);
+
+export const DetailViewUi = ({
+  composite,
+  records,
+  sourceId,
+}: {
+  composite: string;
+  records: GroundedRecord[];
+  sourceId: string;
+}) => {
+  const record = records.find((item) => item.id === sourceId);
+  if (!record) return null;
+  if (record.kind === "entity") {
+    return (
+      <article className="space-y-2">
+        <p className="text-muted-foreground text-xs tracking-wide uppercase">
+          {composite}
+        </p>
+        <h2 className="text-xl font-semibold">{record.title}</h2>
+        {record.summary ? (
+          <p className="text-muted-foreground text-sm">{record.summary}</p>
+        ) : null}
+      </article>
+    );
+  }
+  if (record.kind === "document") {
+    return (
+      <article className="space-y-2">
+        <p className="text-muted-foreground text-xs tracking-wide uppercase">
+          {composite}
+        </p>
+        <h2 className="text-xl font-semibold">{record.title}</h2>
+        <p className="text-sm leading-relaxed">{record.excerpt}</p>
+      </article>
+    );
+  }
+  return (
+    <article className="space-y-2">
+      <p className="text-muted-foreground text-xs tracking-wide uppercase">
+        {composite}
+      </p>
+      <h2 className="text-xl font-semibold">{sourceId}</h2>
+    </article>
+  );
+};
+
+export const DocumentationBlockView = ({
+  composite,
+  documentId,
+  records,
+}: {
+  composite: string;
+  documentId: string;
+  records: GroundedRecord[];
+}) => {
+  const doc = records.find((record) => record.id === documentId);
+  if (!doc || doc.kind !== "document") return null;
+  return (
+    <article className="space-y-3">
+      <header className="space-y-1">
+        <p className="text-muted-foreground text-xs tracking-wide uppercase">
+          {composite}
+        </p>
+        <h2 className="font-semibold">{doc.title}</h2>
+      </header>
+      <p className="text-sm leading-relaxed">{doc.excerpt}</p>
+      {composite === "code-and-prose" ? (
+        <pre className="border-border bg-muted/30 overflow-x-auto rounded-md border p-3 text-xs">
+          <code>{doc.excerpt}</code>
+        </pre>
+      ) : null}
+    </article>
+  );
+};
+
+export const FilePreviewView = ({
+  composite,
+  mediaId,
+  records,
+}: {
+  composite: string;
+  mediaId: string;
+  records: GroundedRecord[];
+}) => {
+  const media = records.find((record) => record.id === mediaId);
+  if (!media || media.kind !== "media") return null;
+  const isImage = media.mimeType.startsWith("image/");
+  return (
+    <figure className="space-y-2">
+      <figcaption className="text-muted-foreground text-xs tracking-wide uppercase">
+        {composite}
+      </figcaption>
+      <div className="border-border rounded-lg border p-4">
+        <p className="font-medium">{media.title}</p>
+        <p className="text-muted-foreground text-xs">{media.mimeType}</p>
+        <a
+          className="mt-3 inline-block text-sm underline"
+          href={media.url}
+          rel="noreferrer"
+          target="_blank"
+        >
+          {isImage ? `Preview ${media.title}` : "Open file"}
+        </a>
+      </div>
+    </figure>
+  );
+};
+
+export const InteractiveFormView = ({
+  composite,
+  formId,
+}: {
+  composite: string;
+  formId: string;
+}) => (
+  <section className="space-y-2">
+    <p className="text-muted-foreground text-xs tracking-wide uppercase">
+      {composite}
+    </p>
+    <StatusMessageView
+      message={`Form "${formId}" is not wired on this host. Register a privileged submit action before enabling submission.`}
+      variant="warning"
+    />
+  </section>
+);

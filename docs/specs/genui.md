@@ -48,11 +48,14 @@ packages/genui/src/
 
 ## Extending
 
-1. Register new Zod props in `contract/schemas.ts` and `contract/library.ts`.
-2. Add composite allowlists in `contract/catalog.ts`.
-3. Add semantics in `registry/semantics.ts`.
-4. Implement React view in `react/views.tsx` and register in `react/library.tsx`.
-5. Add controlled intent rules in `orchestration/routing.ts` (tier 1) or builder helpers (tier 2).
+1. Register new Zod props in `contract/schemas.ts` (`componentPropsByName` is the name source for `registry/components.ts`).
+2. Register the contract noop in `contract/library.ts`.
+3. Add composite allowlists in `contract/catalog.ts`.
+4. Add semantics in `registry/semantics.ts`.
+5. Implement React view in `react/views.tsx` and register in `react/library.tsx` (same component name as the contract).
+6. Add controlled intent rules in `orchestration/routing.ts` (tier 1) or builder helpers (tier 2).
+
+`registry/library-parity.test.ts` fails if the contract library advertises a component the React library does not register. `SectionStack` children render through OpenUI `useRenderNode` so every registered child component can compose declaratively.
 
 Privileged actions: `createActionRegistry()` — never accept callbacks from model output.
 

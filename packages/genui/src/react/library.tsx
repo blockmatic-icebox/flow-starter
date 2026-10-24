@@ -1,6 +1,10 @@
 "use client";
 
-import { createLibrary, defineComponent } from "@openuidev/react-lang";
+import {
+  createLibrary,
+  defineComponent,
+  useRenderNode,
+} from "@openuidev/react-lang";
 import type { z } from "zod";
 
 import {
@@ -8,6 +12,11 @@ import {
   collectionGridPropsSchema,
   comparisonViewPropsSchema,
   dataExplorerPropsSchema,
+  detailViewPropsSchema,
+  documentationBlockPropsSchema,
+  filePreviewPropsSchema,
+  interactiveFormPropsSchema,
+  searchResultsPropsSchema,
   sectionStackPropsSchema,
   statusMessagePropsSchema,
   timelineViewPropsSchema,
@@ -18,6 +27,11 @@ import {
   CollectionGridView,
   ComparisonViewUi,
   DataExplorerView,
+  DetailViewUi,
+  DocumentationBlockView,
+  FilePreviewView,
+  InteractiveFormView,
+  SearchResultsView,
   StatusMessageView,
   TimelineViewUi,
 } from "./views";
@@ -52,6 +66,22 @@ const CollectionGridComponent = ({
   );
 };
 
+const SearchResultsComponent = ({
+  props,
+}: {
+  props: z.infer<typeof searchResultsPropsSchema>;
+}) => {
+  const records = useGenuiRecords();
+  return (
+    <SearchResultsView
+      composite={props.composite}
+      entityIds={props.entityIds}
+      query={props.query}
+      records={records}
+    />
+  );
+};
+
 const ComparisonViewComponent = ({
   props,
 }: {
@@ -79,6 +109,57 @@ const TimelineViewComponent = ({
   return <TimelineViewUi orderedIds={props.orderedIds} records={records} />;
 };
 
+const DetailViewComponent = ({
+  props,
+}: {
+  props: z.infer<typeof detailViewPropsSchema>;
+}) => {
+  const records = useGenuiRecords();
+  return (
+    <DetailViewUi
+      composite={props.composite}
+      records={records}
+      sourceId={props.sourceId}
+    />
+  );
+};
+
+const DocumentationBlockComponent = ({
+  props,
+}: {
+  props: z.infer<typeof documentationBlockPropsSchema>;
+}) => {
+  const records = useGenuiRecords();
+  return (
+    <DocumentationBlockView
+      composite={props.composite}
+      documentId={props.documentId}
+      records={records}
+    />
+  );
+};
+
+const FilePreviewComponent = ({
+  props,
+}: {
+  props: z.infer<typeof filePreviewPropsSchema>;
+}) => {
+  const records = useGenuiRecords();
+  return (
+    <FilePreviewView
+      composite={props.composite}
+      mediaId={props.mediaId}
+      records={records}
+    />
+  );
+};
+
+const InteractiveFormComponent = ({
+  props,
+}: {
+  props: z.infer<typeof interactiveFormPropsSchema>;
+}) => <InteractiveFormView composite={props.composite} formId={props.formId} />;
+
 const StatusMessageComponent = ({
   props,
 }: {
@@ -90,64 +171,13 @@ const SectionStackComponent = ({
 }: {
   props: z.infer<typeof sectionStackPropsSchema>;
 }) => {
-  const records = useGenuiRecords();
+  const renderNode = useRenderNode();
   const children = Array.isArray(props.children) ? props.children : [];
   return (
     <div className="flex flex-col gap-8">
-      {children.map((child, index) => {
-        if (
-          !child ||
-          typeof child !== "object" ||
-          (child as { type?: string }).type !== "element"
-        ) {
-          return null;
-        }
-        const element = child as {
-          props: Record<string, unknown>;
-          typeName: string;
-        };
-        if (element.typeName === "Answer") {
-          return (
-            <AnswerView
-              body={String(element.props.body ?? "")}
-              key={`answer-${index}`}
-              records={records}
-              sourceIds={
-                Array.isArray(element.props.sourceIds)
-                  ? element.props.sourceIds.map(String)
-                  : []
-              }
-            />
-          );
-        }
-        if (element.typeName === "DataExplorer") {
-          return (
-            <DataExplorerView
-              key={`metrics-${index}`}
-              metricIds={
-                Array.isArray(element.props.metricIds)
-                  ? element.props.metricIds.map(String)
-                  : []
-              }
-              records={records}
-            />
-          );
-        }
-        if (element.typeName === "ComparisonView") {
-          return (
-            <ComparisonViewUi
-              entityIds={
-                Array.isArray(element.props.entityIds)
-                  ? element.props.entityIds.map(String)
-                  : []
-              }
-              key={`compare-${index}`}
-              records={records}
-            />
-          );
-        }
-        return null;
-      })}
+      {children.map((child, index) => (
+        <div key={`section-${index}`}>{renderNode(child)}</div>
+      ))}
     </div>
   );
 };
@@ -159,11 +189,25 @@ const Answer = defineComponent({
   props: answerPropsSchema,
 });
 
+const SectionStack = defineComponent({
+  component: SectionStackComponent,
+  description: "Section stack.",
+  name: "SectionStack",
+  props: sectionStackPropsSchema,
+});
+
 const CollectionGrid = defineComponent({
   component: CollectionGridComponent,
   description: "Collection grid.",
   name: "CollectionGrid",
   props: collectionGridPropsSchema,
+});
+
+const SearchResults = defineComponent({
+  component: SearchResultsComponent,
+  description: "Search results with optional filters.",
+  name: "SearchResults",
+  props: searchResultsPropsSchema,
 });
 
 const ComparisonView = defineComponent({
@@ -187,6 +231,34 @@ const TimelineView = defineComponent({
   props: timelineViewPropsSchema,
 });
 
+const DetailView = defineComponent({
+  component: DetailViewComponent,
+  description: "Detail view for one entity or document.",
+  name: "DetailView",
+  props: detailViewPropsSchema,
+});
+
+const DocumentationBlock = defineComponent({
+  component: DocumentationBlockComponent,
+  description: "Documentation with code.",
+  name: "DocumentationBlock",
+  props: documentationBlockPropsSchema,
+});
+
+const InteractiveForm = defineComponent({
+  component: InteractiveFormComponent,
+  description: "Form wired to registered actions.",
+  name: "InteractiveForm",
+  props: interactiveFormPropsSchema,
+});
+
+const FilePreview = defineComponent({
+  component: FilePreviewComponent,
+  description: "Embedded file or media preview.",
+  name: "FilePreview",
+  props: filePreviewPropsSchema,
+});
+
 const StatusMessage = defineComponent({
   component: StatusMessageComponent,
   description: "Status message.",
@@ -194,21 +266,19 @@ const StatusMessage = defineComponent({
   props: statusMessagePropsSchema,
 });
 
-const SectionStack = defineComponent({
-  component: SectionStackComponent,
-  description: "Section stack.",
-  name: "SectionStack",
-  props: sectionStackPropsSchema,
-});
-
 export const flowGenuiReactLibrary = createLibrary({
   components: [
     Answer,
     SectionStack,
     CollectionGrid,
+    SearchResults,
     ComparisonView,
-    DataExplorer,
     TimelineView,
+    DetailView,
+    DataExplorer,
+    DocumentationBlock,
+    InteractiveForm,
+    FilePreview,
     StatusMessage,
   ],
   root: "Answer",

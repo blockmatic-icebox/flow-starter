@@ -34,4 +34,26 @@ describe("compileExperience", () => {
     });
     assert.equal(result.ok, false);
   });
+
+  it("accepts SearchResults with grounded entities", () => {
+    const result = compileExperience({
+      document:
+        'root = SearchResults("results-with-filters", ["entity:orbit-plan"], "orbit")',
+      libraryVersion: 1,
+      records: acmeCatalogRecords,
+    });
+    assert.equal(result.ok, true);
+    if (result.ok) assert.equal(result.component, "SearchResults");
+  });
+
+  it("accepts SectionStack with supported child components", () => {
+    const result = compileExperience({
+      document:
+        'root = SectionStack([Answer("Stacked", []), CollectionGrid("grid-cards", ["entity:orbit-plan"])])',
+      libraryVersion: 1,
+      records: acmeCatalogRecords,
+    });
+    assert.equal(result.ok, true);
+    if (result.ok) assert.equal(result.component, "SectionStack");
+  });
 });

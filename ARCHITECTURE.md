@@ -39,7 +39,7 @@ Do not import server-only modules from client renderers. Share serializable type
 
 ## React and Next.js application architecture
 
-React code follows [ADR 0009](docs/adr/0009-react-nextjs-fractal-architecture.md): route-first colocation, Server Components by default, nuqs for shareable URL state, and no mandatory `features/` layer. Rationale, enforcement, and package boundaries for `apps/web`, `apps/flow`, `@repo/ui`, and `@repo/genui` belong in that ADR.
+React code follows [ADR 0009](docs/adr/0009-react-nextjs-fractal-architecture.md): route-first colocation (route-local by default, optional `_components` / `_lib` grouping, app-shared extraction, then `packages/` only when reuse justifies it), Server Components by default, nuqs for shareable URL state, and no mandatory `features/` layer. Rationale, enforcement, and package boundaries for `apps/web`, `apps/flow`, `@repo/ui`, and `@repo/genui` belong in that ADR.
 
 ## 3. Generative UI: select → compile → validate → render
 

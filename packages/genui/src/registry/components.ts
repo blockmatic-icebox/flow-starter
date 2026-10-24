@@ -1,19 +1,11 @@
-export const componentNames = [
-  "Answer",
-  "SectionStack",
-  "CollectionGrid",
-  "SearchResults",
-  "ComparisonView",
-  "TimelineView",
-  "DetailView",
-  "DataExplorer",
-  "DocumentationBlock",
-  "InteractiveForm",
-  "FilePreview",
-  "StatusMessage",
-] as const;
+import { componentPropsByName } from "../contract/schemas";
 
-export type ComponentName = (typeof componentNames)[number];
+/** Authoritative list — derived from Zod prop schemas to avoid registry drift. */
+export const componentNames = Object.keys(
+  componentPropsByName
+) as ComponentName[];
+
+export type ComponentName = keyof typeof componentPropsByName;
 
 export const forbiddenComponentKeys = [
   "presentation",
