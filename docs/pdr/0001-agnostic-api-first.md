@@ -100,6 +100,5 @@ Rejected as a requirement of the shared workflow. Editor-specific local configur
 - [AGENTS.md](../../AGENTS.md) — universal agent entrypoint
 - [ARCHITECTURE.md](../../ARCHITECTURE.md) — technical boundaries
 - [PRODUCT.md](../../PRODUCT.md) — adopter-owned product template
-- [ADR 0007](../adr/0007-monorepo-vercel-stack.md) — platform
-- [ADR 0008](../adr/0008-monorepo-turborepo-pnpm.md) — repository structure
+- [ADR 0001](../adr/0001-agentic-architecture.md) — foundational technology choices and rationale
 - [ADR 006](../adr/006-external-invocation-is-read-only.md) — planned external authorization boundary

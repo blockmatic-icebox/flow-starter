@@ -2,7 +2,7 @@
 
 An AI-first monorepo starter: generative UI (**select → compile → render**), shared action boundaries, and Vercel-friendly defaults. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are **templates**—replace them with your product. System shape is in [ARCHITECTURE.md](ARCHITECTURE.md); delivery order in [ROADMAP.md](ROADMAP.md). Decisions live in [docs/adr/](docs/adr/).
 
-Flow Starter follows a [product-agnostic, capability-first and agent-ready approach](docs/pdr/0001-agnostic-api-first.md). Its [Vercel-aligned platform direction](docs/adr/0007-monorepo-vercel-stack.md) and [pnpm/Turborepo monorepo](docs/adr/0008-monorepo-turborepo-pnpm.md) are independent architectural decisions. The application and GenUI demonstration are implemented; identity, persistence, a full agent workspace, and MCP host integration are planned rather than shipped.
+Flow Starter follows the [Agentic Architecture foundation](docs/adr/0001-agentic-architecture.md) and a [product-agnostic, capability-first and agent-ready approach](docs/pdr/0001-agnostic-api-first.md). The application and GenUI demonstration are implemented; identity, persistence, a full agent workspace, and MCP host integration are planned rather than shipped.
 
 ## Quick start
 
@@ -95,13 +95,14 @@ The validator checks document paths and filenames; it does not replace engineeri
 
 ## Architectural decisions
 
-- [PDR 0001 — Product and agent agnosticity](docs/pdr/0001-agnostic-api-first.md)
-- [ADR 0007 — Vercel platform and AI infrastructure](docs/adr/0007-monorepo-vercel-stack.md)
-- [ADR 0008 — Monorepo with Turborepo and pnpm](docs/adr/0008-monorepo-turborepo-pnpm.md)
+- [ADR 0001 — Agentic Architecture](docs/adr/0001-agentic-architecture.md): foundational technology choices and rationale.
+- [ADR 002 — Vercel AI SDK for tier-3 answers](docs/adr/002-vercel-ai-sdk-for-tier-3.md)
 - [ADR 003 — Generative UI with OpenUI Lang](docs/adr/003-genui-openui-foundation.md)
 - [GenUI technology comparison](docs/research/2026-10-24-genui-json-vs-openui.md)
 
-Accepted direction lives in current contracts and decision records. Research preserves evidence and alternatives.
+Product-engineering principles (product-agnostic scope, capability-first interfaces, agent-ready boundaries) live in [PDR 0001](docs/pdr/0001-agnostic-api-first.md), not in the technology stack ADR.
+
+Accepted direction lives in current contracts and decision records. Research preserves evidence and alternatives. Superseded ADR 0007 and ADR 0008 remain in `docs/adr/` for historical traceability.
 
 ## Packages
 

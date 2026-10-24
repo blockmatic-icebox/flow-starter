@@ -1,6 +1,8 @@
 # ADR 0008 — Monorepo with Turborepo and pnpm
 
-**Status:** Accepted · October 24, 2026
+**Status:** Superseded · October 24, 2026
+
+> Historical decision. The current foundational architectural rationale is consolidated in [ADR 0001 — Agentic Architecture](0001-agentic-architecture.md). This record is retained for traceability and must not be treated as a separate current source of truth.
 
 ## Context
 

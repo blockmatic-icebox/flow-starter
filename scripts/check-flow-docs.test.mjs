@@ -44,7 +44,6 @@ test("accepts canonical filenames", (t) => {
 
 test("preserves explicit legacy documents", (t) => {
   const root = fixture(t, [
-    "docs/adr/001-use-flow-starter.md",
     "docs/adr/002-vercel-ai-sdk-for-tier-3.md",
     "docs/research/generative-ui.md",
     "docs/specs/genui/README.md",
@@ -52,6 +51,18 @@ test("preserves explicit legacy documents", (t) => {
   ]);
 
   assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("accepts foundational ADR 0001 filename", (t) => {
+  const root = fixture(t, ["docs/adr/0001-agentic-architecture.md"]);
+
+  assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("rejects retired three-digit ADR 001 path", (t) => {
+  const root = fixture(t, ["docs/adr/001-use-flow-starter.md"]);
+
+  assert.match(validateFlowDocs(root).join("\n"), /invalid filename/u);
 });
 
 test("rejects uppercase decision prefixes", (t) => {
@@ -66,13 +77,13 @@ test("rejects new three-digit ADRs", (t) => {
   assert.match(validateFlowDocs(root).join("\n"), /invalid filename/u);
 });
 
-test("detects collision between legacy 001 and new 0001", (t) => {
+test("allows ADR 0001 and ADR 0008 to coexist", (t) => {
   const root = fixture(t, [
-    "docs/adr/001-use-flow-starter.md",
-    "docs/adr/0001-another-decision.md",
+    "docs/adr/0001-agentic-architecture.md",
+    "docs/adr/0008-monorepo-turborepo-pnpm.md",
   ]);
 
-  assert.match(validateFlowDocs(root).join("\n"), /duplicate ADR number/u);
+  assert.deepEqual(validateFlowDocs(root), []);
 });
 
 test("detects duplicate modern ADR numbers", (t) => {
