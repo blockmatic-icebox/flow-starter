@@ -8,14 +8,23 @@ import { validateFlowDocs } from "./check-flow-docs.mjs";
 
 function defaultMarkdownContent(relative) {
   if (relative.startsWith("docs/research/")) {
-    const dated = /^(?<date>\d{4}-\d{2}-\d{2})-/u.exec(path.basename(relative));
-    const researchDate = dated?.groups.date ?? "2026-10-20";
+    const dated = /^(?<date>\d{8})-/u.exec(path.basename(relative));
+    const researchDate = dated
+      ? `${dated.groups.date.slice(0, 4)}-${dated.groups.date.slice(4, 6)}-${dated.groups.date.slice(6, 8)}`
+      : "2026-10-20";
 
     return `# Research\n\n**Research date:** ${researchDate}\n**Last reviewed:** 2026-10-24\n**Status:** Current\n`;
   }
 
   if (relative.startsWith("docs/specs/")) {
     return `# Spec\n\n**Last reviewed:** 2026-10-24\n**Status:** Current\n`;
+  }
+
+  if (
+    relative.startsWith("docs/adr/") ||
+    relative.startsWith("docs/pdr/")
+  ) {
+    return "Date: 2026-10-24\n\n# Decision\n";
   }
 
   return "# Example\n";
@@ -53,7 +62,7 @@ test("accepts canonical filenames", (t) => {
     "docs/initiatives/onboarding.md",
     "docs/plans/database-migration.md",
     "docs/specs/authentication.md",
-    "docs/research/2026-10-24-user-interviews.md",
+    "docs/research/20261024-user-interviews.md",
     "docs/adr/0007-auth-boundary.md",
     "docs/pdr/0001-pricing-model.md",
   ]);
@@ -61,10 +70,8 @@ test("accepts canonical filenames", (t) => {
   assert.deepEqual(validateFlowDocs(root), []);
 });
 
-test("preserves explicit legacy documents with metadata", (t) => {
+test("preserves explicit legacy nested GenUI spec documents", (t) => {
   const root = fixture(t, [
-    "docs/adr/002-vercel-ai-sdk-for-tier-3.md",
-    "docs/research/generative-ui.md",
     "docs/specs/genui/README.md",
     "docs/specs/genui/INVENTORY.md",
   ]);
@@ -136,13 +143,13 @@ test("rejects uppercase Markdown extensions", (t) => {
 });
 
 test("rejects invalid calendar dates", (t) => {
-  const root = fixture(t, ["docs/research/2026-02-29-not-real.md"]);
+  const root = fixture(t, ["docs/research/20260229-not-real.md"]);
 
   assert.match(validateFlowDocs(root).join("\n"), /invalid ISO calendar date/u);
 });
 
 test("accepts valid leap days", (t) => {
-  const root = fixture(t, ["docs/research/2028-02-29-valid-leap-day.md"]);
+  const root = fixture(t, ["docs/research/20280229-valid-leap-day.md"]);
 
   assert.deepEqual(validateFlowDocs(root), []);
 });
@@ -157,8 +164,8 @@ test("rejects decision identifier zero", (t) => {
 });
 
 test("rejects research missing metadata", (t) => {
-  const root = fixture(t, ["docs/research/2026-10-24-missing-meta.md"], {
-    "docs/research/2026-10-24-missing-meta.md": "# Research\n",
+  const root = fixture(t, ["docs/research/20261024-missing-meta.md"], {
+    "docs/research/20261024-missing-meta.md": "# Research\n",
   });
 
   assert.match(
@@ -168,8 +175,8 @@ test("rejects research missing metadata", (t) => {
 });
 
 test("rejects research with invalid review date", (t) => {
-  const root = fixture(t, ["docs/research/2026-10-24-bad-review.md"], {
-    "docs/research/2026-10-24-bad-review.md":
+  const root = fixture(t, ["docs/research/20261024-bad-review.md"], {
+    "docs/research/20261024-bad-review.md":
       "# Research\n\n**Research date:** 2026-10-24\n**Last reviewed:** 2026-02-30\n**Status:** Current\n",
   });
 
@@ -180,21 +187,20 @@ test("rejects research with invalid review date", (t) => {
 });
 
 test("rejects research filename and metadata date mismatch", (t) => {
-  const root = fixture(t, ["docs/research/2026-10-24-mismatch.md"], {
-    "docs/research/2026-10-24-mismatch.md":
+  const root = fixture(t, ["docs/research/20261024-mismatch.md"], {
+    "docs/research/20261024-mismatch.md":
       "# Research\n\n**Research date:** 2026-10-20\n**Last reviewed:** 2026-10-24\n**Status:** Current\n",
   });
 
   assert.match(validateFlowDocs(root).join("\n"), /must match filename date/u);
 });
 
-test("accepts legacy research with unknown original date", (t) => {
-  const root = fixture(t, ["docs/research/generative-ui.md"], {
-    "docs/research/generative-ui.md":
-      "# Legacy\n\n**Research date:** Unknown (legacy)\n**Last reviewed:** 2026-10-24\n**Status:** Historical\n",
+test("rejects ADR missing Date header", (t) => {
+  const root = fixture(t, ["docs/adr/0002-example.md"], {
+    "docs/adr/0002-example.md": "# ADR\n",
   });
 
-  assert.deepEqual(validateFlowDocs(root), []);
+  assert.match(validateFlowDocs(root).join("\n"), /missing Date:/u);
 });
 
 test("rejects spec missing review metadata", (t) => {

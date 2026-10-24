@@ -1,3 +1,5 @@
+Date: 2026-10-24
+
 # PDR 0001 — Product-agnostic, capability-first and agent-ready development
 
 **Status:** Accepted · October 24, 2026
@@ -28,7 +30,7 @@ Product-agnostic means business-domain agnostic. Flow Starter itself is intentio
 
 The repository must work with different coding agents.
 
-Use AGENTS.md and FLOW.md as shared repository instructions. Do not require vendor-specific agent rules or a proprietary editor.
+Use AGENTS.md and docs/Workflow/Flow.md as shared repository instructions. Do not require vendor-specific agent rules or a proprietary editor.
 
 External skills may assist the workflow without controlling product intent or documentation ownership.
 
@@ -98,9 +100,9 @@ Rejected as a requirement of the shared workflow. Editor-specific local configur
 
 ## Related documents
 
-- [FLOW.md](../../FLOW.md) — development workflow
+- [docs/Workflow/Flow.md](../../docs/Workflow/Flow.md) — development workflow
 - [AGENTS.md](../../AGENTS.md) — universal agent entrypoint
 - [ARCHITECTURE.md](../../ARCHITECTURE.md) — technical boundaries
 - [PRODUCT.md](../../PRODUCT.md) — adopter-owned product template
 - [ADR 0001](../adr/0001-agentic-architecture.md) — foundational technology choices and rationale
-- [ADR 006](../adr/006-external-invocation-is-read-only.md) — planned external authorization boundary
+- [ADR 006](../adr/0006-external-invocation-is-read-only.md) — planned external authorization boundary

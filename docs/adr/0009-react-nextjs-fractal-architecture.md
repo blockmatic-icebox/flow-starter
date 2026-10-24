@@ -1,3 +1,5 @@
+Date: 2026-10-24
+
 # ADR 0009 — React and Next.js Fractal Architecture
 
 **Status:** Accepted · October 24, 2026
@@ -339,4 +341,4 @@ Do not create a new ADR for every exception.
 - [nuqs Next.js adapter](https://nuqs.dev/docs/adapters)
 - [Turborepo](https://turborepo.com/docs)
 - [ADR 0001](0001-agentic-architecture.md)
-- [ADR 003](003-genui-openui-foundation.md)
+- [ADR 003](0003-genui-openui-foundation.md)

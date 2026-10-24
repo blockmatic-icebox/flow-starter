@@ -4,7 +4,7 @@ The checkout is a starter baseline. Root contracts describe intended direction. 
 
 ## Flow workflow
 
-[FLOW.md](FLOW.md) defines the agent-agnostic workflow, skill-selection rules, and documentation conventions. Load the relevant sections when planning substantial work, using specialized skills, or changing documentation. Skills provide methods; Flow owns document locations, naming, and lifecycle. Use progressive disclosure: do not read every linked document by default.
+[docs/Workflow/Flow.md](docs/Workflow/Flow.md) defines the agent-agnostic workflow, skill-selection rules, and documentation conventions. Load the relevant sections when planning substantial work, using specialized skills, or changing documentation. Skills provide methods; Flow owns document locations, naming, and lifecycle. Use progressive disclosure: do not read every linked document by default.
 
 ## Decisions
 
@@ -26,7 +26,7 @@ Update the owning document in the same change. Use a PDR in `docs/pdr/` for a co
 
 ## Lifecycle
 
-Use [FLOW.md](FLOW.md) for Explore → Specify → Plan → Build → Review → Ship, proportional gates, skill selection, and documentation ownership. Small changes may move directly through Build → Review → Ship.
+Use [docs/Workflow/Flow.md](docs/Workflow/Flow.md) for Explore → Specify → Plan → Build → Review → Ship, proportional gates, skill selection, and documentation ownership. Small changes may move directly through Build → Review → Ship.
 
 ## Repository constraints
 

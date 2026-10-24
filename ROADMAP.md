@@ -4,7 +4,7 @@ Current delivery status and implementation sequence for the Flow Starter baselin
 
 This document describes the starter's development, not the adopter's product roadmap. Projects created from the starter should replace or adapt it to their own priorities.
 
-Technical constraints and system architecture belong in [ARCHITECTURE.md](ARCHITECTURE.md). Product requirements belong in [PRODUCT.md](PRODUCT.md). The workflow governing changes belongs in [FLOW.md](FLOW.md).
+Technical constraints and system architecture belong in [ARCHITECTURE.md](ARCHITECTURE.md). Product requirements belong in [PRODUCT.md](PRODUCT.md). The workflow governing changes belongs in [docs/Workflow/Flow.md](docs/Workflow/Flow.md).
 
 ## Shipped baseline
 
@@ -31,8 +31,8 @@ A planned integration must not be presented as existing functionality.
 
 ## Later candidates
 
-- External read-only invocation, subject to [ADR 006](docs/adr/006-external-invocation-is-read-only.md).
-- Voice delegation, subject to [ADR 004](docs/adr/004-voice-delegates-to-eve.md).
+- External read-only invocation, subject to [ADR 006](docs/adr/0006-external-invocation-is-read-only.md).
+- Voice delegation, subject to [ADR 004](docs/adr/0004-voice-delegates-to-eve.md).
 - Additional browser, MCP Apps, and generated-interface quality testing where actual adopter needs justify it.
 
 ## Maintenance rules

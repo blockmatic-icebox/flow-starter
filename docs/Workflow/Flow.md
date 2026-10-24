@@ -1,4 +1,6 @@
-# Flow
+Date: 2026-10-24
+
+# Flujo de Trabajo – Método Flow
 
 Version: 0.1
 
@@ -145,7 +147,8 @@ Use one authoritative home for each fact. Link related documents instead of copy
 | Location | Responsibility |
 | --- | --- |
 | `AGENTS.md` | Lightweight agent entrypoint and task-specific document routing |
-| `FLOW.md` | Workflow, skill orchestration, document conventions, and lifecycle |
+| `docs/Workflow/Flow.md` | Workflow, skill orchestration, document conventions, and lifecycle |
+| `docs/Workflow/README.md` | Human-readable introduction to Flow and naming conventions |
 | `PRODUCT.md` | Current product vision, audience, business context, scope, outcomes, and capabilities |
 | `DESIGN.md` | Current visual, interaction, experience, and accessibility direction |
 | `ARCHITECTURE.md` | Current technical structure, boundaries, constraints, and major system choices |
@@ -153,7 +156,7 @@ Use one authoritative home for each fact. Link related documents instead of copy
 | `GLOSSARY.md` | Terms with project-specific meanings and consequential distinctions |
 | `docs/ideas/<slug>.md` | Worthwhile possibilities that are not yet implementation commitments |
 | `docs/initiatives/<slug>.md` | Intentional bounded work: outcome, scope, assumptions, tasks, progress, validation, and findings |
-| `docs/research/YYYY-MM-DD-<slug>.md` | Durable evidence, source assessment, limitations, and research findings |
+| `docs/research/YYYYMMDD-<slug>.md` | Durable evidence, source assessment, limitations, and research findings |
 | `docs/specs/<slug>.md` | Optional detailed requirements or contracts for a substantial capability |
 | `docs/plans/<slug>.md` | Optional standalone implementation plans when an initiative would be insufficient or inappropriate |
 | `docs/pdr/NNNN-<slug>.md` | Consequential product decisions and their rationale |
@@ -176,7 +179,7 @@ For new documents:
 1. Use lowercase `kebab-case` slugs.
 2. Use `.md` for Markdown documents.
 3. Use four-digit sequential numeric prefixes for new PDRs and ADRs: `0001-`, `0002-`, and so on.
-4. Use ISO dates for durable research: `YYYY-MM-DD-<topic>.md`.
+4. Use ISO dates for durable research: `YYYYMMDD-<topic>.md` (compact date prefix, no hyphens in the date).
 5. Do not introduce uppercase document-type prefixes such as `SPEC-`, `ADR-`, `PLAN-`, or `CAPABILITIES-`.
 6. Keep one document per meaningful concern.
 7. Do not create empty placeholder documents or directories.
@@ -242,7 +245,7 @@ Research documents must include concise metadata near the beginning:
 - **Last reviewed:** `YYYY-MM-DD`
 - **Status:** `Current`, `Historical`, or `Exploratory`
 
-For new research files, the date in the filename (`docs/research/YYYY-MM-DD-<slug>.md`) must match **Research date**.
+For new research files, the date in the filename (`docs/research/YYYYMMDD-<slug>.md`, interpreted as `YYYY-MM-DD` in metadata) must match **Research date**.
 
 Legacy research paths without dated filenames may remain; they still require metadata.
 

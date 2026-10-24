@@ -1,3 +1,5 @@
+Date: 2026-10-24
+
 # ADR 002 — Vercel AI SDK for open-ended composition
 
 **Status:** Accepted · October 24, 2026

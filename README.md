@@ -32,17 +32,17 @@ Open the demo at `/genui-demo` (local URL from the dev server, or `https://flow.
 | `pnpm ci:local` | Full local CI including architecture checks and build |
 | `pnpm mcp:next` | Next.js DevTools MCP bridge (dev server must be running) |
 
-Optional tier-3 model answers: set `AI_GATEWAY_API_KEY` (and optionally `GENUI_MODEL`) in `apps/web/.env.local`. See [docs/adr/002-vercel-ai-sdk-for-tier-3.md](docs/adr/002-vercel-ai-sdk-for-tier-3.md). Tier-3 model responses in this starter are general, non-source-grounded answers. They must not display fixture document references as citations. Verified catalog sources are attached only when the response is supported by those records. Compose rate limits: off on `flow.localhost` by default; set `GENUI_ENFORCE_RATE_LIMIT=1` to test 429 behavior locally.
+Optional tier-3 model answers: set `AI_GATEWAY_API_KEY` (and optionally `GENUI_MODEL`) in `apps/web/.env.local`. See [docs/adr/0002-vercel-ai-sdk-for-tier-3.md](docs/adr/0002-vercel-ai-sdk-for-tier-3.md). Tier-3 model responses in this starter are general, non-source-grounded answers. They must not display fixture document references as citations. Verified catalog sources are attached only when the response is supported by those records. Compose rate limits: off on `flow.localhost` by default; set `GENUI_ENFORCE_RATE_LIMIT=1` to test 429 behavior locally.
 
 ## Flow workflow
 
-This starter includes [Flow](FLOW.md), a lightweight workflow for product discovery and software delivery:
+This starter includes [Flow](docs/Workflow/Flow.md), a lightweight workflow for product discovery and software delivery:
 
 **Explore → Specify → Plan → Build → Review → Ship**
 
 Flow defines documentation ownership and conventions while installed third-party skills provide specialized product, design, and engineering techniques.
 
-`AGENTS.md` is the compact router for coding agents. `FLOW.md` is the workflow contract. Read only the relevant project documents for a task.
+`AGENTS.md` is the compact router for coding agents. `docs/Workflow/Flow.md` is the workflow contract. Read only the relevant project documents for a task.
 
 ### Project skills
 
@@ -117,9 +117,9 @@ Application MCP tools for product capabilities remain separate from Next.js deve
 
 - [ADR 0001 — Agentic Architecture](docs/adr/0001-agentic-architecture.md): foundational technology choices and rationale.
 - [ADR 0009 — React and Next.js Fractal Architecture](docs/adr/0009-react-nextjs-fractal-architecture.md): opinionated React structure, server/client boundaries, and URL state.
-- [ADR 002 — Vercel AI SDK for tier-3 answers](docs/adr/002-vercel-ai-sdk-for-tier-3.md)
-- [ADR 003 — Generative UI with OpenUI Lang](docs/adr/003-genui-openui-foundation.md)
-- [GenUI technology comparison](docs/research/2026-10-24-genui-json-vs-openui.md)
+- [ADR 002 — Vercel AI SDK for tier-3 answers](docs/adr/0002-vercel-ai-sdk-for-tier-3.md)
+- [ADR 003 — Generative UI with OpenUI Lang](docs/adr/0003-genui-openui-foundation.md)
+- [GenUI technology comparison](docs/research/20261024-genui-json-vs-openui.md)
 
 Product-engineering principles (product-agnostic scope, capability-first interfaces, agent-ready boundaries) live in [PDR 0001](docs/pdr/0001-agnostic-api-first.md), not in the technology stack ADR.
 

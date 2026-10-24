@@ -1,3 +1,5 @@
+Date: 2026-10-24
+
 # ADR 0007 — Vercel-first platform and AI infrastructure
 
 **Status:** Superseded · October 24, 2026
@@ -34,7 +36,7 @@ Use Vercel AI Gateway as the initial model access strategy when credentials are 
 
 Keep model access optional for the deterministic GenUI baseline. Credentials must remain server-side.
 
-The detailed decision for tier-3 model-backed answers remains in [ADR 002](002-vercel-ai-sdk-for-tier-3.md).
+The detailed decision for tier-3 model-backed answers remains in [ADR 002](0002-vercel-ai-sdk-for-tier-3.md).
 
 ### Deployment direction
 
@@ -50,7 +52,7 @@ Keep independent open-source technologies identifiable as such.
 
 OpenUI Lang, pnpm, Zod, Better Auth, Neon, and Drizzle are not all Vercel technologies. Their selection, implementation status, and maintenance responsibilities must be evaluated separately.
 
-The repository's selected GenUI representation is documented in [ADR 003](003-genui-openui-foundation.md).
+The repository's selected GenUI representation is documented in [ADR 003](0003-genui-openui-foundation.md).
 
 ### Portability
 
@@ -105,8 +107,8 @@ Maintain clear boundaries and address actual portability requirements when they 
 ## Related documents
 
 - [ADR 0008 — Monorepo with Turborepo and pnpm](0008-monorepo-turborepo-pnpm.md)
-- [ADR 002 — Vercel AI SDK](002-vercel-ai-sdk-for-tier-3.md)
-- [ADR 003 — OpenUI Lang](003-genui-openui-foundation.md)
+- [ADR 002 — Vercel AI SDK](0002-vercel-ai-sdk-for-tier-3.md)
+- [ADR 003 — OpenUI Lang](0003-genui-openui-foundation.md)
 - [ARCHITECTURE.md](../../ARCHITECTURE.md)
 - [ROADMAP.md](../../ROADMAP.md)
 

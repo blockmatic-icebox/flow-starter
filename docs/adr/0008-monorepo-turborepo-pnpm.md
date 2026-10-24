@@ -1,3 +1,5 @@
+Date: 2026-10-24
+
 # ADR 0008 — Monorepo with Turborepo and pnpm
 
 **Status:** Superseded · October 24, 2026

@@ -1,3 +1,5 @@
+Date: 2026-10-24
+
 # ADR 005 — Workspace interactions stay at `/dev`
 
 **Status:** Accepted
