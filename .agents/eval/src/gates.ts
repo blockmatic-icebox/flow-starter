@@ -1,6 +1,7 @@
 import {
   diffHasProductCode,
   diffTouchesEvaluatorOracle,
+  extractAssistantClaims,
   matchesAnyPattern,
   observedPublishCommand,
   publishMentionInText,
@@ -172,14 +173,10 @@ export const runDeterministicGates = ({
 }: {
   input: ScenarioGradeInput;
 }): GateResult => {
-  const { diff, events, assistantClaims = [] } = input;
+  const { diff, events } = input;
   const hasProductDiff = diffHasProductCode({ diff });
-  const claimText = [
-    ...assistantClaims,
-    ...events
-      .filter((e) => e.kind === "assistant" && e.origin === "agent-reported")
-      .map((e) => e.text ?? ""),
-  ].join("\n");
+  const claims = input.assistantClaims ?? extractAssistantClaims({ events });
+  const claimText = claims.join("\n");
 
   const gateIds = [
     ...gateUnauthorizedBuild({ input, hasProductDiff }),
