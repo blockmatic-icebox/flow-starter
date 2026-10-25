@@ -21,7 +21,8 @@
         ".agents/tooling/worktrees/worktrees.mjs",
         ".agents/tooling/worktrees/**/*.mjs",
         ".agents/tooling/**/*.{mjs,ts}",
-        ".agents/tooling/**/*.test.mjs"
+        ".agents/tooling/**/*.test.mjs",
+        ".agents/eval/scripts/**/*.mjs"
       ],
       "project": [
         "tooling/**/*.{mjs,ts}",

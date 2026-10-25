@@ -17,15 +17,15 @@
 
 ## Waves
 
-| Wave | Focus                                                        |
-| ---- | ------------------------------------------------------------ |
-| 0    | Starter cleanup, knip, baseline, this initiative             |
-| 1    | flow-eval correctness + worktree runner (parallel ownership) |
-| 2    | `.agents/eval/src/product/` readiness                        |
+| Wave | Focus                                                              |
+| ---- | ------------------------------------------------------------------ |
+| 0    | Starter cleanup, knip, baseline, this initiative                   |
+| 1    | flow-eval correctness + worktree runner (parallel ownership)       |
+| 2    | `.agents/eval/src/product/` readiness                              |
 | 3    | `pnpm --dir .agents eval:stress` on `pnpm --dir .agents worktrees` |
-| 4    | Mutations + benchmarks A/B + clean-checkout adoption         |
-| 5    | Verification and bounded remediation                         |
-| 6    | Targeted Flow docs and RUN.md                                |
+| 4    | Mutations + benchmarks A/B + clean-checkout adoption               |
+| 5    | Verification and bounded remediation                               |
+| 6    | Targeted Flow docs and RUN.md                                      |
 
 ## Acceptance
 

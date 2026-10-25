@@ -1,7 +1,7 @@
 # Corrective pass — 2026-10-25
 
 **Starting revision:** `70d4708fe2cde711761b227c62a3eccb1fb5d0a1`  
-**Ending revision:** `29927a3305f2c97e1e0921a01de77f877129c82b`
+**Ending revision:** see git `HEAD` after final corrective commit
 
 ## Defects fixed
 
@@ -46,7 +46,8 @@
 | `trial-meta.json` | present under `.agents/eval/evidence/flow-evals/...` |
 | Turn 1 | Cursor Task subagent (`composer-2.5`); real `DESIGN.md` edit in worktree |
 | `eval record` turn 1 | exit 0 |
-| `eval finalize` | exit 1 — `no completed jobs; still running: S01/r1` (turn cap 6) |
+| `eval finalize` (turn 1 only, prior run) | exit 1 — incomplete session |
+| Bounded completion (`complete-s01-smoke.mjs`) | `run-1792945783964`, `finalize` **ok: true**, `officialEligible: false` |
 | Official comparative eligibility | **blocked** (ADR 0015) |
 
 ## Dogfooding smoke
@@ -68,8 +69,8 @@
 | Claim | Tier |
 | --- | --- |
 | Factory test suite green | Statically tested (`pnpm --dir .agents test` exit 0, 240 tests) |
-| Product knip without `.agents` | Manually verified (install + `pnpm qa` after removing `.agents`; format may need `pnpm lint:fix` on fresh adopt) |
+| Product knip without `.agents` | Manually verified (`product-only-verify` install, rm `.agents`, `pnpm lint:fix`, `pnpm qa` exit 0, `pnpm build` exit 0) |
 | Trial meta not in subject tree | Integration tested (`isolate.test.ts` + live prepare) |
 | S01 live worker | Manually verified (one turn, real subagent) |
-| Full S01 session grade | Unverified (finalize incomplete) |
+| Full S01 session grade | Manually verified (bounded agent-reported turns; diagnostic not official) |
 | Official compare | Blocked |
