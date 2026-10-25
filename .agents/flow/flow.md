@@ -121,7 +121,7 @@ Present the plan for human review.
 
 Approval of a proposed plan and authorization to execute it are distinct when the user's intent is ambiguous.
 
-Phrases such as "help us implement this properly," "build this feature," "build it now," "skip the process," or "update everything" start **Specify** or **Plan** for substantial new work. They do not authorize **Build**. **Build** starts only after a later message that explicitly authorizes implementation. A small, well-understood bug fix with an explicit fix request (for example, "please fix it") may go directly to **Build** when proportionality applies.
+Phrases such as "help us implement this properly," "build this feature," "build it now," "skip the process," or "update everything" start **Specify** or **Plan** for substantial new work. They do not authorize **Build**. **Build** starts only after a later message that explicitly authorizes implementation. Examples of proportional scope (bounded fixes vs substantial features): [guides/working-with-flow.md](guides/working-with-flow.md#proportional-process).
 
 **Do not begin Build for a substantial new-product initiative without explicit implementation authorization.**
 

@@ -134,3 +134,34 @@ Limitations / next:
 
 Record:
 - none
+---
+Timestamp: 2026-10-25T18:30:00Z
+Work: factory-simplification-pass-2
+Stage: Build
+Prompt: Implement Factory-only simplification plan (Pass 2): skills routing, doc dedup, eval CLI demotion, checks.
+
+Summary:
+- Collapsed skills.md routing; demoted experiment/self-improve/pilot-loop in eval CLI and RUN.md.
+- Shared event id dedup helper; cli-usage module; flow.md proportional link; initiative status pointers.
+
+Documentation:
+- .agents/flow/operations/skills.md, context.md, flow.md, initiatives (evaluation + improvement loop), records/factory-simplification.md [updated]
+- .agents/eval/RUN.md, .agents/README.md, flow-eval/flow-improve SKILL [updated]
+
+Code:
+- .agents/eval/src/cli-usage.ts, event-id-validation.ts, cli.ts, record/runner validation; check-flow-docs.test.mjs
+
+Subagents:
+- none
+
+Verification:
+- pnpm --dir .agents check — exit 0
+- pnpm --dir .agents test — exit 0 (276 tests)
+- pnpm --dir .agents eval integrity — exit 0
+- pnpm knip --config knip.factory.json — exit 0 (hints only)
+
+Commits:
+- (this commit)
+
+Record:
+- .agents/flow/records/factory-simplification.md (Pass 2 section)

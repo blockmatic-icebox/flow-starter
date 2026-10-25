@@ -134,4 +134,33 @@
 
 ### After metrics
 
-_(Updated at pass closeout.)_
+| Metric | Value |
+| --- | --- |
+| `flow.md` lines | 485 (one proportional-scope link; no contract-gate expansion) |
+| `skills.md` lines | 94 |
+| `cli.ts` lines | 970 |
+| `check-flow-docs.mjs` lines | 905 (extract deferred) |
+| New eval modules | `cli-usage.ts`, `event-id-validation.ts` + tests |
+| `pnpm --dir .agents check` | exit 0 |
+| `pnpm --dir .agents test` | 276 tests, exit 0 |
+| `pnpm --dir .agents eval integrity` | exit 0 |
+| Product tree diff | none |
+| `pnpm knip --config knip.factory.json` | exit 0 (configuration hints only) |
+
+### Pass 2 implemented
+
+- Skill routing: collapsed duplicate lists in `operations/skills.md`; `flow-improve` points to `improvement.md`.
+- Docs: `context.md` → `project-context.md`; initiative status pointers; conservative `flow.md` link.
+- Eval: experimental tier for `experiment` / `self-improve` / `pilot-loop` (`cli-usage.ts`, RUN.md, flow-eval skill, README).
+- Evidence: shared `duplicateEventIdReason` for subject/runner record validation.
+- Checks: `flow.md` anchor regression test in `check-flow-docs.test.mjs`.
+
+### Remaining (P1/P2)
+
+| Pri | Item |
+| --- | --- |
+| P1 | Live `/flow-eval` multi-scenario campaign when host isolation improves |
+| P1 | Complete official compare path (blocked ADR 0017) |
+| P2 | Split `check-flow-docs.mjs` static rules |
+| P2 | `knip.factory.json` eval CLI entries (root config) |
+| P2 | Repair campaign automation behavior (deferred per evaluation initiative) |

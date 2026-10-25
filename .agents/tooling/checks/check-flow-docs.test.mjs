@@ -446,7 +446,7 @@ test("flow.md retains progressive disclosure anchors", () => {
   );
   assert.match(flowMd, /## Where detail lives/u);
   assert.match(flowMd, /## Documentation ownership/u);
-  assert.match(flowMd, /### Contract edit gate/u);
+  assert.match(flowMd, /### Proportionality and continuation/u);
 });
 
 test("flags obsolete apps/web security paths in authoritative docs", (t) => {
