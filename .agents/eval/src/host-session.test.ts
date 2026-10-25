@@ -101,9 +101,11 @@ describe("host-session eval harness", () => {
     const observed = hostSessionObserve({
       events: [
         {
+          captureMethod: "runner-subprocess",
           command: "pnpm check-types",
           exitCode: 0,
           id: "c1",
+          invocationId: "test-invoke",
           kind: "command",
           origin: "observed",
           phase: "succeeded",
@@ -113,7 +115,9 @@ describe("host-session eval harness", () => {
           ts: new Date().toISOString(),
         },
         {
+          captureMethod: "runner-subprocess",
           id: "t1",
+          invocationId: "test-invoke",
           kind: "tool",
           name: "skillLoad",
           origin: "observed",

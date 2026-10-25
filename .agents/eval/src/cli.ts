@@ -8,6 +8,7 @@ import { createSeededRng, randomSeed } from "./generation/rng.ts";
 import { runSelfImproveCampaign } from "./generation/self-improve.ts";
 import { gradeScenarioFromRunDir } from "./grade-from-run.ts";
 import { handoffAgentBPrompt } from "./handoff.ts";
+import { headlessCursorAgentAdapter } from "./headless-cursor-agent.ts";
 import {
   detectEvalHost,
   hostSessionFinalize,
@@ -45,6 +46,7 @@ Public:
   preserve               frozen baseline checksum
   prepare                host run setup [--arm flow] [--suite | --scenarios IDs] [--repetition N]
   next | record | observe | finalize   host-session protocol (runner only)
+  headless-run           preflight Cursor agent CLI + prepare (optional --auto)
   prepare flags: --host cursor|claude|other  finalize: --accept-diagnostic --model-id <id>
   grade --run <id> --scenario <id>
   compare --baseline <id> --current <id> [--remediation]   fail-closed eligibility
@@ -184,6 +186,66 @@ const parseHostFlag = (value?: string): EvalHost | undefined => {
   process.exit(3);
 };
 
+const cmdHeadlessRun = ({
+  arm,
+  auto,
+  repetition,
+  runId,
+  scenarios,
+}: {
+  arm: EvalArm;
+  auto?: boolean;
+  repetition: number;
+  runId?: string;
+  scenarios: string[];
+}) => {
+  const preflight = headlessCursorAgentAdapter.preflight();
+  if (!preflight.ok) {
+    console.log(JSON.stringify({ ...preflight, status: "blocked" }, null, 2));
+    process.exit(2);
+  }
+  assertScenarioIds({ ids: scenarios });
+  assertArm({ arm });
+  const prep = prepareHostRun({
+    arm,
+    host: "cursor",
+    repetition,
+    runId,
+    scenarioIds: scenarios,
+  });
+  if (!auto) {
+    console.log(
+      JSON.stringify(
+        {
+          agentCliVersion: preflight.agentCliVersion,
+          host: "cursor",
+          message:
+            "Headless prepared. Run eval next → agent CLI in worktree → eval record/observe → eval finalize --model-id",
+          modelId: preflight.modelId,
+          prep,
+          status: "awaiting-headless-agent",
+        },
+        null,
+        2
+      )
+    );
+    return;
+  }
+  console.log(
+    JSON.stringify(
+      {
+        message:
+          "Auto execution not enabled in this environment; use interactive /flow-eval or complete turns manually.",
+        prep,
+        status: "blocked",
+      },
+      null,
+      2
+    )
+  );
+  process.exit(2);
+};
+
 const cmdPrepare = ({
   arm,
   host,
@@ -284,6 +346,7 @@ const cmdObserve = ({
   const events = JSON.parse(readFileSync(eventsFile, "utf-8")) as EvalEvent[];
   const result = hostSessionObserve({
     events,
+    eventsFilePath: eventsFile,
     repetition,
     runId,
     scenarioId,
@@ -796,6 +859,18 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         dryRun: Boolean(flags["dry-run"]),
         variant: (flags.variant as "C1" | "C2" | "C3") ?? "C1",
       }),
+    "headless-run": () => {
+      const scenarios = flags.scenarios
+        ? String(flags.scenarios).split(",")
+        : listDefaultDiagnosticScenarioIds().slice(0, 1);
+      return cmdHeadlessRun({
+        arm: (flags.arm as EvalArm) ?? "flow",
+        auto: Boolean(flags.auto),
+        repetition: Number(flags.repetition ?? 1),
+        runId: flags.run ? String(flags.run) : undefined,
+        scenarios,
+      });
+    },
     briefs: () => {
       if (!flags.run) {
         console.error("briefs requires --run");

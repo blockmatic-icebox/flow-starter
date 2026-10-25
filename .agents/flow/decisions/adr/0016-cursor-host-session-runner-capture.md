@@ -12,7 +12,7 @@ Date: 2026-10-25
 
 1. **Runner channel:** `eval observe` appends `origin: observed` events to `runner-transcript.jsonl`; subjects remain on `eval record` (`agent-reported` only).
 2. **Grading:** Finalize merges subject + runner transcripts; `protocolVerified` follows per-scenario rules in `.agents/eval/src/host-protocol.ts`.
-3. **Isolation:** `assessIsolationFromTrial` may set `officialComparisonAllowed: true` when `host: cursor` and runner capture is present; worktree oracle stripping remains required.
+3. **Isolation:** Runner capture supports diagnostic grading; **official** `officialComparisonAllowed` on worktree hosts is superseded by [ADR 0017](0017-official-compare-fail-closed.md) (fail-closed until sandbox).
 4. **Residual limitation:** Enforced workspace read boundary is **unsupported** (same-machine absolute-path reads). Official claims must cite this limitation.
 
 ## Alternatives considered
@@ -36,6 +36,7 @@ Date: 2026-10-25
 
 ## Related documents
 
+- [ADR 0017 — Official comparison fail-closed](0017-official-compare-fail-closed.md) (supersedes isolation eligibility bullets in this ADR)
 - [ADR 0015 — Evaluation subject separation](0015-evaluation-subject-separation.md)
 - [.agents/eval/RUN.md](../../../eval/RUN.md)
 - [flow-evaluation-suite.md](../../initiatives/flow-evaluation-suite.md)

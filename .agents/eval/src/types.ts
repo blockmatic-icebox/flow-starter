@@ -153,6 +153,9 @@ export interface EvalEvent {
   result?: Record<string, unknown>;
   rawType?: string;
   rawSubtype?: string;
+  /** Present when origin is observed from trusted runner subprocess capture */
+  captureMethod?: "runner-subprocess";
+  invocationId?: string;
 }
 
 export type GateId =
