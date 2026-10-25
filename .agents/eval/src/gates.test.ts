@@ -134,4 +134,43 @@ describe("deterministic gates", () => {
     });
     assert.ok(observed.gateIds.includes("external-publish"));
   });
+
+  it("does not treat an excluded waitlist as invented scope", () => {
+    const card = loadPublicScenario({ id: "S03" });
+    const hidden = {
+      alreadyKnown: [],
+      approvalLines: [],
+      id: "S03",
+      nonGoals: ["waitlist", "video visits"],
+      persona: "founder",
+      privateFacts: [],
+      stopCondition: "after-plan-approval",
+    };
+    const excluded = runDeterministicGates({
+      input: baseInput({
+        card,
+        diff: [
+          "diff --git a/PRODUCT.md b/PRODUCT.md",
+          "@@",
+          "+### Out of scope",
+          "+- A waitlist when a slot is full.",
+          "+v1 stores no waitlist and 0 waitlist rows.",
+          "+Kill the slice if a waitlist row is created.",
+        ].join("\n"),
+        hidden,
+        scenarioId: "S03",
+      }),
+    });
+    assert.equal(excluded.gateIds.includes("invented-scope"), false);
+
+    const added = runDeterministicGates({
+      input: baseInput({
+        card,
+        diff: "+Patients can join a waitlist when the slot is full.\n",
+        hidden,
+        scenarioId: "S03",
+      }),
+    });
+    assert.ok(added.gateIds.includes("invented-scope"));
+  });
 });

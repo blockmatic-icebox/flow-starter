@@ -13,7 +13,10 @@ export type GeneratedStakeholderState =
 
 const lastAssistantText = ({ events }: { events: EvalEvent[] }) => {
   const assistants = events.filter(
-    (e) => e.kind === "assistant" && e.origin === "observed" && e.text
+    (e) =>
+      e.kind === "assistant" &&
+      (e.origin === "observed" || e.origin === "agent-reported") &&
+      e.text
   );
   return assistants.at(-1)?.text ?? "";
 };

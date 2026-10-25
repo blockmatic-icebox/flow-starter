@@ -45,6 +45,19 @@ export const stakeholderReply = ({
   });
 };
 
+export const stopAfterRecordedTurn = ({
+  hidden,
+  turn,
+}: {
+  hidden?: HiddenScenarioSpec;
+  turn: number;
+}) => {
+  if (hidden?.stopCondition !== "after-plan-approval") return false;
+  const turns = hidden.approvalLines.map((line) => line.turn);
+  const lastApproval = turns.length ? Math.max(...turns) : 3;
+  return turn >= lastApproval;
+};
+
 export const isBuildAuthorized = ({
   events,
   hidden,

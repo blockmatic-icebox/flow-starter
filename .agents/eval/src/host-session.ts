@@ -31,7 +31,7 @@ import {
 } from "./scenarios.ts";
 import { gradeObservedScenario } from "./session-grade.ts";
 import { skillsLockHash } from "./skills-lock.ts";
-import { stakeholderReply } from "./stakeholder.ts";
+import { stakeholderReply, stopAfterRecordedTurn } from "./stakeholder.ts";
 import { subjectTaskPrompt } from "./subject-prompt.ts";
 import { loadTranscript } from "./transcript.ts";
 import { trialScenarioDir } from "./trial-paths.ts";
@@ -64,6 +64,7 @@ type HostJob = {
   prepBaselineSha: string;
   preparedWorkspace?: PreparedSourceIdentity;
   lastRecordedFingerprint?: string;
+  lastRecordedTurn?: number;
 };
 
 type HostSessionState = {
@@ -208,7 +209,7 @@ const shouldStopAfterTurn = ({
 }: {
   hidden?: ReturnType<typeof loadHiddenScenario>;
   turn: number;
-}) => hidden?.stopCondition === "after-plan-approval" && turn >= 3;
+}) => stopAfterRecordedTurn({ hidden, turn });
 
 const buildHostManifest = ({
   arm,
@@ -501,6 +502,12 @@ export const hostSessionNext = ({
     turn: job.currentTurn,
   });
   if (!message) {
+    if (job.currentTurn < job.turnLimit) {
+      job.currentTurn += 1;
+      job.status = "pending";
+      saveJob({ job, runId });
+      return hostSessionNext({ repetition, runId, scenarioId });
+    }
     job.status = "complete";
     saveJob({ job, runId });
     return hostSessionNext({ repetition, runId, scenarioId });
@@ -599,7 +606,9 @@ export const hostSessionRecord = ({
   if (!validated.ok) return { ok: false as const, reason: validated.reason };
 
   const fingerprint = validated.fingerprint;
+  const recordedThisTurn = job.lastRecordedTurn === turn;
   if (
+    recordedThisTurn &&
     job.lastRecordedFingerprint &&
     job.lastRecordedFingerprint !== fingerprint
   )
@@ -607,7 +616,7 @@ export const hostSessionRecord = ({
       ok: false as const,
       reason: "conflicting record for the same turn",
     };
-  if (job.lastRecordedFingerprint === fingerprint)
+  if (recordedThisTurn && job.lastRecordedFingerprint === fingerprint)
     return { ok: true as const, jobStatus: job.status, reused: true as const };
 
   const submissionsDir = path.join(scenarioDir, "submissions");
@@ -669,6 +678,7 @@ export const hostSessionRecord = ({
     job.status = "pending";
   }
   job.lastRecordedFingerprint = fingerprint;
+  job.lastRecordedTurn = turn;
   saveJob({ job, runId });
 
   return { ok: true as const, jobStatus: job.status };

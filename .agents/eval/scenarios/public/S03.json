@@ -2,7 +2,7 @@
   "id": "S03",
   "title": "Founder with a complete product brief",
   "historicalId": "02-existing-brief",
-  "openingPrompt": "See the CareBook brief in the first message of the stakeholder script (pasted by orchestrator).",
+  "openingPrompt": "Patients book visits; clinic staff manage schedules; providers see their clinics only.\n\n- Role-based booking and clinic tenancy\n- No insurance billing, video visits, or prescriptions in v1\n- Success: staff can book inside their clinic without seeing other clinics\n\nAlready accepted: starter stack, Neon Postgres, email reminders only, clinic-scoped records.\n\nOpen: cancellation window, waitlist, who sets provider hours.",
   "turnCap": 6,
   "requiresBuildAuth": true,
   "allowProductCode": false,

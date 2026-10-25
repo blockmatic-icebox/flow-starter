@@ -151,7 +151,13 @@ export const applyArmMutations = ({
   if (arm === "flow-without-skills") rmDirIfExists(skillsLink);
 
   const evalPkg = path.join(worktreePath, packageDirInRepo);
+  const evalSource = path.join(repoRoot, packageDirInRepo);
   rmDirIfExists(evalPkg);
+  mkdirSync(evalPkg, { recursive: true });
+  for (const name of ["package.json", "RUN.md"]) {
+    const source = path.join(evalSource, name);
+    if (existsSync(source)) cpSync(source, path.join(evalPkg, name));
+  }
 };
 
 export const setupWorktree = ({

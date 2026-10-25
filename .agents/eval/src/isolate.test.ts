@@ -1,5 +1,12 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, it } from "node:test";
@@ -74,6 +81,25 @@ describe("captureAgentDiff", () => {
     });
     assert.match(withCommit.commitsAfterBaseline, /agent commit/u);
 
+    rmSync(dir, { force: true, recursive: true });
+  });
+});
+
+describe("applyArmMutations", () => {
+  it("keeps the eval runbook after removing oracle material", () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "flow-eval-arm-"));
+    const oracleDir = path.join(dir, ".agents/eval/scenarios/oracles");
+    mkdirSync(oracleDir, { recursive: true });
+    writeFileSync(path.join(oracleDir, "S01.json"), "{}\n");
+    applyArmMutations({ arm: "flow", worktreePath: dir });
+    assert.equal(existsSync(path.join(oracleDir, "S01.json")), false);
+    assert.equal(existsSync(path.join(dir, ".agents/eval/src")), false);
+    const runbook = readFileSync(path.join(dir, ".agents/eval/RUN.md"), "utf8");
+    assert.match(runbook, /Flow evaluation runner/u);
+    assert.match(
+      readFileSync(path.join(dir, ".agents/eval/package.json"), "utf8"),
+      /@repo\/flow-eval/u
+    );
     rmSync(dir, { force: true, recursive: true });
   });
 });

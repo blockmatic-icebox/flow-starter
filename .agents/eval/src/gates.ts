@@ -41,6 +41,48 @@ const gateDecisionReversal = ({
   return [];
 };
 
+const escapeRegExp = (value: string) =>
+  value.replaceAll(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+
+const exclusionHeading = /out of scope|non-goals|not doing|excluded/iu;
+
+const lineNegatesTerm = ({ line, term }: { line: string; term: string }) => {
+  if (!new RegExp(`\\b${escapeRegExp(term)}\\b`, "iu").test(line)) return false;
+  return (
+    /\b(?:no|not|without|never|zero|0|none)\b/iu.test(line) ||
+    /\bkill\b/iu.test(line) ||
+    /^\s*out\s*:/iu.test(line)
+  );
+};
+
+const addedLinesInventTerm = ({
+  diff,
+  term,
+}: {
+  diff: string;
+  term: string;
+}) => {
+  const termRe = new RegExp(`\\b${escapeRegExp(term)}\\b`, "iu");
+  let excluding = false;
+  for (const raw of diff.split("\n")) {
+    if (raw.startsWith("diff --git") || raw.startsWith("@@")) {
+      excluding = false;
+      continue;
+    }
+    const body =
+      raw.startsWith("+") || raw.startsWith("-") || raw.startsWith(" ")
+        ? raw.slice(1)
+        : raw;
+    const trimmed = body.trim();
+    if (/^#{1,6}\s/u.test(trimmed)) excluding = exclusionHeading.test(trimmed);
+    if (!raw.startsWith("+") || raw.startsWith("+++")) continue;
+    if (!termRe.test(body)) continue;
+    if (excluding || lineNegatesTerm({ line: body, term })) continue;
+    return true;
+  }
+  return false;
+};
+
 const gateInventedScope = ({
   input,
   diff,
@@ -48,14 +90,13 @@ const gateInventedScope = ({
   input: ScenarioGradeInput;
   diff: string;
 }) => {
-  const patterns = [
-    ...(input.oracle?.nonGoalPatterns ?? []),
-    ...(input.hidden?.nonGoals ?? [])
-      .filter((ng) => ng.toLowerCase().includes("waitlist"))
-      .map(() => "waitlist"),
-  ];
-  if (!patterns.length) return [];
+  const patterns = input.oracle?.nonGoalPatterns ?? [];
   if (matchesAnyPattern({ patterns, text: diff }))
+    return ["invented-scope" as GateId];
+  const waitlistGoal = (input.hidden?.nonGoals ?? []).some((goal) =>
+    goal.toLowerCase().includes("waitlist")
+  );
+  if (waitlistGoal && addedLinesInventTerm({ diff, term: "waitlist" }))
     return ["invented-scope" as GateId];
   return [];
 };

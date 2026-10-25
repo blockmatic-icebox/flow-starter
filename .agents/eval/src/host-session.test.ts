@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 
+import type { GeneratedScenario } from "./generation/types.ts";
 import {
   hostSessionFinalize,
   hostSessionNext,
@@ -119,6 +120,145 @@ describe("host-session eval harness", () => {
     assert.equal(finalized.manifest.protocol, "subject-evaluator-v2");
     assert.equal(finalized.grades[0]?.officialEligible, false);
     assert.equal(finalized.grades[0]?.quality, null);
+  });
+
+  it("records a later turn after an earlier turn was recorded", () => {
+    const runId = `test-later-turn-${Date.now()}`;
+    prepareHostRun({ arm: "flow", runId, scenarioIds: ["S02"] });
+    const first = hostSessionNext({
+      repetition: 1,
+      runId,
+      scenarioId: "S02",
+    });
+    assert.equal(first.ok, true);
+    if (!first.ok || first.status !== "turn") return;
+    const firstRecord = hostSessionRecord({
+      events: [
+        {
+          id: "a1",
+          kind: "assistant",
+          origin: "agent-reported",
+          scenarioId: "S02",
+          seq: 2,
+          text: "Added the one-line comment.",
+          ts: new Date().toISOString(),
+          turn: first.packet.turn,
+        },
+      ],
+      repetition: 1,
+      runId,
+      scenarioId: "S02",
+      turn: first.packet.turn,
+    });
+    assert.equal(firstRecord.ok, true);
+    const second = hostSessionNext({
+      repetition: 1,
+      runId,
+      scenarioId: "S02",
+    });
+    assert.equal(second.ok, true);
+    if (!second.ok || second.status !== "turn") return;
+    assert.equal(second.packet.turn, 2);
+    const secondRecord = hostSessionRecord({
+      events: [
+        {
+          id: "a2",
+          kind: "assistant",
+          origin: "agent-reported",
+          scenarioId: "S02",
+          seq: 4,
+          text: "Confirmed the comment is the only change.",
+          ts: new Date().toISOString(),
+          turn: second.packet.turn,
+        },
+      ],
+      repetition: 1,
+      runId,
+      scenarioId: "S02",
+      turn: second.packet.turn,
+    });
+    assert.equal(secondRecord.ok, true);
+  });
+
+  it("delivers a later scripted line when an intermediate turn is empty", () => {
+    const runId = `test-skip-gap-${Date.now()}`;
+    const generated: GeneratedScenario = {
+      category: "ambiguous-requirements",
+      complexity: 1,
+      domain: "care",
+      hidden: {
+        alreadyKnown: [],
+        approvalLines: [{ message: "Keep the original decision.", turn: 4 }],
+        id: "S04",
+        nonGoals: [],
+        persona: "stakeholder",
+        privateFacts: [],
+        stopCondition: "conflict-resolved",
+      },
+      id: "S04",
+      modifiers: {},
+      oracle: {
+        acceptanceChecks: [],
+        holdoutNotes: [],
+        scenarioId: "S04",
+      },
+      publicBrief: "Start.",
+      publicCard: {
+        allowProductCode: false,
+        allowStandalonePlan: false,
+        browserVerification: false,
+        codeExecution: false,
+        id: "S04",
+        openingPrompt: "Start.",
+        relevantStages: ["Specify"],
+        requiresBuildAuth: true,
+        title: "Gap",
+        turnCap: 4,
+      },
+      templateId: "gap",
+    };
+    prepareHostRun({
+      arm: "flow",
+      generatedScenarios: [generated],
+      runId,
+      scenarioIds: ["S04"],
+    });
+    const first = hostSessionNext({
+      repetition: 1,
+      runId,
+      scenarioId: "S04",
+    });
+    assert.equal(first.ok, true);
+    if (!first.ok || first.status !== "turn") return;
+    const recorded = hostSessionRecord({
+      events: [
+        {
+          id: "a1",
+          kind: "assistant",
+          origin: "agent-reported",
+          scenarioId: "S04",
+          seq: 2,
+          text: "I will not treat that change as accepted yet.",
+          ts: new Date().toISOString(),
+          turn: first.packet.turn,
+        },
+      ],
+      repetition: 1,
+      runId,
+      scenarioId: "S04",
+      turn: first.packet.turn,
+    });
+    assert.equal(recorded.ok, true);
+    const second = hostSessionNext({
+      repetition: 1,
+      runId,
+      scenarioId: "S04",
+    });
+    assert.equal(second.ok, true);
+    assert.equal(second.status, "turn");
+    if (!second.ok || second.status !== "turn") return;
+    assert.equal(second.packet.turn, 4);
+    assert.equal(second.packet.prompt, "Keep the original decision.");
   });
 
   it("cli and repair sources do not pin model or composer-2.5", () => {

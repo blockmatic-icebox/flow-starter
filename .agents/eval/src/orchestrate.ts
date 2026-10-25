@@ -28,7 +28,7 @@ import {
 } from "./scenarios.ts";
 import { gradeObservedScenario } from "./session-grade.ts";
 import { skillsLockHash } from "./skills-lock.ts";
-import { stakeholderReply } from "./stakeholder.ts";
+import { stakeholderReply, stopAfterRecordedTurn } from "./stakeholder.ts";
 import { PROTOCOL_ID } from "./trace.ts";
 import { loadTranscript } from "./transcript.ts";
 import { trialScenarioDir } from "./trial-paths.ts";
@@ -91,7 +91,7 @@ const runStakeholderTurns = async ({
       `${readFileSync(eventsPath, "utf-8")}${JSON.stringify(dryEvent)}\n`
     );
 
-    if (hidden?.stopCondition === "after-plan-approval" && turn >= 3) return;
+    if (stopAfterRecordedTurn({ hidden, turn })) return;
     await runTurn(turn + 1);
   };
 
