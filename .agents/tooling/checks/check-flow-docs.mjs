@@ -616,7 +616,8 @@ function validateReadmeIdentity(root) {
     return errors;
   }
 
-  if (!isFullProductTree(root)) return errors;
+  const useAdoptedProductReadmeRules = !factory || isFullProductTree(root);
+  if (!useAdoptedProductReadmeRules) return errors;
 
   if (readme.includes("raw.githubusercontent.com"))
     errors.push(
