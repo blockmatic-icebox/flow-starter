@@ -17,7 +17,7 @@ Install dependencies:
 pnpm install
 ```
 
-`pnpm setup` also prepares environment templates. `pnpm setup:full` installs optional local tools (skills, secret scanners, Portless, DeepSec, Playwright). Scanner installation may require administrator rights. See the [foundation guide](docs/readme.md).
+`pnpm setup` also prepares environment templates. `pnpm setup:full` installs optional local tools (skills, secret scanners, Portless, DeepSec, Playwright). Scanner installation may require administrator rights. See the [foundation guide](.agents/flow/factory.md).
 
 Start the application:
 
@@ -58,7 +58,7 @@ pnpm setup:portless
 
 ## Architecture
 
-This application uses the opinionated [Flow Factory](docs/readme.md) foundation.
+This application uses the opinionated [Flow Factory](.agents/flow/factory.md) foundation.
 
 The inherited technical architecture includes:
 
@@ -85,7 +85,7 @@ Review the relevant architectural decisions before making consequential changes 
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Technical architecture and boundaries |
 | [AGENTS.md](AGENTS.md) | Entry point for coding agents |
 | [Flow for humans](.agents/flow/README.md) | Introduction to the development methodology |
-| [Flow Factory foundation](docs/readme.md) | Inherited architecture, tools and adoption guidance |
+| [Flow Factory foundation](.agents/flow/factory.md) | Inherited architecture, tools and adoption guidance |
 
 ## Configuration
 
@@ -95,7 +95,7 @@ Create local environment configuration only when required.
 
 Never commit credentials or secrets.
 
-For inherited examples and optional integrations, see the [Flow Factory foundation guide](docs/readme.md).
+For inherited examples and optional integrations, see the [Flow Factory foundation guide](.agents/flow/factory.md).
 
 ## Adopting this template
 

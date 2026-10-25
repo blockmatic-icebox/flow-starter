@@ -2,7 +2,7 @@
 
 **Status:** Current
 
-This document is the security boundary for the starter. [ARCHITECTURE.md](../../ARCHITECTURE.md) describes the system. [ADR 0011](../adr/0011-api-and-agent-security-boundaries.md) records the decision. [SECURITY.md](../../SECURITY.md) is the disclosure policy.
+This document is the security boundary for the starter. [ARCHITECTURE.md](../../../ARCHITECTURE.md) describes the system. [ADR 0011](../decisions/adr/0011-api-and-agent-security-boundaries.md) records the decision. [SECURITY.md](../../../SECURITY.md) is the disclosure policy.
 
 References: [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/), [OWASP LLM / agentic guidance](https://genai.owasp.org/), and the [MCP Streamable HTTP transport](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http).
 

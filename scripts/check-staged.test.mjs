@@ -30,7 +30,7 @@ test("classifies staged files without dropping unusual names", () => {
 });
 
 test("selects lightweight checks and skips the full suite", () => {
-  const markdown = stagedChecks(["docs/readme.md"]).map((check) =>
+  const markdown = stagedChecks([".agents/flow/factory.md"]).map((check) =>
     check.args.join(" ")
   );
   assert.match(markdown.join("\n"), /check-flow-docs/u);

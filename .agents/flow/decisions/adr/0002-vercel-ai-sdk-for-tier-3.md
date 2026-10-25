@@ -32,5 +32,5 @@ The extraction source used the Vercel AI SDK (`ai`) with AI Gateway for planners
 - [ADR 0001 — Agentic Architecture](0001-agentic-architecture.md)
 - [ADR 0003 — GenUI OpenUI foundation](0003-genui-openui-foundation.md)
 - [ADR 0011 — API and agent security boundaries](0011-api-and-agent-security-boundaries.md)
-- [docs/research/20261024-genui-extraction-inventory.md](../research/20261024-genui-extraction-inventory.md)
-- [docs/specs/genui.md](../specs/genui.md)
+- [docs/research/20261024-genui-extraction-inventory.md](../../research/20261024-genui-extraction-inventory.md)
+- [GenUI specification](../../specs/genui.md)

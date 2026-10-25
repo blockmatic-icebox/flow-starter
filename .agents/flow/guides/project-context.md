@@ -9,12 +9,14 @@ Flow spreads product intent, decisions, and implementation across **ordinary rep
 | Product vision, audience, scope | Adopter-owned [PRODUCT.md](../../../PRODUCT.md) |
 | Experience and interaction direction | [DESIGN.md](../../../DESIGN.md) |
 | Current technical structure | [ARCHITECTURE.md](../../../ARCHITECTURE.md) |
-| Consequential product rationale | [docs/pdr/](../../../docs/pdr/) |
-| Consequential technical rationale | [docs/adr/](../../../docs/adr/) |
-| Bounded work with tasks and findings | [docs/initiatives/](../../../docs/initiatives/) |
-| Durable research and assessments | [docs/research/](../../../docs/research/) (dated filenames) |
-| Detailed capability contracts | [docs/specs/](../../../docs/specs/) when justified |
-| Flow Factory adoption and stack narrative | [docs/readme.md](../../../docs/readme.md) |
+| Consequential product rationale | `docs/pdr/` when the first record exists |
+| Consequential product architecture | [docs/adr/](../../../docs/adr/) |
+| Factory stack and agent architecture rationale | [decisions/adr/](../decisions/adr/) |
+| Factory engineering principles | [decisions/pdr/](../decisions/pdr/) |
+| Bounded product work with tasks and findings | `docs/initiatives/` when used |
+| Product research and assessments | `docs/research/` (dated filenames) when used |
+| Product capability contracts | `docs/specs/` when justified |
+| Flow Factory adoption and inherited stack | [factory.md](../factory.md), [architecture.md](../architecture.md) |
 | Terms specific to this factory checkout | [GLOSSARY.md](../../../GLOSSARY.md) |
 | Agent procedures (skills, worktrees, verify) | [.agents/flow/operations/](../operations/) |
 | Worthwhile ideas not yet committed | `docs/ideas/<slug>.md` when first needed ([flow.md](../flow.md)) |

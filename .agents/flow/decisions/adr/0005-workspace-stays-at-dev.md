@@ -19,11 +19,11 @@ All workspace generation, chat, canvas updates, and voice stay on one route (`/d
 
 ## Consequences
 
-- Scope and journeys belong in [PRODUCT.md](../../PRODUCT.md) once the workspace ships.
+- Scope and journeys belong in [PRODUCT.md](../../../../PRODUCT.md) once the workspace ships.
 - The Flow experience sidebar ([ADR 0010](0010-site-consultant-chat-and-mcp.md)) is not the `/dev` workspace.
 
 ## Related documents
 
 - [ADR 0010 — Flow Agent chat and MCP](0010-site-consultant-chat-and-mcp.md)
 - [ADR 0012 — Flow and web applications](0012-flow-and-web-applications.md)
-- [ARCHITECTURE.md](../../ARCHITECTURE.md) §7
+- [ARCHITECTURE.md](../../../../ARCHITECTURE.md) §7

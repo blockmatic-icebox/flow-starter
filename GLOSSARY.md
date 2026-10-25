@@ -46,7 +46,7 @@ Results surface inside the workspace for validated, source-backed artifacts. Dis
 
 ## Flow Agent
 
-Read-only technical guide for Flow methodology and Flow Factory architecture. It explains the repository, implemented and planned capabilities, and development workflow through the `apps/flow` chat interface and approved read-only MCP tools. See [ADR 0010](docs/adr/0010-site-consultant-chat-and-mcp.md) and [ADR 0012](docs/adr/0012-flow-and-web-applications.md).
+Read-only technical guide for Flow methodology and Flow Factory architecture. It explains the repository, implemented and planned capabilities, and development workflow through the `apps/flow` chat interface and approved read-only MCP tools. See [ADR 0010](.agents/flow/decisions/adr/0010-site-consultant-chat-and-mcp.md) and [ADR 0012](.agents/flow/decisions/adr/0012-flow-and-web-applications.md).
 
 ## Agent-to-UI (AG-UI)
 
@@ -58,4 +58,4 @@ Docker proxy (`neondatabase/neon_local`) that exposes a Neon cloud branch at `lo
 
 ## External invocation (planned)
 
-Authenticated non-browser clients limited to cited answers and optional validated specs—no session canvas mutation. The shipped MCP endpoint exposes read-only Flow Agent capabilities; broader external invocation remains planned. See [docs/adr/0006-external-invocation-is-read-only.md](docs/adr/0006-external-invocation-is-read-only.md).
+Authenticated non-browser clients limited to cited answers and optional validated specs—no session canvas mutation. The shipped MCP endpoint exposes read-only Flow Agent capabilities; broader external invocation remains planned. See [.agents/flow/decisions/adr/0006-external-invocation-is-read-only.md](.agents/flow/decisions/adr/0006-external-invocation-is-read-only.md).

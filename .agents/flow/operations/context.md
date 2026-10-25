@@ -17,7 +17,7 @@ Use the project's established term when its meaning is relevant. Do not invent s
 
 ## When to inspect decisions
 
-Read the relevant records in [docs/adr/](../../../docs/adr/) when changing architecture, authorization, data boundaries, major integrations, or other consequential choices.
+Read the relevant **product** records in [docs/adr/](../../../docs/adr/) for product-specific choices. Read **Factory** records in [decisions/adr/](../decisions/adr/) when changing inherited architecture, authorization defaults, major integrations, or other Factory boundaries.
 
 Do not load every ADR automatically.
 

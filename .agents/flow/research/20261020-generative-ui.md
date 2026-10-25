@@ -6,7 +6,7 @@
 
 **Status:** Historical
 
-> Landscape evidence only. Accepted starter direction lives in [ADR 0001](../adr/0001-agentic-architecture.md), [ADR 0003](../adr/0003-genui-openui-foundation.md), and [ARCHITECTURE.md](../../ARCHITECTURE.md).
+> Landscape evidence only. Accepted starter direction lives in [ADR 0001](../decisions/adr/0001-agentic-architecture.md), [ADR 0003](../decisions/adr/0003-genui-openui-foundation.md), and [ARCHITECTURE.md](../../../ARCHITECTURE.md).
 
 ## Executive summary
 

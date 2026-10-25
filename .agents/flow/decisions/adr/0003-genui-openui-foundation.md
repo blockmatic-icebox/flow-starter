@@ -19,7 +19,7 @@ This extraction task generalizes that architecture for adopters without copying 
 
 ## Alternatives considered
 
-- **json-render as the primary contract.** Rejected for the initial foundation; see [comparative research](../research/20261024-genui-json-vs-openui.md).
+- **json-render as the primary contract.** Rejected for the initial foundation; see [comparative research](../../research/20261024-genui-json-vs-openui.md).
 - **Dual compilers in the demo.** Rejected; one primary GenUI contract reduces maintenance and agent confusion.
 
 ## Consequences
@@ -30,7 +30,7 @@ This extraction task generalizes that architecture for adopters without copying 
 
 ## Related documents
 
-- [docs/specs/genui.md](../specs/genui.md)
-- [ARCHITECTURE.md](../../ARCHITECTURE.md)
-- [docs/research/20261020-generative-ui.md](../research/20261020-generative-ui.md)
-- [docs/research/20261024-genui-json-vs-openui.md](../research/20261024-genui-json-vs-openui.md)
+- [GenUI specification](../../specs/genui.md)
+- [ARCHITECTURE.md](../../../../ARCHITECTURE.md)
+- [docs/research/20261020-generative-ui.md](../../research/20261020-generative-ui.md)
+- [docs/research/20261024-genui-json-vs-openui.md](../../research/20261024-genui-json-vs-openui.md)

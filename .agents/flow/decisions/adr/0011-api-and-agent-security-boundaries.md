@@ -26,12 +26,12 @@ HTTP and MCP adapters are untrusted boundaries. Every request is validated and b
 - Production MCP and rate limits fail closed until `APP_ORIGIN`, Redis, and either a bearer token or `CONSULTANT_MCP_PUBLIC_READ_ONLY=1` are configured.
 - Development keeps a memory counter and unauthenticated MCP on loopback and `flow.localhost`.
 - The public demo stays unauthenticated. Identity, tenant isolation, and a real approval workflow remain adopter work.
-- Implementation detail lives in [the security model](../security/security-model.md), not in further ADRs, unless a later decision changes this boundary.
+- Implementation detail lives in [the security model](../../security/security-model.md), not in further ADRs, unless a later decision changes this boundary.
 
 ## Related documents
 
-- [SECURITY.md](../../SECURITY.md)
-- [docs/security/security-model.md](../security/security-model.md)
-- [ARCHITECTURE.md](../../ARCHITECTURE.md)
+- [SECURITY.md](../../../../SECURITY.md)
+- [security model](../../security/security-model.md)
+- [ARCHITECTURE.md](../../../../ARCHITECTURE.md)
 - [ADR 0006](0006-external-invocation-is-read-only.md)
 - [ADR 0010](0010-site-consultant-chat-and-mcp.md)

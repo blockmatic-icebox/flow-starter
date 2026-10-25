@@ -4,7 +4,7 @@ Flow is a lightweight way to build software with people and coding agents togeth
 
 ## Who it is for
 
-Flow is written for **solo founders and small technical teams** who want useful products, not just more code. You can use Flow with any stack; in this repository it ships inside [Flow Factory](../../docs/readme.md), which provides an opinionated foundation (Next.js, React, TypeScript, and related tools—see [PDR 0001](../../docs/pdr/0001-agnostic-api-first.md)).
+Flow is written for **solo founders and small technical teams** who want useful products, not just more code. You can use Flow with any stack; in this repository it ships inside [Flow Factory](factory.md), which provides an opinionated foundation (Next.js, React, TypeScript, and related tools—see [Factory PDR 0001](decisions/pdr/0001-agnostic-api-first.md)).
 
 ## Why Flow exists
 
@@ -25,9 +25,9 @@ Flow does **not** guarantee faster delivery, quality, autonomous shipping, or pr
 | --- | --- | --- |
 | What it is | Methodology and document conventions | Agentic product-development environment |
 | You define | Your product in `PRODUCT.md` and `DESIGN.md` | Which application you build (`apps/web`, etc.) |
-| Authority for workflow | [flow.md](flow.md) | Same; [docs/readme.md](../../docs/readme.md) explains the foundation |
+| Authority for workflow | [flow.md](flow.md) | Same; [factory.md](factory.md) explains the foundation |
 
-The **Flow app** (`apps/flow`) is not the methodology; it demonstrates GenUI and a read-only Flow Agent ([ADR 0012](../../docs/adr/0012-flow-and-web-applications.md)).
+The **Flow app** (`apps/flow`) is not the methodology; it demonstrates GenUI and a read-only Flow Agent ([Factory ADR 0012](decisions/adr/0012-flow-and-web-applications.md)).
 
 ## Kinds of work
 
@@ -38,6 +38,18 @@ Flow uses one lifecycle for three everyday situations ([flow.md](flow.md#kinds-o
 - **Flow improvement** — methodology and skills, via user-invoked `flow-improve`, not a second lifecycle.
 
 Parallel execution, evaluation, and improvement are documented under [operations/](operations/); procedures live there and in [flow.md](flow.md), not in this introduction.
+
+## Factory navigation
+
+| Need | Location |
+| --- | --- |
+| Factory mission and adoption | [factory.md](factory.md) |
+| Inherited technical architecture | [architecture.md](architecture.md) |
+| Factory ADRs / PDRs | [decisions/adr/](decisions/adr/), [decisions/pdr/](decisions/pdr/) |
+| GenUI specification | [specs/genui.md](specs/genui.md) |
+| Security implementation model | [security/security-model.md](security/security-model.md) |
+| Factory research and initiatives | [research/](research/), [initiatives/](initiatives/) |
+| Operations (delegation, worktrees, verification) | [operations/](operations/) |
 
 ## Reading path
 

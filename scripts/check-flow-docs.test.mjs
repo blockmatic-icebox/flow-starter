@@ -23,11 +23,19 @@ function defaultMarkdownContent(relative) {
     return `# Research\n\n**Research date:** ${researchDate}\n**Last reviewed:** 2026-10-24\n**Status:** Current\n`;
   }
 
-  if (relative.startsWith("docs/specs/")) {
+  if (
+    relative.startsWith("docs/specs/") ||
+    relative.startsWith(".agents/flow/specs/")
+  ) {
     return `# Spec\n\n**Last reviewed:** 2026-10-24\n**Status:** Current\n`;
   }
 
-  if (relative.startsWith("docs/adr/") || relative.startsWith("docs/pdr/")) {
+  if (
+    relative.startsWith("docs/adr/") ||
+    relative.startsWith("docs/pdr/") ||
+    relative.startsWith(".agents/flow/decisions/adr/") ||
+    relative.startsWith(".agents/flow/decisions/pdr/")
+  ) {
     return `Date: 2026-10-24
 
 # Decision
@@ -63,10 +71,11 @@ const firstPartySkillIds = ["flow", "flow-eval", "flow-improve"];
 
 const requiredDocuments = {
   ".agents/flow/README.md": "# Flow\n",
+  ".agents/flow/architecture.md": "# Factory architecture\n",
+  ".agents/flow/factory.md": "# Foundation\n",
   ".agents/flow/flow.md": "# Contract\n",
   "AGENTS.md": "# Agents\n",
   "ARCHITECTURE.md": "# Architecture\n",
-  "docs/readme.md": "# Foundation\n",
 };
 
 function firstPartySkillFixture(skillId) {
@@ -141,7 +150,9 @@ test("rejects nested GenUI spec paths after migration", (t) => {
 });
 
 test("accepts foundational ADR 0001 filename", (t) => {
-  const root = fixture(t, ["docs/adr/0001-agentic-architecture.md"]);
+  const root = fixture(t, [
+    ".agents/flow/decisions/adr/0001-agentic-architecture.md",
+  ]);
 
   assert.deepEqual(validateFlowDocs(root), []);
 });
@@ -166,8 +177,8 @@ test("rejects new three-digit ADRs", (t) => {
 
 test("allows ADR 0001 and ADR 0008 to coexist", (t) => {
   const root = fixture(t, [
-    "docs/adr/0001-agentic-architecture.md",
-    "docs/adr/0008-monorepo-turborepo-pnpm.md",
+    ".agents/flow/decisions/adr/0001-agentic-architecture.md",
+    ".agents/flow/decisions/adr/0008-monorepo-turborepo-pnpm.md",
   ]);
 
   assert.deepEqual(validateFlowDocs(root), []);
@@ -179,7 +190,37 @@ test("detects duplicate modern ADR numbers", (t) => {
     "docs/adr/0007-second-decision.md",
   ]);
 
-  assert.match(validateFlowDocs(root).join("\n"), /duplicate ADR number/u);
+  assert.match(
+    validateFlowDocs(root).join("\n"),
+    /duplicate product-adr number/u
+  );
+});
+
+test("allows Factory ADR 0001 and product ADR 0001 to coexist", (t) => {
+  const root = fixture(t, [
+    ".agents/flow/decisions/adr/0001-agentic-architecture.md",
+    "docs/adr/0001-use-flow-factory.md",
+  ]);
+
+  assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("detects duplicate Factory ADR numbers", (t) => {
+  const root = fixture(t, [
+    ".agents/flow/decisions/adr/0001-first.md",
+    ".agents/flow/decisions/adr/0001-second.md",
+  ]);
+
+  assert.match(
+    validateFlowDocs(root).join("\n"),
+    /duplicate factory-adr number/u
+  );
+});
+
+test("rejects migrated Factory ADR under docs/adr", (t) => {
+  const root = fixture(t, ["docs/adr/0001-agentic-architecture.md"]);
+
+  assert.match(validateFlowDocs(root).join("\n"), /Factory ADR belongs under/u);
 });
 
 test("does not share identifiers across ADRs and PDRs", (t) => {
@@ -354,10 +395,10 @@ test("flow-improve and flow-eval disable model invocation; flow does not", () =>
 });
 
 test("flags obsolete apps/web security paths in authoritative docs", (t) => {
-  const root = fixture(t, ["docs/specs/genui.md", "apps/flow/.keep"], {
-    "apps/flow/.keep": "",
-    "docs/specs/genui.md":
+  const root = fixture(t, [".agents/flow/specs/genui.md", "apps/flow/.keep"], {
+    ".agents/flow/specs/genui.md":
       "# Spec\n\n**Last reviewed:** 2026-10-24\n**Status:** Current\n\napps/web/lib/security/foo\n",
+    "apps/flow/.keep": "",
   });
 
   assert.match(

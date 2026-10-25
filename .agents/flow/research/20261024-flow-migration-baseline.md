@@ -1,7 +1,9 @@
 # Flow migration baseline
 
 **Research date:** 2026-10-24
+
 **Last reviewed:** 2026-10-24
+
 **Status:** Historical
 
 Captured before consolidating Flow under `.agents/flow/`. Live activation matrix runs are **missing** when agent CLI auth is blocked (`__dev/flow-evals/cli-auth-blocker.json`).
@@ -29,10 +31,11 @@ Captured before consolidating Flow under `.agents/flow/`. Live activation matrix
 
 - `.agents/flow/flow.md`
 - `.agents/flow/README.md`
-- `docs/readme.md`
+- `.agents/flow/factory.md`
+- `.agents/flow/architecture.md`
 - `ARCHITECTURE.md`
 - `AGENTS.md`
-- `.agents/flow/operations/domain.md`
+- `.agents/flow/operations/context.md`
 - `.agents/flow/operations/verification.md`
 - `.agents/flow/operations/skills.md`
 - `.agents/flow/operations/worktrees.md`

@@ -6,7 +6,7 @@ Version: 0.1
 
 Flow is a lightweight product engineering workflow for humans and coding agents. It connects exploration, product decisions, design, engineering, review, shipping, and learning without requiring a separate project management system.
 
-This file defines workflow conventions for any product using Flow. It does not describe the product being built. In this repository, Flow ships inside **Flow Factory** ([docs/readme.md](../../docs/readme.md)); stack-specific rules also appear in [AGENTS.md](../../AGENTS.md).
+This file defines workflow conventions for any product using Flow. It does not describe the product being built. In this repository, Flow ships inside **Flow Factory** ([factory.md](factory.md)); stack-specific rules also appear in [AGENTS.md](../../AGENTS.md).
 
 ## Operating model
 
@@ -251,7 +251,7 @@ Before an explicitly authorized commit, inspect the staged diff and changed-file
 
 Implementation authorization includes scoped local task-branch commits and serialized integration commits into local `main` for accepted work. Never push without explicit authorization.
 
-Security-sensitive changes — request boundaries, authorization, secrets, GenUI validation, database credentials — also require the [security model](../../docs/security/security-model.md) and the tests that cover the changed boundary.
+Security-sensitive changes — request boundaries, authorization, secrets, GenUI validation, database credentials — also require the [Factory security model](security/security-model.md) and the tests that cover the changed boundary.
 
 Automatic checks prove deterministic behavior. They do not replace judgment about product intent, threat model, or whether a change belongs in the commit.
 
@@ -287,31 +287,35 @@ Parallel readiness checks and honest release boundaries: [delegation.md](operati
 
 Use one authoritative home for each fact. Link related documents instead of copying their contents.
 
-Flow Factory's mission, goals, and inherited foundation are explained in docs/readme.md. The root README.md is an adopter-owned product template. Flow methodology and documentation conventions belong in .agents/flow/flow.md, with a human introduction in .agents/flow/README.md. Additional pages linked from that introduction (for example `working-with-flow.md`, `principles.md`, `influences.md`, `project-context.md`, and `improvement.md`) explain the methodology for people; they do not change the rules in this file. Current architecture belongs in ARCHITECTURE.md; durable architectural rationale belongs in ADRs. Use existing initiatives, plans and specifications only when justified by the work.
+Flow Factory's mission, goals, and inherited foundation are explained in [factory.md](factory.md). The root README.md is an adopter-owned product template. Flow methodology and documentation conventions belong in `.agents/flow/flow.md`, with a human introduction in `.agents/flow/README.md`. Additional pages linked from that introduction (for example `working-with-flow.md`, `principles.md`, `influences.md`, `project-context.md`, and `improvement.md`) explain the methodology for people; they do not change the rules in this file. **Product** current architecture belongs in root `ARCHITECTURE.md`. **Factory** inherited architecture belongs in [architecture.md](architecture.md). Durable rationale belongs in ADRs and PDRs under the correct owner. Use existing initiatives, plans, and specifications only when justified by the work.
 
 | Location | Responsibility |
 | --- | --- |
 | `AGENTS.md` | Lightweight agent entrypoint and task-specific document routing |
 | `README.md` | Adopter-owned product README template, including essential setup and documentation links |
-| `docs/readme.md` | Human-facing introduction to Flow Factory, its goals, capabilities and documentation navigation |
+| `.agents/flow/factory.md` | Flow Factory mission, capabilities, adoption, and navigation |
+| `.agents/flow/architecture.md` | Inherited Factory technical architecture and implementation boundaries |
 | `.agents/flow/flow.md` | Workflow, skill orchestration, document conventions, and lifecycle |
 | `.agents/flow/README.md` | Human-facing introduction to the Flow methodology |
 | `PRODUCT.md` | Current product vision, audience, business context, scope, outcomes, and capabilities |
 | `DESIGN.md` | Current visual, interaction, experience, and accessibility direction |
-| `ARCHITECTURE.md` | Current technical structure, boundaries, constraints, and major system choices |
+| `ARCHITECTURE.md` | Current **product** technical structure, boundaries, and deviations from Factory defaults |
 | `GLOSSARY.md` | Terms with project-specific meanings and consequential distinctions |
 | `docs/ideas/<slug>.md` | Worthwhile possibilities that are not yet implementation commitments |
 | `docs/initiatives/<slug>.md` | Product bounded work: outcome, scope, assumptions, tasks, progress, validation, and findings |
-| `.agents/flow/initiatives/<slug>.md` | Flow methodology bounded work (evaluation, improvement, guides) |
+| `.agents/flow/initiatives/<slug>.md` | Factory engineering and methodology bounded work |
 | `docs/research/YYYYMMDD-<slug>.md` | Product research and evidence |
-| `.agents/flow/research/YYYYMMDD-<slug>.md` | Flow methodology research and migration evidence |
+| `.agents/flow/research/YYYYMMDD-<slug>.md` | Factory technical and methodology research |
 | `.agents/flow/guides/` | Human-facing methodology pages (do not override this file) |
 | `.agents/flow/operations/` | Delegation, worktrees, skills, verification, domain context |
-| `docs/specs/<slug>.md` | Optional detailed requirements or contracts for a substantial capability |
+| `docs/specs/<slug>.md` | Product capability contracts when justified |
+| `.agents/flow/specs/<slug>.md` | Factory-wide capability specifications (for example GenUI) |
 | `docs/plans/<slug>.md` | Optional standalone implementation plans when an initiative would be insufficient or inappropriate |
-| `docs/pdr/NNNN-<slug>.md` | Consequential product decisions and their rationale |
-| `docs/adr/NNNN-<slug>.md` | Product architectural decisions and their rationale |
-| `.agents/flow/decisions/adr/NNNN-<slug>.md` | Flow methodology architectural decisions (shared ADR number sequence) |
+| `docs/pdr/NNNN-<slug>.md` | Product decision records (independent numbering) |
+| `docs/adr/NNNN-<slug>.md` | Product architecture decision records (independent numbering) |
+| `.agents/flow/decisions/pdr/NNNN-<slug>.md` | Factory product-engineering decision records |
+| `.agents/flow/decisions/adr/NNNN-<slug>.md` | Factory architecture decision records |
+| `.agents/flow/security/` | Factory security architecture and implementation model |
 
 These directories are created only when the first useful document needs them.
 
@@ -336,13 +340,29 @@ For new documents:
 7. Do not create empty placeholder documents or directories.
 8. Do not rename historical documents merely to satisfy a new convention. Preserve references and update historical material only through an explicit migration.
 
-For ADRs, use the next unused number after the largest existing numeric ADR identifier, regardless of whether older files use three or four digits. Do the same independently for PDRs.
+For ADRs and PDRs, use the next unused number **within each namespace** after the largest existing numeric identifier in that namespace, regardless of whether older files use three or four digits.
+
+## Decision routing
+
+Classify ownership before writing a record:
+
+1. Changes Flow methodology, agent skills, delegation, evaluation, or workflow behavior → Factory (`.agents/flow/`, skills, operations).
+2. Changes reusable Factory technology, architecture, tooling, or security defaults → Factory ADR/PDR/spec under `.agents/flow/`.
+3. Changes the specific product's domain, users, requirements, or chosen deviations → product `docs/` or root contracts.
+4. Product-specific departure from a Factory default → product ADR in `docs/adr/`, explicitly referencing the inherited Factory ADR.
+5. Both Factory and product implications → separate responsibilities; do not duplicate the same decision in two places when one owner is clear.
+
+Relocating an accepted Factory decision does not reverse it. Changing Factory architecture requires the Factory decision process. Products may override inherited defaults through an accepted **product** ADR without rewriting Factory history.
+
+## Context efficiency
+
+Do not load every Factory ADR for ordinary product work. Read product contracts (`PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`, relevant `docs/`) and implementation first. Read [architecture.md](architecture.md) or specific Factory ADRs only when a change touches an inherited boundary.
 
 ## Decision records
 
 Create a decision record only when the decision is meaningful, difficult to reverse, has real alternatives, and would be surprising without recorded context.
 
-Store product ADRs in `docs/adr/` and Flow methodology ADRs in `.agents/flow/decisions/adr/`. Store PDRs in `docs/pdr/` with four-digit prefixes (`0001-<slug>.md`). Use the next unused number across both ADR trees. Do not use `docs/decisions/`, `ADR-001` filenames, or uppercase type prefixes.
+Store **product** ADRs in `docs/adr/` and **Factory** ADRs in `.agents/flow/decisions/adr/`. Store **product** PDRs in `docs/pdr/` and **Factory** PDRs in `.agents/flow/decisions/pdr/`. Factory and product ADR/PDR numbers are **independent** (the same numeric id may exist in both trees). Do not use `docs/decisions/`, `ADR-001` filenames, or uppercase type prefixes.
 
 Use this structure for every new ADR and PDR:
 
@@ -368,7 +388,7 @@ Replace `ADR` with `PDR` for product decisions. Use four-digit ids in titles (`A
 
 **Status** must be exactly one of: `Proposed`, `Accepted`, `Superseded by ADR NNNN`, or `Deprecated`. Record the decision date only in the `Date:` line, not in **Status**.
 
-Rationale and alternatives belong in the record. Current implementation detail belongs in [ARCHITECTURE.md](../../ARCHITECTURE.md), [docs/specs/](../../docs/specs/), or [docs/security/security-model.md](../../docs/security/security-model.md).
+Rationale and alternatives belong in the record. Current **product** implementation detail belongs in [ARCHITECTURE.md](../../ARCHITECTURE.md) or product `docs/specs/`. Current **Factory** implementation detail belongs in [architecture.md](architecture.md), [.agents/flow/specs/](specs/), or [security/security-model.md](security/security-model.md).
 
 Preserve previous accepted decisions as historical records. If a decision changes, write a superseding record and update the current owning document.
 

@@ -18,7 +18,7 @@ The application is a starter, not a completed agent platform or product.
 
 Adopt an **agent-first, capability-first, Vercel-aligned architecture** with explicit contracts, reusable actions, controlled interfaces, and incremental delivery.
 
-Product-engineering principles (capability-first operations, API and MCP readiness, lean interfaces) live in [PDR 0001](../pdr/0001-agnostic-api-first.md). The engineering lifecycle lives in [.agents/flow/flow.md](../../.agents/flow/flow.md).
+Product-engineering principles (capability-first operations, API and MCP readiness, lean interfaces) live in [PDR 0001](../pdr/0001-agnostic-api-first.md). The engineering lifecycle lives in [.agents/flow/flow.md](../../flow.md).
 
 ### Controlled generative UI
 
@@ -38,7 +38,7 @@ Keep application contracts and domain operations as independent as practical fro
 
 ### Technology selection
 
-[ARCHITECTURE.md](../../ARCHITECTURE.md) and package manifests are the source of truth for versions, scripts, and what runs today. This table records **why** the stack was chosen.
+[ARCHITECTURE.md](../../../../ARCHITECTURE.md) and package manifests are the source of truth for versions, scripts, and what runs today. This table records **why** the stack was chosen.
 
 | Area | Selection | Status (direction) | Detail |
 | --- | --- | --- | --- |
@@ -46,7 +46,7 @@ Keep application contracts and domain operations as independent as practical fro
 | Application | Next.js App Router + React | Implemented | [ADR 0009](0009-react-nextjs-fractal-architecture.md) |
 | Language | TypeScript on Node.js | Implemented | Shared types across apps and packages |
 | Models | Vercel AI SDK (+ Gateway when configured) | Implemented for optional tier-3 GenUI | [ADR 0002](0002-vercel-ai-sdk-for-tier-3.md) |
-| GenUI | OpenUI Lang | Implemented in `@repo/genui`, hosted in `apps/flow` | [ADR 0003](0003-genui-openui-foundation.md), [spec](../specs/genui.md) |
+| GenUI | OpenUI Lang | Implemented in `@repo/genui`, hosted in `apps/flow` | [ADR 0003](0003-genui-openui-foundation.md), [spec](../../specs/genui.md) |
 | Agent runtime | Eve | Planned | [ADR 0004](0004-voice-delegates-to-eve.md) |
 | Data | Neon Postgres + Drizzle (`@repo/db`) | Baseline shipped | Product tables and auth data are adopter-owned |
 | Auth | Better Auth | Planned | No login UI in the starter |
@@ -54,7 +54,7 @@ Keep application contracts and domain operations as independent as practical fro
 | Workspace | pnpm + Turborepo | Implemented | Supersedes [ADR 0007](0007-monorepo-vercel-stack.md) / [0008](0008-monorepo-turborepo-pnpm.md) |
 | Interop | MCP (+ MCP Apps later) | Partial | Read-only Flow Agent MCP in `apps/flow`; [ADR 0010](0010-site-consultant-chat-and-mcp.md), [0012](0012-flow-and-web-applications.md) |
 | Validation | Zod | Implemented | Request bodies, GenUI props, agent tools |
-| Engineering | Flow workflow, ADRs, agent skills | Implemented | [.agents/flow/flow.md](../../.agents/flow/flow.md) |
+| Engineering | Flow workflow, ADRs, agent skills | Implemented | [.agents/flow/flow.md](../../flow.md) |
 
 ### Cross-technology integration model
 
@@ -76,13 +76,13 @@ Reconsider a selected technology when credible evidence shows unmet capability, 
 ## Alternatives considered
 
 - **Vercel Workflows and Sandbox as mandatory foundations.** Rejected until Eve and application needs justify a second orchestration system.
-- **json-render and parallel GenUI compilers.** Rejected for the initial foundation; one primary contract ([ADR 0003](0003-genui-openui-foundation.md), [research](../research/20261024-genui-json-vs-openui.md)).
+- **json-render and parallel GenUI compilers.** Rejected for the initial foundation; one primary contract ([ADR 0003](0003-genui-openui-foundation.md), [research](../../research/20261024-genui-json-vs-openui.md)).
 - **Every Neon platform service by default.** Rejected; adopt additional services only with a concrete use case.
 - **UI-bound business logic as the default.** Rejected; see [PDR 0001](../pdr/0001-agnostic-api-first.md).
 
 ## Consequences
 
-- [ARCHITECTURE.md](../../ARCHITECTURE.md) owns current technical boundaries and implementation status.
+- [ARCHITECTURE.md](../../../../ARCHITECTURE.md) owns current technical boundaries and implementation status.
 - Narrower implementation decisions remain in [ADR 0002](0002-vercel-ai-sdk-for-tier-3.md), [ADR 0003](0003-genui-openui-foundation.md), and related records.
 - Do not duplicate the full technology rationale in README.md or ARCHITECTURE.md.
 - Historical [ADR 0007](0007-monorepo-vercel-stack.md) and [ADR 0008](0008-monorepo-turborepo-pnpm.md) are superseded by this record.
@@ -90,7 +90,7 @@ Reconsider a selected technology when credible evidence shows unmet capability, 
 ## Related documents
 
 - [PDR 0001](../pdr/0001-agnostic-api-first.md)
-- [.agents/flow/flow.md](../../.agents/flow/flow.md)
-- [ARCHITECTURE.md](../../ARCHITECTURE.md)
+- [.agents/flow/flow.md](../../flow.md)
+- [ARCHITECTURE.md](../../../../ARCHITECTURE.md)
 - Prior revision before consolidation: `13d4f89368ccb8224098f544674244094a63b814` (`docs(adr): split platform and monorepo; harden GenUI and DeepSec`). Replaces `docs/adr/001-use-flow-starter.md` (Git history).
 - [Vercel platform](https://vercel.com/docs), [AI SDK](https://ai-sdk.dev/docs/introduction), [Eve](https://eve.dev/), [OpenUI Lang](https://www.openui.com/docs/openui-lang), [MCP specification](https://modelcontextprotocol.io/specification)

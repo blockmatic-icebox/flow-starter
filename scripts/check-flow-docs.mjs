@@ -14,17 +14,20 @@ const rules = [
   ["docs/plans", slugFilePattern, "plans"],
   ["docs/specs", slugFilePattern, "specs"],
   ["docs/research", researchFilePattern, "research"],
-  ["docs/adr", decisionFilePattern, "adr"],
-  ["docs/pdr", decisionFilePattern, "pdr"],
+  ["docs/adr", decisionFilePattern, "product-adr"],
+  ["docs/pdr", decisionFilePattern, "product-pdr"],
   [".agents/flow/initiatives", slugFilePattern, "flow-initiatives"],
   [".agents/flow/research", researchFilePattern, "flow-research"],
-  [".agents/flow/decisions/adr", decisionFilePattern, "flow-adr"],
+  [".agents/flow/specs", slugFilePattern, "flow-specs"],
+  [".agents/flow/decisions/adr", decisionFilePattern, "factory-adr"],
+  [".agents/flow/decisions/pdr", decisionFilePattern, "factory-pdr"],
 ];
 
-const knowledgeBundleSources = [
+export const knowledgeBundleSources = [
   ".agents/flow/flow.md",
   ".agents/flow/README.md",
-  "docs/readme.md",
+  ".agents/flow/factory.md",
+  ".agents/flow/architecture.md",
   "ARCHITECTURE.md",
   "AGENTS.md",
   ".agents/flow/operations/context.md",
@@ -53,17 +56,45 @@ const obsoletePathPatterns = [
     label: "nested docs/specs/genui/",
     pattern: /docs\/specs\/genui\//u,
   },
+  {
+    label: ".agents/flow/specs/genui.md (moved to Factory)",
+    pattern: /docs\/specs\/genui\.md/u,
+  },
+  {
+    label: ".agents/flow/factory.md (moved to Factory)",
+    pattern: /docs\/readme\.md/u,
+  },
+  {
+    label: ".agents/flow/security/security-model.md (moved to Factory)",
+    pattern: /docs\/security\/security-model\.md/u,
+  },
   { label: "docs/workflow", pattern: /docs\/workflow\//u },
   { label: "docs/agents", pattern: /docs\/agents\//u },
 ];
+
+const migratedFactoryAdrBasenames = new Set([
+  "0001-agentic-architecture.md",
+  "0002-vercel-ai-sdk-for-tier-3.md",
+  "0003-genui-openui-foundation.md",
+  "0004-voice-delegates-to-eve.md",
+  "0005-workspace-stays-at-dev.md",
+  "0006-external-invocation-is-read-only.md",
+  "0007-monorepo-vercel-stack.md",
+  "0008-monorepo-turborepo-pnpm.md",
+  "0009-react-nextjs-fractal-architecture.md",
+  "0010-site-consultant-chat-and-mcp.md",
+  "0011-api-and-agent-security-boundaries.md",
+  "0012-flow-and-web-applications.md",
+]);
 
 const semanticAuthoritativeFiles = [
   "AGENTS.md",
   "ARCHITECTURE.md",
   "SECURITY.md",
-  "docs/readme.md",
-  "docs/security/security-model.md",
-  "docs/specs/genui.md",
+  ".agents/flow/factory.md",
+  ".agents/flow/architecture.md",
+  ".agents/flow/security/security-model.md",
+  ".agents/flow/specs/genui.md",
   ".agents/flow/flow.md",
 ];
 
@@ -249,6 +280,13 @@ function validateDocumentMetadata(root) {
     validateSpecMetadata({ content, errors, relative });
   }
 
+  for (const filename of markdownFiles(path.join(root, ".agents/flow/specs"))) {
+    const relative = relativePath(root, filename);
+    const content = readFileSync(filename, "utf-8");
+
+    validateSpecMetadata({ content, errors, relative });
+  }
+
   for (const filename of markdownFiles(path.join(root, "docs/adr"))) {
     const relative = relativePath(root, filename);
     const content = readFileSync(filename, "utf-8");
@@ -272,13 +310,23 @@ function validateDocumentMetadata(root) {
     validateDecisionRecord({ content, errors, relative });
   }
 
+  for (const filename of markdownFiles(
+    path.join(root, ".agents/flow/decisions/pdr")
+  )) {
+    const relative = relativePath(root, filename);
+    const content = readFileSync(filename, "utf-8");
+
+    validateDecisionRecord({ content, errors, relative });
+  }
+
   return errors;
 }
 
 export const requiredDocuments = [
   "AGENTS.md",
   "ARCHITECTURE.md",
-  "docs/readme.md",
+  ".agents/flow/factory.md",
+  ".agents/flow/architecture.md",
   ".agents/flow/README.md",
   ".agents/flow/flow.md",
 ];
@@ -359,13 +407,13 @@ function validateSemanticConsistency(root) {
     for (const { label, pattern } of obsoletePathPatterns) {
       if (pattern.test(content)) {
         errors.push(
-          `${relative}: obsolete path reference (${label}); update to current apps/flow or docs/specs/genui.md`
+          `${relative}: obsolete path reference (${label}); update to current apps/flow or .agents/flow/specs/genui.md`
         );
       }
     }
 
     if (
-      relative === "docs/security/security-model.md" &&
+      relative === ".agents/flow/security/security-model.md" &&
       /Three read-only tools/u.test(content)
     ) {
       errors.push(
@@ -575,6 +623,49 @@ function validateRequiredDocuments(root) {
     .map((relative) => `missing canonical document ${relative}`);
 }
 
+function validateFactoryAdrPlacement(root) {
+  const errors = [];
+  const productAdrDir = path.join(root, "docs/adr");
+
+  if (!existsSync(productAdrDir)) {
+    return errors;
+  }
+
+  for (const filename of markdownFiles(productAdrDir)) {
+    const basename = path.basename(filename);
+
+    if (migratedFactoryAdrBasenames.has(basename)) {
+      errors.push(
+        `${relativePath(root, filename)}: Factory ADR belongs under .agents/flow/decisions/adr/`
+      );
+    }
+  }
+
+  return errors;
+}
+
+const staleFactoryDocLinkPattern =
+  /docs\/(?:adr\/(?:000[1-9]|00[1-9][0-9]|010|011|012|013)-(?:agentic|vercel|genui|voice|workspace|external|monorepo|react|site|api|flow)|pdr\/0001-agnostic|readme\.md|specs\/genui\.md|security\/security-model\.md)/u;
+
+function validateStaleFactoryAdrLinks(root) {
+  const errors = [];
+
+  for (const relative of semanticAuthoritativeFiles) {
+    const absolute = path.join(root, relative);
+    if (!existsSync(absolute)) continue;
+
+    const content = readFileSync(absolute, "utf-8");
+
+    if (staleFactoryDocLinkPattern.test(content)) {
+      errors.push(
+        `${relative}: stale Factory documentation path; use .agents/flow/ canonical locations`
+      );
+    }
+  }
+
+  return errors;
+}
+
 export function validateFlowDocs(root = repositoryRoot) {
   const errors = [];
   const documents = [];
@@ -596,8 +687,10 @@ export function validateFlowDocs(root = repositoryRoot) {
   documents.sort((left, right) => left.relative.localeCompare(right.relative));
 
   const numbers = {
-    adr: new Map(),
-    pdr: new Map(),
+    "factory-adr": new Map(),
+    "factory-pdr": new Map(),
+    "product-adr": new Map(),
+    "product-pdr": new Map(),
   };
 
   for (const document of documents) {
@@ -625,8 +718,12 @@ export function validateFlowDocs(root = repositoryRoot) {
       continue;
     }
 
-    if (category === "adr" || category === "flow-adr" || category === "pdr") {
-      const bucket = category === "pdr" ? "pdr" : "adr";
+    if (
+      category === "product-adr" ||
+      category === "factory-adr" ||
+      category === "product-pdr" ||
+      category === "factory-pdr"
+    ) {
       const number = decisionNumber(filename);
 
       if (number === 0) {
@@ -634,19 +731,21 @@ export function validateFlowDocs(root = repositoryRoot) {
         continue;
       }
 
-      const previous = numbers[bucket].get(number);
+      const previous = numbers[category].get(number);
 
       if (previous) {
         errors.push(
-          `${relative}: duplicate ${bucket.toUpperCase()} number ${String(number).padStart(4, "0")}, already used by ${previous}`
+          `${relative}: duplicate ${category} number ${String(number).padStart(4, "0")}, already used by ${previous}`
         );
       } else {
-        numbers[bucket].set(number, relative);
+        numbers[category].set(number, relative);
       }
     }
   }
 
   errors.push(
+    ...validateFactoryAdrPlacement(root),
+    ...validateStaleFactoryAdrLinks(root),
     ...validateDocumentMetadata(root),
     ...validateRequiredDocuments(root),
     ...validateLegacyFlowDocDirs(root),

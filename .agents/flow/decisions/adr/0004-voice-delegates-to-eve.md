@@ -19,11 +19,11 @@ When implemented, the speech model handles listening and presentation only. Grou
 
 ## Consequences
 
-- Product scope for voice belongs in [PRODUCT.md](../../PRODUCT.md). Technical direction stays in [ARCHITECTURE.md](../../ARCHITECTURE.md) §7.
+- Product scope for voice belongs in [PRODUCT.md](../../../../PRODUCT.md). Technical direction stays in [ARCHITECTURE.md](../../../../ARCHITECTURE.md) §7.
 - The Flow Agent sidebar ([ADR 0010](0010-site-consultant-chat-and-mcp.md)) uses transcription and AI SDK chat first; eve voice templates remain the path for durable workspace voice later.
 
 ## Related documents
 
-- [ARCHITECTURE.md](../../ARCHITECTURE.md) §7
-- [docs/research/20261017-voice-surfaces.md](../research/20261017-voice-surfaces.md)
+- [ARCHITECTURE.md](../../../../ARCHITECTURE.md) §7
+- [docs/research/20261017-voice-surfaces.md](../../research/20261017-voice-surfaces.md)
 - [ADR 0005 — Workspace at `/dev`](0005-workspace-stays-at-dev.md)

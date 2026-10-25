@@ -10,7 +10,7 @@
 
 **Target:** the Flow Starter repository on `main`.
 
-> **Path notice.** Tables reference pre-split targets (`apps/web/...`, `docs/specs/genui/`). Current integration lives in `apps/flow` and [docs/specs/genui.md](../specs/genui.md). Historical extraction evidence only.
+> **Path notice.** Tables reference pre-split targets (`apps/web/...`, `docs/specs/genui/`). Current integration lives in `apps/flow` and [genui.md](../specs/genui.md). Historical extraction evidence only.
 
 Classifications: **COPY** (portable as-is), **ADAPT** (generalize), **REBUILD** (new in Flow), **OMIT** (website-specific).
 

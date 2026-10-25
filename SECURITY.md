@@ -19,7 +19,7 @@ On pull requests and on pushes to `main`, the CI and security workflows run dete
 - A secret-scanner canary, a full secret scan of the checkout, OSV lockfile scans, and `pnpm audit`.
 - A pre-commit gate that blocks secret files and scans the staged diff.
 
-These checks are described in [the security model](docs/security/security-model.md) and [ADR 0011](docs/adr/0011-api-and-agent-security-boundaries.md).
+These checks are described in [the security model](.agents/flow/security/security-model.md) and [ADR 0011](.agents/flow/decisions/adr/0011-api-and-agent-security-boundaries.md).
 
 ## What adopters still own
 

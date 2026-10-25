@@ -28,7 +28,7 @@ Speech in the sidebar uses browser transcription (`SpeechInput` / Web Speech API
 
 ## Consequences
 
-- [ARCHITECTURE.md](../../ARCHITECTURE.md) §6 documents `/api/chat` and `/api/mcp`.
+- [ARCHITECTURE.md](../../../../ARCHITECTURE.md) §6 documents `/api/chat` and `/api/mcp`.
 - [ADR 0005](0005-workspace-stays-at-dev.md) still reserves the full workspace to `/dev`; the Flow Agent sidebar is not that workspace.
 - Wispr Flow desktop dictation may fill the composer; embedded Wispr API is out of scope until access is granted.
 
@@ -36,4 +36,4 @@ Speech in the sidebar uses browser transcription (`SpeechInput` / Web Speech API
 
 - [ADR 0012 — Flow and web applications](0012-flow-and-web-applications.md)
 - [ADR 0011 — API and agent security boundaries](0011-api-and-agent-security-boundaries.md)
-- [docs/security/security-model.md](../security/security-model.md)
+- [security model](../../security/security-model.md)

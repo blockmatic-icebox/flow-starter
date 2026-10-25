@@ -339,4 +339,4 @@ Do not create a new ADR for every exception.
 - [ADR 0001](0001-agentic-architecture.md)
 - [ADR 0003](0003-genui-openui-foundation.md)
 - [ADR 0012](0012-flow-and-web-applications.md)
-- [ARCHITECTURE.md](../../ARCHITECTURE.md)
+- [ARCHITECTURE.md](../../../../ARCHITECTURE.md)

@@ -19,11 +19,11 @@ When implemented, the same eve agent serves browser workspace users and external
 
 ## Consequences
 
-- Further external invocation is adopter scope in [PRODUCT.md](../../PRODUCT.md). The boundary stays in [ARCHITECTURE.md](../../ARCHITECTURE.md) §7.
+- Further external invocation is adopter scope in [PRODUCT.md](../../../../PRODUCT.md). The boundary stays in [ARCHITECTURE.md](../../../../ARCHITECTURE.md) §7.
 - Current MCP remains read-only per [ADR 0010](0010-site-consultant-chat-and-mcp.md) and [ADR 0011](0011-api-and-agent-security-boundaries.md).
 
 ## Related documents
 
-- [ARCHITECTURE.md](../../ARCHITECTURE.md) §7
+- [ARCHITECTURE.md](../../../../ARCHITECTURE.md) §7
 - [ADR 0010 — Flow Agent chat and MCP](0010-site-consultant-chat-and-mcp.md)
 - [ADR 0011 — API and agent security boundaries](0011-api-and-agent-security-boundaries.md)

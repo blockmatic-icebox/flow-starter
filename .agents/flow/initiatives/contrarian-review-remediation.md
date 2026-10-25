@@ -23,7 +23,7 @@ Close the gaps found in the 2026-10-24 contrarian review: unproven Flow effectiv
 | --- | --- |
 | This initiative document | Plan acceptance |
 | Run a finding (`F0`–`F16`) | A later message that names that finding id |
-| Live pilot (`F13`) | Message naming scenarios, arm, model, and session cap ([flow-improvement-loop.md](../../.agents/flow/initiatives/flow-improvement-loop.md)) |
+| Live pilot (`F13`) | Message naming scenarios, arm, model, and session cap ([flow-improvement-loop.md](../initiatives/flow-improvement-loop.md)) |
 | Skill-lock edits (`F8`) | Message that approves the removal list |
 | Commit / push | Separate explicit request |
 
@@ -190,7 +190,7 @@ These apply when the corresponding finding is authorized:
 #### F8 — Trim and tier the skill lock (human decision required)
 
 - depends_on: [F0]
-- writes: `skills-lock.json`, `.agents/flow/operations/skills.md`, `docs/readme.md` (after approval only)
+- writes: `skills-lock.json`, `.agents/flow/operations/skills.md`, `.agents/flow/factory.md` (after approval only)
 - See **Plan corrections — F8** above.
 - Check: `pnpm flow:check`, `pnpm skills:install`.
 

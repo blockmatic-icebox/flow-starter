@@ -3,20 +3,11 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { knowledgeBundleSources } from "../../../scripts/check-flow-docs.mjs";
+
 const repoRoot = path.resolve(import.meta.dirname, "../../..");
 
-const sources = [
-  ".agents/flow/flow.md",
-  ".agents/flow/README.md",
-  "docs/readme.md",
-  "ARCHITECTURE.md",
-  "AGENTS.md",
-  ".agents/flow/operations/context.md",
-  ".agents/flow/operations/verification.md",
-  ".agents/flow/operations/skills.md",
-  ".agents/flow/operations/worktrees.md",
-  "PRODUCT.md",
-];
+const sources = knowledgeBundleSources;
 
 const sections = sources.map((relative) => {
   const absolute = path.join(repoRoot, relative);
