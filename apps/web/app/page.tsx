@@ -3,7 +3,9 @@ export default function Page() {
     <main className="flex min-h-svh p-6">
       <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
         <div>
-          <h1 className="font-medium">Product starter</h1>
+          <h1 className="font-heading text-lg font-semibold">
+            Product starter
+          </h1>
           <p>
             Extend product contracts in PRODUCT.md and DESIGN.md as you explore
             the product, then add routes under{" "}

@@ -32,7 +32,7 @@
     "typescript": "7.0.2"
   },
   "portless": {
-    "name": "web",
+    "name": "meta-cto",
     "script": "dev:app"
   }
 }

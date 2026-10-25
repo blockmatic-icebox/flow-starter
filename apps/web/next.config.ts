@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["web.localhost", "*.web.localhost"],
+  allowedDevOrigins: ["meta-cto.localhost", "*.meta-cto.localhost"],
   transpilePackages: ["@repo/ui"],
 };
 

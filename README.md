@@ -1,32 +1,32 @@
-# Flow Factory
+# Meta CTO
 
-An opinionated, agentic software development starter for building products with humans and AI agents.
+Web application built with Flow Factory.
 
-Flow Factory combines a modern TypeScript foundation with Flow, a lightweight methodology for exploring, specifying, building, reviewing, and shipping software.
+## Development
 
-## Create a project
-
-Requires Git and Node.js 24+. The generated project uses pnpm 12+.
+Requires Node.js 24+ and pnpm 12+.
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-factory/main/.agents/tooling/setup/install.sh)"
-```
-
-Enter your project name when prompted.
-
-The installer creates a new project directory, configures its identity, prepares its initial documentation, and starts a fresh Git history. It does not install application dependencies.
-
-## Develop
-
-```bash
-cd your-project
 pnpm setup
 pnpm dev
 ```
 
-## Learn more
+Local development: https://meta-cto.localhost
 
-- [Flow for humans](.agents/flow/README.md)
-- [Working with Flow](.agents/flow/guides/working-with-flow.md)
-- [Flow Factory foundation](.agents/flow/factory.md)
-- [Architecture](.agents/flow/architecture.md)
+## Product documentation
+
+- [Product](PRODUCT.md) — Purpose, scope, and requirements.
+- [Design](DESIGN.md) — Experience direction and design system.
+- [Architecture](ARCHITECTURE.md) — Technical structure and decisions.
+- [Agent instructions](AGENTS.md) — Development conventions.
+
+## Workflow
+
+This project uses [Flow](.agents/flow/README.md) to guide product development.
+
+## Quality
+
+```bash
+pnpm qa
+pnpm ci:local
+```

@@ -1,0 +1,8 @@
+{
+  "extends": "@repo/ts/base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "seed/**/*.ts"],
+  "exclude": ["node_modules"]
+}

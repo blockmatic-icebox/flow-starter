@@ -2,69 +2,132 @@
 
 ## Experience direction
 
-The starter application uses a **neutral, restrained, content-first** interface. Visual and interaction patterns follow **ChatGPT-inspired clarity**—calm surfaces, readable typography, and obvious interactive states—without copying unsupported ChatGPT functionality or implying an official association.
+**Feature Intelligence** uses a **neutral, restrained, content-first** interface on the **[Meta CTO](https://www.metacto.com/) design system**—warm cloud surfaces, ink typography, orange primary actions, teal focus and secondary accents. Patterns keep **ChatGPT-inspired clarity** (obvious states, readable type) without implying a chat product. **FI workflows are structured screens**, not a single assistant thread.
 
-**Current implementation** is a minimal homepage in `apps/web` with system-aware light and dark themes. **Future product-specific** journeys, navigation, and branding belong here once accepted during Explore or Specify.
+**Implemented today:** Factory starter homepage in `apps/web` (theme toggle, minimal copy). **Specified, not yet built:** routes below.
+
+Product copy and labels should match [GLOSSARY.md](GLOSSARY.md) (e.g. **disposition**, **problem statement**, **intake link**).
+
+## User journeys (accepted v1.3)
+
+Full spec: **[docs/specs/feature-intelligence-journeys.md](docs/specs/feature-intelligence-journeys.md)** (personas, UI detail, AI UX cross-links). Patterns: **[feature-intelligence-ai-ux-patterns.md](docs/specs/feature-intelligence-ai-ux-patterns.md)**.
+
+**Home** acts as a **persona router** — four intents: Share feedback (external), Log feedback (internal), Review queue (PM), See outcomes (leader). Nav badge on Triage when open queue &gt; 0.
+
+| Persona | Streamlined path | UI tone |
+| --- | --- | --- |
+| External submitter | Home → submit → thank-you (no PM jargon) | “Feedback”, “similar ideas” |
+| Internal submitter | Home → paste → duplicates first | Duplicate prevention |
+| PM | Home/Triage → expand row → disposition | Glossary terms |
+| Leader | Home → Insights → optional audit | Read-only metrics |
+
+**Demo script (recording direction only—not in-app):** Insights glance → PM triage (×2) → Insights refresh → optional live external submit. No Loom or recorder integration in the product.
+
+## Feature Intelligence — screens (accepted)
+
+Spec: [docs/specs/feature-intelligence.md](docs/specs/feature-intelligence.md). Product name in UI: **Feature Intelligence** (subtitle: turn feedback into decisions).
+
+| Route | Screen | Layout / behavior |
+| --- | --- | --- |
+| `/` | Home (persona router) | Four intent cards + Browse secondary; not a flat feature list |
+| `/requests` | Discover | List + filter by `theme_key`; cards show problem one-liner, theme label, source, support |
+| `/requests/new` | Submit | Step 1 form → step 2 triage preview (editable problem, duplicate link default, confirm) |
+| `/requests/[id]` | Detail | Main: problem, description, brief; sidebar: support, disposition audit, transparency |
+| `/triage` | PM queue | Table or `Item` list; **inline expand panel** for disposition (not dialog-first); `pm_review_started_at` on first expand |
+| `/insights` | Metrics | Persona hero + metric cards (no charts MVP); sample `n` + proxy footnotes |
+| `/chat` | Ask-only help | `max-w-2xl` thread; **no** tool UI; secondary nav item |
+
+### Interaction principles
+
+- **Triage is not chat** — submit flow uses cards and explicit confirm/publish.
+- **Primary actions:** Publish request / Submit feedback (persona), Save disposition.
+- **Destructive:** Decline disposition (same form; no separate destructive button style required in MVP).
+- **Metrics UI:** Show `medianPmTriageMs` only when `pmTriageN >= 2`; otherwise footnote proxy if needed.
+- **Motion:** Skeleton on triage loading only; toast on disposition save; keep demo recording calm.
+- **AI UX:** Submit loading uses harness **stage labels** + time estimate; human confirm before publish/disposition. Pattern map: [feature-intelligence-ai-ux-patterns.md](docs/specs/feature-intelligence-ai-ux-patterns.md) ([AI UX Playground](https://www.aiuxplayground.com/patterns)).
+
+### App shell (FI)
+
+Sticky header: brand + Browse · Submit · Triage (badge when queue &gt; 0) · Insights. Main content uses route `max-w` from [journeys spec](docs/specs/feature-intelligence-journeys.md#ui-detail-design-system) (`xl` submit, `5xl` triage). Home remains persona **card grid** (`sm:grid-cols-2`), not four equal nav destinations.
+
+### Component map (prefer `@repo/ui`)
+
+| UX need | Primitive |
+| --- | --- |
+| Persona home, thank-you, metrics | `Card`, `Button`, `Badge` |
+| Submit form | `Field`, `FieldLabel`, `Input`, `Textarea`, `Collapsible` |
+| Duplicate pick | `RadioGroup`, `FieldSet` |
+| Triage queue + inline review | `Table` / `Item`, `Collapsible` or `Accordion`, `Select`, `Textarea` |
+| Empty queue | `Empty`, `EmptyTitle` |
+| Loading triage | `Skeleton`; submit uses `Spinner` + `aria-live` |
+| Insights | `Card` grid only (defer `Chart`) |
+| Detail audit | `Collapsible`, sidebar at `lg` |
+| Feedback | `toast` after disposition |
+
+### Deferred / cut-if-late
+
+- `/chat` (assessment MVP cut line)
+- Markdown export of briefs
 
 ## Design system
 
-Shared UI lives in `@repo/ui` (shadcn-style primitives on Tailwind CSS v4). Product routes import tokens and components from the package; do not fork token values in `apps/web`.
+Shared UI: `@repo/ui` (**shadcn primitives**, **Meta CTO tokens**—not the default neutral shadcn theme). Import tokens and primitives from the package; do not fork token values in `apps/web`. Brand reference: [metacto.com](https://www.metacto.com/).
 
 ### Color and themes
 
-Semantic colors use **oklch** CSS custom properties in `packages/ui/src/styles/globals.css`. Light theme defaults apply on `:root`; dark theme applies on `.dark` (class strategy via `next-themes`).
+Semantic **oklch** tokens in `packages/ui/src/styles/globals.css`, mapped from Meta CTO palette (`--metacto-*` aliases). Light on `:root`; dark on `.dark` (`next-themes`).
 
-**Documented token parity (light `:root`)** — values must match `globals.css`:
+**Light `:root` parity** (must match `globals.css`):
 
-| Token                  | Value              |
-| ---------------------- | ------------------ |
-| `--background`         | `oklch(1 0 0)`     |
-| `--foreground`         | `oklch(0.145 0 0)` |
-| `--primary`            | `oklch(0.205 0 0)` |
-| `--primary-foreground` | `oklch(0.985 0 0)` |
-| `--border`             | `oklch(0.922 0 0)` |
-| `--muted-foreground`   | `oklch(0.556 0 0)` |
-| `--radius`             | `0.625rem`         |
+| Token | Value |
+| --- | --- |
+| `--background` | `var(--metacto-cloud)` |
+| `--foreground` | `var(--metacto-ink)` |
+| `--primary` | `var(--metacto-orange)` |
+| `--primary-foreground` | `oklch(1 0 0)` |
+| `--border` | `var(--metacto-mist)` |
+| `--muted-foreground` | `var(--metacto-pewter)` |
+| `--radius` | `0.75rem` |
 
-Dark theme inverts surfaces and text while keeping the same semantic roles. Destructive, chart, and sidebar tokens follow the same file.
+Meta aliases: cloud `#faf6f0`, ink `#2a3439`, orange `#f18700`, mist `#e8e4de`, pewter `#a8a29e`, teal `#3d7a72` (ring/accent). Cards and popovers use white (`oklch(1 0 0)`).
+
+Cards and popovers stay **white** on cloud background for contrast (metacto.com pattern).
 
 ### Typography
 
-- **Sans:** Geist (`--font-sans`), applied at the root layout.
-- **Mono:** Geist Mono (`--font-mono`) for code and keyboard hints.
-- Body copy uses `text-sm` with comfortable line height on the starter page; headings use `font-medium` at modest scale.
+- **Sans:** Inter (`--font-sans`) on root layout—body and UI.
+- **Heading:** Barlow (`--font-heading-family`)—`font-heading` on Card titles, dialogs, empty states.
+- **Mono:** Geist Mono for code and keyboard hints.
+- Body: `text-sm`, comfortable line height; headings `font-medium` / Barlow semibold, modest scale.
 
-### Spacing and shape
+### Components
 
-- Base corner radius: `--radius` (`0.625rem`), with derived `radius-sm` through `radius-4xl` in Tailwind theme.
-- Starter page uses generous padding (`p-6`), vertical rhythm (`gap-4`), and `min-h-svh` for full-viewport layout.
-
-### Components and interaction states
-
-Primitives (button, input, dialog, etc.) live under `packages/ui/src/components/`. They use semantic tokens for background, border, ring, and focus outlines (`outline-ring/50` on focusable elements).
-
-The starter surfaces only typography and a keyboard hint; future features should reuse existing primitives before adding variants.
+Primitives under `packages/ui/src/components/`. FI routes should compose Button, Input, Textarea, Select, Card, Badge, Dialog, Collapsible before new variants.
 
 ## Layout and responsive behavior
 
-Root layout (`apps/web/app/layout.tsx`) wraps content in `ThemeProvider`, `NuqsAdapter`, and antialiased Geist body text. The homepage is a single column with `max-w-md` and flex alignment—suitable for small screens without a separate breakpoint system yet.
+Root layout: `ThemeProvider`, `NuqsAdapter`, Inter + Barlow + Geist Mono (`apps/web/app/layout.tsx`). Starter homepage remains `max-w-md` until FI nav ships; FI pages target `max-w-2xl`–full width for triage table as spec’d.
 
 ## Accessibility
 
-- Root `html` sets `lang="en"`.
-- Theme toggle hotkey (`d`) ignores events when focus is in inputs, text areas, selects, or contenteditable regions.
-- New UI must meet WCAG-oriented contrast using semantic tokens; verify interactive components with keyboard and screen readers.
+- `lang="en"` on `html`.
+- Theme hotkey `d` disabled when focus in inputs/editables.
+- FI flows: keyboard-accessible **inline triage** disposition controls; transparency `Collapsible` with visible focus.
+
+## Verification
+
+FI UI: **manual** checklist ([testing spec](docs/specs/feature-intelligence-testing.md))—no FI Playwright in MVP. Use agent-browser per [.agents/flow/operations/verification.md](.agents/flow/operations/verification.md) when routes exist.
 
 ## Implementation references
 
-| Area | Location |
-| --- | --- |
-| Global tokens and base styles | `packages/ui/src/styles/globals.css` |
-| Theme provider and `d` hotkey | `packages/ui/src/components/theme-provider.tsx` |
-| App layout and fonts | `apps/web/app/layout.tsx` |
-| Starter page | `apps/web/app/page.tsx` |
-| shadcn config | `apps/web/components.json` |
+| Area                   | Location                                        |
+| ---------------------- | ----------------------------------------------- |
+| Tokens                 | `packages/ui/src/styles/globals.css`            |
+| Theme provider         | `packages/ui/src/components/theme-provider.tsx` |
+| App layout             | `apps/web/app/layout.tsx`                       |
+| Starter page (current) | `apps/web/app/page.tsx`                         |
+| FI routes (planned)    | `apps/web/app/` per route-first colocation      |
 
 ## Evolution
 
-When visual direction, tokens, or interaction conventions change in implementation, update this document in the same change. Proposed design ideas stay clearly marked until accepted; do not publish empty section headings.
+Update this file in the same change as material UI or token changes. Mark proposals until accepted; no empty section headings.

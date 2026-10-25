@@ -3,7 +3,7 @@ import { ThemeProvider } from "@repo/ui/components/theme-provider";
 import "@repo/ui/globals.css";
 import { cn } from "@repo/ui/lib/utils";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow, Geist_Mono, Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export const metadata: Metadata = {
@@ -11,7 +11,13 @@ export const metadata: Metadata = {
   title: "Product",
 };
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+
+const barlow = Barlow({
+  subsets: ["latin"],
+  variable: "--font-heading-family",
+  weight: ["500", "600", "700"],
+});
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
@@ -31,7 +37,8 @@ export default function RootLayout({
         "antialiased",
         fontMono.variable,
         "font-sans",
-        geist.variable
+        inter.variable,
+        barlow.variable
       )}
     >
       <body>

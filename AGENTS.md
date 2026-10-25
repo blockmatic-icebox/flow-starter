@@ -22,6 +22,10 @@ For repository work other than setup-only install, env, or tooling, read and app
 
 To improve Flow itself, read [.agents/skills/flow-improve/SKILL.md](.agents/skills/flow-improve/SKILL.md) when the user asks or when a workflow failure is clearly methodology-related.
 
+## Local prompt log (enabled)
+
+The coordinator **must** append one Q/A block per handled human request to gitignored repository-root `prompts.txt`. Format: [.agents/flow/operations/journal.md](.agents/flow/operations/journal.md#prompt-log-qa-format). Log **questions and answers** only—do not paste multiple-choice option lists into **Q:**. Never commit `prompts.txt`. Workers and subagents do not append.
+
 ## When to read
 
 For consequential product work (not setup-only install, env, or tooling), read the **current** contents of [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), and [ARCHITECTURE.md](ARCHITECTURE.md) before recommendations or implementation. Update the owning contract in the same change when material facts, accepted direction, or implemented behavior changes.

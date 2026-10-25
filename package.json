@@ -1,5 +1,5 @@
 {
-  "name": "flow",
+  "name": "meta-cto",
   "private": true,
   "type": "module",
   "scripts": {
@@ -21,14 +21,14 @@
     "hooks:commit-msg": "node tooling/checks/check-commit-message.mjs",
     "prepare": "simple-git-hooks",
     "qa": "pnpm lint && pnpm knip && pnpm sherif && pnpm check-types && pnpm test && pnpm --filter @repo/db db:check",
-    "test": "pnpm --filter @repo/genui test && pnpm --filter web test && pnpm --filter @repo/db test",
+    "test": "pnpm --filter @repo/genui test && pnpm --filter @repo/fi test && pnpm --filter web test && pnpm --filter @repo/db test",
+    "seed:fi": "pnpm --filter @repo/fi seed",
     "test:browser": "pnpm test:browser:web",
     "lint": "oxlint . && oxfmt --check .",
     "lint:fix": "oxlint --fix . && oxfmt --write --no-error-on-unmatched-pattern .",
     "format": "oxfmt --write --no-error-on-unmatched-pattern .",
     "check-types": "turbo run check-types",
     "knip": "knip",
-    "knip:factory": "knip --config knip.factory.json",
     "sherif": "sherif",
     "security:block-files": "node tooling/security/block-secret-files.mjs",
     "security:secrets": "node tooling/security/scan-secrets-staged.mjs",
@@ -46,6 +46,12 @@
     "db:ping": "node packages/db/scripts/db-ping.mjs",
     "deepsec": "pnpm --dir=.deepsec exec deepsec",
     "mcp:next": "next-devtools-mcp"
+  },
+  "dependencies": {
+    "@repo/fi": "workspace:*",
+    "ai": "^7.0.152",
+    "eve": "^0.3.5",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "knip": "^6.42.1",

@@ -7,12 +7,7 @@ import { pathToFileURL } from "node:url";
 
 import { repoRoot } from "../lib/repo-paths.mjs";
 
-const forbiddenPaths = [
-  "apps/flow",
-  "packages/flow-eval",
-  "scripts",
-  "GLOSSARY.md",
-];
+const forbiddenPaths = ["apps/flow", "packages/flow-eval", "scripts"];
 
 const forbiddenImportPatterns = [
   /from\s+["']@repo\/flow-eval/u,

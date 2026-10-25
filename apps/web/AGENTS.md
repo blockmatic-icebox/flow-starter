@@ -1,10 +1,12 @@
 # Product application (`apps/web`)
 
-Minimal Next.js starter for a new product. No Flow Agent, GenUI demo, or demo APIs.
+Minimal Next.js product app. **Feature Intelligence** human UI + **ask-only** `/chat` (no mutation tools). **eve** root agent lives at repo `agent/` (not in-app agent sidebar). No GenUI demo unless the product needs it.
+
+**FI MVP testing:** Manual browser verification only — do not add Playwright specs under `tests/browser/` for feature-intelligence routes. See [docs/specs/feature-intelligence-testing.md](../../docs/specs/feature-intelligence-testing.md).
 
 - Colocate route code under `app/<route>/` (see ADR 0009).
 - Shared UI from `@repo/ui`; optional database via `@repo/db`.
-- Local hostname: `web.localhost` (Portless).
+- Local hostname: `meta-cto.localhost` (Portless).
 
 Root `AGENTS.md` and `ARCHITECTURE.md` own monorepo-wide rules.
 
