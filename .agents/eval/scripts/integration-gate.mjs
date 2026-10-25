@@ -39,6 +39,7 @@ const test = spawnSync(
     "tsx",
     "--test",
     "eval/src/infrastructure/database-parallel.integration.test.ts",
+    "eval/src/host-isolation.integration.test.ts",
   ],
   { cwd: agentsRoot, encoding: "utf-8", stdio: "inherit" }
 );

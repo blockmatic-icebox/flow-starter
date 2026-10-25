@@ -25,7 +25,7 @@ describe("database-registry", () => {
     });
     const loaded = loadDatabaseRegistry({ runId });
     assert.equal(loaded.entries.filter((e) => e.status === "active").length, 1);
-    markDatabaseDropped({ databaseName: "flow_eval_a1b2c3d4", runId });
+    await markDatabaseDropped({ databaseName: "flow_eval_a1b2c3d4", runId });
     assert.equal(
       loadDatabaseRegistry({ runId }).entries.find(
         (e) => e.databaseName === "flow_eval_a1b2c3d4"

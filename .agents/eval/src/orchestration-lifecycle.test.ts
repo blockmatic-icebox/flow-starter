@@ -81,8 +81,8 @@ describe("host-session orchestration lifecycle", () => {
       modelId: "test-model",
       runId,
     });
-    assert.equal(finalized.ok, true);
-    if (!finalized.ok) return;
+    assert.equal(finalized.ok, false);
+    assert.equal(finalized.outcome, "partial");
     assert.equal(finalized.partial, true);
     assert.ok(finalized.grades.length >= 1);
     assert.ok(finalized.incompleteJobs?.some((j) => j.startsWith("S02")));

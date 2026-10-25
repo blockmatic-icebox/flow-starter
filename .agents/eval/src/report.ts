@@ -94,13 +94,16 @@ ${criterionLines.join("\n")}
 
 export const writeRunSummary = ({
   databaseCleanup,
+  finalizationOutcome,
   runDir,
   manifest,
   grades,
   hostJobs,
   partial = false,
+  runnerCaptureComplete,
 }: {
   databaseCleanup?: RunManifest["databaseCleanup"];
+  finalizationOutcome?: RunManifest["finalizationOutcome"];
   runDir: string;
   manifest: RunManifest;
   grades: GradeResult[];
@@ -112,6 +115,7 @@ export const writeRunSummary = ({
     failureReason?: string;
   }[];
   partial?: boolean;
+  runnerCaptureComplete?: boolean;
 }) => {
   mkdirSync(runDir, { recursive: true });
   writeFileSync(
@@ -131,6 +135,7 @@ export const writeRunSummary = ({
     `Harness: ${manifest.harness}`,
     `Protocol: ${manifest.protocol}`,
     `Completeness: ${manifest.completeness}`,
+    `Finalization outcome: ${finalizationOutcome ?? manifest.finalizationOutcome ?? "—"}`,
     "",
     "| Scenario | Gate | Official | Task | Verification | Confidence |",
     "| --- | --- | --- | --- | --- | --- |",
@@ -162,6 +167,7 @@ export const writeRunSummary = ({
       `Cancelled: ${cancelled}`,
       `Timed out: ${timedOut}`,
       `Partial finalization: ${partial ? "yes" : "no"}`,
+      `Runner capture complete: ${runnerCaptureComplete === undefined ? "—" : runnerCaptureComplete ? "yes" : "no"}`,
       `Official comparative eligibility: blocked unless isolation and runner capture are demonstrated (see ADR 0015).`
     );
   }

@@ -379,6 +379,7 @@ export const runBatch = async ({
       runId,
       scenarioIds,
     });
+    if (!prep.ok) throw new Error(prep.reason);
     const manifestPath = path.join(runEvalDir(runId), "manifest.json");
     const manifest = JSON.parse(
       readFileSync(manifestPath, "utf-8")

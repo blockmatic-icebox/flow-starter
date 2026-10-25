@@ -22,6 +22,8 @@ import {
 } from "./host-session.ts";
 import {
   cleanupOrphanedDatabasesForRun,
+  cleanupTerminalJobDatabasesForRun,
+  previewDatabaseRecovery,
   reconcileDatabaseRegistry,
 } from "./infrastructure/database.ts";
 import { runBatch } from "./orchestrate.ts";
@@ -242,25 +244,36 @@ const cmdPrepare = async ({
   arm,
   host,
   repetition,
+  restart,
+  resume,
   runId,
   scenarios,
 }: {
   arm: EvalArm;
   host?: EvalHost;
   repetition: number;
+  restart?: boolean;
+  resume?: boolean;
   runId?: string;
   scenarios: string[];
 }) => {
   assertScenarioIds({ ids: scenarios });
   assertArm({ arm });
+  if (resume && restart) {
+    console.error("prepare: use only one of --resume or --restart");
+    process.exit(3);
+  }
+  const sessionMode = resume ? "resume" : restart ? "restart" : "fresh";
   const prep = await prepareHostRun({
     arm,
     host: host ?? detectEvalHost(),
     repetition,
     runId,
     scenarioIds: scenarios,
+    sessionMode,
   });
   console.log(JSON.stringify(prep, null, 2));
+  if (!prep.ok) process.exit(1);
 };
 
 const cmdNext = ({
@@ -359,6 +372,7 @@ const cmdFinalize = async ({
 }) => {
   const result = await hostSessionFinalize({ modelId, runId });
   console.log(JSON.stringify(result, null, 2));
+  if (result.outcome === "blocked") process.exit(2);
   if (!result.ok) process.exit(1);
   if (result.grades.some((g) => g.gate === "fail")) process.exit(1);
   if (!acceptDiagnostic && result.grades.some((g) => !g.officialEligible))
@@ -420,6 +434,14 @@ const cmdPilotLoop = async ({
     runId: `${runId}-control`,
     scenarioIds: controlScenarios,
   });
+  if (!flowPrep.ok) {
+    console.error(flowPrep.reason);
+    process.exit(1);
+  }
+  if (!controlPrep.ok) {
+    console.error(controlPrep.reason);
+    process.exit(1);
+  }
   writeRemediationProposal({
     runId,
     findings: [
@@ -453,6 +475,10 @@ const cmdPilot = async ({ scenarios }: { scenarios: string[] }) => {
     arm: "flow",
     scenarioIds: scenarios,
   });
+  if (!prep.ok) {
+    console.error(prep.reason);
+    process.exit(1);
+  }
   printAwaitingHost({ host: prep.host, runId: prep.runId });
   process.exit(2);
 };
@@ -506,6 +532,10 @@ const cmdRun = async ({
     runId,
     scenarioIds: scenarios,
   });
+  if (!prep.ok) {
+    console.error(prep.reason);
+    process.exit(1);
+  }
   printAwaitingHost({ host: prep.host, runId: prep.runId });
   process.exit(2);
 };
@@ -557,6 +587,10 @@ const cmdHandoff = async ({
     runId,
     scenarioIds: [agentAScenario],
   });
+  if (!prep.ok) {
+    console.error(prep.reason);
+    process.exit(1);
+  }
   const bPrompt = handoffAgentBPrompt({ variant });
   writeFileSync(
     path.join(runEvalDir(runId), "handoff-agent-b-prompt.txt"),
@@ -631,6 +665,14 @@ const cmdCompareArms = async ({
     runId: controlRun,
     scenarioIds: scenarios,
   });
+  if (!flowPrep.ok) {
+    console.error(flowPrep.reason);
+    process.exit(1);
+  }
+  if (!controlPrep.ok) {
+    console.error(controlPrep.reason);
+    process.exit(1);
+  }
   console.log(
     JSON.stringify(
       {
@@ -898,6 +940,8 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         arm: (flags.arm as EvalArm) ?? "flow",
         host: parseHostFlag(flags.host ? String(flags.host) : undefined),
         repetition: Number(flags.repetition ?? 1),
+        restart: Boolean(flags.restart),
+        resume: Boolean(flags.resume),
         runId: flags["run-id"] ? String(flags["run-id"]) : undefined,
         scenarios: flags.suite
           ? listDefaultDiagnosticScenarioIds()
@@ -913,12 +957,24 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         process.exit(3);
       }
       const runId = String(flags.run);
+      const state = loadHostSessionState({ runId });
+      const resumableStatuses = new Set([
+        "pending",
+        "running",
+        "awaiting-host",
+        "awaiting-record",
+      ]);
+      const activeJobs =
+        state?.jobs.filter((j) => resumableStatuses.has(j.status)) ?? [];
+
       if (flags.reconcile) {
-        const state = loadHostSessionState({ runId });
         const reconcile = await reconcileDatabaseRegistry({ runId });
         console.log(
           JSON.stringify(
             {
+              activeJobs: activeJobs.map(
+                (j) => `${j.scenarioId}/r${j.repetition}:${j.status}`
+              ),
               hostJobs: state?.jobs?.length ?? 0,
               orphanDatabaseNames: reconcile.orphanDatabaseNames,
               reconciled: reconcile.reconciled,
@@ -930,9 +986,66 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         );
         return;
       }
-      const result = await cleanupOrphanedDatabasesForRun({ runId });
-      console.log(JSON.stringify(result, null, 2));
-      if (result.results.some((r) => r.cleanup === "failed")) process.exit(1);
+
+      if (flags["retry-cleanup"]) {
+        if (!state?.jobs?.length) {
+          console.error(
+            "recover-databases --retry-cleanup: no host session jobs"
+          );
+          process.exit(1);
+        }
+        const result = await cleanupTerminalJobDatabasesForRun({
+          jobs: state.jobs,
+          runId,
+        });
+        console.log(
+          JSON.stringify({ ...result, status: "retry-cleanup" }, null, 2)
+        );
+        if (result.results.some((r) => r.cleanup === "failed")) process.exit(1);
+        return;
+      }
+
+      if (flags["abandon-run"]) {
+        if (activeJobs.length > 0) {
+          console.error(
+            JSON.stringify(
+              {
+                activeJobs: activeJobs.map(
+                  (j) => `${j.scenarioId}/r${j.repetition}:${j.status}`
+                ),
+                reason:
+                  "refusing abandon-run while resumable jobs remain; use eval prepare --resume or wait for terminal statuses",
+                status: "refused",
+              },
+              null,
+              2
+            )
+          );
+          process.exit(1);
+        }
+        const result = await cleanupOrphanedDatabasesForRun({ runId });
+        console.log(
+          JSON.stringify({ ...result, status: "abandon-run" }, null, 2)
+        );
+        if (result.results.some((r) => r.cleanup === "failed")) process.exit(1);
+        return;
+      }
+
+      const preview = await previewDatabaseRecovery({ runId });
+      console.log(
+        JSON.stringify(
+          {
+            ...preview,
+            activeJobs: activeJobs.map(
+              (j) => `${j.scenarioId}/r${j.repetition}:${j.status}`
+            ),
+            hostJobs: state?.jobs ?? [],
+            status: "preview",
+          },
+          null,
+          2
+        )
+      );
     },
     "freeze-pilot": () => {
       const result = freezePilot({

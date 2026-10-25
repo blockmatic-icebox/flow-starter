@@ -2,21 +2,23 @@
 
 ## Summary
 
-Factory eval readiness runs runner-owned verification from the checkout root; host-session partial finalize retains databases for resumable jobs; registry locking and resume-safe re-prepare; Neon parallel integration uses real subject worktrees; install.sh delegates validation to `product-adoption.mjs`.
+Factory eval harness is fail-closed on finalization (`complete` | `partial` | `blocked` | `failed` with persisted `finalization-outcome.json`), duplicate `prepare` is rejected, explicit `--resume` / `--restart`, locked atomic database registry mutations, provable DB ownership on provision/cleanup, and non-destructive `recover-databases` preview by default.
 
 ## Commits
 
-- `5896872942fb3236fdbf8fe8bade4610d70b0d3f` — primary remediation on `main`
+- `5896872942fb3236fdbf8fe8bade4610d70b0d3f` — initial remediation on `main`
+- (pending) — finalization, resume, registry, recovery hardening
 
 ## Verification
 
 | Command | Result |
 | --- | --- |
 | `pnpm --dir .agents check` | exit 0 |
-| `pnpm --dir .agents test` | 186+ pass; parallel Neon + install parity skipped without env |
+| `pnpm --dir .agents test` | exit 0 |
+| `pnpm --dir .agents eval:test` | 203 pass |
 | `pnpm --dir .agents eval integrity` | exit 0 |
-| `pnpm --dir .agents eval:integration-gate` | exit 2 BLOCKED when Docker/Neon unavailable (not integration success) |
-| S01 smoke (`complete-s01-smoke.mjs`) | exit 0 diagnostic; `officialEligible: false` |
+| `pnpm --dir .agents eval:integration-gate` | exit 2 BLOCKED when Docker/Neon unavailable |
+| S01 smoke (`complete-s01-smoke.mjs`) | diagnostic; `officialEligible: false` |
 
 ## Out of scope
 

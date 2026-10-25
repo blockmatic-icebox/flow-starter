@@ -1,9 +1,21 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from "node:fs";
 import path from "node:path";
 
 import { agentCliVersion, writeSessionMeta } from "./agent.ts";
 import { controlArmValid } from "./compare.ts";
 import { extractCommands } from "./evidence.ts";
+import {
+  allGradesOfficiallyEligible,
+  deriveHostFinalizationOutcome,
+  expectedHostJobCount,
+} from "./finalization-outcome.ts";
 import type { GeneratedScenario } from "./generation/types.ts";
 import { currentFlowSha, recordCommonSource } from "./git.ts";
 import {
@@ -11,10 +23,11 @@ import {
   runnerCaptureCompleteForScenario,
   runnerTranscriptFileName,
 } from "./host-protocol.ts";
+import { activeDatabasesForRun } from "./infrastructure/database-registry.ts";
 import type { DatabaseLifecycleStatus } from "./infrastructure/database.ts";
 import {
+  cleanupOrphanedDatabasesForRun,
   cleanupSubjectDatabase,
-  cleanupTerminalJobDatabasesForRun,
   prepareSubjectDatabase,
 } from "./infrastructure/database.ts";
 import { captureAgentDiff } from "./isolate.ts";
@@ -54,6 +67,7 @@ import type {
   EvalEvent,
   EvalHost,
   GradeResult,
+  HostFinalizationRecord,
   HostJobStatus,
   PreparedSourceIdentity,
   RunManifest,
@@ -142,8 +156,10 @@ type HostSessionState = {
   scenarioIds: string[];
 };
 
-const statePath = ({ runId }: { runId: string }) =>
+export const hostSessionStatePath = ({ runId }: { runId: string }) =>
   path.join(runEvalDir(runId), "host-session-state.json");
+
+const statePath = hostSessionStatePath;
 
 const generatedScenariosPath = ({ runId }: { runId: string }) =>
   path.join(runEvalDir(runId), "generated-scenarios.json");
@@ -272,7 +288,7 @@ const shouldStopAfterTurn = ({
 
 const buildHostManifest = ({
   arm,
-  grades,
+  grades: _grades,
   host,
   isolationAssessment,
   modelId,
@@ -283,6 +299,7 @@ const buildHostManifest = ({
   scenarioIds,
   worktreePaths,
   databaseCleanup,
+  finalizationOutcome,
 }: {
   arm: EvalArm;
   grades: GradeResult[];
@@ -291,6 +308,7 @@ const buildHostManifest = ({
   modelId?: string;
   runnerCaptureComplete?: boolean;
   databaseCleanup?: DatabaseCleanupSummary;
+  finalizationOutcome?: RunManifest["finalizationOutcome"];
   state: HostSessionState;
   repetition: number;
   runId: string;
@@ -313,14 +331,20 @@ const buildHostManifest = ({
     arm === "control"
       ? controlArmValid({ worktreePaths })
       : { accepted: [], blocking: [], residuals: [] };
-  const allComplete = grades.length === scenarioIds.length * repetition;
+  const manifestCompleteness =
+    finalizationOutcome === "complete"
+      ? "complete"
+      : finalizationOutcome === "blocked"
+        ? "blocked"
+        : "partial";
   return {
     acceptedControlResiduals:
       arm === "control" ? controlCheck.accepted : undefined,
     agentCliVersion: agentCliVersion(),
     arm,
-    completeness: allComplete ? "complete" : "partial",
+    completeness: manifestCompleteness,
     databaseCleanup,
+    finalizationOutcome,
     controlResiduals:
       arm === "control" && controlCheck.blocking.length
         ? controlCheck.blocking
@@ -408,6 +432,138 @@ const cleanupJobsDatabases = async ({
   return summarizeDatabaseCleanup({ allJobs: jobs, outcomes });
 };
 
+export type HostPrepareSessionMode = "fresh" | "resume" | "restart";
+
+export type PrepareHostRunResult =
+  | {
+      host: EvalHost;
+      jobs: HostJob[];
+      ok: true;
+      resumed?: true;
+      runId: string;
+    }
+  | { ok: false; reason: string; recovery?: string; runId: string };
+
+const archiveHostSessionAttempt = ({ runId }: { runId: string }) => {
+  const runDir = runEvalDir(runId);
+  const attemptsDir = path.join(runDir, "attempts");
+  mkdirSync(attemptsDir, { recursive: true });
+  const attemptId = readdirSync(attemptsDir).length + 1;
+  const dest = path.join(attemptsDir, String(attemptId));
+  mkdirSync(dest, { recursive: true });
+  for (const file of ["host-session-state.json", "database-registry.json"]) {
+    const src = path.join(runDir, file);
+    if (existsSync(src)) cpSync(src, path.join(dest, file));
+  }
+  const jobsDir = path.join(runDir, "jobs");
+  if (existsSync(jobsDir))
+    cpSync(jobsDir, path.join(dest, "jobs"), { recursive: true });
+  return attemptId;
+};
+
+const validateResumeHostSession = ({
+  arm,
+  host,
+  repetition,
+  scenarioIds,
+  state,
+}: {
+  arm: EvalArm;
+  host: EvalHost;
+  repetition: number;
+  scenarioIds: string[];
+  state: HostSessionState;
+}) => {
+  if (state.arm !== arm)
+    return { ok: false as const, reason: `arm mismatch: stored ${state.arm}` };
+  if (state.host !== host)
+    return {
+      ok: false as const,
+      reason: `host mismatch: stored ${state.host ?? "unknown"}`,
+    };
+  if (state.repetition !== repetition)
+    return {
+      ok: false as const,
+      reason: `repetition mismatch: stored ${state.repetition}`,
+    };
+  const requested = [...scenarioIds].toSorted().join(",");
+  const stored = [...state.scenarioIds].toSorted().join(",");
+  if (requested !== stored)
+    return {
+      ok: false as const,
+      reason: "scenario set does not match stored host session",
+    };
+  const flowSha = currentFlowSha();
+  if (state.trustedEvaluatorRevision?.commitSha !== flowSha)
+    return {
+      ok: false as const,
+      reason:
+        "incompatible evaluator revision; use eval prepare --restart to start a new attempt",
+    };
+  for (const job of state.jobs) {
+    if (
+      job.worktreePath &&
+      job.status !== "blocked" &&
+      !existsSync(job.worktreePath)
+    )
+      return {
+        ok: false as const,
+        reason: `missing worktree for ${job.scenarioId}/r${job.repetition}`,
+      };
+    if (
+      job.databaseName &&
+      !terminalJobStatuses.has(job.status) &&
+      !activeDatabasesForRun({ runId: state.runId }).some(
+        (e) => e.databaseName === job.databaseName
+      )
+    )
+      return {
+        ok: false as const,
+        reason: `database registry missing active entry for ${job.databaseName}`,
+      };
+  }
+  return { ok: true as const };
+};
+
+export const resumeHostRun = ({
+  arm,
+  host: hostOverride,
+  repetition = 1,
+  runId,
+  scenarioIds,
+}: {
+  arm: EvalArm;
+  host?: EvalHost;
+  repetition?: number;
+  runId: string;
+  scenarioIds: string[];
+}): Promise<PrepareHostRunResult> =>
+  Promise.resolve().then(() => {
+    const state = loadHostSessionState({ runId });
+    if (!state)
+      return {
+        ok: false as const,
+        reason: "host session state missing; run eval prepare first",
+        runId,
+      };
+    const host = hostOverride ?? state.host ?? detectEvalHost();
+    const validation = validateResumeHostSession({
+      arm,
+      host,
+      repetition,
+      scenarioIds,
+      state,
+    });
+    if (!validation.ok) return { ...validation, runId };
+    return {
+      host,
+      jobs: state.jobs,
+      ok: true as const,
+      resumed: true as const,
+      runId,
+    };
+  });
+
 /* eslint-disable complexity -- sequential per-job host preparation */
 export const prepareHostRun = async ({
   arm,
@@ -418,6 +574,7 @@ export const prepareHostRun = async ({
   repetition = 1,
   runId: runIdInput,
   scenarioIds,
+  sessionMode = "fresh",
 }: {
   arm: EvalArm;
   copySkills?: boolean;
@@ -427,14 +584,33 @@ export const prepareHostRun = async ({
   repetition?: number;
   runId?: string;
   scenarioIds: string[];
-}) => {
+  sessionMode?: HostPrepareSessionMode;
+}): Promise<PrepareHostRunResult> => {
   const runId = runIdInput ?? `run-${Date.now()}`;
-  if (runIdInput) {
-    const existing = loadHostSessionState({ runId });
-    await cleanupTerminalJobDatabasesForRun({
-      jobs: existing?.jobs ?? [],
+  const host = hostOverride ?? detectEvalHost();
+  const stateExists = existsSync(statePath({ runId }));
+
+  if (sessionMode === "resume")
+    return resumeHostRun({
+      arm,
+      host,
+      repetition,
       runId,
+      scenarioIds,
     });
+
+  if (stateExists && sessionMode === "fresh")
+    return {
+      ok: false as const,
+      reason: `run ${runId} already exists`,
+      recovery:
+        "use eval prepare --resume to continue or eval prepare --restart for a new attempt",
+      runId,
+    };
+
+  if (sessionMode === "restart" && stateExists) {
+    archiveHostSessionAttempt({ runId });
+    await cleanupOrphanedDatabasesForRun({ runId });
   }
   const flowSha = currentFlowSha();
   const commonSource = recordCommonSource();
@@ -445,7 +621,6 @@ export const prepareHostRun = async ({
   const frozenCatalogHash = catalogHash();
   const frozenScenarioOracleHash = scenarioOracleHash();
   const frozenSkillsLockHash = skillsLockHash();
-  const host = hostOverride ?? detectEvalHost();
   const jobs: HostJob[] = [];
   const generatedById = new Map(
     (generatedScenarios ?? []).map((s) => [s.id, s] as const)
@@ -545,9 +720,12 @@ export const prepareHostRun = async ({
       scenarioId,
     });
     mkdirSync(scenarioDir, { recursive: true });
-    writeFileSync(path.join(scenarioDir, "transcript.jsonl"), "");
-    writeFileSync(path.join(scenarioDir, runnerTranscriptFileName), "");
-    writeFileSync(path.join(scenarioDir, "stream.raw.log"), "");
+    const transcriptPath = path.join(scenarioDir, "transcript.jsonl");
+    if (!existsSync(transcriptPath)) writeFileSync(transcriptPath, "");
+    const runnerPath = path.join(scenarioDir, runnerTranscriptFileName);
+    if (!existsSync(runnerPath)) writeFileSync(runnerPath, "");
+    const streamPath = path.join(scenarioDir, "stream.raw.log");
+    if (!existsSync(streamPath)) writeFileSync(streamPath, "");
     writeSessionMeta({
       prepBaseline: {
         commitSha: prep.commitSha,
@@ -1049,6 +1227,44 @@ const finalizeHostScenario = ({
   };
 };
 
+const jobStatusLabel = (job: HostJob) =>
+  `${job.scenarioId}/r${job.repetition}:${job.status}`;
+
+const persistHostFinalization = ({
+  databaseCleanup,
+  finalization,
+  grades,
+  hostJobs,
+  manifest,
+  runId,
+  runnerCaptureComplete,
+}: {
+  databaseCleanup?: DatabaseCleanupSummary;
+  finalization: HostFinalizationRecord;
+  grades: GradeResult[];
+  hostJobs: HostJob[];
+  manifest: RunManifest;
+  runId: string;
+  runnerCaptureComplete?: boolean;
+}) => {
+  const runDir = runEvalDir(runId);
+  mkdirSync(runDir, { recursive: true });
+  writeFileSync(
+    path.join(runDir, "finalization-outcome.json"),
+    `${JSON.stringify(finalization, null, 2)}\n`
+  );
+  writeRunSummary({
+    databaseCleanup,
+    finalizationOutcome: finalization.outcome,
+    grades,
+    hostJobs,
+    manifest,
+    partial: finalization.outcome === "partial",
+    runDir,
+    runnerCaptureComplete,
+  });
+};
+
 export const hostSessionFinalize = async ({
   modelId,
   runId,
@@ -1058,17 +1274,33 @@ export const hostSessionFinalize = async ({
 }) => {
   const state = loadHostSessionState({ runId });
   if (!state)
-    return { ok: false as const, reason: "host session state missing" };
+    return {
+      finalization: {
+        finalizedAt: new Date().toISOString(),
+        gradeCount: 0,
+        expectedGrades: 0,
+        incompleteJobs: [],
+        officialEligible: false,
+        ok: false,
+        outcome: "blocked" as const,
+        reason: "host session state missing",
+      },
+      grades: [] as GradeResult[],
+      ok: false as const,
+      outcome: "blocked" as const,
+      reason: "host session state missing",
+    };
 
   const incomplete = state.jobs.filter(
     (j) => !terminalJobStatuses.has(j.status)
   );
+  const incompleteJobs = incomplete.map(jobStatusLabel);
   const gradable = state.jobs.filter((j) => j.status === "complete");
-  if (!gradable.length && incomplete.length)
-    return {
-      ok: false as const,
-      reason: `no completed jobs; still running: ${incomplete.map((j) => `${j.scenarioId}/r${j.repetition}`).join(", ")}`,
-    };
+  const expectedGrades = expectedHostJobCount({
+    jobCount: state.jobs.length,
+    repetition: state.repetition,
+    scenarioIds: state.scenarioIds,
+  });
 
   const grades: GradeResult[] = [];
   const worktreePaths: string[] = [];
@@ -1089,6 +1321,13 @@ export const hostSessionFinalize = async ({
     runnerCaptureComplete &&= result.runnerCaptureComplete;
   }
 
+  const derived = deriveHostFinalizationOutcome({
+    expectedGrades,
+    grades,
+    incompleteJobLabels: incompleteJobs,
+    jobs: state.jobs,
+  });
+
   if (modelId) state.modelId = modelId;
   const databaseCleanup = await cleanupJobsDatabases({
     jobs: state.jobs,
@@ -1096,9 +1335,20 @@ export const hostSessionFinalize = async ({
   });
   saveState(state);
 
+  const finalization: HostFinalizationRecord = {
+    ...derived,
+    expectedGrades,
+    finalizedAt: new Date().toISOString(),
+    gradeCount: grades.length,
+    incompleteJobs,
+    officialEligible: allGradesOfficiallyEligible({ grades }),
+    runnerCaptureComplete,
+  };
+
   const manifest = buildHostManifest({
     arm: state.arm,
     databaseCleanup,
+    finalizationOutcome: derived.outcome,
     grades,
     host: state.host,
     isolationAssessment,
@@ -1110,29 +1360,28 @@ export const hostSessionFinalize = async ({
     state,
     worktreePaths,
   });
-  const runDir = runEvalDir(runId);
-  writeFileSync(
-    path.join(runDir, "manifest.json"),
-    `${JSON.stringify(manifest, null, 2)}\n`
-  );
-  writeRunSummary({
+
+  persistHostFinalization({
     databaseCleanup,
+    finalization,
     grades,
     hostJobs: state.jobs,
     manifest,
-    partial: incomplete.length > 0,
-    runDir,
+    runId,
+    runnerCaptureComplete,
   });
 
   return {
     databaseCleanup,
+    finalization,
     grades,
-    incompleteJobs: incomplete.map(
-      (j) => `${j.scenarioId}/r${j.repetition}:${j.status}`
-    ),
+    incompleteJobs,
     manifest,
-    ok: true as const,
-    partial: incomplete.length > 0,
+    ok: derived.ok,
+    outcome: derived.outcome,
+    partial: derived.outcome === "partial",
+    reason: derived.reason,
+    runnerCaptureComplete,
   };
 };
 

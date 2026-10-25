@@ -16,6 +16,27 @@ export type EvalHost = "cursor" | "claude" | "other";
 
 export type Completeness = "complete" | "partial" | "blocked";
 
+export type HostFinalizationOutcomeKind =
+  | "complete"
+  | "partial"
+  | "blocked"
+  | "failed";
+
+export type HostFinalizationOutcome = {
+  ok: boolean;
+  outcome: HostFinalizationOutcomeKind;
+  reason: string;
+};
+
+export type HostFinalizationRecord = HostFinalizationOutcome & {
+  finalizedAt: string;
+  gradeCount: number;
+  expectedGrades: number;
+  incompleteJobs: string[];
+  officialEligible: boolean;
+  runnerCaptureComplete?: boolean;
+};
+
 export type HostJobStatus =
   | "pending"
   | "running"
@@ -122,6 +143,7 @@ export interface RunManifest {
   controlResiduals?: string[];
   acceptedControlResiduals?: string[];
   databaseCleanup?: DatabaseCleanupSummary;
+  finalizationOutcome?: HostFinalizationOutcomeKind;
 }
 
 export type DatabaseCleanupSummary = {

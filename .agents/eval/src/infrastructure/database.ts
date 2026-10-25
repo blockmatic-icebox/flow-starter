@@ -9,11 +9,15 @@ import {
   defaultAdminDatabaseUrl,
   redactDatabaseUrl,
 } from "./connection-url.ts";
+import type { DatabaseRegistryEntry } from "./database-registry.ts";
 import {
   activeDatabasesForRun,
   loadDatabaseRegistry,
   markDatabaseDropped,
+  persistDatabaseRegistry,
   registerSubjectDatabase,
+  registryWithDroppedDatabase,
+  withDatabaseRegistryLock,
 } from "./database-registry.ts";
 import { ensureNeonLocalReady } from "./neon-local.ts";
 import { connectPostgres, pingDatabase } from "./postgres-client.ts";
@@ -51,6 +55,24 @@ const quoteIdent = (name: string) => {
   return `"${name.replaceAll('"', '""')}"`;
 };
 
+export const databaseExists = async ({
+  adminUrl,
+  databaseName,
+}: {
+  adminUrl: string;
+  databaseName: string;
+}) => {
+  const sql = connectPostgres({ url: adminUrl });
+  try {
+    const existing = await sql`
+      select 1 from pg_database where datname = ${databaseName}
+    `;
+    return existing.length > 0;
+  } finally {
+    await sql.end({ timeout: 10 });
+  }
+};
+
 export const createDatabaseIfNotExists = async ({
   adminUrl,
   databaseName,
@@ -60,19 +82,43 @@ export const createDatabaseIfNotExists = async ({
 }) => {
   if (!isOwnedEvalDatabaseName(databaseName))
     throw new Error(`refusing to create database: ${databaseName}`);
+  const alreadyExisted = await databaseExists({ adminUrl, databaseName });
+  if (alreadyExisted)
+    return { alreadyExisted: true, createdByThisProvisioningAttempt: false };
+
   const sql = connectPostgres({ url: adminUrl });
   try {
-    const existing = await sql`
-      select 1 from pg_database where datname = ${databaseName}
-    `;
-    if (existing.length === 0)
-      await sql.unsafe(`create database ${quoteIdent(databaseName)}`);
+    await sql.unsafe(`create database ${quoteIdent(databaseName)}`);
   } finally {
     await sql.end({ timeout: 10 });
   }
+  return { alreadyExisted: false, createdByThisProvisioningAttempt: true };
 };
 
-export const dropOwnedDatabase = async ({
+const emergencyDropProvisionedDatabase = ({
+  adminUrl,
+  databaseName,
+}: {
+  adminUrl: string;
+  databaseName: string;
+}) => {
+  if (!isOwnedEvalDatabaseName(databaseName)) return Promise.resolve();
+  const sql = connectPostgres({ url: adminUrl });
+  return (async () => {
+    try {
+      await sql`
+        select pg_terminate_backend(pid)
+        from pg_stat_activity
+        where datname = ${databaseName} and pid <> pg_backend_pid()
+      `.catch(() => undefined);
+      await sql.unsafe(`drop database if exists ${quoteIdent(databaseName)}`);
+    } finally {
+      await sql.end({ timeout: 10 });
+    }
+  })();
+};
+
+export const dropOwnedDatabase = ({
   adminUrl,
   databaseName,
   runId,
@@ -80,50 +126,42 @@ export const dropOwnedDatabase = async ({
   adminUrl: string;
   databaseName: string;
   runId: string;
-}) => {
-  if (!isOwnedEvalDatabaseName(databaseName))
-    throw new Error(`refusing to drop database: ${databaseName}`);
-  const registry = loadDatabaseRegistry({ runId });
-  const owned = registry.entries.some(
-    (e) => e.databaseName === databaseName && e.status === "active"
-  );
-  if (!owned)
-    throw new Error(`database ${databaseName} not owned by run ${runId}`);
+}) =>
+  withDatabaseRegistryLock({
+    runId,
+    fn: () =>
+      (async () => {
+        const registry = loadDatabaseRegistry({ runId });
+        const owned = registry.entries.some(
+          (e) => e.databaseName === databaseName && e.status === "active"
+        );
+        if (!owned)
+          throw new Error(`database ${databaseName} not owned by run ${runId}`);
 
-  const sql = connectPostgres({ url: adminUrl });
-  try {
-    await sql`
-      select pg_terminate_backend(pid)
-      from pg_stat_activity
-      where datname = ${databaseName} and pid <> pg_backend_pid()
-    `.catch(() => undefined);
-    await sql.unsafe(`drop database if exists ${quoteIdent(databaseName)}`);
-  } finally {
-    await sql.end({ timeout: 10 });
-  }
-  markDatabaseDropped({ databaseName, runId });
-};
-
-const emergencyDropUnregisteredDatabase = async ({
-  adminUrl,
-  databaseName,
-}: {
-  adminUrl: string;
-  databaseName: string;
-}) => {
-  if (!isOwnedEvalDatabaseName(databaseName)) return;
-  const sql = connectPostgres({ url: adminUrl });
-  try {
-    await sql`
-      select pg_terminate_backend(pid)
-      from pg_stat_activity
-      where datname = ${databaseName} and pid <> pg_backend_pid()
-    `.catch(() => undefined);
-    await sql.unsafe(`drop database if exists ${quoteIdent(databaseName)}`);
-  } finally {
-    await sql.end({ timeout: 10 });
-  }
-};
+        const exists = await databaseExists({ adminUrl, databaseName });
+        if (exists) {
+          const sql = connectPostgres({ url: adminUrl });
+          try {
+            await sql`
+            select pg_terminate_backend(pid)
+            from pg_stat_activity
+            where datname = ${databaseName} and pid <> pg_backend_pid()
+          `.catch(() => undefined);
+            await sql.unsafe(
+              `drop database if exists ${quoteIdent(databaseName)}`
+            );
+          } finally {
+            await sql.end({ timeout: 10 });
+          }
+        }
+        persistDatabaseRegistry({
+          registry: registryWithDroppedDatabase({
+            databaseName,
+            registry,
+          }),
+        });
+      })(),
+  });
 
 export const provisionSubjectDatabase = async ({
   adminUrl = defaultAdminDatabaseUrl(),
@@ -137,7 +175,7 @@ export const provisionSubjectDatabase = async ({
   worktreePath: string;
 }) => {
   await ensureNeonLocalReady({ adminUrl });
-  await createDatabaseIfNotExists({
+  const createResult = await createDatabaseIfNotExists({
     adminUrl,
     databaseName: identity.databaseName,
   });
@@ -148,10 +186,16 @@ export const provisionSubjectDatabase = async ({
       subjectKey: identity.subjectKey,
     });
   } catch (error) {
-    await emergencyDropUnregisteredDatabase({
-      adminUrl,
-      databaseName: identity.databaseName,
-    });
+    if (createResult.createdByThisProvisioningAttempt)
+      await emergencyDropProvisionedDatabase({
+        adminUrl,
+        databaseName: identity.databaseName,
+      });
+    if (createResult.alreadyExisted)
+      throw new Error(
+        `database ${identity.databaseName} already exists but is not registered to run ${runId}; manual review required`,
+        { cause: error }
+      );
     throw error;
   }
 
@@ -250,6 +294,16 @@ export const cleanupSubjectDatabase = async ({
     return { cleanup: "passed" as const };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    const missingOwnership = /not owned by run/u.test(message);
+    if (missingOwnership) {
+      const exists = await databaseExists({ adminUrl, databaseName });
+      if (!exists) {
+        await markDatabaseDropped({ databaseName, runId }).catch(
+          () => undefined
+        );
+        return { cleanup: "passed" as const };
+      }
+    }
     return { cleanup: "failed" as const, reason: message };
   }
 };
@@ -266,19 +320,22 @@ export const reconcileDatabaseRegistry = async ({
   let reconciled = 0;
   const orphanDatabaseNames: string[] = [];
   try {
-    if (active.length > 0) {
-      await Promise.all(
-        active.map(async (entry) => {
-          const rows = await sql`
-            select 1 from pg_database where datname = ${entry.databaseName}
-          `;
-          if (rows.length === 0) {
-            markDatabaseDropped({ databaseName: entry.databaseName, runId });
-            reconciled += 1;
-          }
-        })
-      );
-    }
+    const reconcileResults = await Promise.all(
+      active.map(async (entry) => {
+        const rows = await sql`
+          select 1 from pg_database where datname = ${entry.databaseName}
+        `;
+        if (rows.length === 0) {
+          await markDatabaseDropped({
+            databaseName: entry.databaseName,
+            runId,
+          });
+          return 1;
+        }
+        return 0;
+      })
+    );
+    reconciled = reconcileResults.reduce<number>((sum, n) => sum + n, 0);
     const registeredActive = new Set(
       activeDatabasesForRun({ runId }).map((e) => e.databaseName)
     );
@@ -401,22 +458,71 @@ export const prepareSubjectDatabase = async ({
     runId,
     worktreePath,
   });
+  let primaryError: Error | undefined;
   try {
     migrateSubjectDatabase({ worktreePath });
     record.lifecycle.migrations = "passed";
     await verifySubjectDatabase({ worktreePath });
     record.lifecycle.integration = "passed";
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    primaryError = error instanceof Error ? error : new Error(String(error));
     if (record.lifecycle.migrations === "unknown")
       record.lifecycle.migrations = "failed";
     else record.lifecycle.integration = "failed";
-    await cleanupSubjectDatabase({
+    const cleanup = await cleanupSubjectDatabase({
       databaseName: identity.databaseName,
       runId,
     });
-    record.lifecycle.cleanup = retainDatabases() ? "skipped" : "passed";
-    throw new Error(message, { cause: error });
+    record.lifecycle.cleanup =
+      cleanup.cleanup === "skipped"
+        ? "skipped"
+        : cleanup.cleanup === "passed"
+          ? "passed"
+          : "failed";
+    throw primaryError;
   }
   return record;
+};
+
+export const previewDatabaseRecovery = async ({
+  adminUrl = defaultAdminDatabaseUrl(),
+  runId,
+}: {
+  adminUrl?: string;
+  runId: string;
+}) => {
+  const registry = loadDatabaseRegistry({ runId });
+  const sql = connectPostgres({ url: adminUrl });
+  const active = activeDatabasesForRun({ runId });
+  let entries: {
+    databaseName: string;
+    exists: boolean;
+    runId: string;
+    status: DatabaseRegistryEntry["status"];
+    subjectKey: string;
+  }[] = [];
+  try {
+    entries = await Promise.all(
+      active.map(async (entry) => {
+        const rows = await sql`
+          select 1 from pg_database where datname = ${entry.databaseName}
+        `;
+        return {
+          databaseName: entry.databaseName,
+          exists: rows.length > 0,
+          runId: entry.runId,
+          status: entry.status,
+          subjectKey: entry.subjectKey,
+        };
+      })
+    );
+  } finally {
+    await sql.end({ timeout: 10 });
+  }
+  const reconcile = await reconcileDatabaseRegistry({ adminUrl, runId });
+  return {
+    activeRegistryEntries: entries,
+    orphanDatabaseNames: reconcile.orphanDatabaseNames,
+    registryRunId: registry.runId,
+  };
 };
