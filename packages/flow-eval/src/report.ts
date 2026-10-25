@@ -1,7 +1,6 @@
-import { writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 
-import { devEvalsRoot } from "./paths.ts";
 import { redactOrThrow } from "./redact.ts";
 import type { CommandEvidence, GradeResult, RunManifest } from "./types.ts";
 
@@ -120,10 +119,4 @@ export const writeRunSummary = ({
     path.join(runDir, "summary.md"),
     redactOrThrow({ text: lines.join("\n") })
   );
-};
-
-export const ensureRunDir = ({ runId }: { runId: string }) => {
-  const runDir = path.join(devEvalsRoot, runId);
-  if (!existsSync(runDir)) mkdirSync(runDir, { recursive: true });
-  return runDir;
 };

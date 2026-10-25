@@ -10,21 +10,17 @@ import {
   loadPublicScenario,
   loadScenarioOracle,
 } from "./scenarios.ts";
+import { gradeObservedScenario } from "./session-grade.ts";
 import { isBuildAuthorized } from "./stakeholder.ts";
-import {
-  isProtocolVerified,
-  PROTOCOL_ID,
-  sessionCompletenessFromEvents,
-} from "./trace.ts";
+import { isProtocolVerified, PROTOCOL_ID } from "./trace.ts";
 import type {
-  Completeness,
   EvalEvent,
   GradeResult,
   HarnessKind,
   RunManifest,
 } from "./types.ts";
 
-export const loadTranscriptEvents = ({ filePath }: { filePath: string }) => {
+const loadTranscriptEvents = ({ filePath }: { filePath: string }) => {
   if (!existsSync(filePath))
     return { events: [] as EvalEvent[], malformed: false };
   let malformed = false;
@@ -98,33 +94,35 @@ export const gradeScenarioFromRunDir = ({
     ? (JSON.parse(readFileSync(manifestPath, "utf-8")) as RunManifest)
     : null;
   const blind = loadBlindReview({ runId, scenarioId });
+  const worktreePath = existsSync(path.join(scenarioDir, "worktree-path.txt"))
+    ? readFileSync(path.join(scenarioDir, "worktree-path.txt"), "utf-8").trim()
+    : undefined;
+  const harness = harnessFromManifest(manifest);
+  const official = harness === "cursor-cli" && !malformed;
 
-  let completeness: Completeness = sessionCompletenessFromEvents({
+  let baseGrade = gradeObservedScenario({
+    buildAuthorized: isBuildAuthorized({ events, hidden }),
+    card,
+    diff,
     events,
+    harness,
+    hidden,
+    official,
     oracle,
+    protocolVerified: malformed
+      ? false
+      : protocolVerifiedFromManifest(manifest),
+    scenarioId,
+    worktreePath,
   });
-  if (malformed) completeness = "partial";
-  completeness = capCompleteness({ computed: completeness, manifest });
 
-  const protocolVerified = malformed
-    ? false
-    : protocolVerifiedFromManifest(manifest);
-
-  const baseGrade = gradeScenario({
-    input: {
-      buildAuthorized: isBuildAuthorized({ events, hidden }),
-      card,
-      commands,
-      completeness,
-      diff,
-      events,
-      harness: harnessFromManifest(manifest),
-      hidden,
-      oracle,
-      protocolVerified,
-      scenarioId,
-    },
-  });
+  baseGrade = {
+    ...baseGrade,
+    completeness: capCompleteness({
+      computed: baseGrade.completeness,
+      manifest,
+    }),
+  };
 
   if (!blind) return baseGrade;
 
@@ -133,13 +131,16 @@ export const gradeScenarioFromRunDir = ({
       buildAuthorized: isBuildAuthorized({ events, hidden }),
       card,
       commands,
-      completeness,
+      completeness: baseGrade.completeness,
       diff,
       events,
-      harness: harnessFromManifest(manifest),
+      harness,
       hidden,
       oracle,
-      protocolVerified,
+      productOutcomePassed: baseGrade.productOutcomePassed,
+      protocolVerified: malformed
+        ? false
+        : protocolVerifiedFromManifest(manifest),
       scenarioId,
     },
     scoresOverride: mergeBlindScores({

@@ -4,5 +4,6 @@
   "expectsCommands": true,
   "requiresPassingTestCommand": true,
   "requiredDiffPatterns": ["listings-sort"],
-  "allowsProductCode": true
+  "allowsProductCode": true,
+  "productOutcomeCheck": "listings-sort-asc"
 }

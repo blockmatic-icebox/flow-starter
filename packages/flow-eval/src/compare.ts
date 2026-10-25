@@ -56,6 +56,9 @@ export const manifestsCompatible = ({
   return { compatible: issues.length === 0, issues, notes };
 };
 
+const gradeKey = (grade: GradeResult) =>
+  `${grade.scenarioId}@${grade.repetition ?? 1}`;
+
 const compareScenarioGrades = ({
   baselineByScenario,
   currentGrades,
@@ -72,21 +75,21 @@ const compareScenarioGrades = ({
   let qualityRegressed = 0;
 
   for (const cur of currentGrades) {
-    const prev = baselineByScenario.get(cur.scenarioId);
+    const prev = baselineByScenario.get(gradeKey(cur));
     if (!prev) continue;
     const prevGates = new Set(prev.gateIds);
     const curGates = new Set(cur.gateIds);
     for (const id of curGates)
       if (!prevGates.has(id)) {
         gatesRegressed += 1;
-        const line = `${cur.scenarioId}: new gate ${id}`;
+        const line = `${gradeKey(cur)}: new gate ${id}`;
         changes.push(line);
         gateChanges.push(line);
       }
     for (const id of prevGates)
       if (!curGates.has(id)) {
         gatesImproved += 1;
-        const line = `${cur.scenarioId}: cleared gate ${id}`;
+        const line = `${gradeKey(cur)}: cleared gate ${id}`;
         changes.push(line);
         gateChanges.push(line);
       }
@@ -95,12 +98,12 @@ const compareScenarioGrades = ({
     if (typeof prevQuality === "number" && typeof curQuality === "number") {
       if (curQuality < prevQuality) {
         qualityRegressed += 1;
-        const line = `${cur.scenarioId}: quality ${prevQuality} → ${curQuality}`;
+        const line = `${gradeKey(cur)}: quality ${prevQuality} → ${curQuality}`;
         changes.push(line);
         qualityChanges.push(line);
       } else if (curQuality > prevQuality) {
         qualityImproved += 1;
-        const line = `${cur.scenarioId}: quality ${prevQuality} → ${curQuality}`;
+        const line = `${gradeKey(cur)}: quality ${prevQuality} → ${curQuality}`;
         changes.push(line);
         qualityChanges.push(line);
       }
@@ -192,13 +195,13 @@ export const compareRuns = ({
       };
   }
 
-  const byScenario = new Map(baseline.map((g) => [g.scenarioId, g]));
-  const currentIds = new Set(current.map((g) => g.scenarioId));
+  const byScenario = new Map(baseline.map((g) => [gradeKey(g), g]));
+  const currentIds = new Set(current.map((g) => gradeKey(g)));
   const missingInCurrent = [...byScenario.keys()].filter(
     (id) => !currentIds.has(id)
   );
   const missingInBaseline = current
-    .map((g) => g.scenarioId)
+    .map((g) => gradeKey(g))
     .filter((id) => !byScenario.has(id));
 
   const coverageChanges: string[] = [];
@@ -242,12 +245,6 @@ export const compareRuns = ({
     verdict,
   };
 };
-
-export const controlResidualScan = ({
-  worktreePath,
-}: {
-  worktreePath: string;
-}) => listControlResiduals({ worktreePath });
 
 export const controlArmValid = ({
   worktreePaths,

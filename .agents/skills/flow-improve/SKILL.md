@@ -13,7 +13,7 @@ ADR 0013 remains **Proposed**—do not implement the observer, hooks, L0 event l
 ## Steps
 
 1. Classify the issue:
-   - **Product or foundation defect** (feature, bug, architecture in the application)—stop; route to normal [flow](../flow/SKILL.md) work.
+   - **Product or foundation defect** (feature, bug, architecture in the application)—stop; route to normal [flow](../flow/SKILL.md) work. Authorized product repair during Build is separate from methodology promotion (L1 only).
    - **Methodology or skill-routing defect** (wrong stage, wrong skill load, delegation mismatch)—continue below.
    - **One-off model miss** that does not justify an instruction change—stop; note it for the human without editing Flow docs.
 2. Read [.agents/flow/guides/improvement.md](../../flow/guides/improvement.md) and the relevant initiative under `.agents/flow/initiatives/`.

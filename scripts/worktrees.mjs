@@ -89,14 +89,14 @@ function commandPrepare(slug, waveName, repoRoot) {
   console.log(`prepared ${prepared.length} task(s): ${prepared.join(", ")}`);
 }
 
-function commandRun(slug, repoRoot, flags) {
+async function commandRun(slug, repoRoot, flags) {
   const result = loadAndValidateInitiative(slug, repoRoot);
   if (!result.ok) {
     for (const error of result.errors) console.error(error);
     process.exit(1);
   }
   const initiativeRelative = path.relative(repoRoot, result.filePath);
-  const runResult = runInitiative({
+  const runResult = await runInitiative({
     host: flags.host,
     initiativeRelative,
     model: flags.model,

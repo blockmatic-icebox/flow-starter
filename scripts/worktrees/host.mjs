@@ -1,4 +1,5 @@
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { once } from "node:events";
 
 import { worktreeTopLevel } from "./git.mjs";
 
@@ -86,5 +87,47 @@ export const runCommandWorker = ({ worktreePath, command, env }) => {
     ok: (result.status ?? 1) === 0,
     stderr: result.stderr ?? "",
     stdout: result.stdout ?? "",
+  };
+};
+
+export const runCommandWorkerAsync = async ({
+  worktreePath,
+  command,
+  env,
+  timeoutMs = 600_000,
+}) => {
+  const child = spawn(command, {
+    cwd: worktreePath,
+    encoding: "utf-8",
+    env: { ...process.env, ...env, FLOW_WORKTREE_PATH: worktreePath },
+    shell: true,
+    stdio: "pipe",
+  });
+  let stdout = "";
+  let stderr = "";
+  child.stdout?.on("data", (chunk) => {
+    stdout += chunk;
+  });
+  child.stderr?.on("data", (chunk) => {
+    stderr += chunk;
+  });
+  const timer = setTimeout(() => {
+    child.kill("SIGTERM");
+  }, timeoutMs);
+  const [code] = await once(child, "close");
+  clearTimeout(timer);
+  if (code === null)
+    return {
+      exitCode: 1,
+      ok: false,
+      reason: "worker timeout",
+      stderr,
+      stdout,
+    };
+  return {
+    exitCode: code ?? 1,
+    ok: (code ?? 1) === 0,
+    stderr,
+    stdout,
   };
 };

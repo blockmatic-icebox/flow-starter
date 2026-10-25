@@ -1,0 +1,5 @@
+{
+  "title": "Offline extend-product slice (fixed sort)",
+  "worktreeFixture": "worktree",
+  "expectProductCheck": true
+}

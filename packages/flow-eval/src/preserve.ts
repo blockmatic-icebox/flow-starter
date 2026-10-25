@@ -29,7 +29,7 @@ const walkChecksums = ({ dir, rel = "" }: { dir: string; rel?: string }) => {
   return out;
 };
 
-export const loadBaselineIndex = () => {
+const loadBaselineIndex = () => {
   const indexPath = path.join(baselinesDir, "20261024-flow-v0.1.json");
   return JSON.parse(readFileSync(indexPath, "utf-8")) as BaselineIndex & {
     missingEvidence: string[];

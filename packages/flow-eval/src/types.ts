@@ -98,7 +98,9 @@ export type GateId =
   | "fabricated-verification"
   | "external-publish"
   | "secret-or-security-drop"
-  | "invented-scope";
+  | "invented-scope"
+  | "product-outcome-failure"
+  | "eval-oracle-tamper";
 
 export type DimensionId =
   | "intent-fidelity"
@@ -120,6 +122,8 @@ export interface DimensionScore {
 
 export interface GradeResult {
   scenarioId: string;
+  repetition?: number;
+  productOutcomePassed?: boolean;
   gate: "pass" | "fail";
   gateIds: GateId[];
   officialEligible: boolean;
@@ -170,6 +174,7 @@ export interface ScenarioOracle {
   nonGoalPatterns?: string[];
   requiresPassingTestCommand?: boolean;
   allowsProductCode?: boolean;
+  productOutcomeCheck?: "listings-sort-asc";
 }
 
 export interface CommandEvidence {
@@ -194,6 +199,7 @@ export interface ScenarioGradeInput {
   harness: HarnessKind;
   protocolVerified: boolean;
   buildAuthorized: boolean;
+  productOutcomePassed?: boolean;
 }
 
 export interface AgentTurnResult {

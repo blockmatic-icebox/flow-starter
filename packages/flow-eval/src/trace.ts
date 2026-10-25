@@ -374,6 +374,22 @@ export const parseStreamJsonLines = ({
   };
 };
 
+export const resolveScenarioCompleteness = ({
+  events,
+  oracle,
+  official,
+}: {
+  events: EvalEvent[];
+  oracle?: {
+    expectsCommands?: boolean;
+    expectsTools?: boolean;
+  };
+  official: boolean;
+}) => {
+  if (!official) return "partial" as const;
+  return sessionCompletenessFromEvents({ events, oracle });
+};
+
 export const foldSessionTelemetry = ({
   sessionCompleteness,
   sessionProtocolVerified,
@@ -396,7 +412,7 @@ export const foldSessionTelemetry = ({
   protocolVerified: sessionProtocolVerified && turnProtocolVerified,
 });
 
-export const sessionCompletenessFromEvents = ({
+const sessionCompletenessFromEvents = ({
   events,
   oracle,
 }: {

@@ -1,9 +1,4 @@
-import type {
-  CommandEvidence,
-  EvalEvent,
-  PublicScenarioCard,
-  ScenarioOracle,
-} from "./types.ts";
+import type { CommandEvidence, EvalEvent } from "./types.ts";
 
 export const extractCommands = ({ events }: { events: EvalEvent[] }) => {
   const commands: CommandEvidence[] = [];
@@ -36,19 +31,38 @@ export const observedSkillReads = ({ events }: { events: EvalEvent[] }) =>
       e.path.endsWith("SKILL.md")
   );
 
-export const diffHasProductCode = ({ diff }: { diff: string }) => {
-  if (!diff.trim()) return false;
-  if (/^diff --git a\/apps\//mu.test(diff)) return true;
-  return /^diff --git a\/packages\/(?!flow-eval)/mu.test(diff);
+export const extractChangedPaths = ({ diff }: { diff: string }) => {
+  const paths = new Set<string>();
+  for (const line of diff.split("\n")) {
+    const git = line.match(/^diff --git a\/(?<from>.+?) b\/(?<to>.+)$/u);
+    if (git) {
+      const target = git.groups?.to ?? git.groups?.from;
+      if (target) paths.add(target);
+      continue;
+    }
+    const renamedFrom = line.match(/^rename from (?<path>.+)$/u);
+    if (renamedFrom?.groups?.path) paths.add(renamedFrom.groups.path);
+    const renamedTo = line.match(/^rename to (?<path>.+)$/u);
+    if (renamedTo?.groups?.path) paths.add(renamedTo.groups.path);
+  }
+  return [...paths];
 };
 
-export const oracleAllowsProductChange = ({
-  oracle,
-  card,
-}: {
-  oracle?: ScenarioOracle;
-  card: PublicScenarioCard;
-}) => oracle?.allowsProductCode ?? card.allowProductCode;
+export const diffHasProductCode = ({ diff }: { diff: string }) => {
+  if (!diff.trim()) return false;
+  return extractChangedPaths({ diff }).some(
+    (p) =>
+      p.startsWith("apps/") ||
+      (p.startsWith("packages/") && !p.startsWith("packages/flow-eval/"))
+  );
+};
+
+export const diffTouchesEvaluatorOracle = ({ diff }: { diff: string }) =>
+  extractChangedPaths({ diff }).some(
+    (p) =>
+      p.startsWith("packages/flow-eval/scenarios/") ||
+      p.startsWith("packages/flow-eval/fixtures/")
+  );
 
 export const matchesAnyPattern = ({
   text,

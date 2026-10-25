@@ -328,6 +328,8 @@ export function loadAndValidateInitiative(slug, repositoryRootPath) {
 
   const markdown = readFileSync(filePath, "utf-8");
   const parsed = parseInitiativeWaves(markdown);
+  const integratedMatch = /^integrated_acceptance:\s*(.+)$/mu.exec(markdown);
+  parsed.integratedAcceptance = integratedMatch?.[1]?.trim() ?? null;
   const skillIds = loadSkillsLock(repositoryRootPath);
   const errors = validateWaves(parsed, skillIds);
   return { errors, filePath, markdown, ok: errors.length === 0, parsed };

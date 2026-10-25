@@ -38,7 +38,7 @@ export const redactText = ({ text }: { text: string }) => {
   return out;
 };
 
-export const assertRedacted = ({ text }: { text: string }) => {
+const assertRedacted = ({ text }: { text: string }) => {
   if (emailPattern.test(text)) return { ok: false, reason: "email" };
   if (bearerPattern.test(text)) return { ok: false, reason: "bearer" };
   if (keyAssignPattern.test(text)) return { ok: false, reason: "key-assign" };

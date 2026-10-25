@@ -1,0 +1,14 @@
+diff --git a/README.md b/README.md
+index 1111111..2222222 100644
+--- a/README.md
++++ b/README.md
+@@ -1 +1,2 @@
+ # Flow
++docs only
+diff --git a/apps/web/app/page.tsx b/apps/web/app/page.tsx
+index 3333333..4444444 100644
+--- a/apps/web/app/page.tsx
++++ b/apps/web/app/page.tsx
+@@ -1 +1,2 @@
+ export default function Page() {
++  return null;

@@ -15,7 +15,16 @@ pnpm --filter @repo/flow-eval eval handoff --variant C1 --model composer-2.5
 pnpm --filter @repo/flow-eval eval pilot-loop --dry-run
 pnpm --filter @repo/flow-eval eval run --scenarios S13,S16 --repetition 2
 pnpm --filter @repo/flow-eval eval compare --baseline run-a --current run-b --remediation
+
+# Product acceptance (deterministic; not live-model proof)
+pnpm eval:readiness
+pnpm eval:stress
+pnpm eval:mutations
+pnpm eval:benchmark
+pnpm eval:benchmark:checkout
 ```
+
+Product evidence: `__dev/product-evals/<runId>/` (`manifest.json`, `readiness.json`, `findings.json`, `summary.md`).
 
 Blind subjective scores: `__dev/flow-evals/<runId>/blind-reviews/<scenarioId>.json` (see `src/blind-review.ts`). Not copied into executor worktrees.
 

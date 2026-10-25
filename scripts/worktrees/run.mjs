@@ -3,14 +3,17 @@ import os from "node:os";
 import {
   probeCursorAgent,
   runCommandWorker,
+  runCommandWorkerAsync,
   runCursorWorker,
 } from "./host.mjs";
 import { listAllTasks } from "./initiative.mjs";
 import {
   integrateTask,
   prepareReadyTasks,
+  runIntegratedAcceptance,
   verifyTaskResult,
 } from "./lifecycle.mjs";
+import { writeQuestionReport } from "./reports.mjs";
 import { loadState, saveState, setTaskStatus } from "./state.mjs";
 
 const capacity = () => {
@@ -22,7 +25,10 @@ const capacity = () => {
 const workerPrompt = ({ repoRoot, slug, taskId }) =>
   `You are a Flow builder worker. Read the brief at ${repoRoot}/.worktrees/briefs/${slug}/${taskId}.md and complete the task. Change only listed writes. Run acceptance when done.`;
 
-const executeWorker = ({
+const questionWorkerPrompt = ({ repoRoot, slug, taskId }) =>
+  `You are a Flow read-only worker. Read the brief at ${repoRoot}/.worktrees/briefs/${slug}/${taskId}.md. Do not modify any files. Return a concise findings summary in your final message.`;
+
+const executeWorkerSync = ({
   host,
   workerCommand,
   model,
@@ -31,8 +37,6 @@ const executeWorker = ({
   task,
   record,
 }) => {
-  if (task.mode === "question") return { exitCode: 0, ok: true };
-
   if (workerCommand)
     return runCommandWorker({
       command: workerCommand,
@@ -40,14 +44,43 @@ const executeWorker = ({
       worktreePath: record.worktreePath,
     });
 
-  if (host === "cursor")
+  if (host === "cursor") {
+    const prompt =
+      task.mode === "question"
+        ? questionWorkerPrompt({ repoRoot, slug, taskId: task.id })
+        : workerPrompt({ repoRoot, slug, taskId: task.id });
     return runCursorWorker({
       model,
-      prompt: workerPrompt({ repoRoot, slug, taskId: task.id }),
+      prompt,
       worktreePath: record.worktreePath,
     });
+  }
 
   return { exitCode: 1, ok: false, reason: "no worker configured" };
+};
+
+const executeWorkerAsync = (input) => {
+  const { workerCommand, task } = input;
+  if (workerCommand)
+    return runCommandWorkerAsync({
+      command: workerCommand,
+      env: { FLOW_SLUG: input.slug, FLOW_TASK_ID: task.id },
+      worktreePath: input.record.worktreePath,
+    });
+  return Promise.resolve(executeWorkerSync(input));
+};
+
+const persistQuestionOutcome = ({ repoRoot, slug, task, workerResult }) => {
+  const summary = workerResult.stdout?.trim();
+  if (!summary)
+    return { ok: false, reason: "question worker returned empty output" };
+  const report = writeQuestionReport({
+    repoRoot,
+    slug,
+    summary,
+    taskId: task.id,
+  });
+  return { ok: true, reportPath: report.path };
 };
 
 const hasOutstandingWork = (state, tasks) => {
@@ -64,7 +97,128 @@ const hasOutstandingWork = (state, tasks) => {
   });
 };
 
-export const runInitiative = ({
+const finalizeRunStatus = ({ state, tasks }) => {
+  const failed = tasks.some((task) =>
+    ["blocked", "failed"].includes(state?.tasks[task.id]?.status)
+  );
+  const allIntegrated = tasks.every(
+    (task) => state?.tasks[task.id]?.status === "integrated"
+  );
+  if (failed) return { ok: false, status: "failed" };
+  if (!allIntegrated) return { ok: false, status: "partial" };
+  return { ok: true, status: "completed" };
+};
+
+const processTask = async ({
+  host,
+  model,
+  repoRoot,
+  results,
+  slug,
+  state,
+  task,
+  workerCommand,
+  workerFn,
+}) => {
+  const record = state.tasks[task.id];
+  setTaskStatus(state, task.id, "running");
+  saveState({ repoRoot, slug, state });
+
+  const workerResult = workerFn
+    ? await workerFn({ record, repoRoot, state, task })
+    : await executeWorkerAsync({
+        host,
+        model,
+        record,
+        repoRoot,
+        slug,
+        task,
+        workerCommand,
+      });
+
+  if (!workerResult.ok) {
+    setTaskStatus(state, task.id, "failed", {
+      error: workerResult.reason ?? `worker exit ${workerResult.exitCode}`,
+    });
+    results.push({ taskId: task.id, workerResult });
+    saveState({ repoRoot, slug, state });
+    return;
+  }
+
+  let questionReportPath = null;
+  if (task.mode === "question") {
+    const persisted = persistQuestionOutcome({
+      repoRoot,
+      slug,
+      task,
+      workerResult,
+    });
+    if (!persisted.ok) {
+      setTaskStatus(state, task.id, "failed", { error: persisted.reason });
+      results.push({ persisted, taskId: task.id });
+      saveState({ repoRoot, slug, state });
+      return;
+    }
+    questionReportPath = persisted.reportPath;
+  }
+
+  const verified = verifyTaskResult({ repoRoot, slug, state, task });
+  if (!verified.ok) {
+    results.push({ taskId: task.id, verified });
+    saveState({ repoRoot, slug, state });
+    return;
+  }
+
+  if (task.mode === "build") {
+    const integrated = integrateTask({ repoRoot, slug, state, task });
+    results.push({ integrated, taskId: task.id });
+  } else {
+    setTaskStatus(state, task.id, "integrated", {
+      integrationSha: null,
+      questionReportPath,
+    });
+    results.push({ integrated: true, taskId: task.id });
+  }
+  saveState({ repoRoot, slug, state });
+};
+
+const runReadyBatch = async ({
+  batch,
+  host,
+  maxConcurrent,
+  model,
+  repoRoot,
+  results,
+  slug,
+  state,
+  workerCommand,
+  workerFn,
+}) => {
+  const limit = workerFn || workerCommand ? maxConcurrent : 1;
+  const queue = [...batch];
+  const workers = Array.from({ length: Math.min(limit, queue.length) }, () =>
+    (async () => {
+      while (queue.length > 0) {
+        const task = queue.shift();
+        if (!task) break;
+        await processTask({
+          host,
+          model,
+          repoRoot,
+          results,
+          slug,
+          state,
+          task,
+          workerCommand,
+          workerFn,
+        });
+      }
+    })()
+  );
+  await Promise.all(workers);
+};
+
+export const runInitiative = async ({
   repoRoot,
   slug,
   parsed,
@@ -73,21 +227,28 @@ export const runInitiative = ({
   host,
   workerCommand,
   model,
+  workerFn,
 }) => {
   let hostWarning = null;
   let maxConcurrent = 1;
   let parallelClaimed = false;
+  const supportsAsyncPool = Boolean(workerFn || workerCommand);
 
   if (host === "cursor") {
     const probe = probeCursorAgent();
     if (!probe.ok) {
       hostWarning = probe.reason;
-      if (!workerCommand)
+      if (!workerCommand && !workerFn)
         return { hostWarning, ok: false, reason: probe.reason };
-    } else if (!workerCommand) {
+    } else if (!workerCommand && !workerFn) {
       parallelClaimed = true;
       maxConcurrent = capacity();
     }
+  }
+
+  if (supportsAsyncPool) {
+    parallelClaimed = true;
+    maxConcurrent = capacity();
   }
 
   const tasks = listAllTasks(parsed);
@@ -106,109 +267,72 @@ export const runInitiative = ({
     if (ready.length === 0) break;
 
     const batch = ready.slice(0, maxConcurrent);
-    for (const task of batch) {
-      const record = state.tasks[task.id];
-      setTaskStatus(state, task.id, "running");
-      saveState({ repoRoot, slug, state });
-
-      const workerResult = executeWorker({
-        host,
-        model,
-        record,
-        repoRoot,
-        slug,
-        task,
-        workerCommand,
-      });
-
-      if (!workerResult.ok) {
-        setTaskStatus(state, task.id, "failed", {
-          error: workerResult.reason ?? `worker exit ${workerResult.exitCode}`,
-        });
-        results.push({ taskId: task.id, workerResult });
-        saveState({ repoRoot, slug, state });
-        continue;
-      }
-
-      const verified = verifyTaskResult({ state, task });
-      if (!verified.ok) {
-        results.push({ taskId: task.id, verified });
-        saveState({ repoRoot, slug, state });
-        continue;
-      }
-
-      if (task.mode === "build") {
-        const integrated = integrateTask({ repoRoot, slug, state, task });
-        results.push({ integrated, taskId: task.id });
-      } else {
-        setTaskStatus(state, task.id, "integrated", { integrationSha: null });
-        results.push({ integrated: true, taskId: task.id });
-      }
-      saveState({ repoRoot, slug, state });
-    }
+    await runReadyBatch({
+      batch,
+      host,
+      maxConcurrent,
+      model,
+      repoRoot,
+      results,
+      slug,
+      state,
+      workerCommand,
+      workerFn,
+    });
   }
 
-  const state = loadState({ repoRoot, slug });
+  let state = loadState({ repoRoot, slug });
+  const integrated = runIntegratedAcceptance({
+    command: parsed.integratedAcceptance,
+    repoRoot,
+    slug,
+  });
+  if (integrated.exitCode !== 0) {
+    return {
+      hostWarning,
+      integratedAcceptance: integrated,
+      maxConcurrent,
+      ok: false,
+      parallelClaimed,
+      reason: "integrated acceptance failed",
+      results,
+      state,
+      status: "failed",
+    };
+  }
+
+  state = loadState({ repoRoot, slug });
+  const finalStatus = finalizeRunStatus({ state, tasks });
   return {
     hostWarning,
     maxConcurrent,
-    ok: true,
+    ok: finalStatus.ok,
     parallelClaimed,
     results,
     state,
+    status: finalStatus.status,
   };
 };
 
-export const runSequentialForTests = ({
+export const runSequentialForTests = async ({
   repoRoot,
   slug,
   parsed,
   initiativeRelative,
   workerFn,
 }) => {
-  const tasks = listAllTasks(parsed);
-
-  while (hasOutstandingWork(loadState({ repoRoot, slug }), tasks)) {
-    const { state } = prepareReadyTasks({
-      initiativeRelative,
-      parsed,
-      repoRoot,
-      slug,
-    });
-
-    const ready = tasks.filter((t) => state.tasks[t.id]?.status === "ready");
-    if (ready.length === 0) break;
-
-    for (const task of ready) {
-      const record = state.tasks[task.id];
-      setTaskStatus(state, task.id, "running");
-      workerFn({ record, repoRoot, state, task });
-      const verified = verifyTaskResult({ state, task });
-      if (!verified.ok) {
-        saveState({ repoRoot, slug, state });
-        return { ok: false, state, taskId: task.id, verified };
-      }
-      if (task.mode === "build") {
-        const integrated = integrateTask({ repoRoot, slug, state, task });
-        if (!integrated.ok) {
-          saveState({ repoRoot, slug, state });
-          return { integrated, ok: false, state, taskId: task.id };
-        }
-      } else
-        setTaskStatus(state, task.id, "integrated", { integrationSha: null });
-
-      saveState({ repoRoot, slug, state });
-    }
-  }
-
-  const state = loadState({ repoRoot, slug });
-  const failed = tasks.some((task) =>
-    ["blocked", "failed"].includes(state?.tasks[task.id]?.status)
-  );
-  const allIntegrated = tasks.every(
-    (task) => state?.tasks[task.id]?.status === "integrated"
-  );
-  if (failed || !allIntegrated)
-    return { allIntegrated, failed, ok: false, state };
-  return { ok: true, state };
+  const result = await runInitiative({
+    initiativeRelative,
+    parsed,
+    repoRoot,
+    slug,
+    workerFn,
+  });
+  if (!result.ok)
+    return {
+      failed: result.status === "failed",
+      ok: false,
+      state: result.state,
+    };
+  return { ok: true, state: result.state };
 };

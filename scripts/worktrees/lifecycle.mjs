@@ -14,10 +14,12 @@ import {
   advanceMainIfSafe,
   ensureIntegrationWorktree,
   integrationMergeClean,
+  integrationWorktreePath,
   verifyOnIntegration,
 } from "./integrate.mjs";
 import { acquireIntegrateLock } from "./lock.mjs";
 import { commitTaskChanges, findOutOfScopePaths } from "./ownership.mjs";
+import { loadQuestionReport } from "./reports.mjs";
 import {
   getTaskRecord,
   initState,
@@ -154,7 +156,7 @@ export const prepareReadyTasks = ({
   return { prepared: ready, state, tasksById };
 };
 
-export const verifyTaskResult = ({ state, task }) => {
+export const verifyTaskResult = ({ state, task, repoRoot, slug }) => {
   const record = getTaskRecord(state, task.id);
   const cwd = record.worktreePath;
   if (!cwd) return { ok: false, reason: "missing worktree" };
@@ -168,7 +170,16 @@ export const verifyTaskResult = ({ state, task }) => {
       });
       return { ok: false, reason: "question task dirty" };
     }
-    setTaskStatus(state, task.id, "ready-to-integrate");
+    const report = loadQuestionReport({ repoRoot, slug, taskId: task.id });
+    if (!report?.summary?.trim()) {
+      setTaskStatus(state, task.id, "failed", {
+        error: "missing question worker report",
+      });
+      return { ok: false, reason: "missing question report" };
+    }
+    setTaskStatus(state, task.id, "ready-to-integrate", {
+      questionReportPath: report.path,
+    });
     return { ok: true };
   }
 
@@ -290,6 +301,14 @@ export const integrateTask = ({ repoRoot, slug, state, task }) => {
   } finally {
     lock.release();
   }
+};
+
+export const runIntegratedAcceptance = ({ repoRoot, slug, command }) => {
+  if (!command) return { exitCode: 0, stderr: "", stdout: "" };
+  const integrationCwd = integrationWorktreePath({ repoRoot, slug });
+  if (!existsSync(integrationCwd))
+    return runAcceptance({ command, cwd: repoRoot });
+  return runAcceptance({ command, cwd: integrationCwd });
 };
 
 export const safeCleanupTask = ({ repoRoot, slug, state, taskId, force }) => {

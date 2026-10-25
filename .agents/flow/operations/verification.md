@@ -63,6 +63,12 @@ When Playwright flakes with `net::ERR_ABORTED` against `localhost`, stop stray d
 
 When behavior is unclear (RSC boundaries, caching, server errors), use `pnpm mcp:next` with the dev server running, then confirm the fix in the browser.
 
+## Product readiness vs methodology eval
+
+- **Flow methodology** (`pnpm --filter @repo/flow-eval eval run`, gates, official eligible) measures agent behavior against scenario cards. It does not by itself prove product quality.
+- **Product readiness** (`pnpm eval:readiness`, `pnpm eval:stress`) uses allowlisted commands and writes evidence under `__dev/product-evals/`. Engineering, feature, and usability dimensions are reported separately; `READY` requires observed evidence for release-blocking criteria.
+- Automated browser checks support usability verification; they are not a substitute for human usability validation.
+
 ## Done when
 
 The affected flows were exercised in a real browser, related routes were checked, automated tests that match the change were run, and the report names the **session id**, **base URL**, and what **snapshot**, **screenshot**, **errors**, and **console** showed—or states that agent-browser was unavailable.

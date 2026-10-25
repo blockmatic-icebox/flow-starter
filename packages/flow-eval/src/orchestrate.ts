@@ -10,7 +10,6 @@ import {
 } from "./agent.ts";
 import { controlArmValid } from "./compare.ts";
 import { extractCommands } from "./evidence.ts";
-import { gradeScenario } from "./grade.ts";
 import {
   applyScenarioFixture,
   captureAgentDiff,
@@ -28,10 +27,17 @@ import {
   loadScenarioOracle,
   scenarioOracleHash,
 } from "./scenarios.ts";
+import { gradeObservedScenario } from "./session-grade.ts";
 import { skillsLockHash } from "./skills-lock.ts";
-import { isBuildAuthorized, stakeholderReply } from "./stakeholder.ts";
+import { stakeholderReply } from "./stakeholder.ts";
 import { foldSessionTelemetry, PROTOCOL_ID } from "./trace.ts";
-import type { EvalArm, EvalEvent, RunManifest, TokenUsage } from "./types.ts";
+import type {
+  EvalArm,
+  EvalEvent,
+  GradeResult,
+  RunManifest,
+  TokenUsage,
+} from "./types.ts";
 
 const currentFlowSha = () =>
   spawnSync("git", ["rev-parse", "HEAD"], {
@@ -57,6 +63,7 @@ export const runScenarioSession = ({
   prepBaselineSha,
   customTurnOnePrompt,
   maxTurns,
+  repetition,
 }: {
   runId: string;
   scenarioId: string;
@@ -67,6 +74,7 @@ export const runScenarioSession = ({
   prepBaselineSha?: string;
   customTurnOnePrompt?: string;
   maxTurns?: number;
+  repetition?: number;
 }) => {
   if (official) {
     const auth = assertAgentAuth();
@@ -114,7 +122,7 @@ export const runScenarioSession = ({
   writeFileSync(rawLog, "");
 
   let sessionId: string | undefined;
-  let completeness: RunManifest["completeness"] = "partial";
+  let sessionCompleteness: RunManifest["completeness"] = "complete";
   let protocolVerified = true;
   let usage: TokenUsage | undefined;
   let eventSeq = 0;
@@ -152,13 +160,13 @@ export const runScenarioSession = ({
       eventSeq += result.events.length;
       if (result.usage) usage = result.usage;
       const folded = foldSessionTelemetry({
-        sessionCompleteness: completeness,
+        sessionCompleteness,
         sessionProtocolVerified: protocolVerified,
         termination: result.termination,
         turnCompleteness: result.completeness,
         turnProtocolVerified: result.protocolVerified,
       });
-      completeness = folded.completeness;
+      sessionCompleteness = folded.completeness;
       protocolVerified = folded.protocolVerified;
     } else {
       const dryEvent: EvalEvent = {
@@ -206,25 +214,29 @@ export const runScenarioSession = ({
   );
 
   const events = loadTranscript({ eventsPath });
+  const grade = gradeObservedScenario({
+    card,
+    diff: diffCapture.patch,
+    events,
+    harness: official ? "cursor-cli" : "diagnostic-unofficial",
+    hidden,
+    official,
+    oracle,
+    protocolVerified,
+    repetition,
+    scenarioId,
+    worktreePath,
+  });
   const commands = extractCommands({ events });
-  const grade = gradeScenario({
-    input: {
-      assistantClaims: undefined,
-      buildAuthorized: isBuildAuthorized({ events, hidden }),
-      card,
-      commands,
-      completeness,
-      diff: diffCapture.patch,
-      events,
-      harness: official ? "cursor-cli" : "diagnostic-unofficial",
-      hidden,
-      oracle,
-      protocolVerified,
-      scenarioId,
-    },
+
+  writeScenarioReport({
+    commands,
+    grade,
+    runDir,
+    scenarioId,
   });
 
-  writeScenarioReport({ commands, grade, runDir, scenarioId });
+  const completeness = grade.completeness;
 
   return {
     completeness,
@@ -266,7 +278,7 @@ const buildBatchManifest = ({
   aggregateUsage?: TokenUsage;
   arm: EvalArm;
   controlCheck: ReturnType<typeof controlArmValid>;
-  grades: ReturnType<typeof gradeScenario>[];
+  grades: GradeResult[];
   modelId: string;
   official: boolean;
   repetition: number;
@@ -333,7 +345,8 @@ export const runBatch = ({
         arm,
         modelId,
         official,
-        runId: rep === 0 ? runId : `${runId}-r${rep + 1}`,
+        repetition: rep + 1,
+        runId,
         scenarioId,
       });
       if (!result.ok) {

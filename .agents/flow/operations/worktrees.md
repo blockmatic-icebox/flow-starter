@@ -30,6 +30,8 @@ Plan approval is not Build authorization.
 
 Also `blocked` (merge conflict, dirty main, unmet prerequisite) and `failed` (worker or acceptance failure). State is stored under `.worktrees/state/<slug>.json` (gitignored).
 
+`pnpm worktrees run` finishes with `ok: false` when any required task is `failed` or `blocked`, or not all tasks reached `integrated`. Question-mode workers must produce non-empty output; reports live under `.worktrees/reports/<slug>/<taskId>.json`. Command-worker runs use a bounded async pool (`FLOW_WORKTREE_CAPACITY`). Optional initiative line `integrated_acceptance: <command>` runs on the integration worktree after all tasks complete.
+
 ## Initiative wave format
 
 Add a `## Waves` section to the initiative. Each `### Wave <name>` groups tasks that may run together after dependencies are satisfied.

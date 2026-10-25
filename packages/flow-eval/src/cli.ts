@@ -8,6 +8,13 @@ import { handoffAgentBPrompt } from "./handoff.ts";
 import { runBatch, runScenarioSession } from "./orchestrate.ts";
 import { devEvalsRoot, baselineRunId } from "./paths.ts";
 import { verifyBaselinePreserved } from "./preserve.ts";
+import {
+  runMutationIntegrity,
+  runOfflineBenchmark,
+} from "./product/mutations.ts";
+import { writeProductEvalArtifacts } from "./product/persist.ts";
+import { evaluateReadiness } from "./product/readiness.ts";
+import { runStressEvaluation } from "./product/stress.ts";
 import { listPublicScenarioIds } from "./scenarios.ts";
 import type { EvalArm } from "./types.ts";
 
@@ -23,6 +30,10 @@ Usage:
   pnpm --filter @repo/flow-eval eval pilot-loop [--model <id>] [--dry-run]
   pnpm --filter @repo/flow-eval eval compare-arms [--scenarios S05,S09,S13] [--dry-run]
   pnpm --filter @repo/flow-eval eval handoff --variant C1 [--model <id>] [--dry-run]
+  pnpm --filter @repo/flow-eval eval readiness [--run <id>]
+  pnpm --filter @repo/flow-eval eval stress [--run <id>] [--cycles N]
+  pnpm --filter @repo/flow-eval eval mutations
+  pnpm --filter @repo/flow-eval eval benchmark --id benchmark-a|benchmark-b
 `);
 };
 
@@ -438,8 +449,50 @@ const dispatchCompareCli = (flags: Record<string, unknown>) => {
   });
 };
 
+const cmdReadiness = ({ runId }: { runId: string }) => {
+  const readiness = evaluateReadiness({ runId });
+  writeProductEvalArtifacts({ readiness, runId });
+  console.log(JSON.stringify(readiness, null, 2));
+  if (readiness.releaseVerdict !== "READY") process.exit(1);
+};
+
+const cmdStress = ({ runId, cycles }: { runId: string; cycles: number }) => {
+  const result = runStressEvaluation({
+    maxRemediationCycles: cycles,
+    runId,
+  });
+  console.log(JSON.stringify(result, null, 2));
+  if (!result.ok) process.exit(1);
+};
+
+const cmdMutations = () => {
+  const result = runMutationIntegrity();
+  console.log(JSON.stringify(result, null, 2));
+  if (!result.ok) process.exit(1);
+};
+
+const cmdBenchmark = ({ id }: { id: "benchmark-a" | "benchmark-b" }) => {
+  const result = runOfflineBenchmark({ benchmarkId: id });
+  console.log(JSON.stringify(result, null, 2));
+  if (!result.ok) process.exit(1);
+};
+
 const dispatchCli = (command: string, flags: Record<string, unknown>) => {
   const handlers: Record<string, () => void> = {
+    benchmark: () =>
+      cmdBenchmark({
+        id: (flags.id as "benchmark-a" | "benchmark-b") ?? "benchmark-a",
+      }),
+    mutations: () => cmdMutations(),
+    readiness: () =>
+      cmdReadiness({
+        runId: String(flags.run ?? `readiness-${Date.now()}`),
+      }),
+    stress: () =>
+      cmdStress({
+        cycles: Number(flags.cycles ?? 3),
+        runId: String(flags.run ?? `stress-${Date.now()}`),
+      }),
     compare: () => dispatchCompareCli(flags),
     "compare-arms": () =>
       cmdCompareArms({

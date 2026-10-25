@@ -6,7 +6,7 @@
   "scripts": {
     "check-types": "tsc-ts --noEmit",
     "eval": "node --import tsx src/cli.ts",
-    "test": "node --import tsx --test src/**/*.test.ts"
+    "test": "node --import tsx --test 'src/**/*.test.ts' 'src/product/**/*.test.ts'"
   },
   "devDependencies": {
     "@repo/ts": "workspace:*",

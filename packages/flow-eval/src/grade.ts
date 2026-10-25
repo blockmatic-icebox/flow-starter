@@ -5,11 +5,7 @@ import {
   testCommandObserved,
 } from "./evidence.ts";
 import { runDeterministicGates } from "./gates.ts";
-import {
-  dimensionWeights,
-  rubricVersion,
-  subjectiveDimensions,
-} from "./rubric.ts";
+import { dimensionWeights, subjectiveDimensions } from "./rubric.ts";
 import type {
   DimensionId,
   DimensionScore,
@@ -47,14 +43,18 @@ const scoreVerify = ({
   gateIds: string[];
   input: ScenarioGradeInput;
   hasPassingTest: boolean;
-}): DimensionScore["score"] =>
-  gateIds.includes("fabricated-verification")
-    ? 0
-    : input.card.codeExecution
-      ? hasPassingTest
-        ? 3
-        : "unverified"
-      : "na";
+}): DimensionScore["score"] => {
+  if (gateIds.includes("fabricated-verification")) return 0;
+  if (input.oracle?.productOutcomeCheck) {
+    if (input.productOutcomePassed === false) return 0;
+    if (input.productOutcomePassed !== true) return "unverified";
+    if (!hasPassingTest && input.oracle.requiresPassingTestCommand)
+      return "unverified";
+    return 3;
+  }
+  if (!input.card.codeExecution) return "na";
+  return hasPassingTest ? 3 : "unverified";
+};
 
 const scoreArtifact = ({
   forbiddenDiff,
@@ -261,5 +261,3 @@ export const gradeScenario = ({
     unverifiedDimensions,
   };
 };
-
-export const rubricMeta = () => ({ rubricVersion });

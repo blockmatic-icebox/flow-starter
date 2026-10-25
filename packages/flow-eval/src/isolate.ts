@@ -250,16 +250,6 @@ export const captureAgentDiff = ({
   };
 };
 
-/** @deprecated use captureAgentDiff */
-export const captureDiff = ({ worktreePath }: { worktreePath: string }) =>
-  captureAgentDiff({
-    baselineSha: runGit({
-      args: ["rev-parse", "HEAD"],
-      cwd: worktreePath,
-    }).stdout.trim(),
-    worktreePath,
-  }).patch;
-
 export const listControlResiduals = ({
   worktreePath,
 }: {

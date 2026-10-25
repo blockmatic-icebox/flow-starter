@@ -1,0 +1,5 @@
+{
+  "title": "Offline new-product slice (listings sort)",
+  "worktreeFixture": "worktree",
+  "expectProductCheck": false
+}

@@ -10,11 +10,12 @@ import {
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { setTimeout as delay } from "node:timers/promises";
 
 import { runGit, revParse } from "./worktrees/git.mjs";
 import { loadAndValidateInitiative } from "./worktrees/initiative.mjs";
 import { prepareReadyTasks, safeCleanupTask } from "./worktrees/lifecycle.mjs";
-import { runSequentialForTests } from "./worktrees/run.mjs";
+import { runInitiative, runSequentialForTests } from "./worktrees/run.mjs";
 import { loadState } from "./worktrees/state.mjs";
 
 const initGitRepo = (root) => {
@@ -98,10 +99,10 @@ function repoWithInitiative(body) {
   return root;
 }
 
-test("independent tasks integrate into main", () => {
+test("independent tasks integrate into main", async () => {
   const root = repoWithInitiative(twoParallelInitiative);
   const parsed = loadAndValidateInitiative("demo", root).parsed;
-  const result = runSequentialForTests({
+  const result = await runSequentialForTests({
     initiativeRelative: "docs/initiatives/demo.md",
     parsed,
     repoRoot: root,
@@ -112,6 +113,7 @@ test("independent tasks integrate into main", () => {
         recursive: true,
       });
       writeFileSync(path.join(record.worktreePath, file), task.id, "utf-8");
+      return { ok: true, stdout: `built ${task.id}` };
     },
   });
   assert.equal(result.ok, true);
@@ -122,10 +124,10 @@ test("independent tasks integrate into main", () => {
   assert.equal(state.tasks.c.status, "integrated");
 });
 
-test("dependent task starts from integrated main", () => {
+test("dependent task starts from integrated main", async () => {
   const root = repoWithInitiative(twoParallelInitiative);
   const parsed = loadAndValidateInitiative("demo", root).parsed;
-  runSequentialForTests({
+  await runSequentialForTests({
     initiativeRelative: "docs/initiatives/demo.md",
     parsed,
     repoRoot: root,
@@ -139,16 +141,17 @@ test("dependent task starts from integrated main", () => {
         `${task.id}\n`,
         "utf-8"
       );
+      return { ok: true, stdout: `built ${task.id}` };
     },
   });
   const mainC = readFileSync(path.join(root, "pkg/c.txt"), "utf-8");
   assert.ok(mainC.includes("c"));
 });
 
-test("out-of-scope changes fail verification", () => {
+test("out-of-scope changes fail verification", async () => {
   const root = repoWithInitiative(twoParallelInitiative);
   const parsed = loadAndValidateInitiative("demo", root).parsed;
-  const result = runSequentialForTests({
+  const result = await runSequentialForTests({
     initiativeRelative: "docs/initiatives/demo.md",
     parsed,
     repoRoot: root,
@@ -159,6 +162,7 @@ test("out-of-scope changes fail verification", () => {
         "nope",
         "utf-8"
       );
+      return { ok: true, stdout: "evil" };
     },
   });
   assert.equal(result.ok, false);
@@ -255,11 +259,11 @@ test("concurrent write overlap across waves is rejected", () => {
   assert.ok(result.errors.some((e) => e.includes("concurrent write overlap")));
 });
 
-test("no push commands in worktrees CLI path", () => {
+test("no push commands in worktrees CLI path", async () => {
   const root = repoWithInitiative(twoParallelInitiative);
   const before = revParse({ cwd: root });
   const parsed = loadAndValidateInitiative("demo", root).parsed;
-  runSequentialForTests({
+  await runSequentialForTests({
     initiativeRelative: "docs/initiatives/demo.md",
     parsed,
     repoRoot: root,
@@ -273,9 +277,69 @@ test("no push commands in worktrees CLI path", () => {
         task.id,
         "utf-8"
       );
+      return { ok: true, stdout: `built ${task.id}` };
     },
   });
   const remote = spawnSync("git", ["remote"], { cwd: root, encoding: "utf-8" });
   assert.equal(remote.stdout.trim(), "");
   assert.notEqual(revParse({ cwd: root }), before);
+});
+
+test("question worker without output fails verification", async () => {
+  const body = `
+## Waves
+
+### Wave one
+
+#### task: review
+
+- mode: question
+- flow_stage: Review
+- depends_on: []
+- writes: []
+- reads:
+  - README.md
+- skills:
+  - incremental-implementation
+`;
+  const root = repoWithInitiative(body);
+  const parsed = loadAndValidateInitiative("demo", root).parsed;
+  const result = await runInitiative({
+    initiativeRelative: "docs/initiatives/demo.md",
+    parsed,
+    repoRoot: root,
+    slug: "demo",
+    workerFn: () => ({ ok: true, stdout: "" }),
+  });
+  assert.equal(result.ok, false);
+});
+
+test("parallel workers overlap under async pool", async () => {
+  const root = repoWithInitiative(twoParallelInitiative);
+  const parsed = loadAndValidateInitiative("demo", root).parsed;
+  let inFlight = 0;
+  let maxSeen = 0;
+  const result = await runInitiative({
+    initiativeRelative: "docs/initiatives/demo.md",
+    parsed,
+    repoRoot: root,
+    slug: "demo",
+    workerFn: async ({ record, task }) => {
+      inFlight += 1;
+      maxSeen = Math.max(maxSeen, inFlight);
+      await delay(50);
+      inFlight -= 1;
+      mkdirSync(path.dirname(path.join(record.worktreePath, task.writes[0])), {
+        recursive: true,
+      });
+      writeFileSync(
+        path.join(record.worktreePath, task.writes[0]),
+        task.id,
+        "utf-8"
+      );
+      return { ok: true, stdout: `built ${task.id}` };
+    },
+  });
+  assert.equal(result.ok, true);
+  assert.ok(maxSeen >= 2);
 });
