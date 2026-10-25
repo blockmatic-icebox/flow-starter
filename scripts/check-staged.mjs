@@ -93,6 +93,11 @@ export const stagedChecks = (paths) => {
   );
   if (groups.code.length > 0)
     checks.push({ args: ["exec", "oxlint", ...groups.code], cmd: "pnpm" });
+  const touchesWebApp = paths.some(
+    (file) => file.startsWith("apps/web/app/") && codePattern.test(file)
+  );
+  if (touchesWebApp)
+    checks.push({ args: ["--filter", "web", "check-types"], cmd: "pnpm" });
   if (codeForOxfmt.length > 0)
     checks.push({
       args: ["exec", "oxfmt", "--check", ...codeForOxfmt],

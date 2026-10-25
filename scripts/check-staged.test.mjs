@@ -49,6 +49,17 @@ test("selects lightweight checks and skips the full suite", () => {
     false
   );
 
+  const webApp = stagedChecks(["apps/web/app/features/page.tsx"]);
+  assert.equal(
+    webApp.some(
+      (check) =>
+        check.cmd === "pnpm" &&
+        check.args.includes("--filter") &&
+        check.args.includes("web")
+    ),
+    true
+  );
+
   const security = stagedChecks(["scripts/scan-secrets-staged.mjs"]);
   assert.equal(
     security.some((check) => check.args.includes("--test")),
