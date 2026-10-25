@@ -20,6 +20,7 @@ import {
   prepareHostRun,
   scenarioWorkerBrief,
 } from "./host-session.ts";
+import { cleanupOrphanedDatabasesForRun } from "./infrastructure/database.ts";
 import { runBatch } from "./orchestrate.ts";
 import { baselineRunId, runEvalDir } from "./paths.ts";
 import { freezePilot } from "./pilot-freeze.ts";
@@ -903,6 +904,17 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
             ),
       }),
     preserve: () => cmdPreserve(),
+    "recover-databases": async () => {
+      if (!flags.run) {
+        console.error("recover-databases requires --run <runId>");
+        process.exit(3);
+      }
+      const result = await cleanupOrphanedDatabasesForRun({
+        runId: String(flags.run),
+      });
+      console.log(JSON.stringify(result, null, 2));
+      if (result.results.some((r) => r.cleanup === "failed")) process.exit(1);
+    },
     "freeze-pilot": () => {
       const result = freezePilot({
         seed: flags.seed ? String(flags.seed) : undefined,

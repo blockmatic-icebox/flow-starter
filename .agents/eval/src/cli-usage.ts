@@ -18,6 +18,7 @@ export const formatEvalUsage = ({
     "  integrity              preserve + mutation checks (static layer A)",
     "  preserve               frozen baseline checksum",
     "  prepare                host run setup [--arm flow] [--suite | --scenarios IDs] [--repetition N]",
+    "  recover-databases      drop registry-owned DBs for --run <runId> (interrupted eval recovery)",
     "  next | record | observe | finalize   host-session protocol (runner only)",
     "  headless-run           preflight Cursor agent CLI + prepare (optional --auto)",
     "  prepare flags: --host cursor|claude|other  finalize: --accept-diagnostic --model-id <id>",

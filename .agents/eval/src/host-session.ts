@@ -13,6 +13,7 @@ import {
 } from "./host-protocol.ts";
 import type { DatabaseLifecycleStatus } from "./infrastructure/database.ts";
 import {
+  cleanupOrphanedDatabasesForRun,
   cleanupSubjectDatabase,
   prepareSubjectDatabase,
 } from "./infrastructure/database.ts";
@@ -392,6 +393,7 @@ export const prepareHostRun = async ({
   scenarioIds: string[];
 }) => {
   const runId = runIdInput ?? `run-${Date.now()}`;
+  if (runIdInput) await cleanupOrphanedDatabasesForRun({ runId });
   const flowSha = currentFlowSha();
   const commonSource = recordCommonSource();
   const trustedEvaluatorRevision: TrustedEvaluatorRevision = {
@@ -463,6 +465,10 @@ export const prepareHostRun = async ({
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "subject preparation failed";
+      if (databaseName) {
+        // eslint-disable-next-line no-await-in-loop -- best-effort cleanup per blocked job
+        await cleanupSubjectDatabase({ databaseName, runId });
+      }
       jobStatus = "blocked";
       failureReason = message;
       worktreePath = "";

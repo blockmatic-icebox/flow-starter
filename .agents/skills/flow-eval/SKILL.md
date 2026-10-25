@@ -14,7 +14,7 @@ Diagnostic runs may use runner observe with **trusted** capture only (`captureMe
 
 Do not spawn the Cursor CLI `agent` command or pass a model.
 
-**Database-backed evals:** The runner (this session) needs Docker and Neon credentials in the Factory `.env` only. Subjects get an isolated `DATABASE_URL` per worktree; do not copy `NEON_API_KEY` into subject workspaces. Methodology scenarios without persistence (default suite) do not require Docker. See [RUN.md](../../eval/RUN.md#database-isolation-neon-local).
+**Database-backed evals:** The runner (this session) needs Docker and Neon credentials in the Factory `.env` only. Subjects get an isolated `DATABASE_URL` per worktree; do not copy `NEON_API_KEY` into subject workspaces. Methodology scenarios without persistence (default suite) do not require Docker. Interrupted runs: `pnpm --dir .agents eval recover-databases --run <runId>`. See [RUN.md](../../eval/RUN.md#database-isolation-neon-local).
 
 ## Parse `/flow-eval`
 

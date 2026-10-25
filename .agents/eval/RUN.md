@@ -88,7 +88,11 @@ Database-dependent evals (`eval readiness`, `eval stress`, scenarios with `persi
 
 **Lifecycle:** `prepare` → create DB → migrate → verify → run subject → `finalize` → drop DB (unless `FLOW_EVAL_RETAIN_DB=1`). Ownership is recorded in `database-registry.json` under the run directory; only `flow_eval_<hash>` names registered for that run are dropped.
 
-**Recovery:** Re-run `eval prepare` for the same `runId` to reconcile orphaned registry entries. Manual cleanup: connect to admin `neondb` via the proxy and `DROP DATABASE flow_eval_<hash>` only when the name appears in your run’s registry.
+**Recovery:** `pnpm --dir .agents eval recover-databases --run <runId>` drops every `flow_eval_*` database still marked active in that run’s `database-registry.json` (safe only for Factory-registered names). Re-running `eval prepare --run-id <runId>` also drops active registry databases before reprovisioning. `reconcileDatabaseRegistry` (on each subject provision) marks registry entries dropped when the database no longer exists. Manual cleanup: connect to admin `neondb` via the proxy and `DROP DATABASE flow_eval_<hash>` only when the name appears in your run’s registry.
+
+**Runner capture:** `runner-invoke.mjs` and `runner-verify-scenario.mjs` load subject `DATABASE_URL` from gitignored `.env.local` in the worktree (same isolation as product acceptance), and never receive Neon API credentials.
+
+**Install parity (local):** `FLOW_EVAL_INSTALL_PARITY=1 pnpm --dir .agents eval:test -- --test-name-pattern 'install parity'` compares eval worktree adoption to `install.sh` (opt-in; not part of default `flow-eval:check`).
 
 **Tests:** Integration tests report `BLOCKED` when Docker or Neon env is missing. Set `FLOW_EVAL_INSTALL_PARITY=1` to run installer parity tests locally.
 

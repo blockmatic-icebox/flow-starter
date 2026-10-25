@@ -8,6 +8,8 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { subjectProcessEnv } from "./runner-subject-env.mjs";
+
 const args = process.argv.slice(2);
 const scenarioDirFlag = args.indexOf("--scenario-dir");
 const scenarioDir =
@@ -44,6 +46,7 @@ for (const command of cmds) {
   const result = spawnSync(command, {
     cwd,
     encoding: "utf-8",
+    env: subjectProcessEnv({ worktreePath }),
     shell: true,
   });
   events.push({

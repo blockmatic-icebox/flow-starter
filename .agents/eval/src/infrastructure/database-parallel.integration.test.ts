@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, it } from "node:test";
@@ -14,6 +14,7 @@ import {
 } from "./database.ts";
 import { integrationPrerequisites } from "./neon-local.ts";
 import { connectPostgres } from "./postgres-client.ts";
+import { subjectEnvFilePath } from "./subject-env.ts";
 
 process.env.DATABASE_TLS_INSECURE_LOCAL = "1";
 const integration = integrationPrerequisites();
@@ -108,5 +109,50 @@ describe("parallel database isolation", { skip: !integration.ok }, () => {
         rmSync(worktreePath, { force: true, recursive: true });
       })
     );
+  });
+
+  it("failed migration on one subject does not affect a sibling", async () => {
+    const runId = `parallel-mig-fail-${Date.now()}`;
+    const adminUrl = defaultAdminDatabaseUrl();
+    const identities = [0, 1].map((index) =>
+      buildSubjectIdentity({
+        arm: "flow",
+        prepareNonce: `fail-${index}`,
+        repetition: 1,
+        runId,
+        scenarioId: "S01",
+      })
+    );
+    const worktrees = identities.map(() =>
+      mkdtempSync(path.join(tmpdir(), "flow-eval-par-fail-"))
+    );
+    const records = await Promise.all(
+      identities.map((identity, index) =>
+        provisionSubjectDatabase({
+          adminUrl,
+          identity,
+          runId,
+          worktreePath: worktrees[index] ?? "",
+        })
+      )
+    );
+    migrateSubjectDatabase({ worktreePath: worktrees[1] ?? "" });
+    writeFileSync(subjectEnvFilePath(worktrees[0] ?? ""), "DATABASE_URL=\n");
+    assert.throws(() =>
+      migrateSubjectDatabase({ worktreePath: worktrees[0] ?? "" })
+    );
+    await verifySubjectDatabase({ worktreePath: worktrees[1] ?? "" });
+    await Promise.all(
+      identities.map((identity, index) =>
+        cleanupSubjectDatabase({
+          adminUrl,
+          databaseName: identity.databaseName,
+          runId,
+        }).then(() =>
+          rmSync(worktrees[index] ?? "", { force: true, recursive: true })
+        )
+      )
+    );
+    assert.equal(records.length, 2);
   });
 });

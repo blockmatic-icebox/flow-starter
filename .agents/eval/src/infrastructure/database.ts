@@ -225,7 +225,7 @@ export const cleanupSubjectDatabase = async ({
   }
 };
 
-export const recoverOrphanedDatabases = async ({
+export const reconcileDatabaseRegistry = async ({
   adminUrl = defaultAdminDatabaseUrl(),
   runId,
 }: {
@@ -233,22 +233,57 @@ export const recoverOrphanedDatabases = async ({
   runId: string;
 }) => {
   const active = activeDatabasesForRun({ runId });
-  if (active.length === 0) return { recovered: 0 };
+  if (active.length === 0) return { reconciled: 0 };
   const sql = connectPostgres({ url: adminUrl });
+  let reconciled = 0;
   try {
     await Promise.all(
       active.map(async (entry) => {
         const rows = await sql`
           select 1 from pg_database where datname = ${entry.databaseName}
         `;
-        if (rows.length === 0)
+        if (rows.length === 0) {
           markDatabaseDropped({ databaseName: entry.databaseName, runId });
+          reconciled += 1;
+        }
       })
     );
   } finally {
     await sql.end({ timeout: 10 });
   }
-  return { recovered: active.length };
+  return { reconciled };
+};
+
+/** @deprecated use reconcileDatabaseRegistry */
+export const recoverOrphanedDatabases = reconcileDatabaseRegistry;
+
+export const cleanupOrphanedDatabasesForRun = async ({
+  adminUrl = defaultAdminDatabaseUrl(),
+  runId,
+}: {
+  adminUrl?: string;
+  runId: string;
+}) => {
+  const active = activeDatabasesForRun({ runId });
+  const results = await Promise.all(
+    active.map(async (entry) => {
+      const outcome = await cleanupSubjectDatabase({
+        adminUrl,
+        databaseName: entry.databaseName,
+        runId,
+      });
+      return {
+        cleanup: outcome.cleanup,
+        databaseName: entry.databaseName,
+        reason: "reason" in outcome ? outcome.reason : undefined,
+      };
+    })
+  );
+  return {
+    dropped: results.filter((r) => r.cleanup === "passed").length,
+    results,
+    skipped: results.filter((r) => r.cleanup === "skipped").length,
+  };
 };
 
 export const prepareSubjectDatabase = async ({
@@ -260,7 +295,7 @@ export const prepareSubjectDatabase = async ({
   runId: string;
   worktreePath: string;
 }) => {
-  await recoverOrphanedDatabases({ runId });
+  await reconcileDatabaseRegistry({ runId });
   const record = await provisionSubjectDatabase({
     identity,
     runId,

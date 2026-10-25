@@ -128,6 +128,8 @@ GenUI unit tests and graded prompt matrix: `pnpm --filter @repo/genui test` (`pa
 
 Neon Local is a Docker proxy to a cloud branch (not an offline Postgres engine). Copy `.env.defaults.example` to `.env`, set `NEON_API_KEY` and `NEON_PROJECT_ID`, then `pnpm db:start`, `pnpm db:migrate`, and `pnpm db:ping`. Default URL: `postgres://neon:npg@localhost:5432/neondb?sslmode=require`. The GenUI demo does not connect to the database until adopters wire `@repo/db` into application features.
 
+**Flow eval isolation:** Database-dependent methodology and product evals provision one disposable `flow_eval_<hash>` database per subject through the same Neon Local proxy; the runner holds admin credentials in the Factory checkout only. Subjects receive an isolated `DATABASE_URL` in gitignored worktree `.env.local`. Lifecycle, recovery (`eval recover-databases`), and parallel guarantees are documented in [eval/RUN.md — database isolation](../eval/RUN.md#database-isolation-neon-local). Eval subjects use the shared `neon` role today (no per-subject DB role).
+
 ## 9. Adoption path
 
 See [factory.md — Adopting Flow Factory](factory.md#adopting-flow-factory).

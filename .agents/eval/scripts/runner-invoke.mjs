@@ -9,6 +9,8 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { spawnEnvForCwd } from "./runner-subject-env.mjs";
+
 const CAPTURE_DIR = "runner-capture";
 const EVENTS_FILE = "events.json";
 const MANIFEST_FILE = "capture-manifest.json";
@@ -32,6 +34,7 @@ const writeBundle = ({
     const result = spawnSync(command, {
       cwd,
       encoding: "utf-8",
+      env: spawnEnvForCwd({ cwd }),
       maxBuffer: 10 * 1024 * 1024,
       shell: true,
     });

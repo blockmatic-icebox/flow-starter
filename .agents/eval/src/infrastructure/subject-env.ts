@@ -42,6 +42,16 @@ export const readSubjectDatabaseUrl = (worktreePath: string) => {
   return undefined;
 };
 
+export const loadSubjectEnvForWorktree = ({
+  worktreePath,
+}: {
+  worktreePath: string;
+}) => {
+  const databaseUrl = readSubjectDatabaseUrl(worktreePath);
+  if (!databaseUrl) return undefined;
+  return subjectProcessEnv({ databaseUrl, worktreePath });
+};
+
 export const subjectProcessEnv = ({
   databaseUrl,
   worktreePath,
