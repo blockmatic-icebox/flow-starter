@@ -604,14 +604,20 @@ function validateReadmeIdentity(root) {
 
   const readme = readFileSync(readmePath, "utf-8");
   const factory = isFactoryCheckout(root);
+  const adoptedProductReadme =
+    isFullProductTree(root) &&
+    readme.includes("Web application built with Flow Factory");
 
-  if (factory) {
+  if (factory && !adoptedProductReadme) {
     if (!readme.startsWith("# Flow Factory\n"))
       errors.push(
         "README.md: Factory checkout must start with '# Flow Factory'"
       );
     return errors;
   }
+
+  const useAdoptedProductReadmeRules = !factory || isFullProductTree(root);
+  if (!useAdoptedProductReadmeRules) return errors;
 
   if (readme.includes("raw.githubusercontent.com"))
     errors.push(
