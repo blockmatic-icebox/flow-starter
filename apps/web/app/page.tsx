@@ -5,7 +5,8 @@ export default function Page() {
         <div>
           <h1 className="font-medium">Product starter</h1>
           <p>
-            Replace PRODUCT.md and DESIGN.md, then add routes under{" "}
+            Extend product contracts in PRODUCT.md and DESIGN.md as you explore
+            the product, then add routes under{" "}
             <code className="font-mono text-xs">app/</code> with route-first
             colocation. Optional GenUI lives in{" "}
             <code className="font-mono text-xs">@repo/genui</code> when your

@@ -1,6 +1,6 @@
 # Flow Factory architecture
 
-> Canonical inherited technical architecture for Flow Factory. Product applications document deviations in root [ARCHITECTURE.md](../../ARCHITECTURE.md) and [product ADRs](../../docs/adr/). [PRODUCT.md](../../PRODUCT.md) and [DESIGN.md](../../DESIGN.md) are adopter-owned templates. Decision rationale: [Factory ADRs](decisions/adr/).
+> Canonical inherited technical architecture for Flow Factory. Product applications document deviations in root [ARCHITECTURE.md](../../ARCHITECTURE.md) and [product ADRs](../../docs/adr/). [PRODUCT.md](../../PRODUCT.md) and [DESIGN.md](../../DESIGN.md) are progressively maintained product contracts. Decision rationale: [Factory ADRs](decisions/adr/).
 
 Flow Factory follows the [Agentic Architecture foundation](decisions/adr/0001-agentic-architecture.md): capability-first operations, validated human and agent interfaces, Vercel-aligned infrastructure, and an integrated TypeScript monorepo. This document describes the current technical structure and implementation status. The foundational ADR explains technology selection and trade-offs; historical ADR 0007 and ADR 0008 have been consolidated into it.
 

@@ -32,7 +32,7 @@ From [skills-lock.json](../../skills-lock.json) and [operations/skills.md](../op
 
 - **Progressive disclosure** — route agents to depth on demand (influenced by Matt Pocock’s writing-for-agents work; house rules in [flow.md](../flow.md)).
 - **One fact, one home** — link instead of duplicating ownership tables.
-- **Glossary discipline** — factory and starter terms in [GLOSSARY.md](../glossary.md); your product replaces them when adopting.
+- **Glossary discipline** — factory terms in [GLOSSARY.md](../glossary.md); product-specific terms accumulate in root contracts as the product evolves.
 - **Proportionate discovery** — discovery methods when uncertainty warrants them, not a mandatory business-planning phase.
 
 Conceptual influences (not installed as skills): [Lean Startup principles](https://theleanstartup.com/principles), [continuous discovery](https://www.producttalk.org/getting-started-with-discovery/) as reasoning aids for customer learning.

@@ -20,6 +20,8 @@ To improve Flow itself, read [.agents/skills/flow-improve/SKILL.md](.agents/skil
 
 ## When to read
 
+For consequential product work (not setup-only install, env, or tooling), read the **current** contents of [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), and [ARCHITECTURE.md](ARCHITECTURE.md) before recommendations or implementation. Update the owning contract in the same change when material facts, accepted direction, or implemented behavior changes.
+
 | Need | Document |
 | --- | --- |
 | Product scope, users, acceptance | [PRODUCT.md](PRODUCT.md) |

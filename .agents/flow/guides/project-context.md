@@ -6,7 +6,7 @@ Flow spreads product intent, decisions, and implementation across **ordinary rep
 
 | You need | Open |
 | --- | --- |
-| Product vision, audience, scope | Adopter-owned [PRODUCT.md](../../../PRODUCT.md) |
+| Product vision, audience, scope | [PRODUCT.md](../../../PRODUCT.md) |
 | Experience and interaction direction | [DESIGN.md](../../../DESIGN.md) |
 | Current technical structure | [ARCHITECTURE.md](../../../ARCHITECTURE.md) |
 | Consequential product rationale | `docs/pdr/` when the first record exists |
@@ -24,6 +24,12 @@ Flow spreads product intent, decisions, and implementation across **ordinary rep
 **Ideas** are possibilities. **Initiatives** are intentional bounded work. Moving from idea to initiative is a deliberate choice, not an automatic pipeline.
 
 Naming rules, metadata for research and specs, and the full ownership table: [flow.md](../flow.md#documentation-ownership).
+
+## Context for coding agents
+
+Agents begin with the current product contracts and load deeper references as the task requires. PRODUCT.md, DESIGN.md, and ARCHITECTURE.md provide the current shared context. Initiatives own bounded execution detail, while ADRs and PDRs preserve consequential decisions and rationale.
+
+Documents should be updated at their authoritative location. Do not duplicate the same requirements across several files simply to make them easier for agents to discover.
 
 ## Traceability
 
@@ -51,7 +57,3 @@ Feedback from evidence may send you back to Explore or to update an accepted con
 - **Research** if you preserve external evidence with dated metadata.
 
 Agents route through [AGENTS.md](../../../AGENTS.md); they should read the documents the task touches, not the entire tree.
-
-## Human guide vs agent bundle
-
-The Flow Agent bundles a **short** set of sources at build time (including this readme’s entry page and `flow.md`). The sibling pages you are reading now are for **human navigation**; they are not added to that bundle.

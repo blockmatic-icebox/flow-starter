@@ -7,8 +7,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export const metadata: Metadata = {
-  description:
-    "Product starter — replace PRODUCT.md and DESIGN.md with your product.",
+  description: "Product starter built with Flow Factory.",
   title: "Product",
 };
 

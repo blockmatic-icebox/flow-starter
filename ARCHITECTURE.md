@@ -1,6 +1,6 @@
 # Architecture
 
-> Product technical contract for this starter. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are adopter-owned templates. Product decisions: [docs/adr/](docs/adr/).
+> Product technical contract for this starter. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are progressively maintained product contracts. Product decisions: [docs/adr/](docs/adr/).
 
 This product **inherits [Flow Factory](.agents/flow/factory.md)**—methodology, skills, evaluation, and default security and GenUI boundaries. Factory-wide rationale lives under [.agents/flow/](.agents/flow/); see [.agents/flow/architecture.md](.agents/flow/architecture.md) for the full inherited technical architecture.
 

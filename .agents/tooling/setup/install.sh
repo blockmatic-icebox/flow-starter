@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Flow Starter — bootstrap a new project from the latest main branch.
+# Flow Factory — bootstrap a new project from the latest main branch.
 #
 # One-liner (copy/paste):
 #   bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-factory/main/.agents/tooling/setup/install.sh)"
@@ -52,6 +52,10 @@ run_install() {
     die "project name cannot be empty"
   fi
 
+  if printf '%s' "$project_name" | grep -q '[[:cntrl:]]'; then
+    die "project name cannot contain control characters"
+  fi
+
   if [[ -z "$slug" ]]; then
     die "project name must contain at least one letter or digit"
   fi
@@ -70,9 +74,11 @@ run_install() {
   local root="$slug"
   cd "$root"
 
-  local adoption_js
-  adoption_js="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/product-adoption.mjs"
-  node "$adoption_js" apply --root "$(pwd)" --project-name "$project_name"
+  if ! node .agents/tooling/setup/product-adoption.mjs apply \
+    --root "$(pwd)" \
+    --project-name "$project_name"; then
+    die "product adoption failed"
+  fi
 
   rm -rf .git
   if ! git init -b main >/dev/null 2>&1; then
@@ -97,9 +103,9 @@ main() {
   require_command git
   require_command node
 
-  local project_name="${FLOW_STARTER_PROJECT_NAME:-}"
+  local project_name="${FLOW_FACTORY_PROJECT_NAME:-${FLOW_STARTER_PROJECT_NAME:-}}"
   if [[ -z "$project_name" ]]; then
-    printf 'Flow Starter install\n\n'
+    printf 'Flow Factory install\n\n'
     printf 'Project name (used for the folder and https://<name>.localhost): '
     read -r project_name
   fi

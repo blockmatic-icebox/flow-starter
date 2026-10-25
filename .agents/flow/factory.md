@@ -108,13 +108,13 @@ Bootstrap from `main`:
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-factory/main/.agents/tooling/setup/install.sh)"
 ```
 
-The installer removes itself and evaluator-only assessment fixtures before the initial commit. It does not run `pnpm install`.
+The installer configures project identity, generates a product-focused README, customizes `PRODUCT.md` (while preserving the baseline `DESIGN.md` contract), removes bootstrap-only tooling and evaluator-only assessment fixtures, and creates a fresh Git history. It does not run `pnpm install`.
 
-When creating a product from this repository:
+After installation:
 
-1. Replace the root README with your product identity.
-2. Define product and experience in PRODUCT.md and DESIGN.md.
-3. Replace fictional data and starter homepage copy as needed.
+1. Run `pnpm setup` and `pnpm dev` for local development.
+2. Evolve `PRODUCT.md`, `DESIGN.md`, and `ARCHITECTURE.md` as you explore and build the product.
+3. Replace starter homepage copy and add routes as the product takes shape.
 4. Configure required integrations; preserve relevant ADRs and PDRs.
 5. Extend `apps/web` using existing React and capability boundaries.
 6. Verify before delivery (`pnpm qa`, [verification.md](operations/verification.md) for UI).

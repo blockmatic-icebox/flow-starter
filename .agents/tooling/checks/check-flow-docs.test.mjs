@@ -394,6 +394,46 @@ test("flow-improve and flow-eval disable model invocation; flow does not", () =>
   assert.doesNotMatch(flow, /^disable-model-invocation:/mu);
 });
 
+test("validates current repository product contracts and readme identity", () => {
+  const errors = validateFlowDocs();
+  assert.equal(errors.length, 0, errors.join("\n"));
+});
+
+test("flags placeholder markers in product contracts", (t) => {
+  const root = fixture(t, ["PRODUCT.md", "DESIGN.md", "README.md"], {
+    "DESIGN.md": "# Design\n\nok\n",
+    "PRODUCT.md": "# Product\n\nnot initialized\n",
+    "README.md": "# Flow Factory\n\n",
+  });
+  assert.match(
+    validateFlowDocs(root).join("\n"),
+    /PRODUCT\.md: contains placeholder marker/u
+  );
+});
+
+test("flags adopted readme missing product identity", (t) => {
+  const root = fixture(
+    t,
+    ["README.md", "PRODUCT.md", "DESIGN.md", ".agents/package.json"],
+    {
+      ".agents/package.json": JSON.stringify({
+        scripts: {
+          "test:tooling": "node --test tooling/setup/prompt-log.test.mjs",
+        },
+      }),
+      "DESIGN.md": "# Design\n\n## Experience direction\n\nok\n",
+      "PRODUCT.md": "# My App\n\nScope.\n",
+      "README.md": "# My App\n\nGeneric readme.\n",
+    },
+    { omitRequired: true }
+  );
+  const errors = validateFlowDocs(root);
+  assert.ok(
+    errors.some((e) => e.includes("Web application built with Flow Factory")),
+    errors.join("\n")
+  );
+});
+
 test("flags obsolete apps/web security paths in authoritative docs", (t) => {
   const root = fixture(t, [".agents/flow/specs/genui.md", "apps/flow/.keep"], {
     ".agents/flow/specs/genui.md":

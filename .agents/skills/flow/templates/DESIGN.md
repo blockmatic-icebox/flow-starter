@@ -1,6 +1,6 @@
 # Design contract
 
-> Initialize or update during **Explore** when visual references, interaction direction, or experience constraints emerge. Link requirements in [PRODUCT.md](PRODUCT.md). Mark proposed direction clearly until approved.
+> **Authoring guide only** — not a replacement for root [DESIGN.md](../../../DESIGN.md). Optional section catalog for Explore and Specify. Include only sections with meaningful evidence; never publish empty headings. Update the canonical DESIGN.md in place when visual direction, tokens, or interaction rules change. Capture references during Explore without requiring a full user journey. Link requirements in [PRODUCT.md](PRODUCT.md). Mark proposed direction clearly until approved.
 
 ## Experience vision
 

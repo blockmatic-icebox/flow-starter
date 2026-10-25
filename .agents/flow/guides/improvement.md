@@ -18,7 +18,7 @@ Flow keeps them separate. Only the third belongs in a later user-invoked `flow-i
 
 ## Evaluating Flow today (implemented)
 
-The `@repo/flow-eval` package provides a **user-invoked** harness: isolated worktrees, scenario cards, deterministic gates, and comparison between arms (`flow`, `flow-without-skills`, `control`). The `flow-eval` skill runs those commands; it does not auto-modify workflow.
+The evaluation harness under `.agents/eval` provides a **user-invoked** suite: isolated worktrees, scenario cards, deterministic gates, and comparison between arms (`flow`, `flow-without-skills`, `control`). The `flow-eval` skill runs those commands; it does not auto-modify workflow.
 
 | Piece | Role |
 | --- | --- |
@@ -26,7 +26,7 @@ The `@repo/flow-eval` package provides a **user-invoked** harness: isolated work
 | Gates | Run before outcome narrative; incomplete telemetry is `missing`, not zero |
 | Arms | Compare Flow entrypoint vs reduced context (official only when isolation assessment passes) |
 | Protocol v2 | Subject / runner / evaluator separation; no renormalized quality percentage |
-| `flow:check` | Validates doc paths and bundle freshness—not product outcomes |
+| `flow:check` | Validates documentation conventions and mechanical contract checks—not product outcomes |
 
 Command reference and the three evaluation paths (harness / diagnostic / official): [.agents/eval/RUN.md](../../eval/RUN.md#evaluation-paths). Pilot freeze: `pnpm --dir .agents eval freeze-pilot`. Initiative: [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md). Host-session (`/flow-eval`) remains **diagnostic** until the inspected Cursor IDE adapter demonstrates ADR 0015 isolation capabilities.
 

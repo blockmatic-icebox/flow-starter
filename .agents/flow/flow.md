@@ -251,8 +251,9 @@ Review:
 - Accessibility, interaction, and responsive behavior where applicable.
 - Compatibility with established architectural decisions.
 - Unnecessary complexity or duplicate concepts.
-- Documentation accuracy and location.
+- Documentation accuracy and location, including product contracts when behavior or accepted direction changed.
 - Remaining limitations.
+- Unresolved mismatches between code and `PRODUCT.md`, `DESIGN.md`, or `ARCHITECTURE.md`.
 
 A working implementation does not itself prove that the feature created customer value. Keep technical verification distinct from product validation.
 
@@ -300,12 +301,12 @@ Parallel readiness checks and honest release boundaries: [delegation.md](operati
 
 Use one authoritative home for each fact. Link related documents instead of copying their contents.
 
-Flow Factory's mission, goals, and inherited foundation are explained in [factory.md](factory.md). The root README.md is an adopter-owned product template. Flow methodology and documentation conventions belong in `.agents/flow/flow.md`, with a human introduction in `.agents/flow/README.md`. Additional pages linked from that introduction (for example `working-with-flow.md`, `principles.md`, `influences.md`, `project-context.md`, and `improvement.md`) explain the methodology for people; they do not change the rules in this file. **Product** current architecture belongs in root `ARCHITECTURE.md`. **Factory** inherited architecture belongs in [architecture.md](architecture.md). Durable rationale belongs in ADRs and PDRs under the correct owner. Use existing initiatives, plans, and specifications only when justified by the work.
+Flow Factory's mission, goals, and inherited foundation are explained in [factory.md](factory.md). Before adoption, the root `README.md` introduces Flow Factory and the installer; after adoption it belongs to the generated product. Flow methodology and documentation conventions belong in `.agents/flow/flow.md`, with a human introduction in `.agents/flow/README.md`. Additional pages linked from that introduction (for example `working-with-flow.md`, `principles.md`, `influences.md`, `project-context.md`, and `improvement.md`) explain the methodology for people; they do not change the rules in this file. **Product** current architecture belongs in root `ARCHITECTURE.md`. **Factory** inherited architecture belongs in [architecture.md](architecture.md). Durable rationale belongs in ADRs and PDRs under the correct owner. Use existing initiatives, plans, and specifications only when justified by the work.
 
 | Location | Responsibility |
 | --- | --- |
 | `AGENTS.md` | Lightweight agent entrypoint and task-specific document routing |
-| `README.md` | Adopter-owned product README template, including essential setup and documentation links |
+| `README.md` | Factory introduction before adoption; product development README after adoption |
 | `.agents/flow/factory.md` | Flow Factory mission, capabilities, adoption, and navigation |
 | `.agents/flow/architecture.md` | Inherited Factory technical architecture and implementation boundaries |
 | `.agents/flow/flow.md` | Workflow, skill orchestration, document conventions, and lifecycle |
@@ -339,6 +340,22 @@ Do not create another `PRD.md`, `SPEC-*.md`, `PLAN-*.md`, `INITIATIVE-OVERVIEW.m
 A PRD is a type of product requirements content, not a mandatory separate filename. Place current product-wide requirements in `PRODUCT.md`; place bounded initiative requirements in the initiative or a justified capability spec.
 
 A PDR is a Product Decision Record. An ADR is an Architecture Decision Record. Both preserve consequential rationale, not the entire current product or architecture specification.
+
+### Contract maintenance
+
+Product documentation is a maintained engineering contract, not an initialization artifact. During Explore, Specify, Plan, Build, Review, and Ship, the coordinator must assess whether new evidence, accepted decisions, or implementation changes affect `PRODUCT.md`, `DESIGN.md`, or `ARCHITECTURE.md`. Update the owning document in the same work when material facts change, without manufacturing decisions or duplicating initiative-level details. At Review and Ship, reconcile current code, accepted direction, and documentation; report unresolved mismatches rather than silently changing approved intent.
+
+Update triggers:
+
+- **`PRODUCT.md`** — product-wide purpose, audience, scope, capabilities, requirements, non-goals, or success criteria materially change.
+- **`DESIGN.md`** — visual direction, design tokens, components, interaction conventions, accessibility rules, responsive behavior, or meaningful UX direction changes. Visual references may be captured during Explore without a full user journey.
+- **`ARCHITECTURE.md`** — implemented system boundaries, routes, integrations, data models, package responsibilities, security architecture, or significant implementation constraints change. Not every implementation detail deserves a root architecture update.
+
+**Design implementation sync:** `DESIGN.md` owns human-readable visual and interaction decisions; `packages/ui/src/styles/globals.css` and related UI files own token and component values. A meaningful UI-system change requires assessing and updating `DESIGN.md` in the same change. An accepted design change that affects implementation must propagate into the relevant UI files during authorized **Build**. Report discrepancies; do not conceal them.
+
+For product work, read the current contents of `PRODUCT.md`, `DESIGN.md`, and `ARCHITECTURE.md` before consequential recommendations or implementation decisions. Delegated workers receive relevant contract paths or concise scoped context.
+
+Before declaring substantial work complete, assess: (1) implementation matches the accepted product contract; (2) interaction/UI matches `DESIGN.md`; (3) `ARCHITECTURE.md` describes the actual system; (4) consequential accepted decisions are recorded correctly; (5) relevant documents were updated with the code; (6) proposed decisions remain clearly identified as proposals.
 
 ## Naming conventions
 

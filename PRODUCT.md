@@ -1,7 +1,23 @@
-# Product (not initialized)
+# Web Starter — Product
 
-This repository has not established a product contract yet.
+## Purpose
 
-When Explore produces meaningful, product-specific material, the coordinator may create or update `PRODUCT.md` using the template at [.agents/skills/flow/templates/PRODUCT.md](.agents/skills/flow/templates/PRODUCT.md).
+Provide the starting application for a product built with Flow Factory.
 
-Draft text is not user approval. Record explicit approvals in conversation or in the document when decisions are accepted.
+## Current scope
+
+The application lives in `apps/web` and inherits the Factory's technical foundation, development workflow, and quality conventions.
+
+It currently provides an application starting point rather than domain-specific product functionality.
+
+## Product development
+
+As the product is explored and specified, maintain its purpose, users, capabilities, scope, and accepted requirements in this document.
+
+Bounded initiatives retain their own detailed requirements and implementation progress.
+
+## Related documents
+
+- [Design](DESIGN.md)
+- [Architecture](ARCHITECTURE.md)
+- [Product decisions](docs/adr/0001-use-flow-factory.md)

@@ -12,7 +12,9 @@ Use the least workflow that fits the risk.
 
 Exact checkpoints: [flow.md](../flow.md).
 
-## Three everyday scenarios
+Flow maintains context as work progresses. When product decisions, experience direction, or implemented architecture change, the agent updates the corresponding product contract. A small fix should not generate unnecessary documentation, but significant decisions must survive beyond the current conversation.
+
+## Four everyday situations
 
 These map to **existing product** and **new product** work kinds in [flow.md](../flow.md#kinds-of-work).
 
@@ -26,11 +28,11 @@ These map to **existing product** and **new product** work kinds in [flow.md](..
 
 **Progress:** Correct sort behavior and an honest report of which commands ran. That is completion for this kind of task.
 
-### 2. Uncertain feature (learning before scale) — new product
+### 2. Uncertain feature (learning before scale) — existing product
 
 **You:** “Let’s add team comments.”
 
-**Collaboration:** This is substantial new work, so it starts in **Explore** even if you used the word “build.” The agent should separate the product assumption from the implementation, ask only questions that change decisions, and present a short decision summary before advancing to Specify. You approve consequential scope and requirements before substantial planning. After you approve a plan, **Build** still needs its own explicit authorization.
+**Collaboration:** A substantial feature can require **Explore** because of uncertainty, whether the product is new or already in production. The agent should separate the product assumption from the implementation, ask only questions that change decisions, and present a short decision summary before advancing to Specify. You approve consequential scope and requirements before substantial planning. After you approve a plan, **Build** still needs its own explicit authorization.
 
 **Artifacts:** Maybe an initiative once the work is bounded; updates to `PRODUCT.md` only when product-wide direction changes.
 
@@ -40,7 +42,7 @@ These map to **existing product** and **new product** work kinds in [flow.md](..
 
 **You:** “Continue the comments initiative.”
 
-**Collaboration:** The agent reads the initiative and accepted contracts (`PRODUCT.md`, relevant ADRs/PDRs), states the current stage, what is already approved, open questions, and the **next authorization** you must give. It should not re-ask settled decisions.
+**Collaboration:** The agent reads the initiative and accepted contracts (`PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`, relevant ADRs/PDRs), states the current stage, what is already approved, open questions, and the **next authorization** you must give. It should not re-ask settled decisions. Agents maintain the owning documents as work progresses.
 
 **Progress:** Clear continuity and the next explicit action—not replaying earlier exploration.
 

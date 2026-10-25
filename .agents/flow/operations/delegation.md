@@ -171,9 +171,22 @@ Every delegated task returns to the coordinator (not the user) with:
 - Unresolved issues and limitations
 - Recommendation to the coordinator
 
+## Worker documentation impact
+
+Workers return a structured documentation impact report (coordinator integrates; multiple workers must not independently edit the same canonical file):
+
+```text
+Documentation impact:
+- PRODUCT.md: update / unchanged / proposed
+- DESIGN.md: update / unchanged / proposed
+- ARCHITECTURE.md: update / unchanged / proposed
+- Evidence:
+- Recommended changes:
+```
+
 ## Coordinator closeout
 
-After substantial work, summarize: current Flow stage, work completed, delegated work, independent findings, decisions or approvals needed, verification evidence, recommended next action.
+After substantial work, summarize: current Flow stage, work completed, delegated work, independent findings, decisions or approvals needed, verification evidence, documentation impact, recommended next action.
 
 ## Evaluation classes
 

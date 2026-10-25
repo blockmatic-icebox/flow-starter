@@ -42,11 +42,11 @@ Each practice below follows a simple pattern: the problem, what Flow chooses, th
 
 **Problem:** Agent sessions end; chat history does not own the product.
 
-**Choice:** One authoritative home per fact in repository documents; agents read only what the task needs ([flow.md](../flow.md)).
+**Choice:** Store current product, design, and architecture contracts in canonical repository documents. Agents read them before consequential product work and reconcile them with accepted decisions and implemented behavior before completion.
 
 **Benefit:** Fresh sessions can recover intent.
 
-**Trade-off:** Someone must update the owning doc when decisions change.
+**Trade-off:** Maintaining authoritative documentation requires deliberate updates, but avoids rediscovering product intent and silently accumulating contradictory instructions.
 
 **Example:** Initiative holds comment assumptions; `PRODUCT.md` changes only if the whole product promise shifts.
 

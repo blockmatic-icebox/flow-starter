@@ -1,114 +1,32 @@
-# Project Name
+# Flow Factory
 
-<!-- Replace this heading and description with your product identity. -->
+An opinionated, agentic software development starter for building products with humans and AI agents.
 
-Briefly describe what your product does, who it serves, and the value it provides.
+Flow Factory combines a modern TypeScript foundation with Flow, a lightweight methodology for exploring, specifying, building, reviewing, and shipping software.
 
-## Getting started
+## Create a project
 
-Requirements:
-
-- Node.js 24+
-- pnpm 12+
-
-Install dependencies:
+Requires Git and Node.js 24+. The generated project uses pnpm 12+.
 
 ```bash
-pnpm install
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-factory/main/.agents/tooling/setup/install.sh)"
 ```
 
-`pnpm setup` also prepares environment templates. `pnpm setup:full` installs optional local tools (skills, secret scanners, Portless, DeepSec, Playwright). Scanner installation may require administrator rights. See the [foundation guide](.agents/flow/factory.md).
+Enter your project name when prompted.
 
-Start the application:
+The installer creates a new project directory, configures its identity, prepares its initial documentation, and starts a fresh Git history. It does not install application dependencies.
+
+## Develop
 
 ```bash
+cd your-project
+pnpm setup
 pnpm dev
 ```
 
-The application uses Portless for its normal local development environment.
+## Learn more
 
-To bypass Portless:
-
-```bash
-pnpm --filter web dev:app
-```
-
-For first-time Portless setup:
-
-```bash
-pnpm setup:portless
-```
-
-## Development commands
-
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Start the product app (`apps/web`) |
-| `pnpm build` | Build applications and packages |
-| `pnpm lint` | Lint and formatting checks |
-| `pnpm check-types` | TypeScript checks |
-| `pnpm test` | Application and package tests |
-| `pnpm qa` | Standard non-mutating quality checks |
-| `pnpm ci:local` | Full local CI, including production build |
-| `pnpm --dir .agents check` | Factory integrity (Flow docs, architecture, ownership, eval) |
-| `pnpm --dir .agents flow:check` | Validate Flow documentation conventions |
-| `pnpm --dir .agents architecture:check` | Validate React monorepo architecture boundaries |
-| `pnpm mcp:next` | Next.js development diagnostics for compatible coding agents |
-
-## Architecture
-
-This application uses the opinionated [Flow Factory](.agents/flow/factory.md) foundation.
-
-The inherited technical architecture includes:
-
-- Next.js App Router and React.
-- TypeScript and a pnpm/Turborepo monorepo.
-- Fractal React component organization.
-- Server-first rendering and intentional client boundaries.
-- Shared UI components and design tokens.
-- Capability-first application boundaries.
-- MCP-oriented integration patterns.
-- Validated generative UI using OpenUI Lang.
-- Agent-readable documentation and development conventions.
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the current technical contract.
-
-Review the relevant architectural decisions before making consequential changes to the inherited foundation.
-
-## Product documentation
-
-| Document | Responsibility |
-| --- | --- |
-| [PRODUCT.md](PRODUCT.md) | Product vision, audience, scope and requirements |
-| [DESIGN.md](DESIGN.md) | Product experience, visual direction and interaction |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Technical architecture and boundaries |
-| [AGENTS.md](AGENTS.md) | Entry point for coding agents |
-| [Flow for humans](.agents/flow/README.md) | Introduction to the development methodology |
-| [Flow Factory foundation](.agents/flow/factory.md) | Inherited architecture, tools and adoption guidance |
-
-## Configuration
-
-Use the relevant application's `.env.example` file to identify supported environment variables.
-
-Create local environment configuration only when required.
-
-Never commit credentials or secrets.
-
-For inherited examples and optional integrations, see the [Flow Factory foundation guide](.agents/flow/factory.md).
-
-## Adopting this template
-
-When starting your product:
-
-1. Replace this README's project name and description.
-2. Define the product in PRODUCT.md.
-3. Define the visual and interaction direction in DESIGN.md.
-4. Replace fictional fixtures and demonstration content as needed.
-5. Configure only the integrations required by your application.
-6. Preserve relevant architecture and workflow contracts.
-7. Implement features within the established application boundaries.
-8. Run `pnpm qa` and `pnpm ci:local` before shipping.
-
-The starter provides the architecture.
-
-Your application defines its own users, domain, capabilities and product goals.
+- [Flow for humans](.agents/flow/README.md)
+- [Working with Flow](.agents/flow/guides/working-with-flow.md)
+- [Flow Factory foundation](.agents/flow/factory.md)
+- [Architecture](.agents/flow/architecture.md)

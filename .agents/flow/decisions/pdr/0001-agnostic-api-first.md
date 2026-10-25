@@ -103,6 +103,6 @@ Rejected as a requirement of the shared workflow. Editor-specific local configur
 - [.agents/flow/flow.md](../../flow.md) — development workflow
 - [AGENTS.md](../../../../AGENTS.md) — universal agent entrypoint
 - [ARCHITECTURE.md](../../../../ARCHITECTURE.md) — technical boundaries
-- [PRODUCT.md](../../../../PRODUCT.md) — adopter-owned product template
+- [PRODUCT.md](../../../../PRODUCT.md) — product scope and requirements contract
 - [ADR 0001](../adr/0001-agentic-architecture.md) — foundational technology choices and rationale
 - [ADR 006](../adr/0006-external-invocation-is-read-only.md) — planned external authorization boundary

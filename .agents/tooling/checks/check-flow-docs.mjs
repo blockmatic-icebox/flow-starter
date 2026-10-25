@@ -433,6 +433,166 @@ function validateKnowledgeSnapshot() {
   return [];
 }
 
+const designParityTokens = [
+  "--background",
+  "--foreground",
+  "--primary",
+  "--primary-foreground",
+  "--border",
+  "--muted-foreground",
+  "--radius",
+];
+
+const placeholderMarkerPattern =
+  /\b(?:not initialized|lorem ipsum)\b|\bTBD\b/iu;
+
+const INSTALL_SCRIPT_REL = ".agents/tooling/setup/install.sh";
+
+function isFactoryCheckout(root) {
+  return existsSync(path.join(root, INSTALL_SCRIPT_REL));
+}
+
+function extractRootCssTokens(cssContent) {
+  const rootMatch = /:root\s*\{([\s\S]*?)\}/u.exec(cssContent);
+  const block = rootMatch?.[1] ?? "";
+  const values = new Map();
+  for (const token of designParityTokens) {
+    const match = new RegExp(`${token}:\\s*([^;\\n]+);`, "u").exec(block);
+    if (match) values.set(token, match[1].trim());
+  }
+  return values;
+}
+
+function extractDesignParityTable(designContent) {
+  const values = new Map();
+  const rowPattern =
+    /\|\s*`(?<token>--[a-z-]+)`\s*\|\s*`(?<value>[^`]+)`\s*\|/gu;
+  for (const match of designContent.matchAll(rowPattern)) {
+    const { token, value } = match.groups;
+    if (designParityTokens.includes(token)) values.set(token, value.trim());
+  }
+  return values;
+}
+
+function validateDesignTokenParity(root) {
+  const errors = [];
+  const cssPath = path.join(root, "packages/ui/src/styles/globals.css");
+  const designPath = path.join(root, "DESIGN.md");
+  if (!existsSync(cssPath) || !existsSync(designPath)) return errors;
+
+  const cssTokens = extractRootCssTokens(readFileSync(cssPath, "utf-8"));
+  const designTokens = extractDesignParityTable(
+    readFileSync(designPath, "utf-8")
+  );
+
+  for (const token of designParityTokens) {
+    const cssValue = cssTokens.get(token);
+    const designValue = designTokens.get(token);
+    if (!cssValue)
+      errors.push(`globals.css: missing :root token ${token} for parity check`);
+    if (!designValue)
+      errors.push(
+        `DESIGN.md: missing documented parity value for ${token} in token table`
+      );
+    if (cssValue && designValue && cssValue !== designValue)
+      errors.push(
+        `DESIGN.md token ${token} (${designValue}) does not match globals.css (${cssValue})`
+      );
+  }
+
+  return errors;
+}
+
+function validateReadmeIdentity(root) {
+  const errors = [];
+  const readmePath = path.join(root, "README.md");
+  if (!existsSync(readmePath)) return ["missing README.md"];
+
+  const readme = readFileSync(readmePath, "utf-8");
+  const factory = isFactoryCheckout(root);
+
+  if (factory) {
+    if (!readme.startsWith("# Flow Factory\n"))
+      errors.push(
+        "README.md: Factory checkout must start with '# Flow Factory'"
+      );
+    return errors;
+  }
+
+  if (readme.includes("raw.githubusercontent.com"))
+    errors.push(
+      "README.md: adopted product must not reference remote installer curl URLs"
+    );
+  if (/^# Project Name$/mu.test(readme))
+    errors.push("README.md: must not retain '# Project Name' heading");
+  if (!readme.includes("Web application built with Flow Factory"))
+    errors.push(
+      "README.md: adopted product must state it is a web application built with Flow Factory"
+    );
+
+  return errors;
+}
+
+function validateNoPlaceholderMarkers(root) {
+  const errors = [];
+  for (const relative of ["PRODUCT.md", "DESIGN.md"]) {
+    const absolute = path.join(root, relative);
+    if (!existsSync(absolute)) continue;
+    const content = readFileSync(absolute, "utf-8");
+    if (placeholderMarkerPattern.test(content))
+      errors.push(`${relative}: contains placeholder marker text`);
+  }
+  return errors;
+}
+
+function validateAdoptedAgentsScripts(root) {
+  if (isFactoryCheckout(root)) return [];
+
+  const errors = [];
+  const agentsPkgPath = path.join(root, ".agents/package.json");
+  if (!existsSync(agentsPkgPath)) return errors;
+
+  const pkg = JSON.parse(readFileSync(agentsPkgPath, "utf-8"));
+  const tooling = pkg.scripts?.["test:tooling"] ?? "";
+  for (const forbidden of [
+    "product-adoption.test.mjs",
+    "clean-adoption.test.mjs",
+    "run-install-tests-if-present.mjs",
+    "install.test.mjs",
+    "local-install-source.mjs",
+  ]) {
+    if (tooling.includes(forbidden))
+      errors.push(
+        `.agents/package.json test:tooling must not reference removed installer file ${forbidden}`
+      );
+  }
+
+  return errors;
+}
+
+function validateProductContractFiles(root) {
+  return ["PRODUCT.md", "DESIGN.md"]
+    .filter((relative) => !existsSync(path.join(root, relative)))
+    .map((relative) => `missing product contract ${relative}`);
+}
+
+function validateDesignImplementationRefs(root) {
+  const errors = [];
+  const refs = [
+    "packages/ui/src/styles/globals.css",
+    "packages/ui/src/components/theme-provider.tsx",
+    "apps/web/app/layout.tsx",
+    "apps/web/components.json",
+  ];
+  for (const relative of refs) {
+    if (!existsSync(path.join(root, relative)))
+      errors.push(
+        `DESIGN.md references missing implementation file: ${relative}`
+      );
+  }
+  return errors;
+}
+
 function validateLegacyFlowDocDirs(root) {
   return legacyFlowDocDirs
     .filter((relative) => existsSync(path.join(root, relative)))
@@ -697,6 +857,12 @@ export function validateFlowDocs(root = repositoryRoot) {
     ...validateMarkdownLinks(root),
     ...validateSemanticConsistency(root),
     ...validateKnowledgeSnapshot(),
+    ...validateProductContractFiles(root),
+    ...validateReadmeIdentity(root),
+    ...validateNoPlaceholderMarkers(root),
+    ...validateDesignTokenParity(root),
+    ...validateDesignImplementationRefs(root),
+    ...validateAdoptedAgentsScripts(root),
     ...validateRepositoryOwnership(root)
   );
 

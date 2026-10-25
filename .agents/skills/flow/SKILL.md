@@ -10,7 +10,8 @@ Follow authorization rules in [AGENTS.md](../../../AGENTS.md). They apply even w
 ## Coordinator (main session)
 
 - **Entry:** Natural-language product requests load this skill via `AGENTS.md`; explicit `/flow` is optional. Do not ask the user to pick methodology skills (`idea-refine`, `prd-writing`, etc.)—load the smallest set from `operations/skills.md` yourself.
-- **Explore:** Read the full brief first; ask a few high-value questions per round; stop when further questioning is not worth the cost. Use templates under `templates/` only when creating real drafts. Capture visual references and interaction direction in `DESIGN.md` during Explore when they appear—user journeys are optional.
+- **Explore:** Read the full brief first; ask a few high-value questions per round; stop when further questioning is not worth the cost. Read current `PRODUCT.md`, `DESIGN.md`, and `ARCHITECTURE.md` before consequential product work. Use templates under `templates/` as optional section catalogs only—never publish empty headings. Capture visual references and interaction direction in `DESIGN.md` during Explore when they appear—user journeys are optional.
+- **Contracts:** Maintain `PRODUCT.md`, `DESIGN.md`, and `ARCHITECTURE.md` as engineering contracts ([flow.md](../../flow/flow.md#contract-maintenance)). Meaningful UI or token changes require updating `DESIGN.md` in the same change; propagate accepted design into `packages/ui` during authorized Build.
 - **Shortcuts:** Interpret authorization from the whole conversation (approved spec, prototype risk acceptance, bug-fix scope)—not fixed phrase lists. Plan approval ≠ Build authorization.
 - **Stages:** At boundaries, state what is established, what is uncertain, what you recommend next, and whether approval is required.
 - **Delegation:** Workers return structured results to you; you integrate, verify, and communicate once. See `operations/delegation.md`.
@@ -24,6 +25,7 @@ Follow authorization rules in [AGENTS.md](../../../AGENTS.md). They apply even w
 5. For UI changes, follow [.agents/flow/operations/verification.md](../../flow/operations/verification.md).
 6. **Prompt log (coordinator only):** For each new human prompt handled, append one block to [.agents/flow/prompts.txt](../../flow/prompts.txt) after delegated work integrates (or at end of solo work). Format and fields: [operations/journal.md](../../flow/operations/journal.md). Create the file if missing; never erase or rewrite existing entries; never fabricate timestamps, commits, subagent work, or verification. Workers and subagents must not append; they return results to the coordinator. `.agents/flow/prompts.txt` is parent-owned in worktrees.
 7. End the response with the **Skills loaded** footer from `operations/skills.md` (include `flow` when this file was read).
+8. For substantial changes, include a **Documentation impact** summary in the final response (`PRODUCT.md` / `DESIGN.md` / `ARCHITECTURE.md`: update, unchanged, or proposed).
 
 ## Completion
 
