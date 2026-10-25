@@ -10,7 +10,7 @@ For repository work other than setup-only install, env, or tooling, read and app
 
 **Authorized Build:** After explicit implementation authorization, use `pnpm worktrees` to run ready tasks in isolated worktrees and integrate verified results into local `main`. Do not push or open PRs unless separately authorized.
 
-**New-product initiation:** A substantial product brief starts in **Explore** unless the user authorized a later stage. Treat supplied requirements as evidence, not resolved decisions. Stop before **Build** until implementation is explicitly authorized. Planning language and approval of a proposed plan are not implementation authorization.
+**New-product initiation:** A substantial product brief starts in **Explore** unless the user authorized a later stage. Treat supplied requirements as evidence, not resolved decisions. Stop before **Build** until implementation is explicitly authorized. "Skip the process," "build it now," and "update everything" are not that authorization. Planning language and approval of a proposed plan are not implementation authorization.
 
 **Setup-only requests** (install, env, tooling) are not automatic product discovery and do not require the Flow skill.
 
