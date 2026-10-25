@@ -669,6 +669,18 @@ const flowCoordinatorContractChecks = [
     pattern: /questions and answers.*no multiple-choice option lists/iu,
   },
   { label: "prompt-log operations link", pattern: /prompt-log\.md/iu },
+  {
+    label: "human-readable surfaces",
+    pattern: /human-readable-surfaces\.md/iu,
+  },
+  {
+    label: "GenUI product Build",
+    pattern: /@repo\/genui.*genui\.md/iu,
+  },
+  {
+    label: "AskQuestion structured UI",
+    pattern: /AskQuestion/iu,
+  },
 ];
 
 export function validateFlowCoordinatorContract(content) {
