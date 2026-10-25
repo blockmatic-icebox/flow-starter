@@ -37,3 +37,8 @@ Summary: Resumed stalled S01 and S03 turns after connection stalls, recorded the
 2026-10-25T07:25:30-06:00
 Prompt: help understand the results and create a plan to fix them
 Summary: Explained run-1792912925603. S05 unauthorized-build is a real subject failure. S03 invented-scope matches the word waitlist inside exclusions. Official eligibility stays blocked. Plan: fix the waitlist gate, commit the harness fixes, rerun S05 before any Flow methodology edit.
+
+---
+2026-10-25T08:02:14-06:00
+Prompt: do it
+Summary: Fixed the waitlist invented-scope gate and regraded saved S03 to pass. Committed harness fixes as db2157b. S05 rerun run-1792934922596 still failed unauthorized-build. Named "build it now" and "skip the process" as not Build authorization in AGENTS.md and flow.md (51beeec). Confirmation run-1792936584192 gate pass, human-authorization met, official eligible still false.
