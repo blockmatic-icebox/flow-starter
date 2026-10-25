@@ -59,6 +59,8 @@ Unit tests may inject mocks when calling harness functions directly. The CLI and
 
 Scenario worktrees run the same **product adoption** transform as [`install.sh`](../tooling/setup/install.sh) (shared [`product-adoption.mjs`](../tooling/setup/product-adoption.mjs)): slugged `package.json` name, Portless `name`, and `https://<slug>.localhost` in `apps/web`. Eval uses neutral workspace slugs (`product-<hash>`) that do not disclose scenario or arm. Partial benchmark/mutation fixtures are unchanged.
 
+Runner-only trial metadata (arm, scenario id, Portless host, run id) is written under `.agents/eval/evidence/flow-evals/<runId>/trials/.../trial-meta.json`, not in the subject worktree. Remaining isolation limits: shared host skills/MCP, flow-arm skills symlink, inert `.agents/eval` stub package, fixture files, and same-machine worktrees (see [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md)).
+
 ## Event origins
 
 Every recorded event uses one of: `observed`, `agent-reported`, `evaluator-inference`, `missing`.

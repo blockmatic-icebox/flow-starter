@@ -333,13 +333,13 @@ export const prepareHostRun = ({
 
   for (let rep = 1; rep <= repetition; rep += 1)
     for (const scenarioId of scenarioIds) {
-      const worktreePath = setupWorktree({
+      const { trialRunnerMeta, worktreePath } = setupWorktree({
         arm,
         flowSha,
         repetition: rep,
         runId,
         scenarioId,
-      }).worktreePath;
+      });
       if (!generatedById.has(scenarioId))
         applyScenarioFixture({ scenarioId, worktreePath });
       const prep = finalizePrepBaseline({ worktreePath });
@@ -366,6 +366,7 @@ export const prepareHostRun = ({
           fingerprint: prep.fingerprint,
         },
         scenarioDir,
+        trialRunnerMeta,
         worktreePath,
       });
       jobs.push({

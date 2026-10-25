@@ -124,15 +124,15 @@ const prepareScenarioWorktree = ({
   if (existingWorktree)
     return { ok: true as const, worktreePath: existingWorktree };
   try {
-    const worktreePath = setupWorktree({
+    const { trialRunnerMeta, worktreePath } = setupWorktree({
       arm,
       flowSha,
       repetition,
       runId,
       scenarioId,
-    }).worktreePath;
+    });
     if (!generated) applyScenarioFixture({ scenarioId, worktreePath });
-    return { ok: true as const, worktreePath };
+    return { ok: true as const, trialRunnerMeta, worktreePath };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "worktree setup failed";
@@ -182,6 +182,7 @@ const runScenarioSession = async ({
   });
   if (!worktreeResult.ok) return worktreeResult;
   const worktreePath = worktreeResult.worktreePath;
+  const trialRunnerMeta = worktreeResult.trialRunnerMeta;
 
   const prep = prepBaselineSha
     ? {
@@ -227,6 +228,7 @@ const runScenarioSession = async ({
     },
     scenarioDir,
     sessionId,
+    trialRunnerMeta,
     worktreePath,
   });
 

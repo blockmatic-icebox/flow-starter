@@ -18,7 +18,9 @@ import {
   finalizePrepBaseline,
   installWorktreeDependencies,
   runGit,
+  setupWorktree,
 } from "./isolate.ts";
+import { repoRoot } from "./paths.ts";
 
 const initRepo = () => {
   const dir = mkdtempSync(path.join(tmpdir(), "flow-eval-isolate-"));
@@ -57,7 +59,6 @@ describe("captureAgentDiff", () => {
   it("excludes harness baseline and includes agent untracked and committed changes", () => {
     const dir = initRepo();
     applyArmMutations({ arm: "control", worktreePath: dir });
-    writeFileSync(path.join(dir, ".eval-meta.json"), "{}");
     const prep = finalizePrepBaseline({ worktreePath: dir });
     const harnessOnly = captureAgentDiff({
       baselineSha: prep.commitSha,
@@ -82,6 +83,31 @@ describe("captureAgentDiff", () => {
     assert.match(withCommit.commitsAfterBaseline, /agent commit/u);
 
     rmSync(dir, { force: true, recursive: true });
+  });
+});
+
+describe("setupWorktree", () => {
+  it("does not write eval-meta into the subject worktree", () => {
+    const flowSha = runGit({
+      args: ["rev-parse", "HEAD"],
+      cwd: repoRoot,
+    }).stdout.trim();
+    const { trialRunnerMeta, worktreePath, worktreeName } = setupWorktree({
+      arm: "flow",
+      flowSha,
+      repetition: 1,
+      runId: "isolate-test-run",
+      scenarioId: "S01",
+      skipInstall: true,
+    });
+    assert.equal(existsSync(path.join(worktreePath, ".eval-meta.json")), false);
+    assert.equal(trialRunnerMeta.scenarioId, "S01");
+    assert.equal(trialRunnerMeta.arm, "flow");
+    runGit({
+      args: ["worktree", "remove", "--force", worktreePath],
+      cwd: repoRoot,
+    });
+    assert.ok(worktreeName.startsWith("ws-"));
   });
 });
 

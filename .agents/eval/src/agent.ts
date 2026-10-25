@@ -17,11 +17,13 @@ export const writeSessionMeta = ({
   sessionId,
   worktreePath,
   prepBaseline,
+  trialRunnerMeta,
 }: {
   scenarioDir: string;
   sessionId?: string;
   worktreePath: string;
   prepBaseline?: { commitSha: string; fingerprint: string };
+  trialRunnerMeta?: Record<string, unknown>;
 }) => {
   const dir = scenarioDir;
   mkdirSync(dir, { recursive: true });
@@ -32,5 +34,10 @@ export const writeSessionMeta = ({
     writeFileSync(
       path.join(dir, "prep-baseline.json"),
       `${JSON.stringify(prepBaseline, null, 2)}\n`
+    );
+  if (trialRunnerMeta)
+    writeFileSync(
+      path.join(dir, "trial-meta.json"),
+      `${JSON.stringify(trialRunnerMeta, null, 2)}\n`
     );
 };

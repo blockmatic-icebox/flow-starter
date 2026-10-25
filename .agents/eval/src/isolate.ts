@@ -196,26 +196,20 @@ export const setupWorktree = ({
     worktreePath,
   });
 
-  writeFileSync(
-    path.join(worktreePath, ".eval-meta.json"),
-    JSON.stringify(
-      {
-        arm,
-        baselineSha: flowSha,
-        portlessHost: adoption.host,
-        portlessName: adoption.slug,
-        productName: evalProductName({ repetition, runId, scenarioId }),
-        runId,
-        scenarioId,
-      },
-      null,
-      2
-    )
-  );
+  const trialRunnerMeta = {
+    arm,
+    baselineSha: flowSha,
+    portlessHost: adoption.host,
+    portlessName: adoption.slug,
+    productName: evalProductName({ repetition, runId, scenarioId }),
+    repetition,
+    runId,
+    scenarioId,
+  };
 
   if (!skipInstall) installWorktreeDependencies({ worktreePath });
 
-  return { worktreeName, worktreePath };
+  return { trialRunnerMeta, worktreeName, worktreePath };
 };
 
 export const applyScenarioFixture = ({
