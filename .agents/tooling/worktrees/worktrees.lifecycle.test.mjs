@@ -13,10 +13,16 @@ import test from "node:test";
 import { setTimeout as delay } from "node:timers/promises";
 
 import { runGit, revParse } from "./git.mjs";
-import { loadAndValidateInitiative } from "./initiative.mjs";
-import { prepareReadyTasks, safeCleanupTask } from "./lifecycle.mjs";
+import { loadAndValidateInitiative, tasksByIdMap } from "./initiative.mjs";
+import {
+  integrateTask,
+  prepareReadyTasks,
+  prepareTaskWorktree,
+  safeCleanupTask,
+  verifyTaskResult,
+} from "./lifecycle.mjs";
 import { runInitiative, runSequentialForTests } from "./run.mjs";
-import { loadState } from "./state.mjs";
+import { loadState, saveState } from "./state.mjs";
 
 const initGitRepo = (root) => {
   runGit({ args: ["init", "-b", "main"], cwd: root });
@@ -342,4 +348,190 @@ test("parallel workers overlap under async pool", async () => {
   });
   assert.equal(result.ok, true);
   assert.ok(maxSeen >= 2);
+});
+
+const singleBuildInitiative = (writePath) => `
+## Waves
+
+### Wave one
+
+#### task: only
+
+- mode: build
+- flow_stage: Build
+- depends_on: []
+- writes:
+  - ${writePath}
+- reads:
+  - README.md
+- skills:
+  - incremental-implementation
+- acceptance: test -f ${writePath}
+- build_authorized: yes
+`;
+
+const finishBuildTask = ({ repoRoot, slug, state, task }) => {
+  const record = state.tasks[task.id];
+  const filePath = path.join(record.worktreePath, task.writes[0]);
+  mkdirSync(path.dirname(filePath), { recursive: true });
+  writeFileSync(filePath, `${task.id}\n`, "utf-8");
+  const verified = verifyTaskResult({
+    repoRoot,
+    slug,
+    state,
+    task,
+  });
+  assert.equal(verified.ok, true);
+  const integrated = integrateTask({ repoRoot, slug, state, task });
+  assert.equal(integrated.ok, true);
+  saveState({ repoRoot, slug, state });
+};
+
+test("committed out-of-scope changes fail verification", async () => {
+  const root = repoWithInitiative(singleBuildInitiative("pkg/allowed.txt"));
+  const parsed = loadAndValidateInitiative("demo", root).parsed;
+  const result = await runSequentialForTests({
+    initiativeRelative: "docs/initiatives/demo.md",
+    parsed,
+    repoRoot: root,
+    slug: "demo",
+    workerFn: ({ record }) => {
+      mkdirSync(path.join(record.worktreePath, "pkg"), { recursive: true });
+      writeFileSync(
+        path.join(record.worktreePath, "pkg/allowed.txt"),
+        "ok",
+        "utf-8"
+      );
+      writeFileSync(
+        path.join(record.worktreePath, "OUTSIDE.txt"),
+        "nope",
+        "utf-8"
+      );
+      runGit({
+        args: ["add", "pkg/allowed.txt", "OUTSIDE.txt"],
+        cwd: record.worktreePath,
+      });
+      runGit({
+        args: ["commit", "-m", "worker overreach", "--no-verify"],
+        cwd: record.worktreePath,
+      });
+      return { ok: true, stdout: "committed" };
+    },
+  });
+  assert.equal(result.ok, false);
+  assert.ok(!existsSync(path.join(root, "pkg/allowed.txt")));
+  assert.ok(!existsSync(path.join(root, "OUTSIDE.txt")));
+});
+
+test("scoped commits integrate into main", () => {
+  const root = repoWithInitiative(singleBuildInitiative("pkg/allowed.txt"));
+  const parsed = loadAndValidateInitiative("demo", root).parsed;
+  const slug = "demo";
+  const initiativeRelative = "docs/initiatives/demo.md";
+  const { state } = prepareReadyTasks({
+    initiativeRelative,
+    parsed,
+    repoRoot: root,
+    slug,
+  });
+  const task = tasksByIdMap(parsed).get("only");
+  finishBuildTask({ repoRoot: root, slug, state, task });
+  assert.equal(
+    readFileSync(path.join(root, "pkg/allowed.txt"), "utf-8"),
+    "only\n"
+  );
+});
+
+test("read-only task cannot pass by committing changes", async () => {
+  const body = `
+## Waves
+
+### Wave one
+
+#### task: review
+
+- mode: question
+- flow_stage: Review
+- depends_on: []
+- writes: []
+- reads:
+  - README.md
+- skills:
+  - incremental-implementation
+`;
+  const root = repoWithInitiative(body);
+  const parsed = loadAndValidateInitiative("demo", root).parsed;
+  const result = await runSequentialForTests({
+    initiativeRelative: "docs/initiatives/demo.md",
+    parsed,
+    repoRoot: root,
+    slug: "demo",
+    workerFn: ({ record }) => {
+      writeFileSync(path.join(record.worktreePath, "secret.txt"), "x", "utf-8");
+      runGit({ args: ["add", "secret.txt"], cwd: record.worktreePath });
+      runGit({
+        args: ["commit", "-m", "illegal", "--no-verify"],
+        cwd: record.worktreePath,
+      });
+      return { ok: true, stdout: "findings" };
+    },
+  });
+  assert.equal(result.ok, false);
+});
+
+const assertCDependencyBase = ({ integrationOrder }) => {
+  const root = repoWithInitiative(twoParallelInitiative);
+  const parsed = loadAndValidateInitiative("demo", root).parsed;
+  const slug = "demo";
+  const initiativeRelative = "docs/initiatives/demo.md";
+  const tasksById = tasksByIdMap(parsed);
+  const { state } = prepareReadyTasks({
+    initiativeRelative,
+    parsed,
+    repoRoot: root,
+    slug,
+  });
+
+  for (const taskId of integrationOrder) {
+    const task = tasksById.get(taskId);
+    const record = state.tasks[taskId];
+    const filePath = path.join(record.worktreePath, task.writes[0]);
+    mkdirSync(path.dirname(filePath), { recursive: true });
+    writeFileSync(filePath, `content-${taskId}\n`, "utf-8");
+    const verified = verifyTaskResult({
+      repoRoot: root,
+      slug,
+      state,
+      task,
+    });
+    assert.equal(verified.ok, true, `verify ${taskId}`);
+    const integrated = integrateTask({ repoRoot: root, slug, state, task });
+    assert.equal(integrated.ok, true, `integrate ${taskId}`);
+    saveState({ repoRoot: root, slug, state });
+  }
+
+  prepareTaskWorktree({
+    initiativeRelative,
+    repoRoot: root,
+    slug,
+    state,
+    task: tasksById.get("c"),
+  });
+  const cRoot = state.tasks.c.worktreePath;
+  assert.equal(
+    readFileSync(path.join(cRoot, "pkg/a.txt"), "utf-8"),
+    "content-a\n"
+  );
+  assert.equal(
+    readFileSync(path.join(cRoot, "pkg/b.txt"), "utf-8"),
+    "content-b\n"
+  );
+};
+
+test("dependent task base includes prerequisites when B integrates before A", () => {
+  assertCDependencyBase({ integrationOrder: ["b", "a"] });
+});
+
+test("dependent task base includes prerequisites when A integrates before B", () => {
+  assertCDependencyBase({ integrationOrder: ["a", "b"] });
 });

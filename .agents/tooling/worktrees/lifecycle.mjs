@@ -8,7 +8,7 @@ import {
   resolveBaseRef,
   scopedCheckpointPaths,
 } from "./checkpoint.mjs";
-import { runGit, revParse, isCleanWorktree } from "./git.mjs";
+import { runGit, revParse } from "./git.mjs";
 import { listAllTasks, tasksByIdMap } from "./initiative.mjs";
 import {
   advanceMainIfSafe,
@@ -76,7 +76,9 @@ export const prepareTaskWorktree = ({
     return record.worktreePath;
   }
 
-  const ref = resolveBaseRef({ state, task });
+  const resolved = resolveBaseRef({ repoRoot, state, task });
+  if (resolved.error) throw new Error(resolved.error);
+  const ref = resolved.ref;
 
   const branch = branchName({ slug, taskId: task.id });
   const worktreePath = worktreePathForTask({ repoRoot, slug, taskId: task.id });
@@ -164,9 +166,14 @@ export const verifyTaskResult = ({ state, task, repoRoot, slug }) => {
   setTaskStatus(state, task.id, "verifying");
 
   if (task.mode === "question") {
-    if (!isCleanWorktree({ cwd })) {
+    const questionOutOfScope = findOutOfScopePaths({
+      baseSha: record.baseSha,
+      cwd,
+      writes: [],
+    });
+    if (questionOutOfScope.length > 0) {
       setTaskStatus(state, task.id, "failed", {
-        error: "question task must not modify files",
+        error: `question task must not modify files: ${questionOutOfScope.join(", ")}`,
       });
       return { ok: false, reason: "question task dirty" };
     }
@@ -183,7 +190,11 @@ export const verifyTaskResult = ({ state, task, repoRoot, slug }) => {
     return { ok: true };
   }
 
-  const outOfScope = findOutOfScopePaths({ cwd, writes: task.writes });
+  const outOfScope = findOutOfScopePaths({
+    baseSha: record.baseSha,
+    cwd,
+    writes: task.writes,
+  });
   if (outOfScope.length > 0) {
     setTaskStatus(state, task.id, "failed", {
       error: `out-of-scope: ${outOfScope.join(", ")}`,
@@ -192,6 +203,7 @@ export const verifyTaskResult = ({ state, task, repoRoot, slug }) => {
   }
 
   const commitResult = commitTaskChanges({
+    baseSha: record.baseSha,
     cwd,
     taskId: task.id,
     writes: task.writes,
@@ -235,6 +247,21 @@ export const integrateTask = ({ repoRoot, slug, state, task }) => {
         ok: false,
         reason: `task ${task.id} not ready to integrate (${record.status})`,
       };
+
+    if (record.worktreePath) {
+      const integrationOutOfScope = findOutOfScopePaths({
+        baseSha: record.baseSha,
+        cwd: record.worktreePath,
+        writes: task.writes,
+      });
+      if (integrationOutOfScope.length > 0) {
+        setTaskStatus(state, task.id, "failed", {
+          error: `out-of-scope at integration: ${integrationOutOfScope.join(", ")}`,
+        });
+        return { ok: false, outOfScope: integrationOutOfScope };
+      }
+    }
+
     const mainRef = revParse({ cwd: repoRoot, ref: "HEAD" });
     const integrationCwd = ensureIntegrationWorktree({
       mainRef,

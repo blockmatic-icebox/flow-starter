@@ -97,19 +97,44 @@ export const createScopedCheckpoint = ({ repoRoot, paths: filePaths }) => {
   return { checkpointPaths: filePaths, checkpointSha: commitSha };
 };
 
-export const resolveBaseRef = ({ state, task }) => {
-  if (task.depends_on.length === 0)
-    return state.checkpointSha ?? state.sourceRevision;
+const isAncestor = ({ repoRoot, ancestor, descendant }) => {
+  if (ancestor === descendant) return true;
+  const { status } = runGit({
+    allowFailure: true,
+    args: ["merge-base", "--is-ancestor", ancestor, descendant],
+    cwd: repoRoot,
+  });
+  return status === 0;
+};
 
-  let latest = null;
-  for (const dep of task.depends_on) {
-    const record = state.tasks[dep];
-    if (record?.integrationSha) latest = record.integrationSha;
+export const resolveBaseRef = ({ repoRoot, state, task }) => {
+  if (task.depends_on.length === 0)
+    return {
+      ref: state.checkpointSha ?? state.sourceRevision,
+    };
+
+  const depShas = task.depends_on
+    .map((dep) => state.tasks[dep]?.integrationSha)
+    .filter(Boolean);
+
+  const containsAllDeps = (candidate) =>
+    depShas.every((sha) =>
+      isAncestor({ ancestor: sha, descendant: candidate, repoRoot })
+    );
+
+  const candidates = [
+    state.integrationHead,
+    ...depShas,
+    state.checkpointSha,
+    state.sourceRevision,
+  ].filter(Boolean);
+
+  for (const candidate of new Set(candidates)) {
+    if (depShas.length === 0 || containsAllDeps(candidate))
+      return { ref: candidate };
   }
-  return (
-    latest ??
-    state.integrationHead ??
-    state.checkpointSha ??
-    state.sourceRevision
-  );
+
+  return {
+    error: `task ${task.id}: no integrated base contains all dependencies`,
+  };
 };

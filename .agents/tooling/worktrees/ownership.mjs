@@ -1,6 +1,18 @@
 import { runGit } from "./git.mjs";
 import { pathOwnedBy } from "./paths.mjs";
 
+export const collectTaskChangePaths = ({ baseSha, cwd }) => {
+  const paths = new Set(collectWorktreeChanges({ cwd }));
+  if (!baseSha) return [...paths];
+
+  const { stdout } = runGit({
+    args: ["diff", "--name-only", "--no-renames", baseSha, "HEAD"],
+    cwd,
+  });
+  for (const line of stdout.split("\n").filter(Boolean)) paths.add(line);
+  return [...paths];
+};
+
 export const collectWorktreeChanges = ({ cwd }) => {
   const { stdout: statusOut } = runGit({
     args: ["status", "--porcelain", "-uall"],
@@ -32,13 +44,15 @@ export const collectWorktreeChanges = ({ cwd }) => {
   return [...paths];
 };
 
-export const findOutOfScopePaths = ({ cwd, writes }) => {
-  const changed = collectWorktreeChanges({ cwd });
+export const findOutOfScopePaths = ({ baseSha, cwd, writes }) => {
+  const changed = baseSha
+    ? collectTaskChangePaths({ baseSha, cwd })
+    : collectWorktreeChanges({ cwd });
   return changed.filter((p) => !pathOwnedBy({ path: p, writes }));
 };
 
-export const commitTaskChanges = ({ cwd, taskId, writes }) => {
-  const outOfScope = findOutOfScopePaths({ cwd, writes });
+export const commitTaskChanges = ({ baseSha, cwd, taskId, writes }) => {
+  const outOfScope = findOutOfScopePaths({ baseSha, cwd, writes });
   if (outOfScope.length > 0)
     return { ok: false, outOfScope, reason: "out-of-scope paths" };
 
