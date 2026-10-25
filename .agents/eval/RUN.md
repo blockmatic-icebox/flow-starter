@@ -28,6 +28,7 @@ pnpm eval:experiment --seed example-seed
 pnpm eval:self-improve
 pnpm eval:self-improve --iterations 3 --seed example-campaign --dry-run
 pnpm eval:experiment --profile full-product --count 1
+pnpm eval:experiment -- --profile technical-ai-assessment
 pnpm --filter @repo/flow-eval eval run --scenarios S01,S02,S05,S09,S13 --arm flow --dry-run
 pnpm --filter @repo/flow-eval eval compare --baseline run-a --current run-b
 pnpm --filter @repo/flow-eval eval pilot-loop --dry-run
@@ -43,6 +44,8 @@ pnpm eval:benchmark:checkout
 ```
 
 Product evidence: `__dev/product-evals/<runId>/` (`manifest.json`, `readiness.json`, `findings.json`, `summary.md`).
+
+`eval experiment --profile technical-ai-assessment` prepares one directory per arm under `__dev/product-evals/<arm>-<runId>/`. Exit 0 means the session is initialized. `productEvaluated` stays false and `releaseVerdict` stays `INCONCLUSIVE` until product checks cover `acceptance.json`. The build target is arm `assessment-a`.
 
 Blind subjective scores: `__dev/flow-evals/<runId>/blind-reviews/<scenarioId>.json` (see `src/blind-review.ts`). Not copied into executor worktrees.
 

@@ -74,16 +74,19 @@ const obsoletePathPatterns = [
   { label: "docs/agents", pattern: /docs\/agents\//u },
 ];
 
-const forbiddenProductStarterPaths = [
+const retiredAssessmentPaths = [
   "apps/web/app/features",
   "apps/web/app/api/features",
   "apps/web/app/_lib/features",
   "apps/web/data/feature-requests.seed.json",
   "apps/web/app/_components/feature-nav.tsx",
   "apps/web/app/_components/feature-triage-panel.tsx",
-  "CLAUDE.md",
-  "prompts.txt",
 ];
+
+const submissionLogPaths = ["CLAUDE.md", "prompts.txt"];
+
+const featureIntelligenceAdoptionAdr =
+  "docs/adr/0002-feature-intelligence-product.md";
 
 const migratedFactoryAdrBasenames = new Set([
   "0001-agentic-architecture.md",
@@ -601,13 +604,31 @@ function validateFactoryAdrPlacement(root) {
 const staleFactoryDocLinkPattern =
   /docs\/(?:adr\/(?:000[1-9]|00[1-9][0-9]|010|011|012|013)-(?:agentic|vercel|genui|voice|workspace|external|monorepo|react|site|api|flow)|pdr\/0001-agnostic|readme\.md|specs\/genui\.md|security\/security-model\.md)/u;
 
+function featureIntelligenceAdoptionAccepted(root) {
+  const filename = path.join(root, featureIntelligenceAdoptionAdr);
+  if (!existsSync(filename)) return false;
+  return /^\*\*Status:\*\*\s*Accepted\s*$/mu.test(
+    readFileSync(filename, "utf-8")
+  );
+}
+
 function validateProductStarter(root) {
   const errors = [];
 
-  for (const relative of forbiddenProductStarterPaths) {
+  for (const relative of retiredAssessmentPaths) {
     if (existsSync(path.join(root, relative))) {
       errors.push(
-        `${relative}: Feature Intelligence assessment artifact must not exist in product starter`
+        `${relative}: keep the request workflow under apps/web/app/requests`
+      );
+    }
+  }
+
+  if (featureIntelligenceAdoptionAccepted(root)) return errors;
+
+  for (const relative of submissionLogPaths) {
+    if (existsSync(path.join(root, relative))) {
+      errors.push(
+        `${relative}: prompt log requires Accepted ${featureIntelligenceAdoptionAdr}`
       );
     }
   }
@@ -617,11 +638,13 @@ function validateProductStarter(root) {
     const content = readFileSync(pagePath, "utf-8");
     if (/Feature Intelligence/u.test(content)) {
       errors.push(
-        "apps/web/app/page.tsx: must not reference Feature Intelligence"
+        `apps/web/app/page.tsx: product homepage requires Accepted ${featureIntelligenceAdoptionAdr}`
       );
     }
     if (!/Product starter/u.test(content)) {
-      errors.push("apps/web/app/page.tsx: expected Product starter homepage");
+      errors.push(
+        `apps/web/app/page.tsx: starter homepage stays until Accepted ${featureIntelligenceAdoptionAdr}`
+      );
     }
   }
 
@@ -630,7 +653,7 @@ function validateProductStarter(root) {
     const content = readFileSync(layoutPath, "utf-8");
     if (/Feature Intelligence/u.test(content)) {
       errors.push(
-        "apps/web/app/layout.tsx: must not use Feature Intelligence metadata"
+        `apps/web/app/layout.tsx: product metadata requires Accepted ${featureIntelligenceAdoptionAdr}`
       );
     }
   }

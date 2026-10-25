@@ -1,0 +1,11 @@
+2026-10-24T21:18:00-06:00
+Prompt: Do a contrarian review of the project and say whether we are ready to start real testing, with me as the user developing the assessment for the Technical AI Assessment.
+Response: The checkout was still a neutral starter. The assessment command always recorded a blocked build. Real testing of the product could not start.
+
+2026-10-24T21:21:00-06:00
+Prompt: Fix everything you think needs fixing to start using the framework to develop that app.
+Response: Adopted Feature Intelligence in Product ADR 0002, PRODUCT.md, and DESIGN.md. The doc check now allows the product homepage and prompt log when that ADR is Accepted, and it keeps the retired app/features tree out. The assessment experiment prepares an initialized session and leaves holdout checks unverified. The request UI slice is specified and still unbuilt.
+
+2026-10-24T21:30:47-06:00
+Prompt: git commit push to main
+Response: Committed the Feature Intelligence adoption and pushed it to main.

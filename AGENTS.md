@@ -50,6 +50,8 @@ Do not read every ADR or research file for ordinary changes. Do not present plan
 
 Every final agent response MUST end with the **Skills loaded** footer defined in [.agents/flow/operations/skills.md](.agents/flow/operations/skills.md).
 
+On each new user instruction in this checkout, append an ISO 8601 timestamp, the instruction, and a short response summary to [prompts.txt](prompts.txt), as [CLAUDE.md](CLAUDE.md) requires.
+
 <!-- BEGIN:turborepo-agent-rules -->
 
 # This is NOT the Turborepo you know

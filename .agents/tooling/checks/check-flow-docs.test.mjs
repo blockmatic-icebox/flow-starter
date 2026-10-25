@@ -129,7 +129,7 @@ test("allows absent optional directories", (t) => {
   assert.deepEqual(validateFlowDocs(root), []);
 });
 
-test("rejects Feature Intelligence paths in product starter", (t) => {
+test("rejects retired feature paths in the product app", (t) => {
   const root = fixture(t, ["apps/web/app/features/page.tsx"], {
     "apps/web/app/features/page.tsx":
       "export default function Page() { return null; }",
@@ -137,7 +137,75 @@ test("rejects Feature Intelligence paths in product starter", (t) => {
 
   assert.match(
     validateFlowDocs(root).join("\n"),
-    /apps\/web\/app\/features: Feature Intelligence assessment artifact/u
+    /apps\/web\/app\/features: keep the request workflow under apps\/web\/app\/requests/u
+  );
+});
+
+test("allows the product homepage and prompt log after accepted adoption", (t) => {
+  const root = fixture(
+    t,
+    [
+      "apps/web/app/page.tsx",
+      "apps/web/app/layout.tsx",
+      "apps/web/app/requests/page.tsx",
+      "CLAUDE.md",
+      "prompts.txt",
+      "docs/adr/0002-feature-intelligence-product.md",
+    ],
+    {
+      "CLAUDE.md": "# Project Rules\n",
+      "apps/web/app/layout.tsx":
+        'export const metadata = { title: "Feature Intelligence" };',
+      "apps/web/app/page.tsx":
+        "export default function Page() { return <h1>Feature Intelligence</h1>; }",
+      "apps/web/app/requests/page.tsx":
+        "export default function Page() { return null; }",
+      "prompts.txt": "2026-10-24T21:21:00-06:00\n",
+    }
+  );
+
+  assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("keeps the starter homepage until product adoption is accepted", (t) => {
+  const root = fixture(
+    t,
+    ["apps/web/app/page.tsx", "docs/adr/0002-feature-intelligence-product.md"],
+    {
+      "apps/web/app/page.tsx":
+        "export default function Page() { return <h1>Feature Intelligence</h1>; }",
+      "docs/adr/0002-feature-intelligence-product.md": `Date: 2026-10-24
+
+# Decision
+
+**Status:** Proposed
+
+## Context
+
+Example context.
+
+## Decision
+
+Example decision.
+
+## Alternatives considered
+
+None for fixture.
+
+## Consequences
+
+Example consequences.
+
+## Related documents
+
+None.
+`,
+    }
+  );
+
+  assert.match(
+    validateFlowDocs(root).join("\n"),
+    /apps\/web\/app\/page\.tsx: product homepage requires Accepted docs\/adr\/0002-feature-intelligence-product\.md/u
   );
 });
 

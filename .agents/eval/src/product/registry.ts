@@ -5,23 +5,15 @@ export const starterRequirements = (): RequirementRecord[] => [
     requirementId: "STARTER-001",
     releaseBlocking: true,
     source: "apps/web neutral starter contract",
-    title: "Product starter homepage is domain-neutral",
+    title: "Homepage identifies the Feature Intelligence product",
     verification: [{ caseId: "web-starter-unit", kind: "unit" }],
   },
   {
     requirementId: "STARTER-002",
     releaseBlocking: true,
     source: "apps/web/tests/browser/smoke.spec.ts",
-    title: "No obsolete Feature Intelligence routes",
+    title: "Retired feature-request URLs stay absent",
     verification: [{ caseId: "web-starter-browser", kind: "browser" }],
-  },
-  {
-    nonGoal: true,
-    requirementId: "STARTER-NG-001",
-    releaseBlocking: false,
-    source: "PRODUCT.md non-goals",
-    title: "Feature Intelligence product in apps/web",
-    verification: [],
   },
 ];
 

@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("homepage renders without consultant or GenUI demo", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Product starter" })
+    page.getByRole("heading", { name: "Feature Intelligence" })
   ).toBeVisible();
   await expect(page.getByPlaceholder("Message Flow Agent…")).toHaveCount(0);
   await expect(page.getByLabel("Ask about Flow")).toHaveCount(0);
@@ -22,7 +22,7 @@ test("no MCP endpoint on product app", async ({ page }) => {
   expect(response.status()).toBe(404);
 });
 
-test("no Feature Intelligence routes", async ({ page }) => {
+test("retired feature-request URLs stay absent", async ({ page }) => {
   const features = await page.goto("/features");
   expect(features?.status()).toBe(404);
 

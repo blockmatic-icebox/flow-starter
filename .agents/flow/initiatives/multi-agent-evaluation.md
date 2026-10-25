@@ -13,7 +13,7 @@
 ## Non-goals
 
 - L0 observer, L2 autopromotion, background reflection, second product lifecycle.
-- Feature Intelligence in `apps/web`; permanent benchmark products in starter.
+- Permanent benchmark products in the starter template. Feature Intelligence follows [Product ADR 0002](../../../docs/adr/0002-feature-intelligence-product.md).
 
 ## Waves
 

@@ -59,3 +59,5 @@ Historical v0.1 run: partial transcripts, three P0 patterns (unauthorized Build,
 | **Removed** | All FI application code, seed data, assessment `CLAUDE.md` / `prompts.txt`, starter `ai`/`zod` deps |
 | **Proposed Flow corrections** | (1) Gate **Build** on ADR 0012 check for `apps/web` route additions beyond starter template. (2) Require green `pnpm lint` before claiming verification complete. (3) Run official S13/S16 matrix only with `agent login` and complete telemetry — see pilot matrix in [flow-improvement-loop.md](flow-improvement-loop.md). |
 | **Next experiment** | Host-session S13 + S16, 2 reps × flow/control, max 8 sessions via `/flow-eval` |
+
+Product ADR 0002 accepts this checkout as the Feature Intelligence product. Request routes belong under `apps/web/app/requests/`. The starter path check allows the product homepage and prompt log while that ADR is Accepted, and it keeps the retired `apps/web/app/features` tree out. `pnpm eval:experiment -- --profile technical-ai-assessment` records lifecycle `initialized` and release verdict `INCONCLUSIVE`.

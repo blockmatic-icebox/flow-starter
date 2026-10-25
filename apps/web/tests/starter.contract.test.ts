@@ -5,14 +5,15 @@ import test from "node:test";
 
 const root = path.join(import.meta.dirname, "..");
 
-test("product starter homepage copy", () => {
+test("homepage identifies Feature Intelligence", () => {
   const page = readFileSync(path.join(root, "app/page.tsx"), "utf-8");
-  assert.match(page, /Product starter/u);
-  assert.doesNotMatch(page, /Feature Intelligence/u);
+  assert.match(page, /Feature Intelligence/u);
+  assert.match(page, /feature-intelligence initiative/u);
+  assert.doesNotMatch(page, /Replace PRODUCT\.md/u);
 });
 
-test("generic application metadata", () => {
+test("product application metadata", () => {
   const layout = readFileSync(path.join(root, "app/layout.tsx"), "utf-8");
-  assert.match(layout, /title:\s*"Product"/u);
-  assert.match(layout, /Product starter — replace PRODUCT\.md and DESIGN\.md/u);
+  assert.match(layout, /title:\s*"Feature Intelligence"/u);
+  assert.doesNotMatch(layout, /replace PRODUCT\.md/u);
 });
