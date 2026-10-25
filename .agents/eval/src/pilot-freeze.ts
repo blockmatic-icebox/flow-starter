@@ -18,9 +18,9 @@ import { catalogHash, scenarioOracleHash } from "./scenarios.ts";
 import { skillsLockHash } from "./skills-lock.ts";
 import type { EvalArm, PreparedSourceIdentity } from "./types.ts";
 
-export const PILOT_SCENARIOS = ["S09", "S13"] as const;
-export const PILOT_ARMS: EvalArm[] = ["flow", "control"];
-export const PILOT_REPS_PER_CELL = 8;
+const PILOT_SCENARIOS = ["S09", "S13"] as const;
+const PILOT_ARMS: EvalArm[] = ["flow", "control"];
+const PILOT_REPS_PER_CELL = 8;
 
 const PILOT_SPEC_PATH = ".agents/flow/specs/eval-pilot-s09-s13.md";
 
@@ -31,7 +31,7 @@ export type PilotSessionSlot = {
   order: number;
 };
 
-export const buildPilotSchedule = ({ seed }: { seed: string }) => {
+const buildPilotSchedule = ({ seed }: { seed: string }) => {
   const slots: Omit<PilotSessionSlot, "order">[] = [];
   for (const scenarioId of PILOT_SCENARIOS)
     for (const arm of PILOT_ARMS)

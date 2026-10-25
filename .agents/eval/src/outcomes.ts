@@ -2,7 +2,6 @@ import type {
   CommandEvidence,
   Completeness,
   GateId,
-  GradeResult,
   HarnessKind,
   OutcomeVerdict,
   ScenarioOracle,
@@ -69,13 +68,3 @@ export const deriveScenarioOutcomes = ({
     verificationClaim,
   };
 };
-
-export const summarizeGradeOutcomes = ({ grades }: { grades: GradeResult[] }) =>
-  grades.map((g) => ({
-    blockers: g.blockers,
-    evidenceValidity: g.evidenceValidity,
-    gateIds: g.gateIds,
-    officialEligible: g.officialEligible,
-    outcomes: g.outcomes,
-    scenarioId: g.scenarioId,
-  }));

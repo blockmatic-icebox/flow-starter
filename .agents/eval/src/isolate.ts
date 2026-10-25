@@ -19,7 +19,7 @@ const productAdoptionScript = path.join(
   ".agents/tooling/setup/product-adoption.mjs"
 );
 
-export const neutralWorkspaceSlug = ({
+const neutralWorkspaceSlug = ({
   repetition = 1,
   runId,
   scenarioId,
@@ -43,7 +43,7 @@ export const evalProductName = ({
   scenarioId: string;
 }) => `product-${neutralWorkspaceSlug({ repetition, runId, scenarioId })}`;
 
-export const applyProductAdoptionToWorktree = ({
+const applyProductAdoptionToWorktree = ({
   projectName,
   worktreePath,
 }: {

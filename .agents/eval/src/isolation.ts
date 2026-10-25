@@ -2,12 +2,7 @@ import type { EvalHost } from "./types.ts";
 
 export const SUBJECT_EVALUATOR_PROTOCOL_ID = "subject-evaluator-v2";
 
-export const LEGACY_OFFICIAL_PROTOCOLS = new Set([
-  "host-session-v1",
-  "cursor-cli-stream-json-2026.10",
-]);
-
-export const HISTORICAL_BASELINE_RUN_ID = "20261024-flow-v0.1-1256e532";
+const HISTORICAL_BASELINE_RUN_ID = "20261024-flow-v0.1-1256e532";
 
 export type IsolationCapability =
   | "independent-subject-conversation"

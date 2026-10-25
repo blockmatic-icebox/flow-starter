@@ -30,7 +30,7 @@ const fixtureTreeHash = () => {
   return createHash("sha256").update(parts.join("\n")).digest("hex");
 };
 
-export const commonSourceFingerprint = () =>
+const commonSourceFingerprint = () =>
   createHash("sha256")
     .update(
       [
@@ -57,9 +57,3 @@ export const recordCommonSource = (): CommonSourceIdentity => ({
   fingerprint: commonSourceFingerprint(),
   recordedAt: new Date().toISOString(),
 });
-
-export const worktreeTreeSha = ({ worktreePath }: { worktreePath: string }) =>
-  spawnSync("git", ["rev-parse", "HEAD^{tree}"], {
-    cwd: worktreePath,
-    encoding: "utf-8",
-  }).stdout.trim();

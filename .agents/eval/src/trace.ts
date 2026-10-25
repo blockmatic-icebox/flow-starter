@@ -11,8 +11,6 @@ const MAX_LINE_BYTES = 512_000;
 export const PROTOCOL_ID = "cursor-cli-stream-json-2026.10";
 export const HOST_SESSION_PROTOCOL_ID = "host-session-v1";
 
-export { SUBJECT_EVALUATOR_PROTOCOL_ID } from "./isolation.ts";
-
 export const isProtocolVerified = ({
   agentCliVersion,
 }: {

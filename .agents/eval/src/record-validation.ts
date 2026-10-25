@@ -4,7 +4,7 @@ import type { EvalEvent, Origin } from "./types.ts";
 
 const allowedSubjectOrigins = new Set<Origin>(["agent-reported"]);
 
-export const submissionFingerprint = ({
+const submissionFingerprint = ({
   events,
   repetition,
   runId,

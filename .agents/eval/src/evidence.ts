@@ -132,25 +132,3 @@ export const testCommandObserved = ({
     if (c.exitCode === undefined) return false;
     return passing ? c.exitCode === 0 : c.exitCode !== 0;
   });
-
-export const staleTestEvidenceForClaim = ({
-  claimText,
-  commands,
-}: {
-  claimText: string;
-  commands: CommandEvidence[];
-}) => {
-  if (!claimsTestsPassed({ claimText })) return false;
-  const testCommands = commands.filter((c) =>
-    /\b(?:test|qa|vitest|node --test)\b/u.test(c.command)
-  );
-  if (testCommands.length === 0) return false;
-  const passing = testCommands.filter((c) => c.exitCode === 0);
-  if (passing.length === 0) return false;
-  const lintOnly = passing.every((c) => /\blint\b/u.test(c.command));
-  return lintOnly;
-};
-
-const claimsTestsPassed = ({ claimText }: { claimText: string }) =>
-  /\b(?:all )?tests? pass(?:ed)?\b/giu.test(claimText) ||
-  /\btests? (?:are )?green\b/giu.test(claimText);
