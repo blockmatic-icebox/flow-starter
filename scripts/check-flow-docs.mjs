@@ -72,6 +72,17 @@ const obsoletePathPatterns = [
   { label: "docs/agents", pattern: /docs\/agents\//u },
 ];
 
+const forbiddenProductStarterPaths = [
+  "apps/web/app/features",
+  "apps/web/app/api/features",
+  "apps/web/app/_lib/features",
+  "apps/web/data/feature-requests.seed.json",
+  "apps/web/app/_components/feature-nav.tsx",
+  "apps/web/app/_components/feature-triage-panel.tsx",
+  "CLAUDE.md",
+  "prompts.txt",
+];
+
 const migratedFactoryAdrBasenames = new Set([
   "0001-agentic-architecture.md",
   "0002-vercel-ai-sdk-for-tier-3.md",
@@ -647,6 +658,43 @@ function validateFactoryAdrPlacement(root) {
 const staleFactoryDocLinkPattern =
   /docs\/(?:adr\/(?:000[1-9]|00[1-9][0-9]|010|011|012|013)-(?:agentic|vercel|genui|voice|workspace|external|monorepo|react|site|api|flow)|pdr\/0001-agnostic|readme\.md|specs\/genui\.md|security\/security-model\.md)/u;
 
+function validateProductStarter(root) {
+  const errors = [];
+
+  for (const relative of forbiddenProductStarterPaths) {
+    if (existsSync(path.join(root, relative))) {
+      errors.push(
+        `${relative}: Feature Intelligence assessment artifact must not exist in product starter`
+      );
+    }
+  }
+
+  const pagePath = path.join(root, "apps/web/app/page.tsx");
+  if (existsSync(pagePath)) {
+    const content = readFileSync(pagePath, "utf-8");
+    if (/Feature Intelligence/u.test(content)) {
+      errors.push(
+        "apps/web/app/page.tsx: must not reference Feature Intelligence"
+      );
+    }
+    if (!/Product starter/u.test(content)) {
+      errors.push("apps/web/app/page.tsx: expected Product starter homepage");
+    }
+  }
+
+  const layoutPath = path.join(root, "apps/web/app/layout.tsx");
+  if (existsSync(layoutPath)) {
+    const content = readFileSync(layoutPath, "utf-8");
+    if (/Feature Intelligence/u.test(content)) {
+      errors.push(
+        "apps/web/app/layout.tsx: must not use Feature Intelligence metadata"
+      );
+    }
+  }
+
+  return errors;
+}
+
 function validateStaleFactoryAdrLinks(root) {
   const errors = [];
 
@@ -753,7 +801,8 @@ export function validateFlowDocs(root = repositoryRoot) {
     ...validateFirstPartySkills(root),
     ...validateMarkdownLinks(root),
     ...validateSemanticConsistency(root),
-    ...validateKnowledgeSnapshot(root)
+    ...validateKnowledgeSnapshot(root),
+    ...validateProductStarter(root)
   );
 
   return errors;

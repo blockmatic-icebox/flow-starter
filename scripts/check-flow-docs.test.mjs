@@ -129,6 +129,18 @@ test("allows absent optional directories", (t) => {
   assert.deepEqual(validateFlowDocs(root), []);
 });
 
+test("rejects Feature Intelligence paths in product starter", (t) => {
+  const root = fixture(t, ["apps/web/app/features/page.tsx"], {
+    "apps/web/app/features/page.tsx":
+      "export default function Page() { return null; }",
+  });
+
+  assert.match(
+    validateFlowDocs(root).join("\n"),
+    /apps\/web\/app\/features: Feature Intelligence assessment artifact/u
+  );
+});
+
 test("accepts canonical filenames", (t) => {
   const root = fixture(t, [
     "docs/ideas/customer-problem.md",

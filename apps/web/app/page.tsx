@@ -1,33 +1,22 @@
-import { Button } from "@repo/ui/components/button";
-import Link from "next/link";
-
 export default function Page() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
-      <div className="flex max-w-lg flex-col gap-3 text-center">
-        <h1 className="text-2xl font-medium tracking-tight">
-          Feature Intelligence
-        </h1>
-        <p className="text-muted-foreground text-sm leading-relaxed">
-          Collect feature requests, surface support, and triage with AI-assisted
-          suggestions—confirmed by humans before prioritization.
-        </p>
-        <div className="flex flex-wrap justify-center gap-2">
-          <Button nativeButton={false} render={<Link href="/features" />}>
-            Browse requests
-          </Button>
-          <Button
-            nativeButton={false}
-            render={<Link href="/features/new" />}
-            variant="secondary"
-          >
-            Submit a request
-          </Button>
+    <div className="flex min-h-svh p-6">
+      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
+        <div>
+          <h1 className="font-medium">Product starter</h1>
+          <p>
+            Replace PRODUCT.md and DESIGN.md, then add routes under{" "}
+            <code className="font-mono text-xs">app/</code> with route-first
+            colocation. Generative UI and Flow Agent live in the separate Flow
+            application (
+            <code className="font-mono text-xs">pnpm dev:flow</code>
+            ).
+          </p>
         </div>
+        <p className="text-muted-foreground font-mono text-xs">
+          Press <kbd>d</kbd> to toggle dark mode.
+        </p>
       </div>
-      <p className="text-muted-foreground font-mono text-xs">
-        Press <kbd>d</kbd> to toggle dark mode.
-      </p>
     </div>
   );
 }
