@@ -1,6 +1,6 @@
 name: CI
 
-# Local parity: `pnpm ci:local` then `pnpm --dir .agents check`
+# Local parity: `pnpm ci:local` then `pnpm --dir .agents check` and `pnpm --dir .agents test`
 # Manual on GitHub: `gh workflow run CI`
 
 on:
@@ -61,3 +61,4 @@ jobs:
 
       - run: pnpm --dir .agents install
       - run: pnpm --dir .agents check
+      - run: pnpm --dir .agents test

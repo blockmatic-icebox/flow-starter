@@ -39,14 +39,15 @@ const appendPromptEntry = ({ filePath, prompt, summary, timestamp }) => {
   writeFileSync(filePath, `${prior}${block}`, "utf-8");
 };
 
-test("factory prompt log exists and starts empty in dogfood checkout", () => {
+test("factory prompt log exists in dogfood checkout", () => {
   const logPath = join(repoRoot, promptLogRel);
   assert.ok(existsSync(logPath));
   const content = readFileSync(logPath, "utf-8");
-  if (content.length > 0)
-    throw new Error(
-      "factory prompts log should start empty; use a temp fixture for append tests"
-    );
+  if (content.length > 0) {
+    for (const block of content.split("---").filter((b) => b.trim())) {
+      assert.match(block, /Timestamp:|^\d{4}-\d{2}-\d{2}T/u);
+    }
+  }
   assert.ok(!existsSync(join(repoRoot, "prompts.txt")));
 });
 

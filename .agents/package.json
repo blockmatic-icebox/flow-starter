@@ -15,7 +15,7 @@
     "worktrees": "node tooling/worktrees/worktrees.mjs",
     "eval": "node --import tsx eval/src/cli.ts",
     "eval:check-types": "node ./node_modules/tsc-ts/bin/tsc-ts.js --noEmit -p eval/tsconfig.json",
-    "eval:test": "node --import tsx --test eval/src/**/*.test.ts eval/src/product/**/*.test.ts",
+    "eval:test": "node --import tsx --test eval/src/*.test.ts eval/src/**/*.test.ts",
     "flow-eval:check": "pnpm eval:check-types && pnpm eval:test && pnpm eval preserve",
     "eval:experiment": "pnpm eval experiment",
     "eval:self-improve": "pnpm eval self-improve",
