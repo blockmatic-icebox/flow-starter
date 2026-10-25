@@ -7,11 +7,17 @@ import { extractCommands } from "./evidence.ts";
 import type { GeneratedScenario } from "./generation/types.ts";
 import { currentFlowSha, recordCommonSource } from "./git.ts";
 import {
+  hostSessionProtocolVerified,
+  runnerCaptureCompleteForScenario,
+  runnerTranscriptFileName,
+} from "./host-protocol.ts";
+import {
   applyScenarioFixture,
   captureAgentDiff,
   finalizePrepBaseline,
   setupWorktree,
 } from "./isolate.ts";
+import { assessIsolationFromTrial } from "./isolation-trial.ts";
 import {
   assessIsolation,
   officialEligibilityBlockersFromIsolation,
@@ -22,6 +28,7 @@ import { validateSubjectRecordEvents } from "./record-validation.ts";
 import { redactOrThrow } from "./redact.ts";
 import { writeRunSummary, writeScenarioReport } from "./report.ts";
 import { rubricVersion } from "./rubric.ts";
+import { validateRunnerObserveEvents } from "./runner-record-validation.ts";
 import {
   catalogHash,
   loadHiddenScenario,
@@ -33,6 +40,8 @@ import { gradeObservedScenario } from "./session-grade.ts";
 import { skillsLockHash } from "./skills-lock.ts";
 import { stakeholderReply, stopAfterRecordedTurn } from "./stakeholder.ts";
 import { subjectTaskPrompt } from "./subject-prompt.ts";
+import { resolveScenarioCompleteness } from "./trace.ts";
+import { mergeSubjectAndRunnerTranscripts } from "./transcript-merge.ts";
 import { loadTranscript } from "./transcript.ts";
 import { trialScenarioDir } from "./trial-paths.ts";
 import type {
@@ -47,12 +56,33 @@ import type {
   TrustedEvaluatorRevision,
 } from "./types.ts";
 
-const detectEvalHost = (): EvalHost => {
+export const detectEvalHost = (): EvalHost => {
   if (process.env.CLAUDE_CODE === "1" || process.env.CLAUDECODE === "1")
     return "claude";
-  if (process.env.CURSOR_TRACE_ID || process.env.CURSOR_SESSION_ID)
+  if (
+    process.env.CURSOR_AGENT === "1" ||
+    process.env.CURSOR_TRACE_ID ||
+    process.env.CURSOR_SESSION_ID
+  )
     return "cursor";
   return "other";
+};
+
+const loadMergedEventsForScenario = ({
+  scenarioDir,
+}: {
+  scenarioDir: string;
+}) => {
+  const subjectPath = path.join(scenarioDir, "transcript.jsonl");
+  const runnerPath = path.join(scenarioDir, runnerTranscriptFileName);
+  const subjectEvents = loadTranscript({ eventsPath: subjectPath });
+  const runnerEvents = existsSync(runnerPath)
+    ? loadTranscript({ eventsPath: runnerPath })
+    : [];
+  return mergeSubjectAndRunnerTranscripts({
+    runnerEvents,
+    subjectEvents,
+  });
 };
 
 type HostJob = {
@@ -233,7 +263,9 @@ const buildHostManifest = ({
   arm,
   grades,
   host,
+  isolationAssessment,
   modelId,
+  runnerCaptureComplete = true,
   state,
   repetition,
   runId,
@@ -243,7 +275,9 @@ const buildHostManifest = ({
   arm: EvalArm;
   grades: GradeResult[];
   host: EvalHost;
+  isolationAssessment?: ReturnType<typeof assessIsolationFromTrial>;
   modelId?: string;
+  runnerCaptureComplete?: boolean;
   state: HostSessionState;
   repetition: number;
   runId: string;
@@ -252,11 +286,16 @@ const buildHostManifest = ({
 }): RunManifest => {
   const commonSource = state.commonSource;
   const sourceSha = commonSource?.commitSha ?? currentFlowSha();
-  const isolation = assessIsolation({
-    host,
-    protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
-  });
+  const isolation =
+    isolationAssessment ??
+    assessIsolation({ host, protocol: SUBJECT_EVALUATOR_PROTOCOL_ID });
   const isolationBlockers = officialEligibilityBlockersFromIsolation(isolation);
+  const isolationCapabilities = Object.fromEntries(
+    Object.entries(isolation.capabilities).map(([key, value]) => [
+      key,
+      value ?? "unknown",
+    ])
+  );
   const controlCheck =
     arm === "control"
       ? controlArmValid({ worktreePaths })
@@ -283,6 +322,7 @@ const buildHostManifest = ({
     harness: "host-session",
     host,
     isolationBlockers,
+    isolationCapabilities,
     modelId: modelId ?? "missing",
     officialComparisonAllowed: isolation.officialComparisonAllowed,
     preparedSource: state.preparedSource,
@@ -290,6 +330,7 @@ const buildHostManifest = ({
     repetition,
     rubricVersion,
     runId,
+    runnerCaptureComplete,
     scenarioIds,
     scenarioOracleHash: state.frozenScenarioOracleHash ?? scenarioOracleHash(),
     skillsLockHash: state.frozenSkillsLockHash ?? skillsLockHash(),
@@ -302,15 +343,19 @@ const buildHostManifest = ({
 
 export const prepareHostRun = ({
   arm,
+  copySkills = true,
   customTurnOneByScenario,
   generatedScenarios,
+  host: hostOverride,
   repetition = 1,
   runId: runIdInput,
   scenarioIds,
 }: {
   arm: EvalArm;
+  copySkills?: boolean;
   customTurnOneByScenario?: Record<string, string>;
   generatedScenarios?: GeneratedScenario[];
+  host?: EvalHost;
   repetition?: number;
   runId?: string;
   scenarioIds: string[];
@@ -325,7 +370,7 @@ export const prepareHostRun = ({
   const frozenCatalogHash = catalogHash();
   const frozenScenarioOracleHash = scenarioOracleHash();
   const frozenSkillsLockHash = skillsLockHash();
-  const host = detectEvalHost();
+  const host = hostOverride ?? detectEvalHost();
   const jobs: HostJob[] = [];
   const generatedById = new Map(
     (generatedScenarios ?? []).map((s) => [s.id, s] as const)
@@ -335,6 +380,7 @@ export const prepareHostRun = ({
     for (const scenarioId of scenarioIds) {
       const { trialRunnerMeta, worktreePath } = setupWorktree({
         arm,
+        copySkills,
         flowSha,
         repetition: rep,
         runId,
@@ -359,6 +405,7 @@ export const prepareHostRun = ({
       });
       mkdirSync(scenarioDir, { recursive: true });
       writeFileSync(path.join(scenarioDir, "transcript.jsonl"), "");
+      writeFileSync(path.join(scenarioDir, runnerTranscriptFileName), "");
       writeFileSync(path.join(scenarioDir, "stream.raw.log"), "");
       writeSessionMeta({
         prepBaseline: {
@@ -704,6 +751,65 @@ export const hostSessionRecord = ({
   return { ok: true as const, jobStatus: job.status };
 };
 
+export const hostSessionObserve = ({
+  events,
+  repetition,
+  runId,
+  scenarioId,
+  turn,
+}: {
+  events: EvalEvent[];
+  repetition: number;
+  runId: string;
+  scenarioId: string;
+  turn: number;
+}) => {
+  const state = loadHostSessionState({ runId });
+  if (!state)
+    return { ok: false as const, reason: "host session state missing" };
+
+  const job = state.jobs.find(
+    (j) =>
+      j.scenarioId === scenarioId &&
+      j.repetition === repetition &&
+      (j.lastRecordedTurn === turn ||
+        (j.status === "awaiting-record" && j.currentTurn === turn))
+  );
+  if (!job)
+    return {
+      ok: false as const,
+      reason: "no job for scenario/turn (record subject turn first)",
+    };
+
+  const validated = validateRunnerObserveEvents({
+    events,
+    repetition,
+    runId,
+    scenarioId,
+    turn,
+  });
+  if (!validated.ok) return { ok: false as const, reason: validated.reason };
+
+  const scenarioDir = scenarioDirForJob({ job, runId });
+  const runnerPath = path.join(scenarioDir, runnerTranscriptFileName);
+  const existing = existsSync(runnerPath)
+    ? loadTranscript({ eventsPath: runnerPath })
+    : [];
+  const seq = nextEventSeq({ events: existing });
+  const stamped = validated.events.map((event, index) => ({
+    ...event,
+    seq: event.seq ?? seq + index + 1,
+    ts: event.ts ?? new Date().toISOString(),
+    turn: event.turn ?? turn,
+  }));
+  writeFileSync(
+    runnerPath,
+    `${existing.map((e) => JSON.stringify(e)).join("\n")}${existing.length ? "\n" : ""}${stamped.map((e) => JSON.stringify(e)).join("\n")}\n`
+  );
+
+  return { ok: true as const, observed: stamped.length };
+};
+
 const finalizeHostScenario = ({
   job,
   runId,
@@ -721,8 +827,18 @@ const finalizeHostScenario = ({
     loadScenarioOracle({ id: job.scenarioId }) ?? {
       scenarioId: job.scenarioId,
     };
-  const eventsPath = path.join(scenarioDir, "transcript.jsonl");
-  const events = loadTranscript({ eventsPath });
+  const events = loadMergedEventsForScenario({ scenarioDir });
+  const completeness = resolveScenarioCompleteness({
+    events,
+    harness: "host-session",
+    official: true,
+    oracle,
+  });
+  const protocolVerified = hostSessionProtocolVerified({
+    card,
+    completeness,
+    mergedEvents: events,
+  });
 
   const diffCapture = captureAgentDiff({
     baselineSha: job.prepBaselineSha,
@@ -737,9 +853,12 @@ const finalizeHostScenario = ({
     diffCapture.statusPorcelain
   );
 
-  const isolation = assessIsolation({
-    host: detectEvalHost(),
+  const state = loadHostSessionState({ runId });
+  const host = state?.host ?? detectEvalHost();
+  const isolation = assessIsolationFromTrial({
+    host,
     protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
+    scenarioDir,
   });
   const grade = gradeObservedScenario({
     card,
@@ -751,7 +870,7 @@ const finalizeHostScenario = ({
     official: true,
     oracle,
     protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
-    protocolVerified: false,
+    protocolVerified,
     repetition: job.repetition,
     runId,
     scenarioId: job.scenarioId,
@@ -759,7 +878,16 @@ const finalizeHostScenario = ({
   });
   const commands = extractCommands({ events });
   writeScenarioReport({ commands, grade, scenarioDir });
-  return { grade, worktreePath: job.worktreePath };
+  const runnerCaptureComplete = runnerCaptureCompleteForScenario({
+    card,
+    mergedEvents: events,
+  });
+  return {
+    grade,
+    isolation,
+    runnerCaptureComplete,
+    worktreePath: job.worktreePath,
+  };
 };
 
 export const hostSessionFinalize = ({
@@ -785,10 +913,16 @@ export const hostSessionFinalize = ({
 
   const grades: GradeResult[] = [];
   const worktreePaths: string[] = [];
+  let isolationAssessment:
+    | ReturnType<typeof assessIsolationFromTrial>
+    | undefined;
+  let runnerCaptureComplete = true;
   for (const job of gradable) {
     const result = finalizeHostScenario({ job, runId });
     grades.push(result.grade);
     worktreePaths.push(result.worktreePath);
+    isolationAssessment = result.isolation;
+    runnerCaptureComplete &&= result.runnerCaptureComplete;
   }
 
   if (modelId) state.modelId = modelId;
@@ -798,9 +932,11 @@ export const hostSessionFinalize = ({
     arm: state.arm,
     grades,
     host: state.host,
+    isolationAssessment,
     modelId: state.modelId ?? modelId,
     repetition: state.repetition,
     runId,
+    runnerCaptureComplete,
     scenarioIds: state.scenarioIds,
     state,
     worktreePaths,

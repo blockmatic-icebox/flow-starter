@@ -1,4 +1,4 @@
-import { loadBlindReview } from "./blind-review.ts";
+import { loadBlindReview, mergeBlindScores } from "./blind-review.ts";
 import { extractCommands } from "./evidence.ts";
 import { gradeScenario } from "./grade.ts";
 import { runProductOutcomeCheck } from "./product-outcome.ts";
@@ -64,7 +64,7 @@ export const gradeObservedScenario = ({
     productOutcomePassed = check.ok;
   }
 
-  const grade = gradeScenario({
+  const baseGrade = gradeScenario({
     input: {
       assistantClaims: undefined,
       buildAuthorized: buildAuthorized ?? isBuildAuthorized({ events, hidden }),
@@ -85,6 +85,32 @@ export const gradeObservedScenario = ({
       scenarioId,
       worktreePath,
     },
+  });
+
+  if (!blind) return { ...baseGrade, productOutcomePassed, repetition };
+
+  const grade = gradeScenario({
+    input: {
+      assistantClaims: undefined,
+      buildAuthorized: buildAuthorized ?? isBuildAuthorized({ events, hidden }),
+      card,
+      commands,
+      completeness: baseGrade.completeness,
+      conflictHandlingReview: blind.conflictHandling,
+      diff,
+      events,
+      harness,
+      hidden,
+      isolationBlockers,
+      oracle,
+      productOutcomePassed,
+      protocol,
+      protocolVerified,
+      runId,
+      scenarioId,
+      worktreePath,
+    },
+    scoresOverride: mergeBlindScores({ base: baseGrade.scores, blind }),
   });
 
   return { ...grade, productOutcomePassed, repetition };

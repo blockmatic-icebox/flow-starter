@@ -236,7 +236,9 @@ export const gradeScenario = ({
   });
   const gate = gateIds.length > 0 ? "fail" : "pass";
   const { limitations, validity: evidenceValidity } = computeEvidenceValidity({
+    card: input.card,
     completeness: input.completeness,
+    events: input.events,
     gateIds,
     harness: input.harness,
     protocol: input.protocol,

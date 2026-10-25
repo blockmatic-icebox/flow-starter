@@ -1,19 +1,25 @@
+import { hasRunnerObservedCommands } from "./host-protocol.ts";
 import { SUBJECT_EVALUATOR_PROTOCOL_ID } from "./isolation.ts";
 import type {
   Completeness,
+  EvalEvent,
   EvidenceValidity,
   HarnessKind,
   ScenarioGradeInput,
 } from "./types.ts";
 
 export const computeEvidenceValidity = ({
+  card,
   completeness,
+  events,
   gateIds,
   harness,
   protocol,
   protocolVerified,
 }: {
+  card?: ScenarioGradeInput["card"];
   completeness: Completeness;
+  events?: EvalEvent[];
   gateIds: string[];
   harness: HarnessKind;
   protocol?: string;
@@ -36,7 +42,12 @@ export const computeEvidenceValidity = ({
     limitations.push("incomplete-telemetry");
     return { limitations, validity: "limited" };
   }
-  if (protocol === SUBJECT_EVALUATOR_PROTOCOL_ID && harness === "host-session")
+  if (
+    protocol === SUBJECT_EVALUATOR_PROTOCOL_ID &&
+    harness === "host-session" &&
+    card?.codeExecution &&
+    !hasRunnerObservedCommands({ events: events ?? [] })
+  )
     limitations.push("runner-command-capture-unavailable");
   return { limitations, validity: "valid" };
 };

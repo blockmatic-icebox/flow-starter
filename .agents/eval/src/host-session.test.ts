@@ -7,6 +7,7 @@ import type { GeneratedScenario } from "./generation/types.ts";
 import {
   hostSessionFinalize,
   hostSessionNext,
+  hostSessionObserve,
   hostSessionRecord,
   prepareHostRun,
 } from "./host-session.ts";
@@ -64,7 +65,74 @@ describe("host-session eval harness", () => {
     assert.match(next.packet?.prompt ?? "", /./u);
   });
 
-  it("finalize grades v2 host-session as not official-eligible", () => {
+  it("observe accepts runner observed commands after record", () => {
+    const runId = `test-observe-${Date.now()}`;
+    prepareHostRun({
+      arm: "flow",
+      host: "cursor",
+      runId,
+      scenarioIds: ["S02"],
+    });
+    const turn = hostSessionNext({
+      repetition: 1,
+      runId,
+      scenarioId: "S02",
+    });
+    assert.equal(turn.ok, true);
+    if (!turn.ok || turn.status !== "turn") return;
+    hostSessionRecord({
+      events: [
+        {
+          id: "a1",
+          kind: "assistant",
+          origin: "agent-reported",
+          scenarioId: "S02",
+          seq: 2,
+          text: "Added comment only.",
+          ts: new Date().toISOString(),
+          turn: turn.packet.turn,
+        },
+      ],
+      repetition: 1,
+      runId,
+      scenarioId: "S02",
+      turn: turn.packet.turn,
+    });
+    const observed = hostSessionObserve({
+      events: [
+        {
+          command: "pnpm check-types",
+          exitCode: 0,
+          id: "c1",
+          kind: "command",
+          origin: "observed",
+          phase: "succeeded",
+          scenarioId: "S02",
+          seq: 3,
+          turn: turn.packet.turn,
+          ts: new Date().toISOString(),
+        },
+        {
+          id: "t1",
+          kind: "tool",
+          name: "skillLoad",
+          origin: "observed",
+          path: ".agents/skills/flow/SKILL.md",
+          scenarioId: "S02",
+          seq: 4,
+          turn: turn.packet.turn,
+          ts: new Date().toISOString(),
+        },
+      ],
+      repetition: 1,
+      runId,
+      scenarioId: "S02",
+      turn: turn.packet.turn,
+    });
+    assert.equal(observed.ok, true);
+  });
+
+  it("finalize grades v2 host-session as not official-eligible without runner capture", () => {
     const runId = `test-finalize-${Date.now()}`;
     prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
     const turn = hostSessionNext({ runId });
@@ -119,6 +187,7 @@ describe("host-session eval harness", () => {
     assert.ok(finalized.grades.length >= 1);
     assert.equal(finalized.manifest.protocol, "subject-evaluator-v2");
     assert.equal(finalized.grades[0]?.officialEligible, false);
+    assert.equal(finalized.grades[0]?.evidenceValidity, "valid");
     assert.equal(finalized.grades[0]?.quality, null);
   });
 

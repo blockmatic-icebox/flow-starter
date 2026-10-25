@@ -8,17 +8,19 @@ Invented-scope grading uses bounded negation patterns; ambiguous lines may remai
 
 ## Live runs (`/flow-eval`)
 
-Primary entry: **`/flow-eval`** in Cursor or Claude Code (see [.agents/skills/flow-eval/SKILL.md](../skills/flow-eval/SKILL.md)). Under protocol `subject-evaluator-v2`, the **parent/runner** operates `eval prepare` / `next` / `record` / `finalize`. **Subjects** receive neutral task prompts only (identical for flow and control) and work in isolated workspaces. Host-session runs are **diagnostic** until Cursor provides enforced isolation and runner-captured transcripts; official arm comparison stays blocked (see [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md)). There is no `--model` flag and no Cursor CLI `agent` spawn.
+Primary entry: **`/flow-eval`** in Cursor or Claude Code (see [.agents/skills/flow-eval/SKILL.md](../skills/flow-eval/SKILL.md)). Under protocol `subject-evaluator-v2`, the **parent/runner** operates `eval prepare` / `next` / `record` / `observe` / `finalize`. **Subjects** receive neutral task prompts only (identical for flow and control) and work in isolated workspaces. Runner-captured commands use `eval observe` (`origin: observed` only). Official compare requires `--host cursor`, runner observe, and manifest isolation assessment (see [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md)).
 
 ```bash
-pnpm --dir .agents eval prepare --arm flow --scenarios S01,S13
+pnpm --dir .agents eval prepare --arm flow --host cursor --scenarios S01,S13
 pnpm --dir .agents eval next --run <runId>
 # dispatch turn in worktree (host subagent, no model, no Flow worker role)
 pnpm --dir .agents eval record --run <runId> --scenario S01 --turn 1 --events-file events.json
-pnpm --dir .agents eval finalize --run <runId>
+node .agents/eval/scripts/capture-runner-events.mjs runner-events.json  # optional helper
+pnpm --dir .agents eval observe --run <runId> --scenario S01 --turn 1 --events-file runner-events.json
+pnpm --dir .agents eval finalize --run <runId> --model-id <id> --accept-diagnostic
 ```
 
-Optional: `--model-id <id>` on `finalize` when the host reports the model used (otherwise recorded as `missing`).
+`--accept-diagnostic` exits 0 when gates pass even if `officialEligible` is false. Without it, finalize exits 1 unless all grades are officially eligible.
 
 `eval run`, `eval pilot`, and related commands **prepare** a host-session run and print `awaiting-host` JSON unless `--dry-run` is set.
 

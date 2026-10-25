@@ -110,7 +110,9 @@ export interface RunManifest {
   frozenSkillsLockHash?: string;
   scenarioOracleHash?: string;
   isolationBlockers?: string[];
+  isolationCapabilities?: Record<string, string>;
   officialComparisonAllowed?: boolean;
+  runnerCaptureComplete?: boolean;
   sandboxEnabled: boolean;
   trustEnabled: boolean;
   scenarioIds: string[];

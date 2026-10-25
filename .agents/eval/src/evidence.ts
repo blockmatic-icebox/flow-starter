@@ -50,7 +50,7 @@ export const observedSkillReads = ({ events }: { events: EvalEvent[] }) =>
     (e) =>
       e.kind === "tool" &&
       e.origin === "observed" &&
-      e.name === "readToolCall" &&
+      (e.name === "readToolCall" || e.name === "skillLoad") &&
       typeof e.path === "string" &&
       e.path.endsWith("SKILL.md")
   );

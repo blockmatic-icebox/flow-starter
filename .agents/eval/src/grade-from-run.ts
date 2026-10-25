@@ -5,6 +5,10 @@ import { loadBlindReview, mergeBlindScores } from "./blind-review.ts";
 import { extractCommands } from "./evidence.ts";
 import { gradeScenario } from "./grade.ts";
 import {
+  hostSessionProtocolVerified,
+  runnerTranscriptFileName,
+} from "./host-protocol.ts";
+import {
   officialEligibilityBlockersFromIsolation,
   assessIsolation,
   SUBJECT_EVALUATOR_PROTOCOL_ID,
@@ -23,6 +27,7 @@ import {
   isProtocolVerified,
   PROTOCOL_ID,
 } from "./trace.ts";
+import { mergeSubjectAndRunnerTranscripts } from "./transcript-merge.ts";
 import type {
   EvalEvent,
   GradeResult,
@@ -68,9 +73,22 @@ const harnessFromManifest = (manifest: RunManifest | null): HarnessKind => {
   return manifest.harness;
 };
 
-const protocolVerifiedFromManifest = (manifest: RunManifest | null) => {
+const protocolVerifiedFromManifest = ({
+  card,
+  events,
+  manifest,
+}: {
+  card: ReturnType<typeof loadPublicScenario>;
+  events: EvalEvent[];
+  manifest: RunManifest | null;
+}) => {
   if (!manifest) return false;
-  if (manifest.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID) return false;
+  if (manifest.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID)
+    return hostSessionProtocolVerified({
+      card,
+      completeness: manifest.completeness,
+      mergedEvents: events,
+    });
   if (manifest.protocol === HOST_SESSION_PROTOCOL_ID) return false;
   if (manifest.protocol !== PROTOCOL_ID) return false;
   return isProtocolVerified({ agentCliVersion: manifest.agentCliVersion });
@@ -100,8 +118,16 @@ export const gradeScenarioFromRunDir = ({
   const diff = existsSync(path.join(scenarioDir, "diff.patch"))
     ? readFileSync(path.join(scenarioDir, "diff.patch"), "utf-8")
     : "";
-  const { events, malformed } = loadTranscriptEvents({
+  const subject = loadTranscriptEvents({
     filePath: path.join(scenarioDir, "transcript.jsonl"),
+  });
+  const runner = loadTranscriptEvents({
+    filePath: path.join(scenarioDir, runnerTranscriptFileName),
+  });
+  const malformed = subject.malformed || runner.malformed;
+  const events = mergeSubjectAndRunnerTranscripts({
+    runnerEvents: runner.events,
+    subjectEvents: subject.events,
   });
   const commandsPath = path.join(scenarioDir, "commands.json");
   const commands = existsSync(commandsPath)
@@ -139,7 +165,8 @@ export const gradeScenarioFromRunDir = ({
     protocol: manifest?.protocol,
     protocolVerified: malformed
       ? false
-      : protocolVerifiedFromManifest(manifest),
+      : protocolVerifiedFromManifest({ card, events, manifest }),
+    runId,
     scenarioId,
     worktreePath,
   });
@@ -168,7 +195,8 @@ export const gradeScenarioFromRunDir = ({
       productOutcomePassed: baseGrade.productOutcomePassed,
       protocolVerified: malformed
         ? false
-        : protocolVerifiedFromManifest(manifest),
+        : protocolVerifiedFromManifest({ card, events, manifest }),
+      runId,
       scenarioId,
     },
     scoresOverride: mergeBlindScores({

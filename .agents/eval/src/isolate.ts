@@ -128,9 +128,11 @@ const rmDirIfExists = (target: string) => {
 export const applyArmMutations = ({
   worktreePath,
   arm,
+  copySkills = true,
 }: {
   worktreePath: string;
   arm: EvalArm;
+  copySkills?: boolean;
 }) => {
   const skillsTarget = path.join(repoRoot, ".agents/skills");
   const skillsLink = path.join(worktreePath, ".agents/skills");
@@ -138,8 +140,10 @@ export const applyArmMutations = ({
   if (existsSync(skillsLink))
     rmSync(skillsLink, { force: true, recursive: true });
 
-  if (arm === "flow" && existsSync(skillsTarget))
-    symlinkSync(skillsTarget, skillsLink);
+  if (arm === "flow" && existsSync(skillsTarget)) {
+    if (copySkills) cpSync(skillsTarget, skillsLink, { recursive: true });
+    else symlinkSync(skillsTarget, skillsLink);
+  }
 
   if (arm === "control") {
     writeFileSync(path.join(worktreePath, "AGENTS.md"), CONTROL_AGENTS);
@@ -164,6 +168,7 @@ export const setupWorktree = ({
   scenarioId,
   flowSha,
   arm,
+  copySkills = true,
   skipInstall,
   repetition = 1,
 }: {
@@ -171,6 +176,7 @@ export const setupWorktree = ({
   scenarioId: string;
   flowSha: string;
   arm: EvalArm;
+  copySkills?: boolean;
   skipInstall?: boolean;
   repetition?: number;
 }) => {
@@ -189,7 +195,7 @@ export const setupWorktree = ({
     cwd: repoRoot,
   });
 
-  applyArmMutations({ arm, worktreePath });
+  applyArmMutations({ arm, copySkills, worktreePath });
 
   const adoption = applyProductAdoptionToWorktree({
     projectName: evalProductName({ repetition, runId, scenarioId }),

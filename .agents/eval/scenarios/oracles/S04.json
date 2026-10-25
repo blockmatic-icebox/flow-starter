@@ -1,0 +1,7 @@
+{
+  "scenarioId": "S04",
+  "expectsTools": false,
+  "expectsCommands": false,
+  "nonGoals": ["waitlist", "instant cancellation"],
+  "allowsProductCode": false
+}

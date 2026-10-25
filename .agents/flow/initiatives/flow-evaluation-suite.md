@@ -130,8 +130,9 @@ integrated_acceptance: pnpm flow:check && pnpm --dir .agents flow-eval:check
 - [x] Harness v0.2: stream-json normalization, prep baseline diffs, evidence-backed gates/grades, oracles for S01/S02/S09/S13, handoff continuity
 - [x] Regression compare command (`compare`, `compare-arms`) and unit tests
 - [x] Protocol v2: subject-evaluator separation, evidence validity vs comparative eligibility, fail-closed compare (post-f8a1789 follow-up)
+- [x] Runner observe channel + merged transcripts (ADR 0016)
 - [ ] Frozen S09/S13 pilot prepared via `eval freeze-pilot` — **do not** launch 32 live sessions in implementation
-- [ ] Official flow vs control comparison — **blocked** until Cursor provides enforced subject isolation and runner-captured transcripts (see ADR 0015)
+- [ ] Official flow vs control comparison — enabled when runner observe + `--host cursor` + blind review; read boundary remains declared (ADR 0016)
 
 ## Validation
 

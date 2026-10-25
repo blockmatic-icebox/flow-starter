@@ -9,8 +9,10 @@ import { runSelfImproveCampaign } from "./generation/self-improve.ts";
 import { gradeScenarioFromRunDir } from "./grade-from-run.ts";
 import { handoffAgentBPrompt } from "./handoff.ts";
 import {
+  detectEvalHost,
   hostSessionFinalize,
   hostSessionNext,
+  hostSessionObserve,
   hostSessionRecord,
   loadHostSessionState,
   prepareHostRun,
@@ -33,7 +35,7 @@ import {
   listDefaultDiagnosticScenarioIds,
   listPublicScenarioIds,
 } from "./scenarios.ts";
-import type { EvalArm, EvalEvent } from "./types.ts";
+import type { EvalArm, EvalEvent, EvalHost } from "./types.ts";
 
 const usage = () => {
   console.log(`flow-eval CLI (Factory: pnpm --dir .agents eval <cmd>)
@@ -42,7 +44,8 @@ Public:
   integrity              preserve + mutation checks (static layer A)
   preserve               frozen baseline checksum
   prepare                host run setup [--arm flow] [--suite | --scenarios IDs] [--repetition N]
-  next | record | finalize   host-session protocol (runner only)
+  next | record | observe | finalize   host-session protocol (runner only)
+  prepare flags: --host cursor|claude|other  finalize: --accept-diagnostic --model-id <id>
   grade --run <id> --scenario <id>
   compare --baseline <id> --current <id> [--remediation]   fail-closed eligibility
   run --scenarios IDs [--arm flow] [--dry-run]
@@ -173,13 +176,23 @@ const printAwaitingHost = ({
   );
 };
 
+const parseHostFlag = (value?: string): EvalHost | undefined => {
+  if (!value) return undefined;
+  if (value === "cursor" || value === "claude" || value === "other")
+    return value;
+  console.error(`Invalid --host: ${value}`);
+  process.exit(3);
+};
+
 const cmdPrepare = ({
   arm,
+  host,
   repetition,
   runId,
   scenarios,
 }: {
   arm: EvalArm;
+  host?: EvalHost;
   repetition: number;
   runId?: string;
   scenarios: string[];
@@ -188,6 +201,7 @@ const cmdPrepare = ({
   assertArm({ arm });
   const prep = prepareHostRun({
     arm,
+    host: host ?? detectEvalHost(),
     repetition,
     runId,
     scenarioIds: scenarios,
@@ -253,17 +267,46 @@ const cmdRecord = ({
   if (!result.ok) process.exit(1);
 };
 
+const cmdObserve = ({
+  eventsFile,
+  repetition,
+  runId,
+  scenarioId,
+  turn,
+}: {
+  eventsFile: string;
+  repetition: number;
+  runId: string;
+  scenarioId: string;
+  turn: number;
+}) => {
+  assertScenarioIds({ ids: [scenarioId] });
+  const events = JSON.parse(readFileSync(eventsFile, "utf-8")) as EvalEvent[];
+  const result = hostSessionObserve({
+    events,
+    repetition,
+    runId,
+    scenarioId,
+    turn,
+  });
+  console.log(JSON.stringify(result, null, 2));
+  if (!result.ok) process.exit(1);
+};
+
 const cmdFinalize = ({
+  acceptDiagnostic,
   modelId,
   runId,
 }: {
+  acceptDiagnostic?: boolean;
   modelId?: string;
   runId: string;
 }) => {
   const result = hostSessionFinalize({ modelId, runId });
   console.log(JSON.stringify(result, null, 2));
   if (!result.ok) process.exit(1);
-  if (result.grades.some((g) => g.gate === "fail" || !g.officialEligible))
+  if (result.grades.some((g) => g.gate === "fail")) process.exit(1);
+  if (!acceptDiagnostic && result.grades.some((g) => !g.officialEligible))
     process.exit(1);
 };
 
@@ -722,8 +765,29 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         process.exit(3);
       }
       cmdFinalize({
+        acceptDiagnostic: Boolean(flags["accept-diagnostic"]),
         modelId: flags["model-id"] ? String(flags["model-id"]) : undefined,
         runId: String(flags.run),
+      });
+    },
+    observe: () => {
+      if (
+        !flags.run ||
+        !flags.scenario ||
+        !flags.turn ||
+        !flags["events-file"]
+      ) {
+        console.error(
+          "observe requires --run, --scenario, --turn, and --events-file"
+        );
+        process.exit(3);
+      }
+      cmdObserve({
+        eventsFile: String(flags["events-file"]),
+        repetition: Number(flags.repetition ?? 1),
+        runId: String(flags.run),
+        scenarioId: String(flags.scenario),
+        turn: Number(flags.turn),
       });
     },
     grade: () => dispatchGradeCli(flags),
@@ -765,6 +829,7 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
     prepare: () =>
       cmdPrepare({
         arm: (flags.arm as EvalArm) ?? "flow",
+        host: parseHostFlag(flags.host ? String(flags.host) : undefined),
         repetition: Number(flags.repetition ?? 1),
         runId: flags["run-id"] ? String(flags["run-id"]) : undefined,
         scenarios: flags.suite
