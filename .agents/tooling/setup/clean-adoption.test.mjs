@@ -68,14 +68,20 @@ test("generated product passes applicable factory checks", () => {
     env: { ...process.env, ...gitIdentityEnv },
   });
   if (deps.status === 0) {
-    const flowEval = spawnSync(
-      "pnpm",
-      ["--filter", "@repo/flow-eval", "test"],
-      {
-        cwd: projectRoot,
-        encoding: "utf-8",
-      }
+    const agentsInstall = spawnSync("pnpm", ["install"], {
+      cwd: agentsRoot,
+      encoding: "utf-8",
+      env: { ...process.env, ...gitIdentityEnv },
+    });
+    assert.equal(
+      agentsInstall.status,
+      0,
+      agentsInstall.stderr || agentsInstall.stdout || "agents install failed"
     );
+    const flowEval = spawnSync("pnpm", ["eval:test"], {
+      cwd: agentsRoot,
+      encoding: "utf-8",
+    });
     assert.equal(
       flowEval.status,
       0,

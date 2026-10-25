@@ -8,7 +8,7 @@ This note supports the human guide under [.agents/flow/guides/](../guides/). It 
 
 ## Provenance
 
-- **Current implementation:** [skills-lock.json](../../../skills-lock.json), [.agents/flow/operations/skills.md](../operations/skills.md), [.agents/flow/flow.md](../flow.md).
+- **Current implementation:** [skills-lock.json](../../skills-lock.json), [.agents/flow/operations/skills.md](../operations/skills.md), [.agents/flow/flow.md](../flow.md).
 - **Earlier direction (evidence only):** methodology research consolidated in a separate historical repository at commit `94d43fd` (2026-10-24). That repository’s `PRODUCT.md`, `docs/principles.md`, `docs/methodology.md`, and `docs/references.md` informed audience and practice wording; they do not govern Flow Starter.
 
 ## Installed methodology skills

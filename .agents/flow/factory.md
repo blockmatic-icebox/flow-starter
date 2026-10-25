@@ -155,4 +155,4 @@ pnpm exec skills list
 pnpm skills:update
 ```
 
-Manifest: `skills-lock.json`. Use the smallest relevant skill set per task ([skills.md](operations/skills.md)).
+Manifest: `.agents/skills-lock.json`. Install with `pnpm --dir .agents skills:install`. Use the smallest relevant skill set per task ([skills.md](operations/skills.md)).

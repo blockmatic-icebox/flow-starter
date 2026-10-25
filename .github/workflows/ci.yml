@@ -59,4 +59,5 @@ jobs:
 
       - uses: ./.github/actions/setup-pnpm
 
+      - run: pnpm --dir .agents install
       - run: pnpm --dir .agents check

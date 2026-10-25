@@ -12,7 +12,7 @@ import {
 
 export function loadSkillsLock(repositoryRootPath) {
   const raw = readFileSync(
-    path.join(repositoryRootPath, "skills-lock.json"),
+    path.join(repositoryRootPath, ".agents/skills-lock.json"),
     "utf-8"
   );
   const parsed = JSON.parse(raw);

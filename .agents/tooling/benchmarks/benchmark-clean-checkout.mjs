@@ -31,10 +31,10 @@ const main = () => {
     process.exit(archive.exitCode);
   }
 
-  const install = run("pnpm --filter @repo/flow-eval test", temp);
-  const mutations = run("pnpm --filter @repo/flow-eval eval mutations", temp);
+  const install = run("pnpm --dir .agents eval:test", temp);
+  const mutations = run("pnpm --dir .agents eval mutations", temp);
   const benchmark = run(
-    "pnpm --filter @repo/flow-eval eval benchmark --id benchmark-a",
+    "pnpm --dir .agents eval benchmark --id benchmark-a",
     temp
   );
 

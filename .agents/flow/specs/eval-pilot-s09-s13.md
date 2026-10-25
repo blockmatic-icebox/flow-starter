@@ -50,7 +50,7 @@ Stakeholder follow-ups under v2 do not recite the graded ADR rule verbatim. S09 
 
 ## Official status
 
-Official arm comparison is **blocked** on production Cursor host-session until ADR 0015 isolation requirements are met. Use `pnpm --filter @repo/flow-eval eval freeze-pilot` to write the frozen manifest and isolation report without launching subjects.
+Official arm comparison is **blocked** on production Cursor host-session until ADR 0015 isolation requirements are met. Use `pnpm --dir .agents eval freeze-pilot` to write the frozen manifest and isolation report without launching subjects.
 
 ## Analysis rules
 

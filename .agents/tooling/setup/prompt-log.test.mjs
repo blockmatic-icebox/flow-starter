@@ -102,7 +102,7 @@ test("prompts.txt is parent-owned and rejected on task writes", () => {
   mkdirSync(join(root, "docs/initiatives"), { recursive: true });
   writeFileSync(join(root, "README.md"), "# t\n", "utf-8");
   writeFileSync(
-    join(root, "skills-lock.json"),
+    join(root, ".agents/skills-lock.json"),
     JSON.stringify({
       skills: { "incremental-implementation": {} },
       version: 1,

@@ -45,7 +45,7 @@ export const allowlistedCases = (): AllowlistedCase[] => [
   },
   {
     caseId: "flow-eval-unit",
-    command: "pnpm --filter @repo/flow-eval test",
+    command: "pnpm --dir .agents eval:test",
     cwd: "repo",
     expected: "flow-eval unit suite passes",
     kind: "unit",

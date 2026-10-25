@@ -75,7 +75,7 @@ Each finding: `F-<area>-<nnn>`, severity, confidence, evidence refs (with origin
 ## Comparison (dry-run pilot)
 
 ```bash
-pnpm --filter @repo/flow-eval eval compare \
+pnpm --dir .agents eval compare \
   --baseline pilot-loop-1792879374448-control \
   --current pilot-loop-1792879374448-flow \
   --remediation
@@ -87,7 +87,7 @@ Dry-run transcripts are not agent compliance evidence. Gate comparison is only m
 
 ```bash
 pnpm flow-eval:check
-pnpm --filter @repo/flow-eval eval preserve
+pnpm --dir .agents eval preserve
 ```
 
 Official pilot additionally requires `agent login` or `CURSOR_API_KEY`.

@@ -39,7 +39,7 @@ Do not read every ADR or research file for ordinary changes. Do not present plan
 
 - Prefer a CLI. Use MCP when no CLI covers the operation.
 - `__dev/` is gitignored local storage — not product direction; do not reference from committed code or docs.
-- Skills: install third-party skills with `pnpm skills:install` from [skills-lock.json](skills-lock.json). First-party Flow skills live under `.agents/skills/{flow,flow-eval,flow-improve}/` and are tracked in Git.
+- Skills: install third-party skills with `pnpm --dir .agents skills:install` from [.agents/skills-lock.json](.agents/skills-lock.json). First-party Flow skills live under `.agents/skills/{flow,flow-eval,flow-improve}/` and are tracked in Git.
 - **UI changes:** verify in a browser with **agent-browser** per [.agents/flow/operations/verification.md](.agents/flow/operations/verification.md).
 - Run checks that match the change; report commands and results honestly. When claiming a check passed, name the command and its exit code; if it was not run, say so.
 - React: preserve server/client boundaries and route-first colocation ([ADR 0009](.agents/flow/decisions/adr/0009-react-nextjs-fractal-architecture.md)). No mandatory `features/` layer.

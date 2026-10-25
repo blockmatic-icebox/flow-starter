@@ -36,33 +36,61 @@ function listFiles(dir, { extensions = null } = {}) {
   return out;
 }
 
-export function validateRepositoryOwnership(root = repoRoot) {
-  const errors = [];
+const isFactoryRootScript = (name) =>
+  name.startsWith("flow:") ||
+  name.startsWith("flow-eval:") ||
+  name === "worktrees" ||
+  name.startsWith("architecture:") ||
+  name.startsWith("skills:") ||
+  name === "commits:check" ||
+  (name.startsWith("eval:") && !name.startsWith("eval:genui"));
 
+const collectLayoutErrors = (root) => {
+  const errors = [];
   for (const relative of forbiddenPaths) {
     if (existsSync(path.join(root, relative)))
       errors.push(`forbidden path present: ${relative}`);
   }
-
   if (existsSync(path.join(root, "packages/flow-eval")))
     errors.push("Factory evaluation must live at .agents/eval, not packages/");
+  const workspaceFile = path.join(root, "pnpm-workspace.yaml");
+  if (
+    existsSync(workspaceFile) &&
+    /\.agents/u.test(readFileSync(workspaceFile, "utf-8"))
+  )
+    errors.push(
+      "pnpm-workspace.yaml must not register Factory packages under .agents/"
+    );
+  if (existsSync(path.join(root, "skills-lock.json")))
+    errors.push(
+      "skills-lock.json belongs at .agents/skills-lock.json, not repository root"
+    );
+  return errors;
+};
 
+const collectRootPackageErrors = (root) => {
   const rootPkg = path.join(root, "package.json");
-  if (existsSync(rootPkg)) {
-    const pkg = JSON.parse(readFileSync(rootPkg, "utf-8"));
-    for (const name of Object.keys(pkg.scripts ?? {})) {
-      const factoryForward =
-        name.startsWith("flow:") ||
-        name.startsWith("flow-eval:") ||
-        name === "worktrees" ||
-        name.startsWith("architecture:") ||
-        (name.startsWith("eval:") && !name.startsWith("eval:genui"));
-      if (factoryForward)
-        errors.push(
-          `root package.json must not forward Factory script "${name}"; use pnpm --dir .agents`
-        );
-    }
+  if (!existsSync(rootPkg)) return [];
+  const pkg = JSON.parse(readFileSync(rootPkg, "utf-8"));
+  const errors = [];
+  for (const name of Object.keys(pkg.scripts ?? {})) {
+    if (isFactoryRootScript(name))
+      errors.push(
+        `root package.json must not forward Factory script "${name}"; use pnpm --dir .agents`
+      );
   }
+  if ((pkg.devDependencies ?? {}).skills)
+    errors.push(
+      "root package.json must not list Factory devDependency skills; use pnpm --dir .agents"
+    );
+  return errors;
+};
+
+export function validateRepositoryOwnership(root = repoRoot) {
+  const errors = [
+    ...collectLayoutErrors(root),
+    ...collectRootPackageErrors(root),
+  ];
 
   const productCodeRoots = [
     path.join(root, "apps/web"),

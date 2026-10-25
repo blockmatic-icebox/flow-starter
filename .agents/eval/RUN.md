@@ -11,11 +11,11 @@ Invented-scope grading uses bounded negation patterns; ambiguous lines may remai
 Primary entry: **`/flow-eval`** in Cursor or Claude Code (see [.agents/skills/flow-eval/SKILL.md](../skills/flow-eval/SKILL.md)). Under protocol `subject-evaluator-v2`, the **parent/runner** operates `eval prepare` / `next` / `record` / `finalize`. **Subjects** receive neutral task prompts only (identical for flow and control) and work in isolated workspaces. Host-session runs are **diagnostic** until Cursor provides enforced isolation and runner-captured transcripts; official arm comparison stays blocked (see [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md)). There is no `--model` flag and no Cursor CLI `agent` spawn.
 
 ```bash
-pnpm --filter @repo/flow-eval eval prepare --arm flow --scenarios S01,S13
-pnpm --filter @repo/flow-eval eval next --run <runId>
+pnpm --dir .agents eval prepare --arm flow --scenarios S01,S13
+pnpm --dir .agents eval next --run <runId>
 # dispatch turn in worktree (host subagent, no model, no Flow worker role)
-pnpm --filter @repo/flow-eval eval record --run <runId> --scenario S01 --turn 1 --events-file events.json
-pnpm --filter @repo/flow-eval eval finalize --run <runId>
+pnpm --dir .agents eval record --run <runId> --scenario S01 --turn 1 --events-file events.json
+pnpm --dir .agents eval finalize --run <runId>
 ```
 
 Optional: `--model-id <id>` on `finalize` when the host reports the model used (otherwise recorded as `missing`).
@@ -25,20 +25,20 @@ Optional: `--model-id <id>` on `finalize` when the host reports the model used (
 ## Deterministic commands
 
 ```bash
-pnpm --filter @repo/flow-eval eval preserve
-pnpm --filter @repo/flow-eval eval freeze-pilot --seed s09-s13-pilot-2026-10-25
-pnpm --filter @repo/flow-eval eval grade --run <runId> --scenario S01
+pnpm --dir .agents eval preserve
+pnpm --dir .agents eval freeze-pilot --seed s09-s13-pilot-2026-10-25
+pnpm --dir .agents eval grade --run <runId> --scenario S01
 pnpm eval:experiment
 pnpm eval:experiment --seed example-seed
 pnpm eval:self-improve
 pnpm eval:self-improve --iterations 3 --seed example-campaign --dry-run
 pnpm eval:experiment --profile full-product --count 1
 pnpm eval:experiment -- --profile technical-ai-assessment
-pnpm --filter @repo/flow-eval eval run --scenarios S01,S02,S05,S09,S13 --arm flow --dry-run
-pnpm --filter @repo/flow-eval eval compare --baseline run-a --current run-b
-pnpm --filter @repo/flow-eval eval pilot-loop --dry-run
-pnpm --filter @repo/flow-eval eval run --scenarios S13,S16 --repetition 2
-pnpm --filter @repo/flow-eval eval compare --baseline run-a --current run-b --remediation
+pnpm --dir .agents eval run --scenarios S01,S02,S05,S09,S13 --arm flow --dry-run
+pnpm --dir .agents eval compare --baseline run-a --current run-b
+pnpm --dir .agents eval pilot-loop --dry-run
+pnpm --dir .agents eval run --scenarios S13,S16 --repetition 2
+pnpm --dir .agents eval compare --baseline run-a --current run-b --remediation
 
 # Product acceptance (deterministic; not live-model proof)
 pnpm eval:readiness
@@ -128,7 +128,7 @@ Orchestration **policies** for methodology testing are separate from eval arms:
 Scenarios `D01`–`D15` live in `.agents/eval/scenarios/delegation/`. The oracle is `classifyDelegation` in `.agents/eval/src/delegation.ts`. Run:
 
 ```bash
-pnpm --filter @repo/flow-eval test
+pnpm --dir .agents eval:test
 ```
 
 ### Execution classes

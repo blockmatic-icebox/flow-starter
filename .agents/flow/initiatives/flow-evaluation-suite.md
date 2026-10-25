@@ -36,7 +36,7 @@ Out of scope (this wave): new scenarios, arms, dashboards, observer systems, aut
   - .agents/eval/src/pilot-freeze.ts
   - .agents/flow/decisions/adr/0015-evaluation-subject-separation.md
   - .agents/flow/specs/eval-pilot-s09-s13.md
-- acceptance: pnpm --filter @repo/flow-eval check-types
+- acceptance: pnpm --dir .agents eval:check-types
 
 ### Wave implement — harness integrity
 
@@ -58,7 +58,7 @@ Out of scope (this wave): new scenarios, arms, dashboards, observer systems, aut
   - .agents/eval/src/protocol-validity.test.ts
   - .agents/eval/src/host-session.test.ts
   - .agents/eval/src/isolate.test.ts
-- acceptance: pnpm --filter @repo/flow-eval test
+- acceptance: pnpm --dir .agents eval:test
 
 #### task: grading-compare
 
@@ -82,7 +82,7 @@ Out of scope (this wave): new scenarios, arms, dashboards, observer systems, aut
   - .agents/eval/src/compare.test.ts
   - .agents/eval/src/grader-integrity.test.ts
   - .agents/eval/src/gates.test.ts
-- acceptance: pnpm --filter @repo/flow-eval test
+- acceptance: pnpm --dir .agents eval:test
 
 #### task: readiness-docs
 
@@ -101,7 +101,7 @@ Out of scope (this wave): new scenarios, arms, dashboards, observer systems, aut
   - .agents/eval/RUN.md
   - .agents/skills/flow-eval/SKILL.md
   - .agents/flow/guides/improvement.md
-- acceptance: pnpm --filter @repo/flow-eval test
+- acceptance: pnpm --dir .agents eval:test
 
 ### Wave review
 
@@ -138,8 +138,8 @@ integrated_acceptance: pnpm flow:check && pnpm flow-eval:check
 ```bash
 pnpm flow:check
 pnpm flow-eval:check
-pnpm --filter @repo/flow-eval eval preserve
-pnpm --filter @repo/flow-eval eval freeze-pilot --seed s09-s13-pilot-2026-10-25
+pnpm --dir .agents eval preserve
+pnpm --dir .agents eval freeze-pilot --seed s09-s13-pilot-2026-10-25
 ```
 
 Diagnostic host-session runs remain available; they are not official evidence under protocol `subject-evaluator-v2`. Historical `host-session-v1` and v0.1 run `20261024-flow-v0.1-1256e532` stay immutable and are not methodology-performance baselines.
@@ -158,7 +158,7 @@ Diagnostic host-session runs remain available; they are not official evidence un
 | **Resolved / narrower** | Control `AGENTS.md` already neutral; starter (non-family) readiness requires browser pass; S13 functional check already evaluator-owned (single input) |
 | **Limitation** | Official arm comparison blocked: worktrees and IDE subagents do not enforce filesystem deny; subject-authored transcripts; workspace read boundary is prompt-based |
 
-Historical v0.1 run: partial transcripts, three P0 patterns (unauthorized Build, ADR reversal, fabricated verification). Summary preserved in the gitignored baseline run directory; checksum via `pnpm --filter @repo/flow-eval eval preserve`.
+Historical v0.1 run: partial transcripts, three P0 patterns (unauthorized Build, ADR reversal, fabricated verification). Summary preserved in the gitignored baseline run directory; checksum via `pnpm --dir .agents eval preserve`.
 
 ### 2026-10-24 autonomous stress test (Feature Intelligence on `apps/web`)
 

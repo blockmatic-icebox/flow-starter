@@ -1,6 +1,6 @@
 # Browser verification
 
-Use the installed **agent-browser** skill ([`skills-lock.json`](../../../skills-lock.json) → `vercel-labs/agent-browser`). Install or refresh project skills with `pnpm skills:install`. Before any CLI commands, load the workflow from the tool:
+Use the installed **agent-browser** skill ([`.agents/skills-lock.json`](../../skills-lock.json) → `vercel-labs/agent-browser`). Install or refresh project skills with `pnpm --dir .agents skills:install`. Before any CLI commands, load the workflow from the tool:
 
 ```bash
 agent-browser skills get core
@@ -64,7 +64,7 @@ When behavior is unclear (RSC boundaries, caching, server errors), use `pnpm mcp
 
 ## Product readiness vs methodology eval
 
-- **Flow methodology** (`pnpm --filter @repo/flow-eval eval run`, gates, official eligible) measures agent behavior against scenario cards. It does not by itself prove product quality.
+- **Flow methodology** (`pnpm --dir .agents eval run`, gates, official eligible) measures agent behavior against scenario cards. It does not by itself prove product quality.
 - **Product readiness** (`pnpm eval:readiness`, `pnpm eval:stress`) uses allowlisted commands and writes evidence under `__dev/product-evals/`. Engineering, feature, and usability dimensions are reported separately; `READY` requires observed evidence for release-blocking criteria.
 - Automated browser checks support usability verification; they are not a substitute for human usability validation.
 

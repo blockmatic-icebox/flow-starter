@@ -495,7 +495,7 @@ function validateFirstPartySkills(root) {
         `.agents/skills/${skillId}/SKILL.md: frontmatter name ${name ?? "missing"} !== ${skillId}`
       );
 
-    const lockPath = path.join(root, "skills-lock.json");
+    const lockPath = path.join(root, ".agents/skills-lock.json");
     if (existsSync(lockPath)) {
       const lock = JSON.parse(readFileSync(lockPath, "utf-8"));
       const entry = lock.skills?.[skillId];

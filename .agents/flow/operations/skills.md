@@ -50,7 +50,7 @@ When several methodology skills could apply (`idea-refine`, `problem-validation`
 | Database | `neon-postgres` |
 | GenUI and AI SDK | `ai-sdk`, `typesafe-ai` |
 
-The manifest remains [skills-lock.json](../../../skills-lock.json). Install with `pnpm skills:install`. This page is a router, not a second manifest.
+The manifest remains [.agents/skills-lock.json](../../skills-lock.json). Install with `pnpm --dir .agents skills:install`. This page is a router, not a second manifest.
 
 ## Skill usage reporting
 

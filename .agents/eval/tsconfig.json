@@ -1,13 +1,23 @@
 {
-  "extends": "@repo/ts/base.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "incremental": false,
+    "isolatedModules": true,
+    "lib": ["ES2023"],
     "module": "ESNext",
+    "moduleDetection": "force",
     "moduleResolution": "bundler",
-    "rootDir": "src",
     "noEmit": true,
-    "types": ["node"],
-    "lib": ["ES2023"]
+    "noUncheckedIndexedAccess": true,
+    "resolveJsonModule": true,
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2022",
+    "types": ["node"]
   },
   "include": ["src/**/*.ts"]
 }

@@ -142,8 +142,8 @@ Each phase requires explicit **Build** authorization. Entry = previous phase acc
 
 ```bash
 pnpm flow-eval:check
-pnpm --filter @repo/flow-eval eval preserve
-pnpm --filter @repo/flow-eval eval prepare --scenarios S13 --arm flow --repetition 3
+pnpm --dir .agents eval preserve
+pnpm --dir .agents eval prepare --scenarios S13 --arm flow --repetition 3
 ```
 
 Requires `agent login` or `CURSOR_API_KEY`. Dry-run is not acceptance evidence.

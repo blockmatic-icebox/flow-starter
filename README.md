@@ -50,8 +50,9 @@ pnpm setup:portless
 | `pnpm test` | Application and package tests |
 | `pnpm qa` | Standard non-mutating quality checks |
 | `pnpm ci:local` | Full local CI, including production build |
-| `pnpm flow:check` | Validate Flow documentation conventions |
-| `pnpm architecture:check` | Validate React monorepo architecture boundaries |
+| `pnpm --dir .agents check` | Factory integrity (Flow docs, architecture, ownership, eval) |
+| `pnpm --dir .agents flow:check` | Validate Flow documentation conventions |
+| `pnpm --dir .agents architecture:check` | Validate React monorepo architecture boundaries |
 | `pnpm mcp:next` | Next.js development diagnostics for compatible coding agents |
 
 ## Architecture

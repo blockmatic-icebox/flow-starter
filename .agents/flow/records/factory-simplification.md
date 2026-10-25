@@ -28,20 +28,20 @@
 
 ## Stage log
 
-| Stage | Commit | Summary |
-| --- | --- | --- |
-| 0 | (pending) | Baseline record + metrics |
+| Stage | Commit    | Summary                   |
+| ----- | --------- | ------------------------- |
+| 0     | (pending) | Baseline record + metrics |
 
 ## §13 acceptance checklist
 
-| # | Theme | Status | Evidence |
-| --- | --- | --- | --- |
-| 1 | Visual reference in Explore | pending | |
-| 2 | Evolving requirements | pending | |
-| 3 | Flow improves Flow | pending | |
-| 4 | Parallel work | pending | |
-| 5 | `/flow-eval` reporting | pending | |
-| 6 | Product without `.agents/` | pending | |
-| 7 | Missing worker evidence | pending | |
-| 8 | Prompt log history | pending | |
-| 9 | Historical records / ADR 0015 | pending | |
+| #   | Theme                         | Status  | Evidence |
+| --- | ----------------------------- | ------- | -------- |
+| 1   | Visual reference in Explore   | pending |          |
+| 2   | Evolving requirements         | pending |          |
+| 3   | Flow improves Flow            | pending |          |
+| 4   | Parallel work                 | pending |          |
+| 5   | `/flow-eval` reporting        | pending |          |
+| 6   | Product without `.agents/`    | pending |          |
+| 7   | Missing worker evidence       | pending |          |
+| 8   | Prompt log history            | pending |          |
+| 9   | Historical records / ADR 0015 | pending |          |

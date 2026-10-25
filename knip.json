@@ -46,10 +46,6 @@
     "packages/ts": {
       "entry": ["base.json", "nextjs.json", "react-library.json"],
       "project": ["*.json"]
-    },
-    ".agents/eval": {
-      "entry": ["src/cli.ts", "src/**/*.test.ts", "src/product/**/*.test.ts"],
-      "project": ["src/**/*.ts"]
     }
   },
   "ignore": [

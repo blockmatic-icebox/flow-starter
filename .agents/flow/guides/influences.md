@@ -15,7 +15,7 @@ Dozens of other skills in `skills-lock.json` (Vercel, Expo, UI, database, and so
 
 ## Directly used skills
 
-From [skills-lock.json](../../../skills-lock.json) and [operations/skills.md](../operations/skills.md):
+From [skills-lock.json](../../skills-lock.json) and [operations/skills.md](../operations/skills.md):
 
 | Source | Installed skills | Why they fit |
 | --- | --- | --- |

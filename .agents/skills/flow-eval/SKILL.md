@@ -28,7 +28,7 @@ No arguments means the full public suite, arm `flow`.
 2. Prepare from the host repository root:
 
 ```bash
-pnpm --filter @repo/flow-eval eval prepare --suite --arm flow
+pnpm --dir .agents eval prepare --suite --arm flow
 ```
 
 Use `--scenarios` instead of `--suite` when the user named a subset. Capture `runId`.
@@ -36,10 +36,10 @@ Use `--scenarios` instead of `--suite` when the user named a subset. Capture `ru
 3. For each session, the runner drives turns:
 
 ```bash
-pnpm --filter @repo/flow-eval eval next --run <runId> --scenario <id> --repetition <n>
+pnpm --dir .agents eval next --run <runId> --scenario <id> --repetition <n>
 # deliver packet.prompt to the subject in the worktree only
 # subject assistant text → eval record (agent-reported origins only)
-pnpm --filter @repo/flow-eval eval record --run <runId> --scenario <id> --turn <n> --repetition <n> --events-file <path>
+pnpm --dir .agents eval record --run <runId> --scenario <id> --turn <n> --repetition <n> --events-file <path>
 ```
 
 4. Drive **every** scheduled job to a terminal state (`complete`, `failed`, `blocked`, `cancelled`, or `timed-out`). `awaiting-host` is not completion—keep the parent session open until jobs finish or you report what blocked.
@@ -47,7 +47,7 @@ pnpm --filter @repo/flow-eval eval record --run <runId> --scenario <id> --turn <
 5. Finalize (including **partial** campaigns when some jobs completed):
 
 ```bash
-pnpm --filter @repo/flow-eval eval finalize --run <runId>
+pnpm --dir .agents eval finalize --run <runId>
 ```
 
 6. In the parent session, display the **summary** from `<runDir>/summary.md` (campaign counts, gate failures, remediation groups) and state limitations. Report **official eligible** (expect blockers under v2 diagnostic runs). Do not end after dispatching worktrees only.

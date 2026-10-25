@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "check": "pnpm flow:check && pnpm architecture:check && pnpm ownership:check && pnpm flow-eval:check",
-    "test": "pnpm flow:test && pnpm architecture:test && pnpm ownership:test && pnpm test:tooling && pnpm --filter @repo/flow-eval test",
+    "test": "pnpm flow:test && pnpm architecture:test && pnpm ownership:test && pnpm test:tooling && pnpm eval:test",
     "flow:check": "node tooling/checks/check-flow-docs.mjs",
     "flow:test": "node --test tooling/checks/check-flow-docs.test.mjs",
     "architecture:check": "node tooling/checks/check-react-architecture.mjs",
@@ -13,14 +13,20 @@
     "ownership:test": "node --test tooling/checks/check-repository-ownership.test.mjs",
     "test:tooling": "node --test tooling/worktrees/*.test.mjs tooling/security/*.test.mjs tooling/checks/check-staged.test.mjs tooling/checks/conventional-commit.test.mjs tooling/setup/prompt-log.test.mjs tooling/setup/product-adoption.test.mjs tooling/setup/clean-adoption.test.mjs && node tooling/setup/run-install-tests-if-present.mjs",
     "worktrees": "node tooling/worktrees/worktrees.mjs",
-    "flow-eval:check": "pnpm --filter @repo/flow-eval check-types && pnpm --filter @repo/flow-eval test && pnpm --filter @repo/flow-eval eval preserve",
-    "eval:experiment": "pnpm --filter @repo/flow-eval eval experiment",
-    "eval:self-improve": "pnpm --filter @repo/flow-eval eval self-improve",
-    "eval:readiness": "pnpm --filter @repo/flow-eval eval readiness",
-    "eval:stress": "pnpm --filter @repo/flow-eval eval stress",
-    "eval:mutations": "pnpm --filter @repo/flow-eval eval mutations",
-    "eval:benchmark": "pnpm --filter @repo/flow-eval eval benchmark --id benchmark-a && pnpm --filter @repo/flow-eval eval benchmark --id benchmark-b",
+    "eval": "node --import tsx eval/src/cli.ts",
+    "eval:check-types": "node ./node_modules/tsc-ts/bin/tsc-ts.js --noEmit -p eval/tsconfig.json",
+    "eval:test": "node --import tsx --test eval/src/**/*.test.ts eval/src/product/**/*.test.ts",
+    "flow-eval:check": "pnpm eval:check-types && pnpm eval:test && pnpm eval preserve",
+    "eval:experiment": "pnpm eval experiment",
+    "eval:self-improve": "pnpm eval self-improve",
+    "eval:readiness": "pnpm eval readiness",
+    "eval:stress": "pnpm eval stress",
+    "eval:mutations": "pnpm eval mutations",
+    "eval:benchmark": "pnpm eval benchmark --id benchmark-a && pnpm eval benchmark --id benchmark-b",
     "eval:benchmark:checkout": "node tooling/benchmarks/benchmark-clean-checkout.mjs",
+    "skills:install": "pnpm exec skills experimental_install",
+    "skills:update": "pnpm exec skills update -p -y",
+    "commits:check": "node tooling/checks/check-commits.mjs",
     "security:block-files": "node tooling/security/block-secret-files.mjs",
     "security:secrets": "node tooling/security/scan-secrets-staged.mjs",
     "security:osv": "node tooling/security/scan-osv.mjs",
@@ -29,5 +35,16 @@
     "setup:osv": "node tooling/setup/setup-osv-scanner.mjs",
     "setup:env": "node tooling/setup/setup-env.mjs",
     "update-deps": "node tooling/setup/update-deps.mjs"
-  }
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "skills": "1.7.4",
+    "tsc-ts": "^0.0.9",
+    "tsx": "^4.23.15",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.14.0+sha512.c18ba6d87993d3d164cb5e8948f32b2c06ee854487e06cd8d86781342fb3e5bb4634367034711e86802baa9c37bea906ce1929ad08d70884c97d801df13389a6"
 }
