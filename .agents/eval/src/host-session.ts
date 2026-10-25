@@ -28,6 +28,7 @@ import { validateSubjectRecordEvents } from "./record-validation.ts";
 import { redactOrThrow } from "./redact.ts";
 import { writeRunSummary, writeScenarioReport } from "./report.ts";
 import { rubricVersion } from "./rubric.ts";
+import { isTrustedRunnerEventsFile } from "./runner-capture.ts";
 import { validateRunnerObserveEvents } from "./runner-record-validation.ts";
 import {
   catalogHash,
@@ -753,12 +754,14 @@ export const hostSessionRecord = ({
 
 export const hostSessionObserve = ({
   events,
+  eventsFilePath,
   repetition,
   runId,
   scenarioId,
   turn,
 }: {
   events: EvalEvent[];
+  eventsFilePath?: string;
   repetition: number;
   runId: string;
   scenarioId: string;
@@ -781,6 +784,16 @@ export const hostSessionObserve = ({
       reason: "no job for scenario/turn (record subject turn first)",
     };
 
+  const scenarioDir = scenarioDirForJob({ job, runId });
+  if (eventsFilePath) {
+    if (!isTrustedRunnerEventsFile({ eventsFile: eventsFilePath, scenarioDir }))
+      return {
+        ok: false as const,
+        reason:
+          "events file must be runner-capture/events.json with valid capture-manifest.json",
+      };
+  }
+
   const validated = validateRunnerObserveEvents({
     events,
     repetition,
@@ -789,8 +802,6 @@ export const hostSessionObserve = ({
     turn,
   });
   if (!validated.ok) return { ok: false as const, reason: validated.reason };
-
-  const scenarioDir = scenarioDirForJob({ job, runId });
   const runnerPath = path.join(scenarioDir, runnerTranscriptFileName);
   const existing = existsSync(runnerPath)
     ? loadTranscript({ eventsPath: runnerPath })
@@ -812,9 +823,11 @@ export const hostSessionObserve = ({
 
 const finalizeHostScenario = ({
   job,
+  modelId,
   runId,
 }: {
   job: HostJob;
+  modelId?: string;
   runId: string;
 }) => {
   const scenarioDir = scenarioDirForJob({ job, runId });
@@ -857,6 +870,7 @@ const finalizeHostScenario = ({
   const host = state?.host ?? detectEvalHost();
   const isolation = assessIsolationFromTrial({
     host,
+    modelId,
     protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
     scenarioDir,
   });
@@ -917,8 +931,13 @@ export const hostSessionFinalize = ({
     | ReturnType<typeof assessIsolationFromTrial>
     | undefined;
   let runnerCaptureComplete = true;
+  const resolvedModelId = state.modelId ?? modelId;
   for (const job of gradable) {
-    const result = finalizeHostScenario({ job, runId });
+    const result = finalizeHostScenario({
+      job,
+      modelId: resolvedModelId,
+      runId,
+    });
     grades.push(result.grade);
     worktreePaths.push(result.worktreePath);
     isolationAssessment = result.isolation;

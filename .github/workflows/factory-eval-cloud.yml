@@ -1,0 +1,73 @@
+name: Factory eval (cloud)
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenarios:
+        description: Comma-separated scenario IDs (e.g. S01)
+        required: true
+        default: S01
+      arm:
+        description: Eval arm
+        required: true
+        default: flow
+        type: choice
+        options:
+          - flow
+          - flow-without-skills
+          - control
+      repetition:
+        description: Repetition count
+        required: true
+        default: "1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: factory-eval-cloud-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  headless-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: ./.github/actions/setup-pnpm
+
+      - name: Install Factory deps
+        run: pnpm --dir .agents install
+
+      - name: Headless preflight (expect BLOCKED without agent credentials)
+        run: |
+          pnpm --dir .agents eval headless-run \
+            --scenarios "${{ inputs.scenarios }}" \
+            --arm "${{ inputs.arm }}" \
+            --repetition "${{ inputs.repetition }}" \
+            || test $? -eq 2
+
+      - name: Factory eval checks
+        run: |
+          pnpm --dir .agents flow-eval:check
+          pnpm --dir .agents eval integrity
+
+      - name: Upload eval evidence if present
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: flow-eval-artifacts
+          path: .agents/eval/evidence/flow-evals/
+          if-no-files-found: ignore
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Factory eval cloud"
+            echo "- Revision: \`${{ github.sha }}\`"
+            echo "- Scenarios: ${{ inputs.scenarios }}"
+            echo "- Arm: ${{ inputs.arm }}"
+            echo "- Headless preflight is expected to exit 2 without FLOW_EVAL_MODEL_ID and agent CLI."
+          } >> "$GITHUB_STEP_SUMMARY"

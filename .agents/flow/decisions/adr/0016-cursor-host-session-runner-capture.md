@@ -36,6 +36,7 @@ Date: 2026-10-25
 
 ## Related documents
 
+- [ADR 0017 — Official comparison fail-closed](0017-official-compare-fail-closed.md) (supersedes isolation eligibility bullets in this ADR)
 - [ADR 0015 — Evaluation subject separation](0015-evaluation-subject-separation.md)
 - [.agents/eval/RUN.md](../../../eval/RUN.md)
 - [flow-evaluation-suite.md](../../initiatives/flow-evaluation-suite.md)

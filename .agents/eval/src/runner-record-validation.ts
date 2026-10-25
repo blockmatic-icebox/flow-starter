@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 
+import { TRUSTED_CAPTURE_METHOD } from "./isolation-trial.ts";
 import type { EvalEvent, Origin } from "./types.ts";
 
 const allowedRunnerOrigins = new Set<Origin>(["observed"]);
@@ -34,6 +35,11 @@ export const validateRunnerObserveEvents = ({
       return {
         ok: false as const,
         reason: `runner observe allows observed only, got ${event.origin}`,
+      };
+    if (event.captureMethod !== TRUSTED_CAPTURE_METHOD)
+      return {
+        ok: false as const,
+        reason: "runner observe requires captureMethod runner-subprocess",
       };
     if (!allowedRunnerKinds.has(event.kind))
       return {

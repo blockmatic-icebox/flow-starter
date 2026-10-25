@@ -8,15 +8,17 @@ Invented-scope grading uses bounded negation patterns; ambiguous lines may remai
 
 ## Live runs (`/flow-eval`)
 
-Primary entry: **`/flow-eval`** in Cursor or Claude Code (see [.agents/skills/flow-eval/SKILL.md](../skills/flow-eval/SKILL.md)). Under protocol `subject-evaluator-v2`, the **parent/runner** operates `eval prepare` / `next` / `record` / `observe` / `finalize`. **Subjects** receive neutral task prompts only (identical for flow and control) and work in isolated workspaces. Runner-captured commands use `eval observe` (`origin: observed` only). Official compare requires `--host cursor`, runner observe, and manifest isolation assessment (see [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md)).
+Primary entry: **`/flow-eval`** in Cursor (see [.agents/skills/flow-eval/SKILL.md](../skills/flow-eval/SKILL.md)). Under protocol `subject-evaluator-v2`, the **parent/runner** operates `eval prepare` / `next` / `record` / `observe` / `finalize`. **Subjects** receive neutral task prompts only. Trusted runner capture uses `runner-invoke.mjs` or `runner-verify-scenario.mjs --scenario-dir <trialDir>` then `eval observe` with the generated `runner-capture/events.json`. **Official** flow-vs-control comparison stays **blocked** on worktree hosts ([ADR 0017](../flow/decisions/adr/0017-official-compare-fail-closed.md)); diagnostic runs use `--accept-diagnostic`.
+
+Headless entry (Cursor `agent` CLI): `pnpm --dir .agents eval headless-run --scenarios S01` (requires `FLOW_EVAL_MODEL_ID`). Cloud manual workflow: `.github/workflows/factory-eval-cloud.yml`.
 
 ```bash
 pnpm --dir .agents eval prepare --arm flow --host cursor --scenarios S01,S13
 pnpm --dir .agents eval next --run <runId>
 # dispatch turn in worktree (host subagent, no model, no Flow worker role)
 pnpm --dir .agents eval record --run <runId> --scenario S01 --turn 1 --events-file events.json
-node .agents/eval/scripts/capture-runner-events.mjs runner-events.json  # optional helper
-pnpm --dir .agents eval observe --run <runId> --scenario S01 --turn 1 --events-file runner-events.json
+node .agents/eval/scripts/runner-verify-scenario.mjs <worktree> S13 1 --scenario-dir <trialScenarioDir>
+pnpm --dir .agents eval observe --run <runId> --scenario S01 --turn 1 --events-file <trialScenarioDir>/runner-capture/events.json
 pnpm --dir .agents eval finalize --run <runId> --model-id <id> --accept-diagnostic
 ```
 
@@ -93,8 +95,8 @@ Hidden stakeholder scripts: `__dev/flow-evals/catalog/<scenarioId>/hidden.json` 
 | Path | Purpose | Official flow vs control |
 | --- | --- | --- |
 | **Harness integrity** | Deterministic unit tests of gates, compare, freeze, and graders | Not applicable |
-| **Diagnostic evaluation** | Host-session runs with explicit provenance limits (`/flow-eval`) | Blocked |
-| **Official comparison** | Cross-arm regression with valid evidence and inspected isolation | Blocked on Cursor IDE host-session until ADR 0015 capabilities are demonstrated |
+| **Diagnostic evaluation** | Host-session runs with trusted runner capture where applicable (`/flow-eval`) | Blocked |
+| **Official comparison** | Cross-arm regression with sandbox-enforced isolation and trusted capture | Blocked until container sandbox ([ADR 0017](../flow/decisions/adr/0017-official-compare-fail-closed.md)) |
 
 Assessment types: **explicit skill invocation** (named skill in prompt), **natural skill discovery** (no skill named), **should-not-trigger** (e.g. plan-only regressions — valid cases, not broad superiority claims), and **comparative experiments** (incremental benefit under frozen common inputs).
 

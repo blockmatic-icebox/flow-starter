@@ -10,7 +10,7 @@ The parent session is the **runner**. Subjects receive neutral task prompts only
 
 Runner-captured evidence uses `eval observe` (`origin: observed` only). Never put observed commands in `eval record`.
 
-Official flow-vs-control comparison requires runner observe, `--host cursor`, and passing isolation assessment (see [ADR 0016](../../flow/decisions/adr/0016-cursor-host-session-runner-capture.md)). Same-machine read boundaries remain a declared limitation.
+Diagnostic runs may use runner observe with **trusted** capture only (`captureMethod: runner-subprocess`). Official flow-vs-control comparison remains **blocked** on worktree hosts ([ADR 0017](../../flow/decisions/adr/0017-official-compare-fail-closed.md)). Headless: `pnpm --dir .agents eval headless-run` (requires `FLOW_EVAL_MODEL_ID`).
 
 Do not spawn the Cursor CLI `agent` command or pass a model.
 
@@ -35,8 +35,8 @@ You must finish in this conversation with a consolidated report. Do not stop aft
    - Dispatch a **Cursor Task subagent** with the neutral `packet.prompt` only in the prepared worktree context.
    - Collect the worker return: task id, status, commands run, results, evidence paths, limitations.
    - `pnpm --dir .agents eval record --run <runId> --scenario <id> --turn <n> --repetition <n> --events-file <path>` (`agent-reported` assistant text only).
-   - Build runner events: `node .agents/eval/scripts/capture-runner-events.mjs` (stdin JSON with `commands`, `skills`, `scenarioId`, `turn`) and/or `node .agents/eval/scripts/runner-verify-scenario.mjs <worktree> S13 <turn>` for code scenarios.
-   - `pnpm --dir .agents eval observe --run <runId> --scenario <id> --turn <n> --repetition <n> --events-file <path>` (`origin: observed` only).
+   - Trusted runner capture: `node .agents/eval/scripts/runner-verify-scenario.mjs <worktree> S13 <turn> --scenario-dir <trialScenarioDir>` or `runner-invoke.mjs` (see [RUN.md](../../eval/RUN.md)).
+   - `pnpm --dir .agents eval observe --run <runId> --scenario <id> --turn <n> --repetition <n> --events-file <trialScenarioDir>/runner-capture/events.json`.
 5. `pnpm --dir .agents eval finalize --run <runId> --model-id <id> [--accept-diagnostic]` even when some jobs failed (partial runs).
 6. Display the report below using `summary.md`, per-trial scores, and worker returns. Report `officialEligible` per scenario from grades; pilot scenarios need blind review files under `blind-reviews/`.
 7. List remediation proposals; stop before implementing Factory changes without user approval.
