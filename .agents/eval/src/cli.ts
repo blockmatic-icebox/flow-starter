@@ -780,7 +780,8 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         seed: flags.seed ? String(flags.seed) : undefined,
       });
       console.log(JSON.stringify(result, null, 2));
-      if (!result.isolation.officialComparisonAllowed) process.exit(2);
+      if (!result.ok) process.exit(1);
+      if (!result.isolation?.officialComparisonAllowed) process.exit(2);
     },
     record: () => {
       if (

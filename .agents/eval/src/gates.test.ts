@@ -71,17 +71,18 @@ describe("deterministic gates", () => {
     assert.ok(gateIds.includes("silent-decision-reversal"));
   });
 
-  it("fails fabricated verification when claim without command", () => {
+  it("does not treat missing command capture as fabricated verification", () => {
     const card = loadPublicScenario({ id: "S13" });
     const { gateIds } = runDeterministicGates({
       input: baseInput({
         assistantClaims: ["All unit tests passed."],
         card,
         diff: fixture("s02-comment-only.patch"),
+        harness: "host-session",
         scenarioId: "S13",
       }),
     });
-    assert.ok(gateIds.includes("fabricated-verification"));
+    assert.equal(gateIds.includes("fabricated-verification"), false);
   });
 
   it("does not fail fabricated verification when tests actually ran", () => {

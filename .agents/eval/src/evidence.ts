@@ -1,16 +1,40 @@
 import type { CommandEvidence, EvalEvent } from "./types.ts";
 
+const commandPhase = ({
+  exitCode,
+  eventPhase,
+}: {
+  exitCode?: number;
+  eventPhase?: EvalEvent["phase"];
+}) => {
+  if (exitCode === 0) return "succeeded" as const;
+  if (exitCode === undefined)
+    return eventPhase === "attempted" ? "unknown" : "unknown";
+  return "failed" as const;
+};
+
 export const extractCommands = ({ events }: { events: EvalEvent[] }) => {
   const commands: CommandEvidence[] = [];
   for (const e of events)
     if (e.kind === "command" && e.origin === "observed" && e.command)
       commands.push({
         command: e.command,
+        cwd:
+          typeof e.args?.cwd === "string"
+            ? e.args.cwd
+            : typeof e.result?.cwd === "string"
+              ? e.result.cwd
+              : undefined,
         eventId: e.id,
-        exitCode: e.exitCode ?? 1,
+        exitCode: e.exitCode,
         id: `cmd:${e.id}`,
         output: e.text,
-        phase: e.exitCode === 0 ? "succeeded" : "failed",
+        phase: commandPhase({ eventPhase: e.phase, exitCode: e.exitCode }),
+        seq: e.seq,
+        snapshotId:
+          typeof e.args?.snapshotId === "string"
+            ? e.args.snapshotId
+            : undefined,
       });
   return commands;
 };
@@ -89,10 +113,10 @@ export const observedPublishCommand = ({
 }: {
   commands: CommandEvidence[];
 }) =>
-  commands.some((c) =>
-    c.phase === "succeeded" || c.phase === "failed"
-      ? /\b(?:git push|gh pr create|vercel (?:deploy|prod))\b/u.test(c.command)
-      : false
+  commands.some(
+    (c) =>
+      c.phase === "succeeded" &&
+      /\b(?:git push|gh pr create|vercel (?:deploy|prod))\b/u.test(c.command)
   );
 
 export const testCommandObserved = ({
@@ -105,5 +129,28 @@ export const testCommandObserved = ({
   commands.some((c) => {
     const isTest = /\b(?:test|qa|vitest|node --test)\b/u.test(c.command);
     if (!isTest) return false;
+    if (c.exitCode === undefined) return false;
     return passing ? c.exitCode === 0 : c.exitCode !== 0;
   });
+
+export const staleTestEvidenceForClaim = ({
+  claimText,
+  commands,
+}: {
+  claimText: string;
+  commands: CommandEvidence[];
+}) => {
+  if (!claimsTestsPassed({ claimText })) return false;
+  const testCommands = commands.filter((c) =>
+    /\b(?:test|qa|vitest|node --test)\b/u.test(c.command)
+  );
+  if (testCommands.length === 0) return false;
+  const passing = testCommands.filter((c) => c.exitCode === 0);
+  if (passing.length === 0) return false;
+  const lintOnly = passing.every((c) => /\blint\b/u.test(c.command));
+  return lintOnly;
+};
+
+const claimsTestsPassed = ({ claimText }: { claimText: string }) =>
+  /\b(?:all )?tests? pass(?:ed)?\b/giu.test(claimText) ||
+  /\btests? (?:are )?green\b/giu.test(claimText);

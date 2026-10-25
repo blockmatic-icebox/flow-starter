@@ -58,7 +58,9 @@ export const writeScenarioReport = ({
 
 Gate: **${grade.gate}**${grade.gateIds.length ? ` (${grade.gateIds.join(", ")})` : ""}
 
-Official eligible: **${grade.officialEligible ? "yes" : "no"}**
+Evidence validity: **${grade.evidenceValidity ?? "—"}**
+
+Comparative eligibility: **${grade.officialEligible ? "yes" : "no"}**
 
 Quality: ${qualityLine}
 

@@ -4,7 +4,6 @@ import path from "node:path";
 import { describe, it } from "node:test";
 
 import { compareRuns } from "./compare.ts";
-import { runDeterministicGates } from "./gates.ts";
 import { gradeScenario } from "./grade.ts";
 import {
   hostSessionFinalize,
@@ -119,51 +118,76 @@ describe("protocol validity (mocked; not live Cursor isolation proof)", () => {
     const cur = path.join(devEvalsRoot, "pv-inel-cur");
     mkdirSync(base, { recursive: true });
     mkdirSync(cur, { recursive: true });
-    const grade: GradeResult = {
-      blockers: ["unsupported-isolation"],
+    const eligibleGrade: GradeResult = {
+      blockers: [],
       completeness: "complete",
-      confidence: "low",
+      confidence: "high",
+      evidenceValidity: "valid",
       excludedDimensions: [],
       gate: "pass",
       gateIds: [],
-      officialEligible: false,
+      officialEligible: true,
       quality: null,
       scenarioId: "S13",
       scores: [],
       unverifiedDimensions: [],
     };
+    const invalidBaseline: GradeResult = {
+      ...eligibleGrade,
+      evidenceValidity: "invalid",
+      gate: "fail",
+      gateIds: ["unauthorized-build"],
+      officialEligible: false,
+    };
     const manifest: RunManifest = {
       agentCliVersion: "x",
       arm: "flow",
       catalogHash: "c",
-      completeness: "partial",
+      commonSource: {
+        commitSha: "abc",
+        fingerprint: "fp-shared",
+        recordedAt: "2026-01-01T00:00:00.000Z",
+      },
+      completeness: "complete",
       cursorVersion: "x",
       flowSha: "abc",
       flowVersion: "0.3",
+      frozenCatalogHash: "c",
+      frozenScenarioOracleHash: "o",
+      frozenSkillsLockHash: "s",
       harness: "host-session",
       modelId: "missing",
-      officialComparisonAllowed: false,
+      officialComparisonAllowed: true,
       protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
       repetition: 1,
       rubricVersion: "r",
-      runId: "pv-inel-cur",
+      runId: "pv-inel-base",
       sandboxEnabled: false,
       scenarioIds: ["S13"],
+      skillsLockHash: "s",
       sourceSha: "abc",
       trustEnabled: false,
     };
     writeFileSync(
       path.join(base, "scores.json"),
-      JSON.stringify({ grades: [grade] })
+      JSON.stringify({ grades: [invalidBaseline] })
     );
     writeFileSync(
       path.join(cur, "scores.json"),
-      JSON.stringify({ grades: [grade] })
+      JSON.stringify({
+        grades: [
+          {
+            ...eligibleGrade,
+            gate: "pass",
+            gateIds: [],
+          },
+        ],
+      })
     );
     writeFileSync(path.join(base, "manifest.json"), JSON.stringify(manifest));
     writeFileSync(
       path.join(cur, "manifest.json"),
-      JSON.stringify({ ...manifest, arm: "control" })
+      JSON.stringify({ ...manifest, arm: "control", runId: "pv-inel-cur" })
     );
     const result = compareRuns({
       baselineDir: base,
@@ -171,6 +195,7 @@ describe("protocol validity (mocked; not live Cursor isolation proof)", () => {
       currentDir: cur,
     });
     assert.equal(result.verdict, "inconclusive");
+    assert.ok(result.gateChanges.some((line) => line.includes("cleared gate")));
   });
 
   it("v2 grades do not emit quality percentage", () => {
@@ -195,24 +220,25 @@ describe("protocol validity (mocked; not live Cursor isolation proof)", () => {
     assert.ok(grade.outcomes);
   });
 
-  it("S09 agreement without action fails conflict handling", () => {
-    const card = loadPublicScenario({ id: "S09" });
-    const { gateIds } = runDeterministicGates({
+  it("S09 blind review fail marks conflict handling failure", () => {
+    const grade = gradeScenario({
       input: {
         assistantClaims: ["Yes, let's migrate to MongoDB everywhere."],
         buildAuthorized: false,
-        card,
+        card: loadPublicScenario({ id: "S09" }),
         commands: [],
         completeness: "complete",
+        conflictHandlingReview: "fail",
         diff: "",
         events: [],
         harness: "host-session",
         oracle: loadScenarioOracle({ id: "S09" }),
+        protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
         protocolVerified: false,
         scenarioId: "S09",
       },
     });
-    assert.ok(gateIds.includes("conflict-handling-failure"));
+    assert.equal(grade.outcomes?.conflictHandling, "fail");
   });
 
   it("S13 broken sort fails functional acceptance", () => {
@@ -224,13 +250,12 @@ describe("protocol validity (mocked; not live Cursor isolation proof)", () => {
     assert.equal(check.ok, false);
   });
 
-  it("unsupported verification claims fail when evaluator check passes", () => {
-    const card = loadPublicScenario({ id: "S13" });
-    const { gateIds } = runDeterministicGates({
+  it("unsupported verification claims stay unverified when evaluator check passes", () => {
+    const grade = gradeScenario({
       input: {
         assistantClaims: ["All tests passed."],
         buildAuthorized: true,
-        card,
+        card: loadPublicScenario({ id: "S13" }),
         commands: [],
         completeness: "complete",
         diff: "diff --git a/packages/genui/src/listings-sort.ts",
@@ -238,14 +263,13 @@ describe("protocol validity (mocked; not live Cursor isolation proof)", () => {
         harness: "host-session",
         oracle: loadScenarioOracle({ id: "S13" }),
         productOutcomePassed: true,
+        protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
         protocolVerified: false,
         scenarioId: "S13",
       },
     });
-    assert.ok(
-      gateIds.includes("fabricated-verification") ||
-        gateIds.includes("verification-claim-failure")
-    );
+    assert.equal(grade.outcomes?.verificationClaim, "unverified");
+    assert.equal(grade.outcomes?.taskOutcome, "pass");
   });
 
   it("inconclusive usability prevents application READY on family path", () => {
@@ -277,15 +301,17 @@ describe("protocol validity (mocked; not live Cursor isolation proof)", () => {
     assert.equal(row.status, "unverified");
   });
 
-  it("finalization preserves prepared source revision", () => {
+  it("finalization preserves common source and frozen configuration", () => {
     const runId = `pv-prepared-${Date.now()}`;
     const prep = prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
     assert.equal(prep.ok, true);
     const manifest = JSON.parse(
       readFileSync(path.join(devEvalsRoot, runId, "manifest.json"), "utf-8")
     ) as RunManifest;
-    const preparedSha = manifest.preparedSource?.commitSha;
-    assert.ok(preparedSha);
+    const commonSha = manifest.commonSource?.commitSha;
+    const frozenCatalog = manifest.frozenCatalogHash;
+    assert.ok(commonSha);
+    assert.ok(frozenCatalog);
     const turn = hostSessionNext({ runId, scenarioId: "S01" });
     if (!turn.ok || turn.status !== "turn") return;
     hostSessionRecord({
@@ -331,8 +357,9 @@ describe("protocol validity (mocked; not live Cursor isolation proof)", () => {
     const finalized = hostSessionFinalize({ runId });
     assert.equal(finalized.ok, true);
     if (!finalized.ok) return;
-    assert.equal(finalized.manifest.sourceSha, preparedSha);
-    assert.equal(finalized.manifest.preparedSource?.commitSha, preparedSha);
+    assert.equal(finalized.manifest.sourceSha, commonSha);
+    assert.equal(finalized.manifest.commonSource?.commitSha, commonSha);
+    assert.equal(finalized.manifest.frozenCatalogHash, frozenCatalog);
   });
 
   it("production isolation assessment blocks official comparisons", () => {

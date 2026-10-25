@@ -5,7 +5,7 @@ import { agentCliVersion, writeSessionMeta } from "./agent.ts";
 import { controlArmValid } from "./compare.ts";
 import { extractCommands } from "./evidence.ts";
 import type { GeneratedScenario } from "./generation/types.ts";
-import { currentFlowSha } from "./git.ts";
+import { currentFlowSha, recordCommonSource } from "./git.ts";
 import {
   applyScenarioFixture,
   captureAgentDiff,
@@ -36,12 +36,14 @@ import { subjectTaskPrompt } from "./subject-prompt.ts";
 import { loadTranscript } from "./transcript.ts";
 import { trialScenarioDir } from "./trial-paths.ts";
 import type {
+  CommonSourceIdentity,
   EvalArm,
   EvalEvent,
   EvalHost,
   GradeResult,
   PreparedSourceIdentity,
   RunManifest,
+  TrustedEvaluatorRevision,
 } from "./types.ts";
 
 const detectEvalHost = (): EvalHost => {
@@ -60,6 +62,8 @@ type HostJob = {
   status: "pending" | "awaiting-record" | "complete";
   worktreePath: string;
   prepBaselineSha: string;
+  preparedWorkspace?: PreparedSourceIdentity;
+  lastRecordedFingerprint?: string;
 };
 
 type HostSessionState = {
@@ -67,7 +71,13 @@ type HostSessionState = {
   host: EvalHost;
   jobs: HostJob[];
   modelId?: string;
-  preparedSource: PreparedSourceIdentity;
+  commonSource?: CommonSourceIdentity;
+  trustedEvaluatorRevision?: TrustedEvaluatorRevision;
+  frozenCatalogHash?: string;
+  frozenScenarioOracleHash?: string;
+  frozenSkillsLockHash?: string;
+  /** @deprecated legacy field; do not synthesize when missing */
+  preparedSource?: PreparedSourceIdentity;
   repetition: number;
   runId: string;
   scenarioIds: string[];
@@ -108,14 +118,6 @@ export const loadHostSessionState = ({ runId }: { runId: string }) => {
   const file = statePath({ runId });
   if (!existsSync(file)) return null;
   const state = JSON.parse(readFileSync(file, "utf-8")) as HostSessionState;
-  if (!state.preparedSource) {
-    const sha = currentFlowSha();
-    state.preparedSource = {
-      commitSha: sha,
-      fingerprint: sha,
-      recordedAt: new Date().toISOString(),
-    };
-  }
   state.jobs = state.jobs.map((job) => {
     const overlay = jobFile({
       repetition: job.repetition,
@@ -213,7 +215,7 @@ const buildHostManifest = ({
   grades,
   host,
   modelId,
-  preparedSource,
+  state,
   repetition,
   runId,
   scenarioIds,
@@ -223,12 +225,14 @@ const buildHostManifest = ({
   grades: GradeResult[];
   host: EvalHost;
   modelId?: string;
-  preparedSource: PreparedSourceIdentity;
+  state: HostSessionState;
   repetition: number;
   runId: string;
   scenarioIds: string[];
   worktreePaths: string[];
 }): RunManifest => {
+  const commonSource = state.commonSource;
+  const sourceSha = commonSource?.commitSha ?? currentFlowSha();
   const isolation = assessIsolation({
     host,
     protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
@@ -244,33 +248,35 @@ const buildHostManifest = ({
       arm === "control" ? controlCheck.accepted : undefined,
     agentCliVersion: agentCliVersion(),
     arm,
-    catalogHash: catalogHash(),
-    completeness:
-      allComplete && grades.every((g) => g.officialEligible)
-        ? "complete"
-        : "partial",
+    completeness: allComplete ? "complete" : "partial",
     controlResiduals:
       arm === "control" && controlCheck.blocking.length
         ? controlCheck.blocking
         : undefined,
     cursorVersion: process.env.CURSOR_VERSION ?? "unknown",
-    flowSha: preparedSource.commitSha,
+    catalogHash: state.frozenCatalogHash ?? catalogHash(),
+    commonSource,
+    flowSha: sourceSha,
     flowVersion: "0.3",
+    frozenCatalogHash: state.frozenCatalogHash,
+    frozenScenarioOracleHash: state.frozenScenarioOracleHash,
+    frozenSkillsLockHash: state.frozenSkillsLockHash,
     harness: "host-session",
     host,
     isolationBlockers,
     modelId: modelId ?? "missing",
     officialComparisonAllowed: isolation.officialComparisonAllowed,
-    preparedSource,
+    preparedSource: state.preparedSource,
     protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
     repetition,
     rubricVersion,
     runId,
     scenarioIds,
-    scenarioOracleHash: scenarioOracleHash(),
-    skillsLockHash: skillsLockHash(),
+    scenarioOracleHash: state.frozenScenarioOracleHash ?? scenarioOracleHash(),
+    skillsLockHash: state.frozenSkillsLockHash ?? skillsLockHash(),
     sandboxEnabled: false,
-    sourceSha: preparedSource.commitSha,
+    sourceSha,
+    trustedEvaluatorRevision: state.trustedEvaluatorRevision,
     trustEnabled: false,
   };
 };
@@ -292,7 +298,14 @@ export const prepareHostRun = ({
 }) => {
   const runId = runIdInput ?? `run-${Date.now()}`;
   const flowSha = currentFlowSha();
-  let preparedSource: PreparedSourceIdentity | undefined;
+  const commonSource = recordCommonSource();
+  const trustedEvaluatorRevision: TrustedEvaluatorRevision = {
+    commitSha: flowSha,
+    recordedAt: new Date().toISOString(),
+  };
+  const frozenCatalogHash = catalogHash();
+  const frozenScenarioOracleHash = scenarioOracleHash();
+  const frozenSkillsLockHash = skillsLockHash();
   const host = detectEvalHost();
   const jobs: HostJob[] = [];
   const generatedById = new Map(
@@ -311,13 +324,12 @@ export const prepareHostRun = ({
       if (!generatedById.has(scenarioId))
         applyScenarioFixture({ scenarioId, worktreePath });
       const prep = finalizePrepBaseline({ worktreePath });
-      if (!preparedSource)
-        preparedSource = {
-          commitSha: prep.commitSha,
-          fingerprint: prep.fingerprint,
-          recordedAt: prep.recordedAt,
-          treeSha: prep.treeSha,
-        };
+      const preparedWorkspace: PreparedSourceIdentity = {
+        commitSha: prep.commitSha,
+        fingerprint: prep.fingerprint,
+        recordedAt: prep.recordedAt,
+        treeSha: prep.treeSha,
+      };
       const card =
         generatedById.get(scenarioId)?.publicCard ??
         loadPublicScenario({ id: scenarioId });
@@ -340,6 +352,7 @@ export const prepareHostRun = ({
       jobs.push({
         currentTurn: 1,
         prepBaselineSha: prep.commitSha,
+        preparedWorkspace,
         repetition: rep,
         scenarioId,
         status: "pending",
@@ -350,16 +363,16 @@ export const prepareHostRun = ({
 
   const state: HostSessionState = {
     arm,
+    commonSource,
+    frozenCatalogHash,
+    frozenScenarioOracleHash,
+    frozenSkillsLockHash,
     host,
     jobs,
-    preparedSource: preparedSource ?? {
-      commitSha: flowSha,
-      fingerprint: flowSha,
-      recordedAt: new Date().toISOString(),
-    },
     repetition,
     runId,
     scenarioIds,
+    trustedEvaluatorRevision,
   };
   saveState(state);
 
@@ -367,10 +380,10 @@ export const prepareHostRun = ({
     arm,
     grades: [],
     host,
-    preparedSource: state.preparedSource,
     repetition,
     runId,
     scenarioIds,
+    state,
     worktreePaths: jobs.map((j) => j.worktreePath),
   });
   mkdirSync(path.join(devEvalsRoot, runId), { recursive: true });
@@ -585,6 +598,47 @@ export const hostSessionRecord = ({
   });
   if (!validated.ok) return { ok: false as const, reason: validated.reason };
 
+  const fingerprint = validated.fingerprint;
+  if (
+    job.lastRecordedFingerprint &&
+    job.lastRecordedFingerprint !== fingerprint
+  )
+    return {
+      ok: false as const,
+      reason: "conflicting record for the same turn",
+    };
+  if (job.lastRecordedFingerprint === fingerprint)
+    return { ok: true as const, jobStatus: job.status, reused: true as const };
+
+  const submissionsDir = path.join(scenarioDir, "submissions");
+  mkdirSync(submissionsDir, { recursive: true });
+  const submissionPath = path.join(
+    submissionsDir,
+    `t${turn}-${fingerprint}.json`
+  );
+  const redactedSubmission = validated.events.map((event) =>
+    event.text === undefined
+      ? event
+      : { ...event, text: redactOrThrow({ text: event.text }) }
+  );
+  writeFileSync(
+    submissionPath,
+    `${JSON.stringify(
+      {
+        channel: "subject-submitted",
+        events: redactedSubmission,
+        fingerprint,
+        recordedAt: new Date().toISOString(),
+        repetition,
+        runId,
+        scenarioId,
+        turn,
+      },
+      null,
+      2
+    )}\n`
+  );
+
   const stamped = validated.events.map((event, index) => {
     const base = {
       ...event,
@@ -597,10 +651,6 @@ export const hostSessionRecord = ({
       ? base
       : { ...base, text: redactOrThrow({ text: base.text }) };
   });
-  writeFileSync(
-    path.join(scenarioDir, "raw-record.json"),
-    `${JSON.stringify({ events: stamped, recordedAt: new Date().toISOString() }, null, 2)}\n`
-  );
   const lines = stamped.map((e) => JSON.stringify(e)).join("\n");
   writeFileSync(
     eventsPath,
@@ -618,6 +668,7 @@ export const hostSessionRecord = ({
     job.currentTurn += 1;
     job.status = "pending";
   }
+  job.lastRecordedFingerprint = fingerprint;
   saveJob({ job, runId });
 
   return { ok: true as const, jobStatus: job.status };
@@ -672,6 +723,7 @@ const finalizeHostScenario = ({
     protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
     protocolVerified: false,
     repetition: job.repetition,
+    runId,
     scenarioId: job.scenarioId,
     worktreePath: job.worktreePath,
   });
@@ -714,10 +766,10 @@ export const hostSessionFinalize = ({
     grades,
     host: state.host,
     modelId: state.modelId ?? modelId,
-    preparedSource: state.preparedSource,
     repetition: state.repetition,
     runId,
     scenarioIds: state.scenarioIds,
+    state,
     worktreePaths,
   });
   const runDir = path.join(devEvalsRoot, runId);

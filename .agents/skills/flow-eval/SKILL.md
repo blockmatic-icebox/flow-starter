@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 The parent session is the **runner**. Subjects receive neutral task prompts only (protocol `subject-evaluator-v2`). The runner operates `eval prepare` / `next` / `record` / `finalize`. Subjects do not run eval CLI commands or propose methodology fixes.
 
-Official flow-vs-control comparison is **blocked** until isolation and runner-captured evidence are supported; treat host-session output as diagnostic. See [ADR 0015](../../flow/decisions/adr/0015-evaluation-subject-separation.md).
+Official flow-vs-control comparison is **blocked** until isolation and runner-captured evidence are supported; treat host-session output as diagnostic. Harness integrity vs diagnostic vs official paths: [.agents/eval/RUN.md](../../eval/RUN.md#evaluation-paths). See [ADR 0015](../../flow/decisions/adr/0015-evaluation-subject-separation.md).
 
 Do not spawn the Cursor CLI `agent` command or pass a model.
 

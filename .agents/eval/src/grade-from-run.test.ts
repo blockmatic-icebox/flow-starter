@@ -76,7 +76,7 @@ describe("gradeScenarioFromRunDir", () => {
       scenarioId: "S05",
     });
     const grade = gradeScenarioFromRunDir({ runId, scenarioId: "S05" });
-    assert.ok(grade.blockers.includes("unverified-protocol"));
+    assert.equal(grade.evidenceValidity, "invalid");
     assert.equal(grade.officialEligible, false);
     rmSync(path.join(devEvalsRoot, runId), { force: true, recursive: true });
   });
@@ -107,8 +107,8 @@ describe("gradeScenarioFromRunDir", () => {
       scenarioId: "S05",
     });
     const grade = gradeScenarioFromRunDir({ runId, scenarioId: "S05" });
-    assert.ok(grade.blockers.includes("unverified-protocol"));
-    assert.ok(grade.blockers.includes("incomplete-telemetry"));
+    assert.equal(grade.evidenceValidity, "invalid");
+    assert.ok(grade.evidenceLimitations?.includes("unverified-protocol"));
     rmSync(path.join(devEvalsRoot, runId), { force: true, recursive: true });
   });
 });

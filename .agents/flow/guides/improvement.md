@@ -28,7 +28,7 @@ The `@repo/flow-eval` package provides a **user-invoked** harness: isolated work
 | Protocol v2 | Subject / runner / evaluator separation; no renormalized quality percentage |
 | `flow:check` | Validates doc paths and bundle freshness—not product outcomes |
 
-Command reference: [.agents/eval/RUN.md](../../eval/RUN.md). Pilot freeze: `pnpm --filter @repo/flow-eval eval freeze-pilot`. Initiative: [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md). Host-session (`/flow-eval`) remains **diagnostic** until Cursor supports enforced isolation and runner-captured transcripts ([ADR 0015](../decisions/adr/0015-evaluation-subject-separation.md)).
+Command reference and the three evaluation paths (harness / diagnostic / official): [.agents/eval/RUN.md](../../eval/RUN.md#evaluation-paths). Pilot freeze: `pnpm --filter @repo/flow-eval eval freeze-pilot`. Initiative: [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md). Host-session (`/flow-eval`) remains **diagnostic** until the inspected Cursor IDE adapter demonstrates ADR 0015 isolation capabilities.
 
 ## Human-reviewed improvement loop (operating process)
 

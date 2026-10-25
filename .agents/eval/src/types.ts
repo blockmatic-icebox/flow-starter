@@ -29,7 +29,27 @@ export type EventPhase =
   | "attempted"
   | "succeeded"
   | "failed"
+  | "unknown"
   | "mentioned";
+
+export type EvidenceValidity = "valid" | "limited" | "invalid";
+
+export interface CommonSourceIdentity {
+  commitSha: string;
+  fingerprint: string;
+  recordedAt: string;
+}
+
+export interface TrustedEvaluatorRevision {
+  commitSha: string;
+  recordedAt: string;
+}
+
+export interface EvaluatedProductSnapshot {
+  treeSha: string;
+  fingerprint: string;
+  recordedAt: string;
+}
 
 export interface TokenUsage {
   inputTokens?: number;
@@ -70,7 +90,13 @@ export interface RunManifest {
   protocol: string;
   skillsLockHash?: string;
   sourceSha: string;
+  /** @deprecated use commonSource for v2 compatibility checks */
   preparedSource?: PreparedSourceIdentity;
+  commonSource?: CommonSourceIdentity;
+  trustedEvaluatorRevision?: TrustedEvaluatorRevision;
+  frozenCatalogHash?: string;
+  frozenScenarioOracleHash?: string;
+  frozenSkillsLockHash?: string;
   scenarioOracleHash?: string;
   isolationBlockers?: string[];
   officialComparisonAllowed?: boolean;
@@ -152,6 +178,8 @@ export interface GradeResult {
   productOutcomePassed?: boolean;
   gate: "pass" | "fail";
   gateIds: GateId[];
+  evidenceValidity?: EvidenceValidity;
+  evidenceLimitations?: string[];
   officialEligible: boolean;
   /** @deprecated v2 reports use outcomes; always null for subject-evaluator-v2 */
   quality: number | null;
@@ -211,10 +239,13 @@ export interface ScenarioOracle {
 export interface CommandEvidence {
   id: string;
   command: string;
-  exitCode: number;
+  exitCode?: number;
   output?: string;
   eventId: string;
-  phase: "succeeded" | "failed";
+  phase: "succeeded" | "failed" | "unknown";
+  cwd?: string;
+  snapshotId?: string;
+  seq?: number;
 }
 
 export interface ScenarioGradeInput {
@@ -233,6 +264,10 @@ export interface ScenarioGradeInput {
   isolationBlockers?: string[];
   buildAuthorized: boolean;
   productOutcomePassed?: boolean;
+  runId?: string;
+  conflictHandlingReview?: "pass" | "fail";
+  evaluatedSnapshot?: EvaluatedProductSnapshot;
+  worktreePath?: string;
 }
 
 export interface AgentTurnResult {

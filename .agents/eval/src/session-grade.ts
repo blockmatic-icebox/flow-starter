@@ -1,3 +1,4 @@
+import { loadBlindReview } from "./blind-review.ts";
 import { extractCommands } from "./evidence.ts";
 import { gradeScenario } from "./grade.ts";
 import { runProductOutcomeCheck } from "./product-outcome.ts";
@@ -25,6 +26,7 @@ export const gradeObservedScenario = ({
   protocol,
   protocolVerified,
   repetition,
+  runId,
   scenarioId,
   worktreePath,
 }: {
@@ -40,9 +42,11 @@ export const gradeObservedScenario = ({
   protocol?: string;
   protocolVerified: boolean;
   repetition?: number;
+  runId?: string;
   scenarioId: string;
   worktreePath?: string;
 }): GradeResult => {
+  const blind = runId ? loadBlindReview({ runId, scenarioId }) : undefined;
   const commands = extractCommands({ events });
   const completeness = resolveScenarioCompleteness({
     events,
@@ -67,6 +71,7 @@ export const gradeObservedScenario = ({
       card,
       commands,
       completeness,
+      conflictHandlingReview: blind?.conflictHandling,
       diff,
       events,
       harness,
@@ -76,7 +81,9 @@ export const gradeObservedScenario = ({
       productOutcomePassed,
       protocol,
       protocolVerified,
+      runId,
       scenarioId,
+      worktreePath,
     },
   });
 

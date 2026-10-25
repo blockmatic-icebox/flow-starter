@@ -1,4 +1,8 @@
 import {
+  computeEvidenceValidity,
+  evidenceSupportsComparison,
+} from "./evidence-validity.ts";
+import {
   extractAssistantClaims,
   matchesAnyPattern,
   observedSkillReads,
@@ -11,6 +15,7 @@ import { dimensionWeights, subjectiveDimensions } from "./rubric.ts";
 import type {
   DimensionId,
   DimensionScore,
+  EvidenceValidity,
   GradeResult,
   ScenarioGradeInput,
 } from "./types.ts";
@@ -185,32 +190,28 @@ const computeConfidence = ({
   return "high" as const;
 };
 
-const computeOfficialEligible = ({
-  gateIds,
+const computeComparativeEligibility = ({
   confidence,
-  completeness,
-  harness,
+  evidenceValidity,
+  input,
   isolationBlockers = [],
   protocol,
-  protocolVerified,
   scores,
 }: {
-  gateIds: string[];
   confidence: GradeResult["confidence"];
-  completeness: ScenarioGradeInput["completeness"];
-  harness: ScenarioGradeInput["harness"];
+  evidenceValidity: EvidenceValidity;
+  input: ScenarioGradeInput;
   isolationBlockers?: string[];
   protocol?: string;
-  protocolVerified: boolean;
   scores: DimensionScore[];
 }) => {
   const blockers: string[] = [];
-  if (gateIds.length) blockers.push("critical-gate-failure");
-  if (harness === "diagnostic-unofficial") blockers.push("unofficial-harness");
-  if (!protocolVerified) blockers.push("unverified-protocol");
+  if (input.harness === "diagnostic-unofficial")
+    blockers.push("unofficial-harness");
+  if (!evidenceSupportsComparison({ evidenceValidity, input }))
+    blockers.push("evidence-not-comparison-grade");
   if (protocol === SUBJECT_EVALUATOR_PROTOCOL_ID)
     blockers.push(...isolationBlockers);
-  if (completeness !== "complete") blockers.push("incomplete-telemetry");
   if (confidence === "low") blockers.push("low-confidence");
   const requiredUnverified = scores.filter(
     (s) => s.score === "unverified" && !subjectiveDimensions.includes(s.id)
@@ -229,10 +230,18 @@ export const gradeScenario = ({
 }): GradeResult => {
   const claims =
     input.assistantClaims ?? extractAssistantClaims({ events: input.events });
+  const claimText = claims.join("\n");
   const { gateIds } = runDeterministicGates({
     input: { ...input, assistantClaims: claims },
   });
   const gate = gateIds.length > 0 ? "fail" : "pass";
+  const { limitations, validity: evidenceValidity } = computeEvidenceValidity({
+    completeness: input.completeness,
+    gateIds,
+    harness: input.harness,
+    protocol: input.protocol,
+    protocolVerified: input.protocolVerified,
+  });
   const scores = scoresOverride ?? deterministicScores({ gateIds, input });
   const excludedDimensions = scores
     .filter((s) => s.score === "na")
@@ -245,14 +254,12 @@ export const gradeScenario = ({
     protocolVerified: input.protocolVerified,
     scores,
   });
-  const { eligible, blockers } = computeOfficialEligible({
-    completeness: input.completeness,
+  const { eligible, blockers } = computeComparativeEligibility({
     confidence,
-    gateIds,
-    harness: input.harness,
+    evidenceValidity: evidenceValidity ?? "invalid",
+    input,
     isolationBlockers: input.isolationBlockers,
     protocol: input.protocol,
-    protocolVerified: input.protocolVerified,
     scores,
   });
   const isV2 = input.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID;
@@ -263,8 +270,13 @@ export const gradeScenario = ({
       : null;
   const outcomes = isV2
     ? deriveScenarioOutcomes({
+        claimText,
+        commands: input.commands,
         completeness: input.completeness,
+        conflictHandlingReview: input.conflictHandlingReview,
         gateIds,
+        harness: input.harness,
+        oracle: input.oracle,
         productOutcomePassed: input.productOutcomePassed,
         scenarioId: input.scenarioId,
       })
@@ -274,6 +286,8 @@ export const gradeScenario = ({
     blockers,
     completeness: input.completeness,
     confidence,
+    evidenceLimitations: limitations,
+    evidenceValidity,
     excludedDimensions,
     gate,
     gateIds,

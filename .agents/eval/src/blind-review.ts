@@ -13,6 +13,7 @@ export type BlindReviewSheet = {
   reviewer: string;
   rubricVersion: string;
   scores: Partial<Record<DimensionId, 0 | 1 | 2 | 3 | 4>>;
+  conflictHandling?: "pass" | "fail";
 };
 
 const subjectiveIds = new Set<DimensionId>([

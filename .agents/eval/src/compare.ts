@@ -32,6 +32,9 @@ export type RegressionVerdict =
 const observedModel = (id?: string) =>
   id && id !== "missing" ? id : undefined;
 
+const commonFingerprint = (manifest: RunManifest) =>
+  manifest.commonSource?.fingerprint ?? manifest.preparedSource?.fingerprint;
+
 const appendSourceShaCompatibility = ({
   baseline,
   current,
@@ -45,6 +48,21 @@ const appendSourceShaCompatibility = ({
   issues: string[];
   notes: string[];
 }) => {
+  const baseCommon = commonFingerprint(baseline);
+  const curCommon = commonFingerprint(current);
+  if (
+    baseline.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID &&
+    baseCommon &&
+    curCommon
+  ) {
+    if (baseCommon !== curCommon)
+      issues.push("commonSource fingerprint mismatch");
+    if (remediationMode && baseline.sourceSha !== current.sourceSha)
+      notes.push(
+        `evaluator revision differs (baseline ${baseline.sourceSha.slice(0, 7)} → current ${current.sourceSha.slice(0, 7)})`
+      );
+    return;
+  }
   if (baseline.sourceSha === current.sourceSha) return;
   if (remediationMode)
     notes.push(
@@ -69,12 +87,43 @@ const appendManifestFieldCompatibility = ({
   if (baseline.rubricVersion !== current.rubricVersion)
     issues.push("rubricVersion mismatch");
   if (baseline.protocol !== current.protocol) issues.push("protocol mismatch");
-  if (
-    baseline.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID &&
-    baseline.preparedSource?.fingerprint !== current.preparedSource?.fingerprint
-  )
-    issues.push("preparedSource fingerprint mismatch");
-  if (
+  if (baseline.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID) {
+    const hashField = (
+      field:
+        | "frozenCatalogHash"
+        | "frozenScenarioOracleHash"
+        | "frozenSkillsLockHash",
+      fallback: keyof RunManifest
+    ) => {
+      const a = baseline[field] ?? baseline[fallback];
+      const b = current[field] ?? current[fallback];
+      if (!a || !b) {
+        if (!a && !b) issues.push(`${field} missing on both runs`);
+        else issues.push(`${field} missing on one run`);
+        return;
+      }
+      if (a === "unknown" || b === "unknown") {
+        issues.push(`${field} unknown is not a match`);
+        return;
+      }
+      if (a !== b) issues.push(`${field} mismatch`);
+    };
+    hashField("frozenCatalogHash", "catalogHash");
+    hashField("frozenScenarioOracleHash", "scenarioOracleHash");
+    hashField("frozenSkillsLockHash", "skillsLockHash");
+    if (
+      baseline.catalogHash &&
+      current.catalogHash &&
+      baseline.catalogHash !== current.catalogHash
+    )
+      issues.push("catalogHash mismatch");
+    if (
+      baseline.skillsLockHash &&
+      current.skillsLockHash &&
+      baseline.skillsLockHash !== current.skillsLockHash
+    )
+      issues.push("skillsLockHash mismatch");
+  } else if (
     baseline.scenarioOracleHash &&
     current.scenarioOracleHash &&
     baseline.scenarioOracleHash !== current.scenarioOracleHash
@@ -156,6 +205,25 @@ export const experimentManifestsCompatible = ({
 const gradeKey = (grade: GradeResult) =>
   `${grade.scenarioId}@${grade.repetition ?? 1}`;
 
+const duplicateGradeKeys = (grades: GradeResult[]) => {
+  const seen = new Set<string>();
+  const dupes: string[] = [];
+  for (const g of grades) {
+    const key = gradeKey(g);
+    if (seen.has(key)) dupes.push(key);
+    seen.add(key);
+  }
+  return dupes;
+};
+
+const gradeComparisonEligible = (grades: GradeResult[]) =>
+  grades.every(
+    (g) =>
+      g.officialEligible &&
+      g.evidenceValidity !== "invalid" &&
+      g.evidenceValidity !== "limited"
+  );
+
 const compareScenarioGrades = ({
   baselineByScenario,
   currentGrades,
@@ -220,26 +288,30 @@ const compareScenarioGrades = ({
 
 const regressionVerdict = ({
   coverageIncomplete,
+  duplicateKeys,
   gatesImproved,
   gatesRegressed,
+  ineligibleBaseline,
   ineligibleCurrent,
   manifestBlocked,
   qualityImproved,
   qualityRegressed,
 }: {
   coverageIncomplete: boolean;
+  duplicateKeys: string[];
   gatesImproved: number;
   gatesRegressed: number;
+  ineligibleBaseline: boolean;
   ineligibleCurrent: boolean;
   manifestBlocked: boolean;
   qualityImproved: number;
   qualityRegressed: number;
 }): RegressionVerdict => {
-  if (manifestBlocked) return "inconclusive";
+  if (manifestBlocked || duplicateKeys.length > 0) return "inconclusive";
   if (gatesRegressed > 0) return "regressed";
   if (coverageIncomplete) return "inconclusive";
   if (qualityRegressed > 0) return "regressed";
-  if (ineligibleCurrent) return "inconclusive";
+  if (ineligibleCurrent || ineligibleBaseline) return "inconclusive";
   if (gatesImproved > 0 || qualityImproved > 0) return "improved";
   return "unchanged";
 };
@@ -318,20 +390,6 @@ export const compareRuns = ({
     remediationMode,
   });
   manifestNotes.push(...notes);
-  if (!compatible)
-    return {
-      changes: issues,
-      details: issues,
-      gateChanges: issues,
-      improved: 0,
-      manifestNotes,
-      missingInCurrent: [],
-      missingInBaseline: [],
-      qualityChanges: [],
-      regressed: 0,
-      remediationMode,
-      verdict: "inconclusive" as const,
-    };
 
   const byScenario = new Map(baseline.map((g) => [gradeKey(g), g]));
   const currentIds = new Set(current.map((g) => gradeKey(g)));
@@ -361,21 +419,46 @@ export const compareRuns = ({
   });
   const coverageIncomplete =
     missingInCurrent.length > 0 || missingInBaseline.length > 0;
-  const ineligibleCurrent = current.some((g) => !g.officialEligible);
+  const duplicateKeys = [
+    ...duplicateGradeKeys(baseline),
+    ...duplicateGradeKeys(current),
+  ];
+  const ineligibleCurrent = !gradeComparisonEligible(current);
+  const ineligibleBaseline = !gradeComparisonEligible(baseline);
   const verdict = regressionVerdict({
     coverageIncomplete,
+    duplicateKeys,
     gatesImproved: compared.gatesImproved,
     gatesRegressed: compared.gatesRegressed,
+    ineligibleBaseline,
     ineligibleCurrent,
-    manifestBlocked: false,
+    manifestBlocked: !compatible,
     qualityImproved: compared.qualityImproved,
     qualityRegressed: compared.qualityRegressed,
   });
 
+  const manifestIssues = compatible ? [] : issues;
+
   return {
-    changes: [...manifestNotes, ...coverageChanges, ...compared.changes],
-    details: [...manifestNotes, ...coverageChanges, ...compared.changes],
-    gateChanges: [...coverageGateChanges, ...compared.gateChanges],
+    changes: [
+      ...manifestIssues,
+      ...manifestNotes,
+      ...duplicateKeys.map((k) => `${k}: duplicate trial key`),
+      ...coverageChanges,
+      ...compared.changes,
+    ],
+    details: [
+      ...manifestIssues,
+      ...manifestNotes,
+      ...duplicateKeys.map((k) => `${k}: duplicate trial key`),
+      ...coverageChanges,
+      ...compared.changes,
+    ],
+    gateChanges: [
+      ...manifestIssues,
+      ...coverageGateChanges,
+      ...compared.gateChanges,
+    ],
     improved: compared.gatesImproved + compared.qualityImproved,
     manifestNotes,
     missingInBaseline,

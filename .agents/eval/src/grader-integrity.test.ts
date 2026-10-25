@@ -27,12 +27,16 @@ describe("grader integrity", () => {
         ],
         harness: "cursor-cli",
         oracle: loadScenarioOracle({ id: "S13" }),
-        productOutcomePassed: false,
+        productOutcomePassed: undefined,
         protocolVerified: true,
         scenarioId: "S13",
       },
     });
-    assert.ok(grade.gateIds.includes("fabricated-verification"));
+    assert.equal(grade.gateIds.includes("fabricated-verification"), false);
+    assert.equal(
+      grade.scores.find((s) => s.id === "verification")?.score,
+      "unverified"
+    );
     assert.equal(grade.quality, null);
   });
 

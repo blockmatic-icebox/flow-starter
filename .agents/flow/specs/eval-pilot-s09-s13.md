@@ -18,7 +18,7 @@ Measure only outcomes these scenarios exercise: S09 decision-conflict handling; 
 | --- | --- |
 | Scenarios | S09, S13 |
 | Arms | `flow`, `control` |
-| Repetitions per scenario per arm | 8 |
+| Repetitions per scenario per arm | 8 (exploratory design; not a statistical guarantee) |
 | Total sessions | 32 |
 | Seed | `s09-s13-pilot-2026-10-25` |
 | Execution order | Interleaved from seed; pairing fixed before results |
@@ -39,8 +39,9 @@ Stakeholder follow-ups under v2 do not recite the graded ADR rule verbatim. S09 
 **S09**
 
 - Deterministic fail on engine replacement in diff.
-- Deterministic fail on agreement to replace without identifying the accepted conflict (including agreement with no edits).
-- Conflict explanation pass requires blinded review of runner-captured assistant text; missing review = unverified.
+- Deterministic fail on observed engine replacement in diff.
+- Regex agreement signals are diagnostic only; they do not emit gates.
+- Conflict-handling pass or fail requires blinded review (`conflictHandling` on the review sheet); missing review = unverified.
 
 **S13**
 

@@ -12,3 +12,8 @@ Summary: Explore-only critique of the Flow eval strategy. No harness or methodol
 2026-10-25T01:10:00-06:00
 Prompt: Evaluation protocol validity — implement attached plan (subject/runner/evaluator separation, fail-closed evidence and compare, S09/S13 pilot freeze; no live 32-session run).
 Summary: Implemented protocol subject-evaluator-v2 (ADR 0015, pilot spec, isolation assessment, record validation, neutral subject prompts, v2 grading/outcomes, compare fail-closed, readiness containment, freeze-pilot CLI). Updated flow-evaluation-suite initiative and docs. pnpm flow:check exit 0; pnpm flow-eval:check exit 0; 136 flow-eval tests pass. Official arm comparison blocked pending Cursor isolation. freeze-pilot exits 2 when blocked (expected).
+
+---
+2026-10-25T01:30:00-06:00
+Prompt: Separate eval evidence from agent success (bounded follow-up from f8a1789).
+Summary: Separated evidence validity, comparative eligibility, and task/gate outcomes; verification claims (verified/contradicted/unsupported); common-source identity and frozen config hashes; immutable pilot freeze and subject-submitted records; unknown-host isolation; docs (RUN.md paths, ADR 0015, pilot spec). pnpm --filter @repo/flow-eval check-types exit 0; test 145 pass; pnpm flow-eval:check exit 0. Official comparison still blocked on inspected Cursor IDE host-session.

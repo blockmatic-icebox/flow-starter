@@ -77,11 +77,31 @@ __dev/flow-evals/<runId>/
 
 Hidden stakeholder scripts: `__dev/flow-evals/catalog/<scenarioId>/hidden.json` (not in executor worktrees).
 
+## Evaluation paths
+
+| Path | Purpose | Official flow vs control |
+| --- | --- | --- |
+| **Harness integrity** | Deterministic unit tests of gates, compare, freeze, and graders | Not applicable |
+| **Diagnostic evaluation** | Host-session runs with explicit provenance limits (`/flow-eval`) | Blocked |
+| **Official comparison** | Cross-arm regression with valid evidence and inspected isolation | Blocked on Cursor IDE host-session until ADR 0015 capabilities are demonstrated |
+
+Assessment types: **explicit skill invocation** (named skill in prompt), **natural skill discovery** (no skill named), **should-not-trigger** (e.g. plan-only regressions — valid cases, not broad superiority claims), and **comparative experiments** (incremental benefit under frozen common inputs).
+
+Improvement vocabulary (diagnostic, not auto-promoted):
+
+- **Self-healing:** restore expected behavior and verify recovery.
+- **Skill improvement:** reusable skill behavior improves without regressions.
+- **Factory improvement:** orchestration or tooling improves with system-level evidence.
+
+Deferred (not in this harness): holdout infrastructure, campaign automation, recovery suites — use real assessment failures as future inputs.
+
 ## Grading
 
-Deterministic gates run first. Reports lead with **Gate**, **Official eligible**, per-outcome fields (task, verification claim, conflict handling when applicable), and evidence completeness. Protocol v2 does not emit a renormalized quality percentage.
+Deterministic gates run first. Reports lead with **Gate**, **evidence validity**, **comparative eligibility** (stored as `officialEligible`), per-outcome fields (task, verification claim, conflict handling when applicable), and evidence completeness. Protocol v2 does not emit a renormalized quality percentage.
 
-Official methodology claims require protocol `subject-evaluator-v2`, compatible manifests, eligible evidence, and a passing isolation assessment. Historical `host-session-v1`, `cursor-cli`, and run `20261024-flow-v0.1-1256e532` remain readable but are not official performance baselines.
+Agent task failures remain valid evidence; they do not by themselves invalidate a trial. Missing command capture yields **unsupported** verification claims, not proven fabrication. Subject `eval record` files are **subject-submitted** claims, not runner-captured transcripts.
+
+Official methodology claims require protocol `subject-evaluator-v2`, compatible frozen manifests, comparison-grade evidence, and a passing isolation assessment for the inspected mechanism. Historical `host-session-v1`, `cursor-cli`, and run `20261024-flow-v0.1-1256e532` remain readable but are not official performance baselines.
 
 Offline integrity: `pnpm flow-eval:check` from the repository root (types, unit tests, baseline preserve).
 

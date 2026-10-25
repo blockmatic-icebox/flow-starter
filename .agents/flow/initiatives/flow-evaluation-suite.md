@@ -129,7 +129,7 @@ integrated_acceptance: pnpm flow:check && pnpm flow-eval:check
 - [x] Dry-run harness verification (worktrees, grading, compare-arms)
 - [x] Harness v0.2: stream-json normalization, prep baseline diffs, evidence-backed gates/grades, oracles for S01/S02/S09/S13, handoff continuity
 - [x] Regression compare command (`compare`, `compare-arms`) and unit tests
-- [ ] Protocol v2: subject-evaluator separation, fail-closed evidence and compare (waves above)
+- [x] Protocol v2: subject-evaluator separation, evidence validity vs comparative eligibility, fail-closed compare (post-f8a1789 follow-up)
 - [ ] Frozen S09/S13 pilot prepared via `eval freeze-pilot` — **do not** launch 32 live sessions in implementation
 - [ ] Official flow vs control comparison — **blocked** until Cursor provides enforced subject isolation and runner-captured transcripts (see ADR 0015)
 
@@ -145,6 +145,10 @@ pnpm --filter @repo/flow-eval eval freeze-pilot --seed s09-s13-pilot-2026-10-25
 Diagnostic host-session runs remain available; they are not official evidence under protocol `subject-evaluator-v2`. Historical `host-session-v1` and v0.1 run `20261024-flow-v0.1-1256e532` stay immutable and are not methodology-performance baselines.
 
 ## Findings
+
+### Deferred follow-ups (evidence-validity wave)
+
+- Holdout infrastructure, campaign automation (`self-improve` resume, `experiment`, `pilot-loop`), and recovery suites — inputs: 2026-10-24 assessment failures (ADR 0012 product-in-neutral-app, incomplete traces).
 
 ### 2026-10-25 protocol validity review (revision `4070c3a`)
 

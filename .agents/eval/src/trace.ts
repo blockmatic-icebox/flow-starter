@@ -191,12 +191,12 @@ const handleToolCallLine = ({
     origin: "observed",
     callId,
     command: shell.command,
-    exitCode: shell.exitCode ?? 1,
+    exitCode: shell.exitCode,
     phase:
       shell.exitCode === 0
         ? "succeeded"
         : shell.exitCode === undefined
-          ? "attempted"
+          ? "unknown"
           : "failed",
     text: shell.output?.slice(0, 4000),
   });
