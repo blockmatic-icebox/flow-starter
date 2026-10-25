@@ -1,7 +1,7 @@
 # Corrective pass — 2026-10-25
 
 **Starting revision:** `70d4708fe2cde711761b227c62a3eccb1fb5d0a1`  
-**Ending revision:** `88e2799` (full: `git rev-parse HEAD` on `main`)
+**Ending revision:** `6aa075d` (`70d4708` → corrective pass on `main`)
 
 ## Defects fixed
 
