@@ -1,4 +1,10 @@
-import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import path from "node:path";
 
 const ASSESSMENT_HANDOFF = ".agents/flow/operations/assessment-adoption.md";
@@ -129,10 +135,14 @@ When Explore produces meaningful material, create \`PRODUCT.md\` from \`.agents/
 `;
   const uninitializedDesign = `# Design (not initialized)
 
-Create \`DESIGN.md\` only when a real user journey exists. Template: \`.agents/skills/flow/templates/DESIGN.md\`.
+Create or update \`DESIGN.md\` during Explore when visual references or interaction direction emerge; a user journey is not required. Template: \`.agents/skills/flow/templates/DESIGN.md\`.
 `;
   writeFileSync(path.join(root, "PRODUCT.md"), uninitializedProduct, "utf-8");
   writeFileSync(path.join(root, "DESIGN.md"), uninitializedDesign, "utf-8");
+
+  removeIfExists(root, "prompts.txt");
+  mkdirSync(path.join(root, ".agents/flow"), { recursive: true });
+  writeFileSync(path.join(root, ".agents/flow/prompts.txt"), "", "utf-8");
 
   return { host: hostTo, slug };
 };

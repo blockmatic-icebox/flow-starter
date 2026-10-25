@@ -34,8 +34,9 @@ const initGitRepo = (root) => {
 };
 
 const writeSkillsLock = (root) => {
+  mkdirSync(path.join(root, ".agents"), { recursive: true });
   writeFileSync(
-    path.join(root, "skills-lock.json"),
+    path.join(root, ".agents/skills-lock.json"),
     JSON.stringify({
       skills: { "incremental-implementation": {} },
       version: 1,

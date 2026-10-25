@@ -34,8 +34,12 @@ test("generated product passes applicable factory checks", () => {
   const projectRoot = join(parent, "adoption-check");
   const agentsRoot = join(projectRoot, ".agents");
 
-  assert.ok(existsSync(join(projectRoot, "prompts.txt")));
-  assert.equal(readFileSync(join(projectRoot, "prompts.txt"), "utf-8"), "");
+  assert.ok(!existsSync(join(projectRoot, "prompts.txt")));
+  assert.ok(existsSync(join(projectRoot, ".agents/flow/prompts.txt")));
+  assert.equal(
+    readFileSync(join(projectRoot, ".agents/flow/prompts.txt"), "utf-8"),
+    ""
+  );
   assert.ok(!existsSync(join(projectRoot, ".agents/tooling/setup/install.sh")));
   assert.ok(!existsSync(join(agentsRoot, "tooling/setup/install.test.mjs")));
   assert.ok(!existsSync(join(agentsRoot, "eval/src/assessment/run.test.ts")));

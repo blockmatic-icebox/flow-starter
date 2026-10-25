@@ -17,6 +17,8 @@ import { runGit } from "../worktrees/git.mjs";
 import { loadAndValidateInitiative } from "../worktrees/initiative.mjs";
 import { findOutOfScopePaths } from "../worktrees/ownership.mjs";
 
+const promptLogRel = ".agents/flow/prompts.txt";
+
 const redactForLog = (text) =>
   text
     .replaceAll(/Bearer\s+\S+/giu, "Bearer [REDACTED]")
@@ -37,14 +39,15 @@ const appendPromptEntry = ({ filePath, prompt, summary, timestamp }) => {
   writeFileSync(filePath, `${prior}${block}`, "utf-8");
 };
 
-test("starter prompts.txt is tracked and empty", () => {
-  const logPath = join(repoRoot, "prompts.txt");
+test("factory prompt log exists and starts empty in dogfood checkout", () => {
+  const logPath = join(repoRoot, promptLogRel);
   assert.ok(existsSync(logPath));
   const content = readFileSync(logPath, "utf-8");
   if (content.length > 0)
     throw new Error(
-      "repo prompts.txt must stay empty for the starter baseline; use a temp fixture for examples"
+      "factory prompts log should start empty; use a temp fixture for append tests"
     );
+  assert.ok(!existsSync(join(repoRoot, "prompts.txt")));
 });
 
 test("prompt log append preserves prior entries and redacts secrets", () => {
@@ -76,8 +79,8 @@ test("prompt log append preserves prior entries and redacts secrets", () => {
   rmSync(dir, { force: true, recursive: true });
 });
 
-test("prompts.txt is parent-owned and rejected on task writes", () => {
-  assert.equal(isParentOwnedWrite("prompts.txt"), true);
+test("factory prompt log path is parent-owned and rejected on task writes", () => {
+  assert.equal(isParentOwnedWrite(promptLogRel), true);
 
   const body = `
 ## Waves
@@ -90,7 +93,7 @@ test("prompts.txt is parent-owned and rejected on task writes", () => {
 - flow_stage: Build
 - depends_on: []
 - writes:
-  - prompts.txt
+  - ${promptLogRel}
 - reads:
   - README.md
 - skills:
@@ -100,6 +103,7 @@ test("prompts.txt is parent-owned and rejected on task writes", () => {
 `;
   const root = mkdtempSync(join(tmpdir(), "flow-prompt-init-"));
   mkdirSync(join(root, "docs/initiatives"), { recursive: true });
+  mkdirSync(join(root, ".agents"), { recursive: true });
   writeFileSync(join(root, "README.md"), "# t\n", "utf-8");
   writeFileSync(
     join(root, ".agents/skills-lock.json"),
@@ -122,7 +126,7 @@ test("prompts.txt is parent-owned and rejected on task writes", () => {
   rmSync(root, { force: true, recursive: true });
 });
 
-test("worker changes to prompts.txt are out of scope", () => {
+test("worker changes to factory prompt log are out of scope", () => {
   const root = mkdtempSync(join(tmpdir(), "flow-prompt-own-"));
   runGit({ args: ["init", "-b", "main"], cwd: root });
   runGit({ args: ["config", "user.email", "t@t.local"], cwd: root });
@@ -130,13 +134,14 @@ test("worker changes to prompts.txt are out of scope", () => {
   writeFileSync(join(root, "allowed.txt"), "ok", "utf-8");
   runGit({ args: ["add", "allowed.txt"], cwd: root });
   runGit({ args: ["commit", "-m", "init", "--no-verify"], cwd: root });
-  writeFileSync(join(root, "prompts.txt"), "worker wrote\n", "utf-8");
+  mkdirSync(join(root, ".agents/flow"), { recursive: true });
+  writeFileSync(join(root, promptLogRel), "worker wrote\n", "utf-8");
 
   const outOfScope = findOutOfScopePaths({
     cwd: root,
     writes: ["allowed.txt"],
   });
-  assert.ok(outOfScope.includes("prompts.txt"));
+  assert.ok(outOfScope.includes(promptLogRel));
 
   rmSync(root, { force: true, recursive: true });
 });

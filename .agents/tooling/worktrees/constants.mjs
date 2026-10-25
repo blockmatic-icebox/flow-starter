@@ -3,7 +3,7 @@ export const PARENT_OWNED_WRITE_PATTERNS = [
   /^\.agents\/flow\/initiatives\//u,
   /^pnpm-lock\.yaml$/u,
   /^\.agents\/skills-lock\.json$/u,
-  /^prompts\.txt$/u,
+  /^\.agents\/flow\/prompts\.txt$/u,
   /knowledge-snapshot\.ts$/u,
 ];
 

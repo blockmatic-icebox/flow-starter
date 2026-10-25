@@ -67,8 +67,9 @@ const validInitiative = `
 function tempRepo(initiativeBody = validInitiative) {
   const root = mkdtempSync(path.join(os.tmpdir(), "flow-worktrees-"));
   mkdirSync(path.join(root, "docs/initiatives"), { recursive: true });
+  mkdirSync(path.join(root, ".agents"), { recursive: true });
   writeFileSync(
-    path.join(root, "skills-lock.json"),
+    path.join(root, ".agents/skills-lock.json"),
     JSON.stringify({
       skills: {
         "incremental-implementation": {},

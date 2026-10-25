@@ -65,6 +65,10 @@ const collectLayoutErrors = (root) => {
     errors.push(
       "skills-lock.json belongs at .agents/skills-lock.json, not repository root"
     );
+  if (existsSync(path.join(root, "prompts.txt")))
+    errors.push(
+      "prompts.txt belongs at .agents/flow/prompts.txt, not repository root"
+    );
   return errors;
 };
 
