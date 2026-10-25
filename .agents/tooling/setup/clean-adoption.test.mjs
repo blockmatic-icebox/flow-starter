@@ -54,8 +54,8 @@ test("generated product passes applicable factory checks", () => {
     [
       "--test",
       "tooling/worktrees/*.test.mjs",
-      "tooling/security/*.test.mjs",
-      "tooling/checks/check-staged.test.mjs",
+      "../tooling/security/*.test.mjs",
+      "../tooling/checks/check-staged.test.mjs",
       "tooling/setup/prompt-log.test.mjs",
     ],
     { cwd: agentsRoot, encoding: "utf-8", shell: true }

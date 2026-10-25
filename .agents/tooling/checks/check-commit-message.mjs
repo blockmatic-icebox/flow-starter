@@ -1,40 +1,12 @@
 #!/usr/bin/env node
+import { spawnSync } from "node:child_process";
+import path from "node:path";
 
-import { readFileSync } from "node:fs";
-import { exit } from "node:process";
-import { pathToFileURL } from "node:url";
-
-import {
-  formatConventionalCommitHelp,
-  isConventionalCommitSubject,
-  parseCommitSubject,
-} from "./conventional-commit.mjs";
-
-export const validateCommitMessageText = (message) => {
-  const subject = parseCommitSubject(message);
-  if (isConventionalCommitSubject(subject)) return { ok: true, subject };
-
-  return {
-    ok: false,
-    reason: formatConventionalCommitHelp(),
-    subject,
-  };
-};
-
-const main = () => {
-  const messagePath = process.argv[2];
-  if (!messagePath) {
-    console.error("Usage: check-commit-message.mjs <commit-message-file>");
-    exit(1);
-  }
-
-  const message = readFileSync(messagePath, "utf-8");
-  const result = validateCommitMessageText(message);
-  if (result.ok) exit(0);
-
-  console.error(`Invalid commit subject: ${result.subject || "(empty)"}\n`);
-  console.error(result.reason);
-  exit(1);
-};
-
-if (import.meta.url === pathToFileURL(process.argv[1]).href) main();
+const target = path.resolve(
+  import.meta.dirname,
+  "../../../tooling/checks/check-commit-message.mjs"
+);
+const result = spawnSync(process.execPath, [target, ...process.argv.slice(2)], {
+  stdio: "inherit",
+});
+process.exit(result.status ?? 1);

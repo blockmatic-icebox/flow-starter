@@ -95,6 +95,7 @@ export const applyProductAdoption = ({ projectName, root }) => {
   removeIfExists(root, "CLAUDE.md");
   removeIfExists(root, "docs/adr/0002-feature-intelligence-product.md");
   removeIfExists(root, "docs/initiatives/feature-intelligence.md");
+  removeIfExists(root, "knip.factory.json");
 
   replaceInFile({
     filePath: path.join(root, "apps/web/next.config.ts"),

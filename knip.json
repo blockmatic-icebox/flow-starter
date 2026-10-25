@@ -16,12 +16,10 @@
     ".": {
       "entry": [
         "oxlint.config.ts",
-        ".agents/tooling/worktrees/worktrees.mjs",
-        ".agents/tooling/worktrees/**/*.mjs",
-        ".agents/tooling/**/*.{mjs,ts}",
-        ".agents/tooling/**/*.test.mjs"
+        "tooling/**/*.{mjs,ts}",
+        "tooling/**/*.test.mjs"
       ],
-      "project": [".agents/tooling/**/*.{mjs,ts}", "oxlint.config.ts"]
+      "project": ["tooling/**/*.{mjs,ts}", "oxlint.config.ts"]
     },
     "apps/web": {
       "entry": [
@@ -56,6 +54,7 @@
   ],
   "ignoreUnresolved": ["next"],
   "ignoreDependencies": [
+    "typescript-ast",
     "@tailwindcss/postcss",
     "better-auth",
     "next-themes",

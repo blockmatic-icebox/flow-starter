@@ -28,7 +28,7 @@ jobs:
       - uses: ./.github/actions/setup-pnpm
 
       - name: Install verified gitleaks
-        run: node .agents/tooling/setup/setup-gitleaks.mjs
+        run: node tooling/setup/setup-gitleaks.mjs
 
       - run: pnpm lint
       - run: pnpm knip

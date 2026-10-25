@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { validateCommitMessageText } from "./check-commit-message.mjs";
+import { validateCommitMessageText } from "../../../tooling/checks/check-commit-message.mjs";
+import { isConventionalCommitSubject } from "../../../tooling/checks/conventional-commit.mjs";
 import { findNonConventionalSubjects } from "./check-commits.mjs";
-import { isConventionalCommitSubject } from "./conventional-commit.mjs";
 
 test("accepts conventional subjects aligned with PR title types", () => {
   assert.equal(isConventionalCommitSubject("feat(web): add triage"), true);
