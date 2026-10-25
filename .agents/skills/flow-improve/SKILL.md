@@ -25,3 +25,5 @@ ADR 0013 remains **Proposed**—do not implement the observer, hooks, L0 event l
 ## Completion
 
 Outcome recorded in the initiative (accepted, revised, or reverted) with commands and exit codes, or an explicit blocker.
+
+Close with the standard **Task report** ([journal.md](../../flow/operations/journal.md)) covering methodology doc changes, verification, and Git, then **Skills loaded**. Initiative outcome stays in the report **Outcome** and **Documentation** sections; do not replace the Task report with initiative text alone.

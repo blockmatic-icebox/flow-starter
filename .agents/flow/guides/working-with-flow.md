@@ -79,6 +79,24 @@ flowchart LR
 
 Dotted edges mean: new evidence or risk can send you back to an earlier activity. This is not a mandatory pipeline for every bug fix.
 
+## What you get after a task
+
+When a repository task finishes, the agent closes the conversation with a short **Task report**: what happened, which documents changed (with exact paths), what changed in code, which checks ran, commit references when they exist, and what to do next. Every report ends with **Skills loaded**—which methodology and technology skills were actually used.
+
+Operational rules live in [operations/journal.md](../operations/journal.md). Example shape (illustrative only):
+
+**Task report** — Completed · Build
+
+Fixed invoice date sorting and added a regression test.
+
+**Documentation** — No documentation changes.
+
+**Code** — Invoice list sort comparator and test.
+
+**Verification** — `pnpm test` — passed, exit 0.
+
+**Git** — Not committed.
+
 ## What “done” means
 
 | Kind of work | Done when |

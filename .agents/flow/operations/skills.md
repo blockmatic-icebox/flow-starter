@@ -52,7 +52,9 @@ When several methodology skills could apply (`idea-refine`, `problem-validation`
 
 The manifest remains [.agents/skills-lock.json](../../skills-lock.json). Install with `pnpm --dir .agents skills:install`. This page is a router, not a second manifest.
 
-## Skill usage reporting
+## Task report and Skills loaded
+
+The **Task report** ([journal.md](journal.md#task-report-user-visible)) is the user-visible closeout: status, outcome, documentation, code, verification, Git, delegation, and next action when relevant. Place it before the **Skills loaded** footer.
 
 Every final agent response ends with this footer (both categories always present):
 
@@ -91,7 +93,7 @@ Classification follows each skill's role in Flow, not its publisher.
 6. Deduplicate repeated loads of the same skill.
 7. For subagents, include their skills only when usage is verified from their reports or execution records — never infer.
 8. Reading `AGENTS.md`, workflow documents, or architecture documents is not loading a skill.
-9. Place the footer at the very end of the final response, after summaries, tests, and next actions.
+9. Place the footer at the very end of the final response, after the Task report (including **Next** when present).
 10. Apply to all tasks (research, exploration, planning, implementation, review, documentation-only).
 
 This convention improves observability; it does not prove compliance or guarantee execution.

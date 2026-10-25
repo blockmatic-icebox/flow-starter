@@ -32,7 +32,7 @@ The canonical product documents evolve as the product changes. Agents read the r
 
 You do not need to memorize commands. Describe the work you want to do and collaborate with your coding agent.
 
-- [Working with Flow](guides/working-with-flow.md)
+- [Working with Flow](guides/working-with-flow.md) — includes what you receive in a **Task report** after each task
 - [Principles](guides/principles.md)
 - [Project context and documentation](guides/project-context.md)
 - [Influences and skills](guides/influences.md)

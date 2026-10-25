@@ -75,3 +75,62 @@ Commits:
 
 Record:
 - .agents/flow/records/corrective-pass-2026-10-25.md
+---
+Timestamp: 2026-10-25T17:57:41Z
+Work: flow-task-reporting
+Stage: Build
+Prompt: Implement Flow Task Reporting and Traceability; test commit and push to main when done.
+
+Outcome: Completed — Universal Task report contract in journal.md; entrypoints, delegation, workers, human guide, and structural checks wired.
+
+Summary:
+- Extended journal.md with user-visible Task report and coordinator prompt log rules.
+- Updated AGENTS.md, flow/flow-improve/flow-eval skills, delegation, skills.md, flow.md table.
+- Added check-task-reporting.mjs tests; flow:check runs both doc validators.
+
+Documentation (product):
+- None
+
+Documentation (Factory):
+- .agents/flow/operations/journal.md [updated] — canonical Task report and journaling
+- .agents/flow/operations/delegation.md [updated] — worker result contract and coordinator closeout
+- .agents/flow/operations/skills.md [updated] — Task report vs Skills loaded
+- .agents/skills/flow/SKILL.md [updated] — Task report closeout
+- .agents/skills/flow-improve/SKILL.md [updated] — completion reporting
+- .agents/skills/flow-eval/SKILL.md [updated] — runner Task report after eval sections
+- .agents/flow/flow.md [updated] — progressive disclosure table
+- .agents/flow/guides/working-with-flow.md [updated] — human example
+- .agents/flow/README.md [updated] — link to Task report section
+- .agents/agents/researcher.md, builder.md, verifier.md [updated] — worker return contract
+- AGENTS.md [updated] — universal Task report requirement
+
+Decisions:
+- none
+
+Research:
+- none
+
+Initiatives / specifications:
+- none
+
+Code:
+- .agents/tooling/checks/check-task-reporting.mjs and test; package.json flow:check/flow:test; check-flow-docs product-tree guards (prior WIP)
+
+Subagents:
+- none
+
+Verification:
+- pnpm --dir .agents flow:check — passed, exit 0
+- pnpm --dir .agents flow:test — passed, exit 0 (35 tests)
+- pnpm --dir .agents check — passed, exit 0
+- pnpm --dir .agents test — failed, exit 1 (clean-adoption install integration; oxfmt/lint in generated product)
+
+Commits:
+- pending this commit
+
+Limitations / next:
+- Behavioral scenarios A–G not executed in Cursor; live agent obedience requires evaluation.
+- Full pnpm --dir .agents test blocked by pre-existing clean-adoption failure unrelated to reporting files.
+
+Record:
+- none

@@ -50,7 +50,7 @@ Do not read every ADR or research file for ordinary changes. Do not present plan
 - **Ownership:** Product code lives in `apps/web` and `packages/*`. Factory implementation lives in `.agents/`. Product must not import Factory packages.
 - Before an authorized commit: diff-scoped review in [.agents/flow/flow.md](.agents/flow/flow.md).
 
-Every final agent response MUST end with the **Skills loaded** footer defined in [.agents/flow/operations/skills.md](.agents/flow/operations/skills.md).
+Every repository task (including setup-only install, env, or tooling) MUST end with a **Task report** per [.agents/flow/operations/journal.md](.agents/flow/operations/journal.md), then the **Skills loaded** footer defined in [.agents/flow/operations/skills.md](.agents/flow/operations/skills.md). The footer must be the final section.
 
 <!-- BEGIN:turborepo-agent-rules -->
 

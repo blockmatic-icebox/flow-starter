@@ -61,6 +61,8 @@ Each worker must return: Task ID, role, execution status, outcome, changed files
 
 If blocked, return a complete BLOCKED report with the actual obstacle and work completed.
 
+After the evaluation-specific sections above, close the runner session with the shared **Task report** ([journal.md](../../flow/operations/journal.md)) for coordinator work (revision, Factory doc changes, verification commands, Git). Evaluation scenario outcomes, validity limitations, and remediation proposals remain in the eval sections—not duplicated as invented code changes. End with **Skills loaded**.
+
 ## Deterministic-only modes
 
 Run the CLI directly: `pnpm --dir .agents eval <cmd>` for `integrity`, `preserve`, `freeze-pilot`, `grade`, `compare`, `mutations`, `readiness`, `stress`, `benchmark`, and `run --dry-run`.

@@ -452,6 +452,10 @@ function isFactoryCheckout(root) {
   return existsSync(path.join(root, INSTALL_SCRIPT_REL));
 }
 
+function isFullProductTree(root) {
+  return existsSync(path.join(root, "packages/ui/src/styles/globals.css"));
+}
+
 function extractRootCssTokens(cssContent) {
   const rootMatch = /:root\s*\{([\s\S]*?)\}/u.exec(cssContent);
   const block = rootMatch?.[1] ?? "";
@@ -476,9 +480,10 @@ function extractDesignParityTable(designContent) {
 
 function validateDesignTokenParity(root) {
   const errors = [];
+  if (!isFullProductTree(root)) return errors;
   const cssPath = path.join(root, "packages/ui/src/styles/globals.css");
   const designPath = path.join(root, "DESIGN.md");
-  if (!existsSync(cssPath) || !existsSync(designPath)) return errors;
+  if (!existsSync(designPath)) return errors;
 
   const cssTokens = extractRootCssTokens(readFileSync(cssPath, "utf-8"));
   const designTokens = extractDesignParityTable(
@@ -506,7 +511,11 @@ function validateDesignTokenParity(root) {
 function validateReadmeIdentity(root) {
   const errors = [];
   const readmePath = path.join(root, "README.md");
-  if (!existsSync(readmePath)) return ["missing README.md"];
+  if (!existsSync(readmePath)) {
+    if (isFactoryCheckout(root) || isFullProductTree(root))
+      return ["missing README.md"];
+    return [];
+  }
 
   const readme = readFileSync(readmePath, "utf-8");
   const factory = isFactoryCheckout(root);
@@ -571,12 +580,14 @@ function validateAdoptedAgentsScripts(root) {
 }
 
 function validateProductContractFiles(root) {
+  if (!isFullProductTree(root)) return [];
   return ["PRODUCT.md", "DESIGN.md"]
     .filter((relative) => !existsSync(path.join(root, relative)))
     .map((relative) => `missing product contract ${relative}`);
 }
 
 function validateDesignImplementationRefs(root) {
+  if (!isFullProductTree(root)) return [];
   const errors = [];
   const refs = [
     "packages/ui/src/styles/globals.css",

@@ -12,3 +12,4 @@ You are a **builder** worker in Flow. Follow [.agents/flow/operations/delegation
 - Run the acceptance command; report commands with exit codes.
 - Do not edit parent-owned paths (initiative file, lockfiles, knowledge snapshot) unless explicitly assigned.
 - Commit only on your task branch; do not merge to `main`, push, or open a PR.
+- Return structured facts per the **Worker result contract** in [delegation.md](../../.agents/flow/operations/delegation.md#worker-result-contract). No user-facing Task report; no writes to `.agents/flow/prompts.txt`.

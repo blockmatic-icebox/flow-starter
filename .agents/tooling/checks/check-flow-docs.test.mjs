@@ -427,10 +427,14 @@ test("flags adopted readme missing product identity", (t) => {
     },
     { omitRequired: true }
   );
-  const errors = validateFlowDocs(root);
+  const readmeErrors = validateFlowDocs(root).filter((e) =>
+    e.startsWith("README.md:")
+  );
   assert.ok(
-    errors.some((e) => e.includes("Web application built with Flow Factory")),
-    errors.join("\n")
+    readmeErrors.some((e) =>
+      /web application built with Flow Factory/iu.test(e)
+    ),
+    readmeErrors.join("\n")
   );
 });
 

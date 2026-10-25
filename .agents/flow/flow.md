@@ -16,7 +16,7 @@ This file defines workflow conventions for any product using Flow. It does not d
 | Delegation and subagents | [operations/delegation.md](operations/delegation.md) |
 | Parallel worktrees | [operations/worktrees.md](operations/worktrees.md) |
 | Verification | [operations/verification.md](operations/verification.md) |
-| Prompt log and records | [operations/journal.md](operations/journal.md) |
+| Task report and prompt log | [operations/journal.md](operations/journal.md) |
 | Skill routing | [operations/skills.md](operations/skills.md) |
 | Human-oriented intro | [guides/working-with-flow.md](guides/working-with-flow.md) |
 | Dogfooding → evaluation | [guides/dogfooding-eval.md](guides/dogfooding-eval.md) |

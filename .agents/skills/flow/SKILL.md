@@ -24,8 +24,8 @@ Follow authorization rules in [AGENTS.md](../../../AGENTS.md). They apply even w
 4. When delegation helps, follow [.agents/flow/operations/delegation.md](../../flow/operations/delegation.md) and [.agents/flow/operations/worktrees.md](../../flow/operations/worktrees.md). Plan approval is not Build authorization.
 5. For UI changes, follow [.agents/flow/operations/verification.md](../../flow/operations/verification.md).
 6. **Prompt log (coordinator only):** For each new human prompt handled, append one block to [.agents/flow/prompts.txt](../../flow/prompts.txt) after delegated work integrates (or at end of solo work). Format and fields: [operations/journal.md](../../flow/operations/journal.md). Create the file if missing; never erase or rewrite existing entries; never fabricate timestamps, commits, subagent work, or verification. Workers and subagents must not append; they return results to the coordinator. `.agents/flow/prompts.txt` is parent-owned in worktrees.
-7. End the response with the **Skills loaded** footer from `operations/skills.md` (include `flow` when this file was read).
-8. For substantial changes, include a **Documentation impact** summary in the final response (`PRODUCT.md` / `DESIGN.md` / `ARCHITECTURE.md`: update, unchanged, or proposed).
+7. **Task report:** Close every repository task with the user-visible **Task report** in [operations/journal.md](../../flow/operations/journal.md) (documentation, code, verification, Git, delegation, next action). Collect and reconcile worker returns per [operations/delegation.md](../../flow/operations/delegation.md).
+8. End the response with the **Skills loaded** footer from `operations/skills.md` (include `flow` when this file was read). The footer must be the final section.
 
 ## Completion
 

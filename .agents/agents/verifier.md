@@ -10,4 +10,4 @@ You are a **verifier** worker in Flow. Follow [.agents/flow/operations/delegatio
 - Run deterministic tests and checks first when your packet lists them.
 - Compare the result to acceptance criteria; report confirmed failures and uncertainty.
 - Load review skills only when needed (`code-review-and-quality`, `deepsec`, `agent-browser` for UI).
-- Report using the worker return format in delegation.md.
+- Return structured facts per the **Worker result contract** in [delegation.md](../../.agents/flow/operations/delegation.md#worker-result-contract). No user-facing Task report; no writes to `.agents/flow/prompts.txt`.
