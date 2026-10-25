@@ -1,6 +1,10 @@
 # Parallel worktrees
 
-Host-agnostic coordination for multiple coding agents. [delegation.md](delegation.md) decides whether to fan out; this document owns gates, wave format, commands, and briefs. The initiative owns the wave graph; `pnpm worktrees` validates it, manages lifecycle state, and integrates verified results into local `main`. The agent host (Cursor CLI, and others) starts agents and passes each one the generated brief.
+Prefer **Cursor Task subagents** for exploration, research, Build, and verification. The parent defines bounded objectives, read/write scopes, acceptance criteria, and collects structured returns before integrating.
+
+This document covers initiative **gates**, **wave format**, `pnpm --dir .agents worktrees check|prepare`, and integration safety. Custom `worktrees run` remains for hosts that supply an explicit `--worker` command; it is not the default parallel path in Cursor.
+
+[delegation.md](delegation.md) decides whether to fan out. The initiative owns the wave graph; the parent integrates verified results into local `main`.
 
 Worker roles map to task fields: **researcher** (`mode: question`, empty `writes`), **builder** (`mode: build`, `build_authorized: yes`), **verifier** (`mode: question`, `flow_stage: Review`, empty `writes`).
 

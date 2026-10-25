@@ -8,56 +8,59 @@ disable-model-invocation: true
 
 The parent session is the **runner**. Subjects receive neutral task prompts only (protocol `subject-evaluator-v2`). The runner operates `eval prepare` / `next` / `record` / `finalize`. Subjects do not run eval CLI commands or propose methodology fixes.
 
-Official flow-vs-control comparison is **blocked** until isolation and runner-captured evidence are supported; treat host-session output as diagnostic. Harness integrity vs diagnostic vs official paths: [.agents/eval/RUN.md](../../eval/RUN.md#evaluation-paths). See [ADR 0015](../../flow/decisions/adr/0015-evaluation-subject-separation.md).
+Official flow-vs-control comparison is **blocked** until isolation and runner-captured evidence are supported; treat host-session output as diagnostic. See [RUN.md](../../eval/RUN.md#evaluation-paths) and [ADR 0015](../../flow/decisions/adr/0015-evaluation-subject-separation.md).
 
 Do not spawn the Cursor CLI `agent` command or pass a model.
 
 ## Parse `/flow-eval`
 
-No arguments means the full public suite, arm `flow`.
-
 | Argument | Meaning |
 | --- | --- |
-| `preserve`, `grade`, `compare`, `readiness`, `stress`, `mutations`, `benchmark`, `freeze-pilot` | Deterministic CLI only (see [RUN.md](../../eval/RUN.md)) |
-| `--scenarios S01,S02` | Limit the suite |
+| _(none)_ or `end-to-end` | Bounded diagnostic suite (default scenario list), arm `flow`, repetition `1` |
+| `preserve`, `grade`, `compare`, `integrity`, `mutations`, `readiness`, `stress`, `benchmark` | Deterministic CLI only (see [RUN.md](../../eval/RUN.md)) |
+| `--scenarios S01,S02` | Limit the suite (still bounded; avoid large campaigns) |
 | `--arm flow` \| `flow-without-skills` \| `control` | Worktree arm |
 
-## Suite loop
+## End-to-end runner workflow (mandatory)
 
-1. Do not edit [.agents/flow/flow.md](../../flow/flow.md) or mutate frozen run `20261024-flow-v0.1-1256e532` (legacy path under `__dev/flow-evals/`).
-2. Prepare from the host repository root:
+You must finish in this conversation with a consolidated report. Do not stop after dispatching workers.
 
-```bash
-pnpm --dir .agents eval prepare --suite --arm flow
-```
+1. Record source revision (`git rev-parse HEAD`).
+2. `pnpm --dir .agents eval integrity` (or `flow-eval:check` when appropriate).
+3. `pnpm --dir .agents eval prepare --suite --arm flow` (or `--scenarios` when the user named a subset). Capture `runId`.
+4. For each scheduled job until terminal state (`complete`, `failed`, `blocked`, `cancelled`, `timed-out`):
+   - `pnpm --dir .agents eval next --run <runId> --scenario <id> --repetition <n>`
+   - Dispatch a **Cursor Task subagent** with the neutral `packet.prompt` only in the prepared worktree context.
+   - Collect the worker return: task id, status, commands run, results, evidence paths, limitations.
+   - `pnpm --dir .agents eval record --run <runId> --scenario <id> --turn <n> --repetition <n> --events-file <path>` (`agent-reported` origins only unless you independently verified execution).
+5. `pnpm --dir .agents eval finalize --run <runId>` even when some jobs failed (partial runs).
+6. Display the report below using `summary.md`, per-trial scores, and worker returns. State **official eligible: blocked** for Cursor host-session unless ADR 0015 gates pass.
+7. List remediation proposals; stop before implementing Factory changes without user approval.
 
-Use `--scenarios` instead of `--suite` when the user named a subset. Capture `runId`.
+### Worker return contract
 
-3. For each session, the runner drives turns:
+Each worker must return: Task ID, role, execution status, outcome, changed files (if any), commands executed, actual results, evidence references, failures/limitations, recommended next action.
 
-```bash
-pnpm --dir .agents eval next --run <runId> --scenario <id> --repetition <n>
-# deliver packet.prompt to the subject in the worktree only
-# subject assistant text → eval record (agent-reported origins only)
-pnpm --dir .agents eval record --run <runId> --scenario <id> --turn <n> --repetition <n> --events-file <path>
-```
+### Final report template
 
-4. Drive **every** scheduled job to a terminal state (`complete`, `failed`, `blocked`, `cancelled`, or `timed-out`). `awaiting-host` is not completion—keep the parent session open until jobs finish or you report what blocked.
+**Overview** — revision, mode (diagnostic), scenarios, workers completed/failed/blocked, validity limitations.
 
-5. Finalize (including **partial** campaigns when some jobs completed):
+**Results** — per scenario: product outcome, evidence, missing requirements, verification outcome.
 
-```bash
-pnpm --dir .agents eval finalize --run <runId>
-```
+**Findings** — P0 blocking, P1 significant, P2 improvements.
 
-6. In the parent session, display the **summary** from `<runDir>/summary.md` (campaign counts, gate failures, remediation groups) and state limitations. Report **official eligible** (expect blockers under v2 diagnostic runs). Do not end after dispatching worktrees only.
+**Root causes** — Flow instruction, agent behavior, product, test case, grader, orchestration, environment.
 
-7. Stop. Discuss findings in the parent session. Implement methodology changes only after explicit user authorization.
+**Remediation** — finding id, evidence, smallest fix, expected benefit, regression risk, verification method.
+
+**Approval** — ask the user to approve or reject proposed Factory changes.
+
+If blocked, return a complete BLOCKED report with the actual obstacle and work completed.
 
 ## Deterministic-only modes
 
-Run the CLI directly for `preserve`, `freeze-pilot`, `grade`, `compare`, `readiness`, `stress`, `mutations`, `benchmark`, and `run --dry-run` (see [RUN.md](../../eval/RUN.md)).
+Run the CLI directly: `pnpm --dir .agents eval <cmd>` for `integrity`, `preserve`, `freeze-pilot`, `grade`, `compare`, `mutations`, `readiness`, `stress`, `benchmark`, and `run --dry-run`.
 
 ## Completion
 
-The suite is complete when every subject session has finished, `finalize` has run, and the parent has reported outcomes and limitations without treating diagnostic runs as official proof.
+Every subject session reaches a terminal state, `finalize` has run, and the parent reported outcomes and limitations without treating diagnostic runs as official proof.

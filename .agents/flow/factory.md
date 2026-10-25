@@ -133,8 +133,7 @@ pnpm dev
 pnpm qa
 pnpm ci:local
 pnpm security:check
-pnpm architecture:check
-pnpm flow:check
+pnpm --dir .agents check
 ```
 
 `pnpm mcp:next` connects Next.js development diagnostics while the dev server is running.

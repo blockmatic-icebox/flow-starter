@@ -29,35 +29,28 @@ import { evaluateReadiness } from "./product/readiness.ts";
 import { findingsFromReadiness } from "./product/remediate.ts";
 import { createHostRepairExecutor } from "./product/repair-executor.ts";
 import { runStressEvaluation } from "./product/stress.ts";
-import { listPublicScenarioIds } from "./scenarios.ts";
+import {
+  listDefaultDiagnosticScenarioIds,
+  listPublicScenarioIds,
+} from "./scenarios.ts";
 import type { EvalArm, EvalEvent } from "./types.ts";
 
 const usage = () => {
-  console.log(`flow-eval CLI
+  console.log(`flow-eval CLI (Factory: pnpm --dir .agents eval <cmd>)
 
-Usage:
-  pnpm --dir .agents eval preserve
-  pnpm --dir .agents eval freeze-pilot [--seed s09-s13-pilot-2026-10-25]
-  pnpm --dir .agents eval grade --run <runId> --scenario <id>
-  pnpm --dir .agents eval prepare [--arm flow] [--suite | --scenarios S01,S13] [--run-id <id>] [--repetition N]
-  pnpm --dir .agents eval briefs --run <runId>
-  pnpm --dir .agents eval next --run <runId> [--scenario <id>] [--repetition N]
-  pnpm --dir .agents eval record --run <runId> --scenario <id> --turn <n> [--repetition N] --events-file <path>
-  pnpm --dir .agents eval finalize --run <runId> [--model-id <id>]
-  pnpm --dir .agents eval pilot [--scenarios S01,S13]
-  pnpm --dir .agents eval run --scenarios S01,S02 [--arm flow] [--dry-run]
-  pnpm --dir .agents eval compare --baseline <runId> --current <runId> [--remediation]
-  pnpm --dir .agents eval pilot-loop [--dry-run]
-  pnpm --dir .agents eval compare-arms [--scenarios S05,S09,S13] [--dry-run]
-  pnpm --dir .agents eval handoff --variant C1 [--dry-run]
-  pnpm --dir .agents eval readiness [--run <id>]
-  pnpm --dir .agents eval stress [--run <id>] [--cycles N]
-  pnpm --dir .agents eval mutations
-  pnpm --dir .agents eval benchmark --id benchmark-a|benchmark-b
-  pnpm --dir .agents eval experiment [--profile full-product|mixed|technical-ai-assessment] [--count N] [--seed <seed>] [--dry-run]
-  pnpm --dir .agents eval self-improve [--iterations 3] [--seed <seed>] [--dry-run] [--resume <campaign-id>]
+Public:
+  integrity              preserve + mutation checks (static layer A)
+  preserve               frozen baseline checksum
+  prepare                host run setup [--arm flow] [--suite | --scenarios IDs] [--repetition N]
+  next | record | finalize   host-session protocol (runner only)
+  grade --run <id> --scenario <id>
+  compare --baseline <id> --current <id> [--remediation]   fail-closed eligibility
+  run --scenarios IDs [--arm flow] [--dry-run]
+  mutations | readiness | stress | benchmark   product fixture checks
 
-Live runs use host-session (/flow-eval). No --model flag.
+Default diagnostic suite IDs: ${listDefaultDiagnosticScenarioIds().join(",")}
+
+Live /flow-eval end-to-end uses host-session (diagnostic; official compare blocked per ADR 0015).
 `);
 };
 
@@ -699,6 +692,10 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
       cmdBenchmark({
         id: (flags.id as "benchmark-a" | "benchmark-b") ?? "benchmark-a",
       }),
+    integrity: () => {
+      cmdPreserve();
+      cmdMutations();
+    },
     mutations: () => cmdMutations(),
     readiness: () =>
       cmdReadiness({
@@ -771,8 +768,11 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         repetition: Number(flags.repetition ?? 1),
         runId: flags["run-id"] ? String(flags["run-id"]) : undefined,
         scenarios: flags.suite
-          ? listPublicScenarioIds()
-          : scenarioList(flags.scenarios as string | undefined, "S01,S13"),
+          ? listDefaultDiagnosticScenarioIds()
+          : scenarioList(
+              flags.scenarios as string | undefined,
+              listDefaultDiagnosticScenarioIds().join(",")
+            ),
       }),
     preserve: () => cmdPreserve(),
     "freeze-pilot": () => {

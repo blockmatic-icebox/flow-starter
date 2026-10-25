@@ -20,6 +20,17 @@ export const listPublicScenarioIds = () =>
     .map((f) => f.replace(/\.json$/u, ""))
     .toSorted();
 
+/** Bounded default for `/flow-eval end-to-end` (diagnostic, not full catalog). */
+export const listDefaultDiagnosticScenarioIds = () => [
+  "S01",
+  "S02",
+  "S04",
+  "S05",
+  "S09",
+  "S13",
+  "S16",
+];
+
 export const loadHiddenScenario = ({ id }: { id: string }) => {
   const filePath = path.join(catalogRoot, id, "hidden.json");
   if (!existsSync(filePath)) return undefined;

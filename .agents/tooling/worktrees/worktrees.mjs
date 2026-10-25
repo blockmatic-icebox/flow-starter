@@ -86,6 +86,9 @@ function commandPrepare(slug, waveName, repoRoot) {
 }
 
 async function commandRun(slug, repoRoot, flags) {
+  console.warn(
+    "worktrees run: prefer Cursor Task subagents for parallel Build; use check/prepare for briefs and parent integration."
+  );
   const result = loadAndValidateInitiative(slug, repoRoot);
   if (!result.ok) {
     for (const error of result.errors) console.error(error);

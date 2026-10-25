@@ -8,6 +8,19 @@ Flow is a lightweight product engineering workflow for humans and coding agents.
 
 This file defines workflow conventions for any product using Flow. It does not describe the product being built. In this repository, Flow ships inside **Flow Factory** ([factory.md](factory.md)); stack-specific rules also appear in [AGENTS.md](../../AGENTS.md).
 
+### Where detail lives (read progressively)
+
+| Topic | Canonical owner |
+| --- | --- |
+| Coordinator entry | [.agents/skills/flow/SKILL.md](../skills/flow/SKILL.md) |
+| Delegation and subagents | [operations/delegation.md](operations/delegation.md) |
+| Parallel worktrees | [operations/worktrees.md](operations/worktrees.md) |
+| Verification | [operations/verification.md](operations/verification.md) |
+| Prompt log and records | [operations/journal.md](operations/journal.md) |
+| Skill routing | [operations/skills.md](operations/skills.md) |
+| Human-oriented intro | [guides/working-with-flow.md](guides/working-with-flow.md) |
+| Dogfooding → evaluation | [guides/dogfooding-eval.md](guides/dogfooding-eval.md) |
+
 ## Operating model
 
 **Explore → Specify → Plan → Build → Review → Ship**
@@ -450,6 +463,6 @@ The workflow is a repository convention, not a self-executing runtime.
 
 Agent instructions encourage compliant behavior; they cannot guarantee that every tool or model obeys the convention.
 
-The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, research/specification metadata, required entry documents, relative links, selected semantic consistency rules (obsolete paths, MCP tool counts, stale Flow Agent knowledge snapshot), and reproducibility of the bundled knowledge snapshot. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. Delegation behavior is tested separately by `@repo/flow-eval` policy scenarios (`D01`–`D18`). These checks do not verify human approval, product outcomes, skill invocation, or live subagent execution.
+`pnpm --dir .agents flow:check` validates documentation paths, metadata, links, and knowledge snapshot reproducibility. `architecture:check` enforces React monorepo boundaries. `pnpm --dir .agents eval:test` covers delegation policy scenarios (`D01`–`D18`) and harness gates. These checks do not verify human approval, product outcomes, skill invocation, or live subagent execution.
 
 Humans and reviewers remain responsible for approving consequential decisions and evaluating the quality of the work.
