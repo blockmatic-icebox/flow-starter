@@ -2,6 +2,11 @@
 
 import type { DuplicateCandidate } from "@repo/fi";
 import { Button } from "@repo/ui/components/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@repo/ui/components/collapsible";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/radio-group";
@@ -17,11 +22,84 @@ import {
 } from "../../actions";
 
 const TRIAGE_STAGES = [
-  "Checking for similar requests",
+  "Checking for similar feedback",
   "Matching theme",
   "Classifying request",
   "Drafting decision summary",
 ];
+
+const matchLabel = (score: number) =>
+  score > 0.35 ? "Strong match" : "Possible match";
+
+const DuplicateLinkSection = ({
+  duplicates,
+  isExternal,
+  linkId,
+  setLinkId,
+}: {
+  duplicates: DuplicateCandidate[];
+  isExternal: boolean;
+  linkId: string | null;
+  setLinkId: (id: string | null) => void;
+}) => {
+  if (duplicates.length === 0) return null;
+
+  return (
+    <section className="space-y-3 rounded-lg border p-4">
+      <h2 className="font-medium">
+        {isExternal ? "Similar ideas" : "Similar existing requests"}
+      </h2>
+      {isExternal ? null : (
+        <ul className="space-y-2 text-sm">
+          {duplicates.map((d) => (
+            <li key={d.id}>
+              <Link
+                className="text-primary underline"
+                href={`/requests/${d.id}`}
+              >
+                {d.title}
+              </Link>
+              <span className="text-muted-foreground"> — {d.explanation}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="space-y-2">
+        <p className="text-sm font-medium" id="intake-link-label">
+          {isExternal
+            ? "Link to a similar idea (optional)"
+            : "Link this submission to an existing request (optional)"}
+        </p>
+        <RadioGroup
+          aria-labelledby="intake-link-label"
+          onValueChange={(value) => {
+            setLinkId(value === "none" ? null : value);
+          }}
+          value={linkId ?? "none"}
+        >
+          <div className="flex items-center gap-2">
+            <RadioGroupItem id="intake-link-none" value="none" />
+            <Label htmlFor="intake-link-none">No link</Label>
+          </div>
+          {duplicates.map((d) => (
+            <div className="flex items-center gap-2" key={d.id}>
+              <RadioGroupItem id={`intake-link-${d.id}`} value={d.id} />
+              <Label htmlFor={`intake-link-${d.id}`}>
+                {d.title}
+                {isExternal ? (
+                  <span className="text-muted-foreground font-normal">
+                    {" "}
+                    ({matchLabel(d.score)})
+                  </span>
+                ) : null}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      </div>
+    </section>
+  );
+};
 
 export const SubmitForm = ({
   context,
@@ -29,9 +107,11 @@ export const SubmitForm = ({
   context: "external" | "internal";
 }) => {
   const router = useRouter();
+  const isExternal = context === "external";
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [problemStatement, setProblemStatement] = useState("");
+  const [decisionBrief, setDecisionBrief] = useState("");
   const [requestId, setRequestId] = useState<string | null>(null);
   const [linkId, setLinkId] = useState<string | null>(null);
   const [duplicates, setDuplicates] = useState<DuplicateCandidate[]>([]);
@@ -39,7 +119,7 @@ export const SubmitForm = ({
   const [stageIndex, setStageIndex] = useState(0);
   const [thankYou, setThankYou] = useState(false);
 
-  const source = context === "external" ? "customer" : "internal";
+  const source = isExternal ? "customer" : "internal";
 
   useEffect(() => {
     if (!loading) return;
@@ -63,6 +143,7 @@ export const SubmitForm = ({
     }
     setRequestId(request.id);
     setProblemStatement(harness.problemStatement);
+    setDecisionBrief(harness.decisionBrief);
     setDuplicates(harness.duplicateCandidates);
     setLinkId(harness.recommendedIntakeLinkId);
     setLoading(false);
@@ -77,18 +158,26 @@ export const SubmitForm = ({
       requestId,
     });
     setLoading(false);
-    if (context === "external") {
+    if (isExternal) {
       setThankYou(true);
       return;
     }
     router.push(`/requests/${requestId}`);
   };
 
-  if (thankYou)
+  if (thankYou && requestId)
     return (
-      <p className="text-lg">
-        Thank you — your feedback was published. We appreciate it.
-      </p>
+      <div className="mx-auto max-w-xl space-y-4 rounded-lg border p-6">
+        <p className="text-lg">
+          Thank you — we&apos;ll consider this with other feedback.
+        </p>
+        <Link
+          className="text-primary text-sm underline"
+          href={`/requests/${requestId}`}
+        >
+          View your submission
+        </Link>
+      </div>
     );
 
   if (loading && !requestId)
@@ -123,7 +212,11 @@ export const SubmitForm = ({
         />
         <Textarea
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Describe the need"
+          placeholder={
+            isExternal
+              ? "What's going wrong or missing?"
+              : "Paste notes from customer or support ticket"
+          }
           required
           rows={6}
           value={description}
@@ -134,70 +227,36 @@ export const SubmitForm = ({
       </form>
     );
 
-  const showDupes = context === "internal" || duplicates.length > 0;
+  let confirmLabel = "Confirm & publish";
+  if (loading) confirmLabel = "Publishing…";
+  else if (isExternal) confirmLabel = "Submit feedback";
 
   return (
     <div className="mx-auto max-w-xl space-y-4">
-      {showDupes && duplicates.length > 0 ? (
-        <section className="space-y-3 rounded-lg border p-4">
-          <h2 className="font-medium">Similar existing requests</h2>
-          <ul className="space-y-2 text-sm">
-            {duplicates.map((d) => (
-              <li key={d.id}>
-                <Link
-                  className="text-primary underline"
-                  href={`/requests/${d.id}`}
-                >
-                  {d.title}
-                </Link>
-                <span className="text-muted-foreground">
-                  {" "}
-                  — {d.explanation}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <div className="space-y-2">
-            <p className="text-sm font-medium" id="intake-link-label">
-              Link this submission to an existing request (optional)
-            </p>
-            <RadioGroup
-              aria-labelledby="intake-link-label"
-              onValueChange={(value) => {
-                setLinkId(value === "none" ? null : value);
-              }}
-              value={linkId ?? "none"}
-            >
-              <div className="flex items-center gap-2">
-                <RadioGroupItem id="intake-link-none" value="none" />
-                <Label htmlFor="intake-link-none">No link</Label>
-              </div>
-              {duplicates.map((d) => (
-                <div className="flex items-center gap-2" key={d.id}>
-                  <RadioGroupItem id={`intake-link-${d.id}`} value={d.id} />
-                  <Label htmlFor={`intake-link-${d.id}`}>{d.title}</Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
-        </section>
-      ) : null}
+      <DuplicateLinkSection
+        duplicates={duplicates}
+        isExternal={isExternal}
+        linkId={linkId}
+        setLinkId={setLinkId}
+      />
       <label className="block text-sm font-medium" htmlFor="problem-statement">
-        Problem statement
+        {isExternal ? "We heard this as:" : "Problem statement"}
       </label>
       <Textarea
         id="problem-statement"
         onChange={(e) => setProblemStatement(e.target.value)}
-        rows={4}
+        rows={isExternal ? 2 : 4}
         value={problemStatement}
       />
-      {linkId && !showDupes ? (
-        <p className="text-muted-foreground text-sm">
-          Suggested link:{" "}
-          <Link className="underline" href={`/requests/${linkId}`}>
-            View linked request
-          </Link>
-        </p>
+      {!isExternal && decisionBrief ? (
+        <Collapsible>
+          <CollapsibleTrigger className="text-sm font-medium underline">
+            PM summary
+          </CollapsibleTrigger>
+          <CollapsibleContent className="text-muted-foreground pt-2 text-sm">
+            {decisionBrief}
+          </CollapsibleContent>
+        </Collapsible>
       ) : null}
       <Button
         disabled={loading}
@@ -206,7 +265,7 @@ export const SubmitForm = ({
         }}
         type="button"
       >
-        {loading ? "Publishing…" : "Confirm & publish"}
+        {confirmLabel}
       </Button>
     </div>
   );

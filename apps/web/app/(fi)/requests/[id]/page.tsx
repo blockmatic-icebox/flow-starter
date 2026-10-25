@@ -8,11 +8,15 @@ import { TransparencyPanel } from "./transparency-panel";
 
 export default async function RequestDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ view?: string }>;
 }) {
   const { id } = await params;
+  const { view } = await searchParams;
   const detail = await actionGetRequest({ requestId: id });
+  const externalView = view === "external";
   if (!detail) notFound();
 
   const triageSteps = detail.request.triageSteps as TriageStepsPayload | null;
@@ -45,7 +49,7 @@ export default async function RequestDetailPage({
           }}
         >
           <Button type="submit" variant="secondary">
-            Support
+            {externalView ? "I want this too" : "Support"}
           </Button>
         </form>
       </aside>

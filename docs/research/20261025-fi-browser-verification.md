@@ -15,8 +15,8 @@
 | ID | Result | Notes |
 | --- | --- | --- |
 | W-1 | Pass | `/requests` lists seeded titles with theme badges and sources |
-| W-2e | Pass | External submit → confirm; queue badge 8→9 |
-| W-2i | Partial | Internal form loads; one run landed on published detail (link flow) — re-test confirm+dupes on next pass |
+| W-2e | Pass | External copy (“We heard this as”, Submit feedback, thank-you + view link); similar-ideas radio when matches |
+| W-2i | Pass | Internal dupes-first, PM summary collapsible, confirm → detail |
 | W-3 | Partial | Near-duplicate lexical matches surfaced on external confirm (FR-001 title overlap) |
 | W-4 | Pass | Support control on `/requests/00000000-0000-4000-8000-000000000001` |
 | W-5 | Pass | `/triage` shows 8 items with inline disposition combobox + rationale |
@@ -24,7 +24,8 @@
 | W-6 | Pass | “How this was evaluated” expands step list |
 | W-7 | Pass | `/insights` — open queue **8**, decision capture **20%**, four metric cards |
 | W-8 | Pass | `/chat` prompt starters + composer; no mutation tools wired |
-| W-9 | Not recorded | Loading stages not captured in this pass (harness fast without gateway) |
+| W-9 | Pass | `aria-live` + rotating stage labels on submit loading |
+| AC-4 | Pass | `/requests?theme=` filter chips via `themeRegistry` |
 
 ## Demo rehearsal script (T-4-5)
 

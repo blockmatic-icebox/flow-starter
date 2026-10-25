@@ -14,6 +14,7 @@ describe("runTriageHarness", () => {
           title: "Export dashboards to CSV",
         },
       ],
+      source: "customer",
       title: "csv dump",
     });
 
@@ -23,5 +24,19 @@ describe("runTriageHarness", () => {
     );
     assert.equal(result.themeKey, "reporting_exports");
     assert.ok(result.triageSteps.duration_ms >= 0);
+  });
+
+  it("marks degraded when AI gateway key is absent", async () => {
+    const prior = process.env.AI_GATEWAY_API_KEY;
+    delete process.env.AI_GATEWAY_API_KEY;
+    const result = await runTriageHarness({
+      description: "need csv",
+      published: [],
+      source: "internal",
+      title: "export",
+    });
+    if (prior !== undefined) process.env.AI_GATEWAY_API_KEY = prior;
+    assert.equal(result.degraded, true);
+    assert.ok(result.triageSteps.steps.some((s) => s.name === "synthesize"));
   });
 });

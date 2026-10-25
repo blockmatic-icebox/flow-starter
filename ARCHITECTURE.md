@@ -34,7 +34,7 @@ Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundar
 
 | Path | Role | Implementation status |
 | --- | --- | --- |
-| `packages/fi` | Metrics, queue/CRUD, T0/T1 harness, seed; T2/T3 modules present, wired when gateway key set | **Live** — full Jev+synthesis path [T-1-5–7](docs/tasks/feature-intelligence.md) still open |
+| `packages/fi` | Metrics, queue/CRUD, T0–T3 harness, seed, offline triage-matrix test | **Live** — degrades without gateway key |
 | `packages/db` | Drizzle schema; `fi-schema.ts`; migrations through `0002_feature_intelligence` | **Live** — `pnpm db:migrate`, remote SSL in client |
 | `agent/` | eve root agent; `instructions.md` + 8 tools → `@repo/fi` | **Live** — smoke evals in `evals/` |
 | `apps/web` | Next.js + `eve/next`; FI routes under `app/(fi)/` | **Live** — browse, submit, triage, insights, `/chat` |
@@ -58,8 +58,8 @@ Canonical: [triage harness spec](docs/specs/feature-intelligence-triage-harness.
 
 - **T0:** Lexical duplicate retrieve (top 10)
 - **T1:** Deterministic theme when confidence ≥ 0.9
-- **T2:** Jev `experimental_decide` — `classify-decisions.ts` (not yet composed in `runTriageHarness`)
-- **T3:** `generateObject` synthesis — `synthesize-artifact.ts` (same)
+- **T2:** Jev `experimental_decide` — `classify-decisions.ts` (composed in `runTriageHarness`)
+- **T3:** `generateObject` synthesis — `synthesize-artifact.ts` (composed in `runTriageHarness`)
 
 Degraded path when `AI_GATEWAY_API_KEY` absent still sets `triage_completed_at` for metrics. Gateway helpers: `packages/fi/src/ai/gateway.ts`. Ask-only `/chat` uses **`ANTHROPIC_API_KEY`** (not gateway) — [ADR 0003](docs/adr/0003-feature-intelligence-model-providers.md).
 

@@ -38,7 +38,7 @@ Display in the main Cursor conversation after every repository task (Explore, Sp
 
 **Core principle:** concise, evidence-based, truthful. Never invent verification, commits, or documentation changes.
 
-**Human-readable closeout:** **Outcome**, **Next**, and delegation summaries describe work in plain language. Gate ids (**G***), task ids (**T-*-*), and dependency formulas belong in `docs/tasks/` and similar artifacts—not as the primary explanation in chat. Link to the tasks file when ids help traceability; see [human-readable-surfaces.md § Chat prose](human-readable-surfaces.md#chat-prose-coordinator).
+**Human-readable closeout:** **Outcome**, **Next**, and delegation summaries describe work in plain language. Gate ids (**G***), task ids (**T-_-_), and dependency formulas belong in `docs/tasks/` and similar artifacts—not as the primary explanation in chat. Link to the tasks file when ids help traceability; see [human-readable-surfaces.md § Chat prose](human-readable-surfaces.md#chat-prose-coordinator).
 
 ### Required sections
 

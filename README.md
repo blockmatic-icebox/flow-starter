@@ -26,11 +26,11 @@ pnpm dev                        # https://meta-cto.localhost (portless) or pnpm 
 
 ### Environment
 
-| Variable | Purpose |
-| --- | --- |
-| `DATABASE_URL` | Postgres (Neon Path A or local proxy) |
+| Variable             | Purpose                                       |
+| -------------------- | --------------------------------------------- |
+| `DATABASE_URL`       | Postgres (Neon Path A or local proxy)         |
 | `AI_GATEWAY_API_KEY` | Triage harness Jev + synthesis via AI Gateway |
-| `ANTHROPIC_API_KEY` | Ask-only `/chat` (no FI mutations) |
+| `ANTHROPIC_API_KEY`  | Ask-only `/chat` (no FI mutations)            |
 
 ### Quality and agents
 

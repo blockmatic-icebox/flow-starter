@@ -9,7 +9,7 @@
   "scripts": {
     "check-types": "tsc-ts --noEmit",
     "seed": "node --import tsx seed/load.ts",
-    "test": "node --import tsx --test 'src/**/*.test.ts' 'seed/**/*.test.ts'"
+    "test": "node --import tsx --test 'src/**/*.test.ts' 'seed/**/*.test.ts' 'eval/**/*.test.ts'"
   },
   "dependencies": {
     "@ai-sdk/gateway": "4.0.125",

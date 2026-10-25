@@ -38,9 +38,10 @@ export const createDraftAndTriage = async ({
     .from(featureRequest)
     .where(eq(featureRequest.status, "published"));
 
-  const harness = runTriageHarness({
+  const harness = await runTriageHarness({
     description,
     published,
+    source,
     title,
   });
 

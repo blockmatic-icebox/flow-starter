@@ -54,12 +54,12 @@ Spike (re-verify after G1):
 
 Build:
 
-- [ ] **T-1-5** — `classify-decisions.ts` (T2 Jev via gateway) — depends **G1**, T-1-4
-- [ ] **T-1-6** — `synthesize-artifact.ts` (T3) — depends **G1**, T-1-4; **∥ T-1-5**
-- [ ] **T-1-7** — full `runTriageHarness` — depends T-1-3, T-1-5, T-1-6
+- [x] **T-1-5** — `classify-decisions.ts` (T2 Jev via gateway) — depends **G1**, T-1-4
+- [x] **T-1-6** — `synthesize-artifact.ts` (T3) — depends **G1**, T-1-4; **∥ T-1-5**
+- [x] **T-1-7** — full `runTriageHarness` — depends T-1-3, T-1-5, T-1-6
 - [x] **T-1-8** — `createDraftAndTriage`, `confirmRequest`, `getRequest` — depends T-1-7, T-0-4
 - [x] **T-1-9** — queue, disposition, support, `recordPmReviewStarted` — depends T-0-4; **∥ T-1-5…T-1-8** after G1
-- [ ] **T-1-10** — offline `triage-matrix` — depends T-1-7
+- [x] **T-1-10** — offline `triage-matrix` — depends T-1-7
 
 ---
 

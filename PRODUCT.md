@@ -36,13 +36,11 @@ Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence
 | --- | --- |
 | **Specification** | Complete — [tasks](docs/tasks/feature-intelligence.md) + [initiative](docs/initiatives/feature-intelligence.md) |
 | **Database** | **Live** with `DATABASE_URL` — migrate, seed (`pnpm seed:fi`), Wave 0 done |
-| **Domain (`@repo/fi`)** | **Live** — metrics, queue/CRUD, T0/T1 harness path; **T2 Jev + T3 synthesis** stubbed (`classify-decisions`, `synthesize-artifact`) but not wired into `runTriageHarness` without `AI_GATEWAY_API_KEY` |
+| **Domain (`@repo/fi`)** | **Live** — full T0–T3 harness orchestration; **degraded** when `AI_GATEWAY_API_KEY` absent |
 | **eve (`agent/`)** | **Live** — MVP tools, `evals/` smoke (AG-7), `pnpm exec eve eval smoke` |
 | **Human UI (`apps/web`)** | **Live** — `app/(fi)/` routes, server actions, ask-only `/chat`; [browser verification](docs/research/20261025-fi-browser-verification.md) |
 
-**Assessment gaps (honest):** [T-4-3](docs/tasks/feature-intelligence.md) submission README; external submit still shows duplicate UI when lexical matches exist (journeys W-2e simplified copy); discover **theme filter** not built on `/requests` yet.
-
-**Build checklist:** [docs/tasks/feature-intelligence.md](docs/tasks/feature-intelligence.md) — Waves 0–3 and most Wave 4 complete; harness T-1-5–7 remain open.
+**Build checklist:** [docs/tasks/feature-intelligence.md](docs/tasks/feature-intelligence.md) — Waves 0–4 complete for assessment MVP; live gateway improves triage quality when `AI_GATEWAY_API_KEY` is set.
 
 ## Success metrics
 

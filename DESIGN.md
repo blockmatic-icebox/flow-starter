@@ -67,8 +67,6 @@ Sticky header: brand + Browse · Submit · Triage (badge when queue &gt; 0) · I
 ### Deferred / cut-if-late
 
 - Markdown export of briefs
-- Discover **theme filter** UI on `/requests` (badges only today)
-- External confirm **fully** stripped of PM copy when duplicates exist (thank-you path works; confirm step may still show problem statement / dupes — align with W-2e on next UX pass)
 
 ## Design system
 
@@ -80,15 +78,15 @@ Semantic **oklch** tokens in `packages/ui/src/styles/globals.css`, mapped from M
 
 **Light `:root` parity** (must match `globals.css`):
 
-| Token | Value |
-| --- | --- |
-| `--background` | `var(--metacto-cloud)` |
-| `--foreground` | `var(--metacto-ink)` |
-| `--primary` | `var(--metacto-orange)` |
-| `--primary-foreground` | `oklch(1 0 0)` |
-| `--border` | `var(--metacto-mist)` |
-| `--muted-foreground` | `var(--metacto-pewter)` |
-| `--radius` | `0.75rem` |
+| Token                  | Value                   |
+| ---------------------- | ----------------------- |
+| `--background`         | `var(--metacto-cloud)`  |
+| `--foreground`         | `var(--metacto-ink)`    |
+| `--primary`            | `var(--metacto-orange)` |
+| `--primary-foreground` | `oklch(1 0 0)`          |
+| `--border`             | `var(--metacto-mist)`   |
+| `--muted-foreground`   | `var(--metacto-pewter)` |
+| `--radius`             | `0.75rem`               |
 
 Meta aliases: cloud `#faf6f0`, ink `#2a3439`, orange `#f18700`, mist `#e8e4de`, pewter `#a8a29e`, teal `#3d7a72` (ring/accent). Cards and popovers use white (`oklch(1 0 0)`).
 
