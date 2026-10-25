@@ -15,7 +15,7 @@ import {
   finalizePrepBaseline,
   setupWorktree,
 } from "./isolate.ts";
-import { devEvalsRoot } from "./paths.ts";
+import { runEvalDir } from "./paths.ts";
 import { redactOrThrow } from "./redact.ts";
 import { writeRunSummary, writeScenarioReport } from "./report.ts";
 import { rubricVersion } from "./rubric.ts";
@@ -377,7 +377,7 @@ export const runBatch = async ({
       runId,
       scenarioIds,
     });
-    const manifestPath = path.join(devEvalsRoot, runId, "manifest.json");
+    const manifestPath = path.join(runEvalDir(runId), "manifest.json");
     const manifest = JSON.parse(
       readFileSync(manifestPath, "utf-8")
     ) as RunManifest;
@@ -393,7 +393,7 @@ export const runBatch = async ({
       scenarioIds,
     });
     writeFileSync(
-      path.join(devEvalsRoot, runId, "outcomes.json"),
+      path.join(runEvalDir(runId), "outcomes.json"),
       `${JSON.stringify(
         { ...outcomes, hostSession: true, status: "awaiting-host" },
         null,
@@ -475,11 +475,11 @@ export const runBatch = async ({
   });
 
   writeFileSync(
-    path.join(devEvalsRoot, runId, "scenario-oracle-hash.txt"),
+    path.join(runEvalDir(runId), "scenario-oracle-hash.txt"),
     `${scenarioOracleHash()}\n`
   );
 
-  const runDir = path.join(devEvalsRoot, runId);
+  const runDir = path.join(runEvalDir(runId));
   writeRunSummary({ grades, manifest, runDir });
 
   const outcomes = summarizeBatchOutcomes({

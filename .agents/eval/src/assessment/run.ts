@@ -2,7 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { mapWithConcurrency } from "../concurrency.ts";
-import { repoRoot } from "../paths.ts";
+import { productEvalsRoot } from "../product/paths.ts";
 import { technicalAiAssessmentRoot } from "./paths.ts";
 
 export type AssessmentArm = "assessment-a" | "assessment-b";
@@ -85,7 +85,7 @@ export const runTechnicalAiAssessmentPair = async ({
   runId: string;
 }) => {
   const fixture = loadAssessmentFixture();
-  const productEvalRoot = path.join(repoRoot, "__dev", "product-evals");
+  const productEvalRoot = productEvalsRoot;
   mkdirSync(productEvalRoot, { recursive: true });
   const brief = readFileSync(
     path.join(technicalAiAssessmentRoot, "brief.md"),

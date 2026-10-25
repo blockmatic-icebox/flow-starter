@@ -51,7 +51,7 @@ DESIGN.md          # experience direction
 Local verification used in this repo:
 
 - `pnpm qa` — documentation, architecture boundaries, lint, types, unit tests, schema check.
-- `pnpm flow:check` — Flow and product documentation conventions (delegates to Factory).
+- `pnpm --dir .agents flow:check` — Flow and product documentation conventions (Factory).
 - `pnpm architecture:check` — React import and client-boundary rules.
 
 Factory integrity and evaluation: `pnpm --dir .agents check` and `pnpm --dir .agents test`.

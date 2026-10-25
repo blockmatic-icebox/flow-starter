@@ -120,6 +120,7 @@ const evaluateFamilyWorkspaceReadiness = ({
       : counts.unverified > 0
         ? ("INCONCLUSIVE" as DimensionVerdict)
         : ("PASS" as DimensionVerdict);
+  // Family workspace checks do not collect browser usability evidence; READY is unreachable here.
   const usability = "INCONCLUSIVE" as DimensionVerdict;
 
   let releaseVerdict: ReadinessReport["releaseVerdict"] = "INCONCLUSIVE";
@@ -222,4 +223,5 @@ export const evaluateReadiness = ({
   } satisfies ReadinessReport;
 };
 
-export const fullProductFamiliesReady = () => acceptanceFamilies().length >= 6;
+export const acceptanceFamiliesRegistered = () =>
+  acceptanceFamilies().length >= 6;

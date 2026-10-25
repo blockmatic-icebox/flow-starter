@@ -1,6 +1,6 @@
 name: CI
 
-# Local parity: `pnpm ci:local`
+# Local parity: `pnpm ci:local` then `pnpm --dir .agents check`
 # Manual on GitHub: `gh workflow run CI`
 
 on:
@@ -19,7 +19,7 @@ permissions:
   id-token: write
 
 jobs:
-  quality:
+  product:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -30,18 +30,12 @@ jobs:
       - name: Install verified gitleaks
         run: node .agents/tooling/setup/setup-gitleaks.mjs
 
-      - run: pnpm flow:test
-      - run: pnpm flow:check
-      - run: pnpm --dir .agents ownership:test
-      - run: pnpm architecture:test
-      - run: pnpm architecture:check
       - run: pnpm lint
       - run: pnpm knip
       - run: pnpm sherif
       - run: pnpm check-types
       - run: pnpm test
       - run: pnpm --filter @repo/db db:check
-      - run: pnpm --dir .agents test
       - run: pnpm eval:genui:offline
 
       - name: Install Playwright Chromium
@@ -56,3 +50,13 @@ jobs:
           team: ${{ vars.TURBO_TEAM }}
 
       - run: pnpm build
+
+  factory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: ./.github/actions/setup-pnpm
+
+      - run: pnpm --dir .agents check

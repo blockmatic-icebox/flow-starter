@@ -13,10 +13,11 @@ Self-contained Flow Factory: methodology, skills, evaluation, tooling, and worke
 **Commands** (from repository root):
 
 ```bash
-pnpm --dir .agents check    # Factory integrity
-pnpm --dir .agents test     # Factory tests + eval unit tests
-pnpm worktrees              # Initiative orchestration (delegates here)
-pnpm flow-eval:check        # Deterministic evaluation preservation
+pnpm --dir .agents check      # Factory integrity (flow docs, architecture, ownership, eval preserve)
+pnpm --dir .agents test       # Factory tests + eval unit tests
+pnpm --dir .agents worktrees  # Initiative orchestration
 ```
 
-Product code lives in `apps/web` and `packages/*`. Product must not import Factory implementation.
+Product code lives in `apps/web` and `packages/*`. Product QA: `pnpm qa`. Product must not import Factory implementation.
+
+New evaluation evidence defaults to `.agents/eval/evidence/` (gitignored). Legacy runs under `__dev/flow-evals/` remain readable.

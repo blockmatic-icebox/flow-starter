@@ -3,7 +3,7 @@ import { readFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 
-import { repoRoot } from "../paths.ts";
+import { productEvalsRoot } from "../product/paths.ts";
 import { loadAssessmentFixture, runTechnicalAiAssessmentPair } from "./run.ts";
 
 describe("technical ai assessment fixture", () => {
@@ -19,7 +19,7 @@ describe("technical ai assessment fixture", () => {
   it("prepares an initialized session and leaves the product unverified", async (t) => {
     const runId = `prepare-${Date.now()}`;
     const armDirs = ["assessment-a", "assessment-b"].map((arm) =>
-      path.join(repoRoot, "__dev", "product-evals", `${arm}-${runId}`)
+      path.join(productEvalsRoot, `${arm}-${runId}`)
     );
     t.after(() => {
       for (const armDir of armDirs)

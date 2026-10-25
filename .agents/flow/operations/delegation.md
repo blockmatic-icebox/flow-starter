@@ -160,6 +160,17 @@ Detailed dumps only when the coordinator needs them for a decision. Do not pass 
 | Expired assumptions | Revisit stage; do not Build on stale decisions |
 | Unclear authorization | Stop before Build; ask human |
 
+## Worker result contract
+
+Every delegated task returns to the coordinator (not the user) with:
+
+- Worker identifier and assigned scope
+- Execution status (`completed`, `failed`, `blocked`, `partial`)
+- Actions performed and findings or code changes
+- Evidence paths and tests run (with exit codes); never claim tests not run
+- Unresolved issues and limitations
+- Recommendation to the coordinator
+
 ## Coordinator closeout
 
 After substantial work, summarize: current Flow stage, work completed, delegated work, independent findings, decisions or approvals needed, verification evidence, recommended next action.

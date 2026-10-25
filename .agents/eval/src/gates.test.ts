@@ -173,4 +173,80 @@ describe("deterministic gates", () => {
     });
     assert.ok(added.gateIds.includes("invented-scope"));
   });
+
+  it("flags waitlist invention when negation targets a modifier only", () => {
+    const card = loadPublicScenario({ id: "S03" });
+    const hidden = {
+      alreadyKnown: [],
+      approvalLines: [],
+      id: "S03",
+      nonGoals: ["waitlist"],
+      persona: "founder",
+      privateFacts: [],
+      stopCondition: "after-plan-approval",
+    };
+    const withoutAccount = runDeterministicGates({
+      input: baseInput({
+        card,
+        diff: "+Patients can join a waitlist without an account.\n",
+        hidden,
+        scenarioId: "S03",
+      }),
+    });
+    assert.ok(withoutAccount.gateIds.includes("invented-scope"));
+
+    const noFee = runDeterministicGates({
+      input: baseInput({
+        card,
+        diff: "+Create a waitlist with no fee.\n",
+        hidden,
+        scenarioId: "S03",
+      }),
+    });
+    assert.ok(noFee.gateIds.includes("invented-scope"));
+  });
+
+  it("does not flag invented scope for explicit waitlist exclusion wording", () => {
+    const card = loadPublicScenario({ id: "S03" });
+    const hidden = {
+      alreadyKnown: [],
+      approvalLines: [],
+      id: "S03",
+      nonGoals: ["waitlist"],
+      persona: "founder",
+      privateFacts: [],
+      stopCondition: "after-plan-approval",
+    };
+    const explicit = runDeterministicGates({
+      input: baseInput({
+        card,
+        diff: "+Waitlist is explicitly excluded from scope for v1.\n",
+        hidden,
+        scenarioId: "S03",
+      }),
+    });
+    assert.equal(explicit.gateIds.includes("invented-scope"), false);
+  });
+
+  it("flags invention when waitlist is added alongside an excluded feature", () => {
+    const card = loadPublicScenario({ id: "S03" });
+    const hidden = {
+      alreadyKnown: [],
+      approvalLines: [],
+      id: "S03",
+      nonGoals: ["waitlist", "video visits"],
+      persona: "founder",
+      privateFacts: [],
+      stopCondition: "after-plan-approval",
+    };
+    const mixed = runDeterministicGates({
+      input: baseInput({
+        card,
+        diff: "+Video visits are out; patients can join a waitlist when full.\n",
+        hidden,
+        scenarioId: "S03",
+      }),
+    });
+    assert.ok(mixed.gateIds.includes("invented-scope"));
+  });
 });

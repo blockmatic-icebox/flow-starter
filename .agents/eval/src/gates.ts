@@ -48,12 +48,27 @@ const escapeRegExp = (value: string) =>
 const exclusionHeading = /out of scope|non-goals|not doing|excluded/iu;
 
 const lineNegatesTerm = ({ line, term }: { line: string; term: string }) => {
-  if (!new RegExp(`\\b${escapeRegExp(term)}\\b`, "iu").test(line)) return false;
-  return (
-    /\b(?:no|not|without|never|zero|0|none)\b/iu.test(line) ||
-    /\bkill\b/iu.test(line) ||
-    /^\s*out\s*:/iu.test(line)
-  );
+  const esc = escapeRegExp(term);
+  const termRe = new RegExp(`\\b${esc}\\b`, "iu");
+  if (!termRe.test(line)) return false;
+
+  const exclusionPatterns = [
+    new RegExp(`\\bno\\s+${esc}\\b`, "iu"),
+    new RegExp(`\\bnot\\s+(?:a\\s+)?${esc}\\b`, "iu"),
+    new RegExp(`\\bwithout\\s+(?:a\\s+)?${esc}\\b`, "iu"),
+    new RegExp(`\\bnever\\s+${esc}\\b`, "iu"),
+    new RegExp(`\\b(?:zero|0)\\s+${esc}\\b`, "iu"),
+    new RegExp(`\\bnone\\s+${esc}\\b`, "iu"),
+    new RegExp(`\\bkill\\s+(?:the\\s+)?${esc}\\b`, "iu"),
+    new RegExp(`\\b${esc}\\s+(?:is|are)\\s+excluded\\b`, "iu"),
+    new RegExp(`\\b${esc}\\s+is\\s+not\\s+in\\s+scope\\b`, "iu"),
+    new RegExp(`\\bstores?\\s+no\\s+${esc}\\b`, "iu"),
+    /^\s*out\s*:/iu,
+  ];
+  if (exclusionPatterns.some((pattern) => pattern.test(line))) return true;
+  if (/\bexcluded\s+from\s+scope\b/iu.test(line) && termRe.test(line))
+    return true;
+  return false;
 };
 
 const addedLinesInventTerm = ({

@@ -46,6 +46,7 @@ yarn-error.log*
 id_rsa
 id_rsa.*
 __dev
+.agents/eval/evidence/
 .worktrees/
 
 # DeepSec scan output and credentials (config and INFO.md are committed)

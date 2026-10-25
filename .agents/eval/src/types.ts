@@ -16,6 +16,17 @@ export type EvalHost = "cursor" | "claude" | "other";
 
 export type Completeness = "complete" | "partial" | "blocked";
 
+export type HostJobStatus =
+  | "pending"
+  | "running"
+  | "awaiting-host"
+  | "awaiting-record"
+  | "complete"
+  | "failed"
+  | "blocked"
+  | "timed-out"
+  | "cancelled";
+
 export type TurnTermination =
   | "completed"
   | "timeout"

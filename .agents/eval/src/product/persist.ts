@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { redactOrThrow } from "../redact.ts";
-import { productEvalsRoot } from "./paths.ts";
+import { productRunDir } from "./paths.ts";
 import { starterRequirements } from "./registry.ts";
 import type { ReadinessReport, StressFinding } from "./types.ts";
 
@@ -17,7 +17,7 @@ export const writeProductEvalArtifacts = ({
   findings?: StressFinding[];
   summaryExtra?: string;
 }) => {
-  const runDir = path.join(productEvalsRoot, runId);
+  const runDir = productRunDir(runId);
   mkdirSync(path.join(runDir, "agents"), { recursive: true });
   mkdirSync(path.join(runDir, "evidence"), { recursive: true });
   mkdirSync(path.join(runDir, "remediation"), { recursive: true });

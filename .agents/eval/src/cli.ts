@@ -17,7 +17,7 @@ import {
   scenarioWorkerBrief,
 } from "./host-session.ts";
 import { runBatch } from "./orchestrate.ts";
-import { devEvalsRoot, baselineRunId } from "./paths.ts";
+import { baselineRunId, runEvalDir } from "./paths.ts";
 import { freezePilot } from "./pilot-freeze.ts";
 import { verifyBaselinePreserved } from "./preserve.ts";
 import {
@@ -136,7 +136,7 @@ const writeRemediationProposal = ({
   runId: string;
   findings: { id: string; status: string; summary: string }[];
 }) => {
-  const runDir = path.join(devEvalsRoot, runId);
+  const runDir = runEvalDir(runId);
   mkdirSync(runDir, { recursive: true });
   const lines = [
     "# Remediation proposal",
@@ -383,9 +383,9 @@ const cmdRun = async ({
   assertArm({ arm });
   const runId = `run-${Date.now()}`;
   if (randomizationSeed) {
-    mkdirSync(path.join(devEvalsRoot, runId), { recursive: true });
+    mkdirSync(runEvalDir(runId), { recursive: true });
     writeFileSync(
-      path.join(devEvalsRoot, runId, "randomization.json"),
+      path.join(runEvalDir(runId), "randomization.json"),
       `${JSON.stringify({ seed: randomizationSeed, scenarioIds: scenarios, strategy: "methodology-stratified" }, null, 2)}\n`
     );
   }
@@ -429,8 +429,8 @@ const cmdCompare = ({
   remediationMode?: boolean;
 }) => {
   const result = compareRuns({
-    baselineDir: path.join(devEvalsRoot, baseline),
-    currentDir: path.join(devEvalsRoot, current),
+    baselineDir: runEvalDir(baseline),
+    currentDir: runEvalDir(current),
     remediationMode,
   });
   console.log(JSON.stringify(result, null, 2));
@@ -468,11 +468,11 @@ const cmdHandoff = async ({
   });
   const bPrompt = handoffAgentBPrompt({ variant });
   writeFileSync(
-    path.join(devEvalsRoot, runId, "handoff-agent-b-prompt.txt"),
+    path.join(runEvalDir(runId), "handoff-agent-b-prompt.txt"),
     `${bPrompt}\n`
   );
   writeFileSync(
-    path.join(devEvalsRoot, runId, "handoff-notes.json"),
+    path.join(runEvalDir(runId), "handoff-notes.json"),
     `${JSON.stringify(
       {
         agentAScenario,
@@ -522,9 +522,9 @@ const cmdCompareArms = async ({
       process.exit(controlBatch.infrastructureFailure ? 4 : 1);
     }
     const result = compareRuns({
-      baselineDir: path.join(devEvalsRoot, controlRun),
+      baselineDir: runEvalDir(controlRun),
       crossArm: true,
-      currentDir: path.join(devEvalsRoot, flowRun),
+      currentDir: runEvalDir(flowRun),
     });
     console.log(JSON.stringify(result, null, 2));
     return;

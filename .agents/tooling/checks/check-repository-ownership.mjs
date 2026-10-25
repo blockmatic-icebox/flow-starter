@@ -47,6 +47,23 @@ export function validateRepositoryOwnership(root = repoRoot) {
   if (existsSync(path.join(root, "packages/flow-eval")))
     errors.push("Factory evaluation must live at .agents/eval, not packages/");
 
+  const rootPkg = path.join(root, "package.json");
+  if (existsSync(rootPkg)) {
+    const pkg = JSON.parse(readFileSync(rootPkg, "utf-8"));
+    for (const name of Object.keys(pkg.scripts ?? {})) {
+      const factoryForward =
+        name.startsWith("flow:") ||
+        name.startsWith("flow-eval:") ||
+        name === "worktrees" ||
+        name.startsWith("architecture:") ||
+        (name.startsWith("eval:") && !name.startsWith("eval:genui"));
+      if (factoryForward)
+        errors.push(
+          `root package.json must not forward Factory script "${name}"; use pnpm --dir .agents`
+        );
+    }
+  }
+
   const productCodeRoots = [
     path.join(root, "apps/web"),
     path.join(root, "packages/db"),

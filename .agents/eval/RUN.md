@@ -1,6 +1,10 @@
 # Flow evaluation runner
 
-User-invoked methodology evaluations for Flow. Evidence stays under `__dev/flow-evals/`. The historical run `20261024-flow-v0.1-1256e532` is read-only.
+User-invoked methodology evaluations for Flow. **New** evidence defaults to `.agents/eval/evidence/flow-evals/` (gitignored). Legacy runs under `__dev/flow-evals/` remain readable; frozen run `20261024-flow-v0.1-1256e532` is read-only.
+
+Subject worktrees must not receive evaluator runbooks, oracles, or grading instructions (inert `@repo/flow-eval` workspace stub only).
+
+Invented-scope grading uses bounded negation patterns; ambiguous lines may remain inconclusive—see `gates.ts` tests.
 
 ## Live runs (`/flow-eval`)
 
@@ -44,7 +48,7 @@ pnpm eval:benchmark
 pnpm eval:benchmark:checkout
 ```
 
-Product evidence: `__dev/product-evals/<runId>/` (`manifest.json`, `readiness.json`, `findings.json`, `summary.md`).
+Product evidence: `.agents/eval/evidence/product-evals/<runId>/` (legacy: `__dev/product-evals/<runId>/`).
 
 `eval experiment --profile technical-ai-assessment` prepares one directory per arm under `__dev/product-evals/<arm>-<runId>/`. Exit 0 means the session is initialized. `productEvaluated` stays false and `releaseVerdict` stays `INCONCLUSIVE` until product checks cover `acceptance.json`. The build target is arm `assessment-a`.
 
@@ -103,7 +107,7 @@ Agent task failures remain valid evidence; they do not by themselves invalidate 
 
 Official methodology claims require protocol `subject-evaluator-v2`, compatible frozen manifests, comparison-grade evidence, and a passing isolation assessment for the inspected mechanism. Historical `host-session-v1`, `cursor-cli`, and run `20261024-flow-v0.1-1256e532` remain readable but are not official performance baselines.
 
-Offline integrity: `pnpm flow-eval:check` from the repository root (types, unit tests, baseline preserve).
+Offline integrity: `pnpm --dir .agents flow-eval:check` (types, unit tests, baseline preserve).
 
 ## Arms
 

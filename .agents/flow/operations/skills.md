@@ -8,6 +8,8 @@ Do not load the full catalog. Skills for technologies that are not implemented h
 
 `flow-improve` and `flow-eval` load only when the user explicitly invokes that work. Ordinary product features, bugs, and refactors do not load them.
 
+The **coordinator** loads methodology skills from this page automatically; the user should not need to name `idea-refine`, `prd-writing`, or `planning-and-task-breakdown` unless they want a specific method.
+
 ## Phase-aware selection
 
 Select skills using the actual task and uncertainty, not keyword matching alone.

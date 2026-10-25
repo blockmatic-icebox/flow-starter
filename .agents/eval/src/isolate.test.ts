@@ -86,16 +86,18 @@ describe("captureAgentDiff", () => {
 });
 
 describe("applyArmMutations", () => {
-  it("keeps the eval runbook after removing oracle material", () => {
+  it("strips evaluator material and leaves an inert workspace package stub", () => {
     const dir = mkdtempSync(path.join(tmpdir(), "flow-eval-arm-"));
     const oracleDir = path.join(dir, ".agents/eval/scenarios/oracles");
     mkdirSync(oracleDir, { recursive: true });
     writeFileSync(path.join(oracleDir, "S01.json"), "{}\n");
+    mkdirSync(path.join(dir, ".agents/eval/src"), { recursive: true });
+    writeFileSync(path.join(dir, ".agents/eval/RUN.md"), "evaluator secret\n");
     applyArmMutations({ arm: "flow", worktreePath: dir });
     assert.equal(existsSync(path.join(oracleDir, "S01.json")), false);
     assert.equal(existsSync(path.join(dir, ".agents/eval/src")), false);
-    const runbook = readFileSync(path.join(dir, ".agents/eval/RUN.md"), "utf8");
-    assert.match(runbook, /Flow evaluation runner/u);
+    assert.equal(existsSync(path.join(dir, ".agents/eval/RUN.md")), false);
+    assert.equal(existsSync(path.join(dir, ".agents/eval/scenarios")), false);
     assert.match(
       readFileSync(path.join(dir, ".agents/eval/package.json"), "utf8"),
       /@repo\/flow-eval/u

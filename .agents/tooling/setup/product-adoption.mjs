@@ -121,6 +121,19 @@ export const applyProductAdoption = ({ projectName, root }) => {
     name: slug,
   });
 
+  const uninitializedProduct = `# Product (not initialized)
+
+This repository has not established a product contract yet.
+
+When Explore produces meaningful material, create \`PRODUCT.md\` from \`.agents/skills/flow/templates/PRODUCT.md\`.
+`;
+  const uninitializedDesign = `# Design (not initialized)
+
+Create \`DESIGN.md\` only when a real user journey exists. Template: \`.agents/skills/flow/templates/DESIGN.md\`.
+`;
+  writeFileSync(path.join(root, "PRODUCT.md"), uninitializedProduct, "utf-8");
+  writeFileSync(path.join(root, "DESIGN.md"), uninitializedDesign, "utf-8");
+
   return { host: hostTo, slug };
 };
 

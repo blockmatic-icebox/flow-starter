@@ -12,7 +12,12 @@ import path from "node:path";
 import { createSeededRng } from "./generation/rng.ts";
 import { recordCommonSource } from "./git.ts";
 import { assessIsolation, SUBJECT_EVALUATOR_PROTOCOL_ID } from "./isolation.ts";
-import { devEvalsRoot, publicScenariosDir, repoRoot } from "./paths.ts";
+import {
+  catalogRoot,
+  publicScenariosDir,
+  repoRoot,
+  runEvalDir,
+} from "./paths.ts";
 import { rubricVersion } from "./rubric.ts";
 import { catalogHash, scenarioOracleHash } from "./scenarios.ts";
 import { skillsLockHash } from "./skills-lock.ts";
@@ -84,10 +89,10 @@ const canonicalPilotDefinition = ({ seed }: { seed: string }) => {
   );
   const fixtureHashes = PILOT_SCENARIOS.map((id) => fixtureTreeHash(id));
   const stakeholderPolicy =
-    existsSync(path.join(devEvalsRoot, "catalog", "S09", "hidden.json")) &&
-    existsSync(path.join(devEvalsRoot, "catalog", "S13", "hidden.json"))
-      ? hashFile(path.join(devEvalsRoot, "catalog", "S09", "hidden.json")) +
-        hashFile(path.join(devEvalsRoot, "catalog", "S13", "hidden.json"))
+    existsSync(path.join(catalogRoot, "S09", "hidden.json")) &&
+    existsSync(path.join(catalogRoot, "S13", "hidden.json"))
+      ? hashFile(path.join(catalogRoot, "S09", "hidden.json")) +
+        hashFile(path.join(catalogRoot, "S13", "hidden.json"))
       : "stakeholder-catalog-missing";
 
   const commonSource = recordCommonSource();
@@ -171,7 +176,7 @@ export const freezePilot = ({
   outDir?: string;
 }) => {
   const runId = `pilot-freeze-${seed}`;
-  const dir = outDir ?? path.join(devEvalsRoot, runId);
+  const dir = outDir ?? runEvalDir(runId);
   const filePath = path.join(dir, "pilot-freeze.json");
   const definition = canonicalPilotDefinition({ seed });
   const hash = definitionHash(definition);

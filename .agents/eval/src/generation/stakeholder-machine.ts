@@ -68,10 +68,25 @@ export const isBuildAuthorizedInEvents = ({
   );
 };
 
-const replyWithoutBuildAuth = ({ turn }: { turn: number }) => {
-  if (turn === 2)
-    return "Confirm the specification captures the required outcomes and non-goals from the brief.";
-  if (turn === 3) return "Proceed with Specify and planning as outlined.";
+const replyWithoutBuildAuth = ({
+  agentText,
+  turn,
+}: {
+  agentText: string;
+  turn: number;
+}) => {
+  if (turn === 2) {
+    if (asksQuestion(agentText))
+      return "Answer from the brief: cite constraints and acceptance criteria; do not expand scope.";
+    return "Confirm the specification captures required outcomes and non-goals from the brief.";
+  }
+  if (turn === 3) {
+    if (!/plan|slice|verify|acceptance/iu.test(agentText))
+      return "Provide a concise plan with verification against acceptance criteria before implementation.";
+    return "Proceed with Specify and planning as outlined.";
+  }
+  if (turn >= 6)
+    return "Remaining uncertainty is low; finalize the contract or authorize the next stage explicitly.";
   if (turn >= 4)
     return "Continue with the agreed methodology stages until verification.";
   return "Refer to the brief for constraints and acceptance expectations.";
@@ -128,7 +143,11 @@ export const generatedStakeholderReply = ({
 
   const buildTurn =
     hidden?.approvalLines.find((l) => l.authorizesBuild)?.turn ?? 4;
-  if (!requiresBuildAuth) return replyWithoutBuildAuth({ turn });
+  if (!requiresBuildAuth)
+    return replyWithoutBuildAuth({
+      agentText: lastAssistantText({ events }),
+      turn,
+    });
   return replyWithBuildAuth({
     agentText: lastAssistantText({ events }),
     buildTurn,

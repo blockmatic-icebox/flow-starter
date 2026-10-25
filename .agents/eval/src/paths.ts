@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import path from "node:path";
 
 const packageRoot = path.resolve(import.meta.dirname, "..");
@@ -6,16 +7,26 @@ export const repoRoot = path.resolve(packageRoot, "..", "..");
 
 export const baselineRunId = "20261024-flow-v0.1-1256e532";
 
-export const baselineDevPath = path.join(
-  repoRoot,
-  "__dev",
-  "flow-evals",
-  baselineRunId
-);
+const legacyEvalsRoot = path.join(repoRoot, "__dev", "flow-evals");
 
-export const devEvalsRoot = path.join(repoRoot, "__dev", "flow-evals");
+const evalEvidenceRoot = path.join(packageRoot, "evidence", "flow-evals");
 
-export const catalogRoot = path.join(devEvalsRoot, "catalog");
+/** Default write root for new methodology evaluation runs. */
+export const devEvalsRoot = evalEvidenceRoot;
+
+export const baselineDevPath = path.join(legacyEvalsRoot, baselineRunId);
+
+export const runEvalDir = (runId: string) => {
+  const primary = path.join(evalEvidenceRoot, runId);
+  const legacy = path.join(legacyEvalsRoot, runId);
+  if (existsSync(primary)) return primary;
+  if (existsSync(legacy)) return legacy;
+  return primary;
+};
+
+export const catalogRoot = existsSync(path.join(legacyEvalsRoot, "catalog"))
+  ? path.join(legacyEvalsRoot, "catalog")
+  : path.join(evalEvidenceRoot, "catalog");
 
 export const publicScenariosDir = path.join(packageRoot, "scenarios", "public");
 

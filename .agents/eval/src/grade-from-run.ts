@@ -9,7 +9,7 @@ import {
   assessIsolation,
   SUBJECT_EVALUATOR_PROTOCOL_ID,
 } from "./isolation.ts";
-import { devEvalsRoot } from "./paths.ts";
+import { runEvalDir } from "./paths.ts";
 import { resolveScenarioEvidenceDir } from "./scenario-evidence.ts";
 import {
   loadHiddenScenario,
@@ -114,7 +114,7 @@ export const gradeScenarioFromRunDir = ({
   const card = loadPublicScenario({ id: scenarioId });
   const hidden = loadHiddenScenario({ id: scenarioId });
   const oracle = loadScenarioOracle({ id: scenarioId });
-  const manifestPath = path.join(devEvalsRoot, runId, "manifest.json");
+  const manifestPath = path.join(runEvalDir(runId), "manifest.json");
   const manifest = existsSync(manifestPath)
     ? (JSON.parse(readFileSync(manifestPath, "utf-8")) as RunManifest)
     : null;

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
-import { devEvalsRoot } from "./paths.ts";
+import { runEvalDir } from "./paths.ts";
 import type {
   DimensionId,
   DimensionScore,
@@ -30,8 +30,7 @@ export const loadBlindReview = ({
   scenarioId: string;
 }) => {
   const filePath = path.join(
-    devEvalsRoot,
-    runId,
+    runEvalDir(runId),
     "blind-reviews",
     `${scenarioId}.json`
   );

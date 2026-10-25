@@ -7,6 +7,14 @@ description: Product-development methodology for a new product, an existing prod
 
 Follow authorization rules in [AGENTS.md](../../../AGENTS.md). They apply even when this skill is loaded.
 
+## Coordinator (main session)
+
+- **Entry:** Natural-language product requests load this skill via `AGENTS.md`; explicit `/flow` is optional. Do not ask the user to pick methodology skills (`idea-refine`, `prd-writing`, etc.)—load the smallest set from `operations/skills.md` yourself.
+- **Explore:** Read the full brief first; ask a few high-value questions per round; stop when further questioning is not worth the cost. Use templates under `templates/` only when creating real drafts.
+- **Shortcuts:** Interpret authorization from the whole conversation (approved spec, prototype risk acceptance, bug-fix scope)—not fixed phrase lists. Plan approval ≠ Build authorization.
+- **Stages:** At boundaries, state what is established, what is uncertain, what you recommend next, and whether approval is required.
+- **Delegation:** Workers return structured results to you; you integrate, verify, and communicate once. See `operations/delegation.md`.
+
 ## Steps
 
 1. Classify the work kind (new product, existing product, or Flow improvement). For Flow improvement, stop and use user-invoked [flow-improve](../flow-improve/SKILL.md) instead of treating it as product discovery. Choose the activity (Explore → Specify → Plan → Build → Review → Ship) from task intent. Read only the matching sections of [.agents/flow/flow.md](../../flow/flow.md).

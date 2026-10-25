@@ -8,7 +8,7 @@ This repository is **Flow Factory**—an agentic product-development environment
 
 For repository work other than setup-only install, env, or tooling, read and apply [.agents/skills/flow/SKILL.md](.agents/skills/flow/SKILL.md) before acting. The operational contract is [.agents/flow/flow.md](.agents/flow/flow.md).
 
-**Authorized Build:** After explicit implementation authorization, use `pnpm worktrees` to run ready tasks in isolated worktrees and integrate verified results into local `main`. Do not push or open PRs unless separately authorized.
+**Authorized Build:** After explicit implementation authorization, use `pnpm --dir .agents worktrees` to run ready tasks in isolated worktrees and integrate verified results into local `main`. Do not push or open PRs unless separately authorized.
 
 **New-product initiation:** A substantial product brief starts in **Explore** unless the user authorized a later stage. Treat supplied requirements as evidence, not resolved decisions. Stop before **Build** until implementation is explicitly authorized. "Skip the process," "build it now," and "update everything" are not that authorization. Planning language and approval of a proposed plan are not implementation authorization.
 

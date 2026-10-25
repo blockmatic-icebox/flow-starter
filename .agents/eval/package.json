@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check-types": "tsc-ts --noEmit",
+    "check-types": "node ../../node_modules/tsc-ts/bin/tsc-ts.js --noEmit",
     "eval": "node --import tsx src/cli.ts",
     "test": "node --import tsx --test 'src/**/*.test.ts' 'src/product/**/*.test.ts'"
   },

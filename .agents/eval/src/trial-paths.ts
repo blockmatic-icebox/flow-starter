@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { devEvalsRoot } from "./paths.ts";
+import { runEvalDir } from "./paths.ts";
 
 export const trialScenarioDir = ({
   repetition,
@@ -10,4 +10,4 @@ export const trialScenarioDir = ({
   repetition: number;
   runId: string;
   scenarioId: string;
-}) => path.join(devEvalsRoot, runId, "trials", scenarioId, `r${repetition}`);
+}) => path.join(runEvalDir(runId), "trials", scenarioId, `r${repetition}`);

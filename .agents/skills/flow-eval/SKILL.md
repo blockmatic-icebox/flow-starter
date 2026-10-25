@@ -24,7 +24,7 @@ No arguments means the full public suite, arm `flow`.
 
 ## Suite loop
 
-1. Do not edit [.agents/flow/flow.md](../../flow/flow.md) or mutate `__dev/flow-evals/20261024-flow-v0.1-1256e532/`.
+1. Do not edit [.agents/flow/flow.md](../../flow/flow.md) or mutate frozen run `20261024-flow-v0.1-1256e532` (legacy path under `__dev/flow-evals/`).
 2. Prepare from the host repository root:
 
 ```bash
@@ -42,15 +42,17 @@ pnpm --filter @repo/flow-eval eval next --run <runId> --scenario <id> --repetiti
 pnpm --filter @repo/flow-eval eval record --run <runId> --scenario <id> --turn <n> --repetition <n> --events-file <path>
 ```
 
-4. When every session is complete, finalize:
+4. Drive **every** scheduled job to a terminal state (`complete`, `failed`, `blocked`, `cancelled`, or `timed-out`). `awaiting-host` is not completion—keep the parent session open until jobs finish or you report what blocked.
+
+5. Finalize (including **partial** campaigns when some jobs completed):
 
 ```bash
 pnpm --filter @repo/flow-eval eval finalize --run <runId>
 ```
 
-5. In the parent session, report **gate**, **official eligible** (expect blockers under v2 diagnostic runs), **outcomes**, evidence completeness, and limitations. Do not claim methodology improvement from a single run.
+6. In the parent session, display the **summary** from `<runDir>/summary.md` (campaign counts, gate failures, remediation groups) and state limitations. Report **official eligible** (expect blockers under v2 diagnostic runs). Do not end after dispatching worktrees only.
 
-6. Stop. Discuss findings in the parent session. Implement methodology changes only after explicit user authorization.
+7. Stop. Discuss findings in the parent session. Implement methodology changes only after explicit user authorization.
 
 ## Deterministic-only modes
 

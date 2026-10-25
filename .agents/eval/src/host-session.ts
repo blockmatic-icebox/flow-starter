@@ -17,7 +17,7 @@ import {
   officialEligibilityBlockersFromIsolation,
   SUBJECT_EVALUATOR_PROTOCOL_ID,
 } from "./isolation.ts";
-import { devEvalsRoot } from "./paths.ts";
+import { runEvalDir } from "./paths.ts";
 import { validateSubjectRecordEvents } from "./record-validation.ts";
 import { redactOrThrow } from "./redact.ts";
 import { writeRunSummary, writeScenarioReport } from "./report.ts";
@@ -41,6 +41,7 @@ import type {
   EvalEvent,
   EvalHost,
   GradeResult,
+  HostJobStatus,
   PreparedSourceIdentity,
   RunManifest,
   TrustedEvaluatorRevision,
@@ -59,13 +60,29 @@ type HostJob = {
   repetition: number;
   turnLimit: number;
   currentTurn: number;
-  status: "pending" | "awaiting-record" | "complete";
+  status: HostJobStatus;
+  attemptId: number;
   worktreePath: string;
   prepBaselineSha: string;
   preparedWorkspace?: PreparedSourceIdentity;
   lastRecordedFingerprint?: string;
   lastRecordedTurn?: number;
+  failureReason?: string;
 };
+
+const terminalJobStatuses = new Set<HostJobStatus>([
+  "complete",
+  "failed",
+  "blocked",
+  "timed-out",
+  "cancelled",
+]);
+
+const normalizeHostJob = (job: HostJob): HostJob => ({
+  ...job,
+  attemptId: job.attemptId ?? 1,
+  status: job.status ?? "pending",
+});
 
 type HostSessionState = {
   arm: EvalArm;
@@ -85,10 +102,10 @@ type HostSessionState = {
 };
 
 const statePath = ({ runId }: { runId: string }) =>
-  path.join(devEvalsRoot, runId, "host-session-state.json");
+  path.join(runEvalDir(runId), "host-session-state.json");
 
 const generatedScenariosPath = ({ runId }: { runId: string }) =>
-  path.join(devEvalsRoot, runId, "generated-scenarios.json");
+  path.join(runEvalDir(runId), "generated-scenarios.json");
 
 const loadGeneratedScenariosById = ({ runId }: { runId: string }) => {
   const file = generatedScenariosPath({ runId });
@@ -125,8 +142,10 @@ export const loadHostSessionState = ({ runId }: { runId: string }) => {
       runId,
       scenarioId: job.scenarioId,
     });
-    if (!existsSync(overlay)) return job;
-    return JSON.parse(readFileSync(overlay, "utf-8")) as HostJob;
+    if (!existsSync(overlay)) return normalizeHostJob(job);
+    return normalizeHostJob(
+      JSON.parse(readFileSync(overlay, "utf-8")) as HostJob
+    );
   });
   return state;
 };
@@ -139,8 +158,7 @@ const jobFile = ({
   repetition: number;
   runId: string;
   scenarioId: string;
-}) =>
-  path.join(devEvalsRoot, runId, "jobs", `${scenarioId}-r${repetition}.json`);
+}) => path.join(runEvalDir(runId), "jobs", `${scenarioId}-r${repetition}.json`);
 
 const saveJob = ({ job, runId }: { job: HostJob; runId: string }) => {
   const file = jobFile({
@@ -153,7 +171,7 @@ const saveJob = ({ job, runId }: { job: HostJob; runId: string }) => {
 };
 
 const saveState = (state: HostSessionState) => {
-  mkdirSync(path.join(devEvalsRoot, state.runId), { recursive: true });
+  mkdirSync(path.join(runEvalDir(state.runId)), { recursive: true });
   writeFileSync(
     statePath({ runId: state.runId }),
     `${JSON.stringify(state, null, 2)}\n`
@@ -351,6 +369,7 @@ export const prepareHostRun = ({
         worktreePath,
       });
       jobs.push({
+        attemptId: 1,
         currentTurn: 1,
         prepBaselineSha: prep.commitSha,
         preparedWorkspace,
@@ -387,19 +406,19 @@ export const prepareHostRun = ({
     state,
     worktreePaths: jobs.map((j) => j.worktreePath),
   });
-  mkdirSync(path.join(devEvalsRoot, runId), { recursive: true });
+  mkdirSync(runEvalDir(runId), { recursive: true });
   writeFileSync(
-    path.join(devEvalsRoot, runId, "manifest.json"),
+    path.join(runEvalDir(runId), "manifest.json"),
     `${JSON.stringify(manifest, null, 2)}\n`
   );
   writeFileSync(
-    path.join(devEvalsRoot, runId, "scenario-oracle-hash.txt"),
+    path.join(runEvalDir(runId), "scenario-oracle-hash.txt"),
     `${scenarioOracleHash()}\n`
   );
 
   if (customTurnOneByScenario)
     writeFileSync(
-      path.join(devEvalsRoot, runId, "custom-turn-one.json"),
+      path.join(runEvalDir(runId), "custom-turn-one.json"),
       `${JSON.stringify(customTurnOneByScenario, null, 2)}\n`
     );
 
@@ -488,7 +507,7 @@ export const hostSessionNext = ({
       status: scenarioId ? ("scenario-done" as const) : ("done" as const),
     };
 
-  const customPath = path.join(devEvalsRoot, runId, "custom-turn-one.json");
+  const customPath = path.join(runEvalDir(runId), "custom-turn-one.json");
   const customTurnOne = existsSync(customPath)
     ? (JSON.parse(readFileSync(customPath, "utf-8")) as Record<string, string>)[
         job.scenarioId
@@ -753,16 +772,19 @@ export const hostSessionFinalize = ({
   if (!state)
     return { ok: false as const, reason: "host session state missing" };
 
-  const incomplete = state.jobs.filter((j) => j.status !== "complete");
-  if (incomplete.length)
+  const incomplete = state.jobs.filter(
+    (j) => !terminalJobStatuses.has(j.status)
+  );
+  const gradable = state.jobs.filter((j) => j.status === "complete");
+  if (!gradable.length && incomplete.length)
     return {
       ok: false as const,
-      reason: `incomplete jobs: ${incomplete.map((j) => `${j.scenarioId}/r${j.repetition}`).join(", ")}`,
+      reason: `no completed jobs; still running: ${incomplete.map((j) => `${j.scenarioId}/r${j.repetition}`).join(", ")}`,
     };
 
   const grades: GradeResult[] = [];
   const worktreePaths: string[] = [];
-  for (const job of state.jobs) {
+  for (const job of gradable) {
     const result = finalizeHostScenario({ job, runId });
     grades.push(result.grade);
     worktreePaths.push(result.worktreePath);
@@ -782,14 +804,28 @@ export const hostSessionFinalize = ({
     state,
     worktreePaths,
   });
-  const runDir = path.join(devEvalsRoot, runId);
+  const runDir = runEvalDir(runId);
   writeFileSync(
     path.join(runDir, "manifest.json"),
     `${JSON.stringify(manifest, null, 2)}\n`
   );
-  writeRunSummary({ grades, manifest, runDir });
+  writeRunSummary({
+    grades,
+    hostJobs: state.jobs,
+    manifest,
+    partial: incomplete.length > 0,
+    runDir,
+  });
 
-  return { grades, manifest, ok: true as const };
+  return {
+    grades,
+    incompleteJobs: incomplete.map(
+      (j) => `${j.scenarioId}/r${j.repetition}:${j.status}`
+    ),
+    manifest,
+    ok: true as const,
+    partial: incomplete.length > 0,
+  };
 };
 
 export const scenarioWorkerBrief = ({
