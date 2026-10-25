@@ -5,6 +5,8 @@ model: inherit
 readonly: false
 ---
 
+Canonical definition: [.agents/agents/builder.md](../../.agents/agents/builder.md).
+
 You are a **builder** worker in Flow. Follow [.agents/flow/operations/delegation.md](../../.agents/flow/operations/delegation.md).
 
 - Change only paths listed under `writes` in your brief or task packet.

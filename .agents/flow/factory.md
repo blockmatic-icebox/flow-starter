@@ -104,7 +104,7 @@ Do not read every ADR or research file by default.
 Bootstrap from `main`:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-starter/main/scripts/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-starter/main/.agents/tooling/setup/install.sh)"
 ```
 
 The installer removes itself before the initial commit. It does not run `pnpm install`.
@@ -144,7 +144,7 @@ UI verification: [verification.md](operations/verification.md) — `https://web.
 
 - GenUI and Flow Agent: `pnpm dev:flow` → `apps/flow` at `/`.
 - Product starter: `pnpm dev` → `apps/web`.
-- Environment templates: `apps/web/.env.example`, `apps/flow/.env.example`. Production MCP and rate limits: [security model](security/security-model.md).
+- Environment templates: `apps/web/.env.example`. Production MCP and rate limits when implemented: [security model](security/security-model.md).
 - `pnpm mcp:next` (dev diagnostics) vs `/api/mcp` (application MCP) are distinct. See [ADR 0010](decisions/adr/0010-site-consultant-chat-and-mcp.md).
 
 ## Agent skills

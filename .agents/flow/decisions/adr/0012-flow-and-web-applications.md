@@ -2,7 +2,7 @@ Date: 2026-10-24
 
 # ADR 0012 — Flow application and product web split
 
-**Status:** Accepted
+**Status:** Superseded by ADR 0014
 
 ## Context
 

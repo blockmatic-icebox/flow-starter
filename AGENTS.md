@@ -28,7 +28,7 @@ To improve Flow itself, read [.agents/skills/flow-improve/SKILL.md](.agents/skil
 | Security boundaries | [SECURITY.md](SECURITY.md), [.agents/flow/security/security-model.md](.agents/flow/security/security-model.md) |
 | Foundation, adoption, navigation | [.agents/flow/factory.md](.agents/flow/factory.md) |
 | Methodology (human intro) | [.agents/flow/README.md](.agents/flow/README.md) |
-| Terms | [GLOSSARY.md](GLOSSARY.md) |
+| Factory terms | [.agents/flow/glossary.md](.agents/flow/glossary.md) |
 | Dated product evidence | `docs/research/` when present — not current instructions by default |
 | Stack trade-offs (major changes) | [ADR 0001](.agents/flow/decisions/adr/0001-agentic-architecture.md) (sections as needed) |
 | React/Next routes, GenUI, URL state | [ADR 0009](.agents/flow/decisions/adr/0009-react-nextjs-fractal-architecture.md), [.agents/flow/specs/genui.md](.agents/flow/specs/genui.md) |
@@ -44,7 +44,8 @@ Do not read every ADR or research file for ordinary changes. Do not present plan
 - Run checks that match the change; report commands and results honestly. When claiming a check passed, name the command and its exit code; if it was not run, say so.
 - React: preserve server/client boundaries and route-first colocation ([ADR 0009](.agents/flow/decisions/adr/0009-react-nextjs-fractal-architecture.md)). No mandatory `features/` layer.
 - Next.js issues: use runtime MCP diagnostics when available, then browser/CLI fallback.
-- Pre-commit: `pnpm security:block-files`, `pnpm security:secrets`, `node scripts/check-staged.mjs`. Install gitleaks (`pnpm setup:gitleaks`). Format with `pnpm lint:fix` before staging. Hooks must not auto-stage or reformat unrelated files.
+- Pre-commit: `pnpm security:block-files`, `pnpm security:secrets`, `node .agents/tooling/checks/check-staged.mjs`. Install gitleaks (`pnpm setup:gitleaks`). Format with `pnpm lint:fix` before staging. Hooks must not auto-stage or reformat unrelated files.
+- **Ownership:** Product code lives in `apps/web` and `packages/*`. Factory implementation lives in `.agents/`. Product must not import Factory packages.
 - Before an authorized commit: diff-scoped review in [.agents/flow/flow.md](.agents/flow/flow.md).
 
 Every final agent response MUST end with the **Skills loaded** footer defined in [.agents/flow/operations/skills.md](.agents/flow/operations/skills.md).

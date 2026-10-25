@@ -1,0 +1,33 @@
+{
+  "name": "@repo/flow-factory",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "pnpm flow:check && pnpm architecture:check && pnpm ownership:check && pnpm flow-eval:check",
+    "test": "pnpm flow:test && pnpm architecture:test && pnpm ownership:test && pnpm test:tooling && pnpm --filter @repo/flow-eval test",
+    "flow:check": "node tooling/checks/check-flow-docs.mjs",
+    "flow:test": "node --test tooling/checks/check-flow-docs.test.mjs",
+    "architecture:check": "node tooling/checks/check-react-architecture.mjs",
+    "architecture:test": "node --test tooling/checks/check-react-architecture.test.mjs",
+    "ownership:check": "node tooling/checks/check-repository-ownership.mjs",
+    "ownership:test": "node --test tooling/checks/check-repository-ownership.test.mjs",
+    "test:tooling": "node --test tooling/worktrees/*.test.mjs tooling/security/*.test.mjs tooling/checks/check-staged.test.mjs",
+    "worktrees": "node tooling/worktrees/worktrees.mjs",
+    "flow-eval:check": "pnpm --filter @repo/flow-eval check-types && pnpm --filter @repo/flow-eval test && pnpm --filter @repo/flow-eval eval preserve",
+    "eval:experiment": "pnpm --filter @repo/flow-eval eval experiment",
+    "eval:self-improve": "pnpm --filter @repo/flow-eval eval self-improve",
+    "eval:readiness": "pnpm --filter @repo/flow-eval eval readiness",
+    "eval:stress": "pnpm --filter @repo/flow-eval eval stress",
+    "eval:mutations": "pnpm --filter @repo/flow-eval eval mutations",
+    "eval:benchmark": "pnpm --filter @repo/flow-eval eval benchmark --id benchmark-a && pnpm --filter @repo/flow-eval eval benchmark --id benchmark-b",
+    "eval:benchmark:checkout": "node tooling/benchmarks/benchmark-clean-checkout.mjs",
+    "security:block-files": "node tooling/security/block-secret-files.mjs",
+    "security:secrets": "node tooling/security/scan-secrets-staged.mjs",
+    "security:osv": "node tooling/security/scan-osv.mjs",
+    "security:check": "node tooling/security/security-check.mjs",
+    "setup:gitleaks": "node tooling/setup/setup-gitleaks.mjs",
+    "setup:osv": "node tooling/setup/setup-osv-scanner.mjs",
+    "setup:env": "node tooling/setup/setup-env.mjs",
+    "update-deps": "node tooling/setup/update-deps.mjs"
+  }
+}

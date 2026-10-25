@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 1. Name the mode: `preserve`, `grade`, `pilot`, `run`, `compare`, `handoff`, `readiness`, `stress`, `mutations`, or `benchmark`.
 2. Do not edit [.agents/flow/flow.md](../../flow/flow.md) or mutate `__dev/flow-evals/20261024-flow-v0.1-1256e532/`.
-3. Run the CLI from the repository root (see [RUN.md](../../../packages/flow-eval/RUN.md)).
+3. Run the CLI from the repository root (see [RUN.md](../../eval/RUN.md)).
 4. Report **gate**, **official eligible**, **confidence**, blockers, and missing telemetry before any quality percentage.
 
 ## Completion

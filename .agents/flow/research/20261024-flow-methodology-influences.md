@@ -25,7 +25,7 @@ No skill named `flow` is listed in the manifest.
 ## Adapted concepts (not full skill adoption)
 
 - Progressive disclosure and agent routing — influenced by [writing-for-agents](https://github.com/mattpocock/skills/blob/main/skills/productivity/writing-for-agents/SKILL.md); enforced via Flow document ownership.
-- Shared language maintenance — influenced by [domain-modeling](https://github.com/mattpocock/skills/blob/main/skills/engineering/domain-modeling/SKILL.md) and glossary practice; adopters use [GLOSSARY.md](../../../GLOSSARY.md).
+- Shared language maintenance — influenced by [domain-modeling](https://github.com/mattpocock/skills/blob/main/skills/engineering/domain-modeling/SKILL.md) and glossary practice; adopters use [GLOSSARY.md](../glossary.md).
 - Customer learning mindset — [Lean Startup principles](https://theleanstartup.com/principles), [Product Talk discovery](https://www.producttalk.org/getting-started-with-discovery/) as conceptual references; not installed as standalone Flow skills.
 
 ## Competitive landscape review (October 2026)

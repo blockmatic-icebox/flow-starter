@@ -17,7 +17,7 @@ Flow spreads product intent, decisions, and implementation across **ordinary rep
 | Product research and assessments | `docs/research/` (dated filenames) when used |
 | Product capability contracts | `docs/specs/` when justified |
 | Flow Factory adoption and inherited stack | [factory.md](../factory.md), [architecture.md](../architecture.md) |
-| Terms specific to this factory checkout | [GLOSSARY.md](../../../GLOSSARY.md) |
+| Terms specific to this factory checkout | [GLOSSARY.md](../glossary.md) |
 | Agent procedures (skills, worktrees, verify) | [.agents/flow/operations/](../operations/) |
 | Worthwhile ideas not yet committed | `docs/ideas/<slug>.md` when first needed ([flow.md](../flow.md)) |
 

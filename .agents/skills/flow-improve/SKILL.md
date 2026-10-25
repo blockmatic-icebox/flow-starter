@@ -18,8 +18,8 @@ ADR 0013 remains **Proposed**—do not implement the observer, hooks, L0 event l
    - **One-off model miss** that does not justify an instruction change—stop; note it for the human without editing Flow docs.
 2. Read [.agents/flow/guides/improvement.md](../../flow/guides/improvement.md) and the relevant initiative under `.agents/flow/initiatives/`.
 3. Record a bounded initiative or update an existing one. Do not auto-merge or push.
-4. Implement candidates only in an isolated worktree with `writes` that exclude `packages/flow-eval/**`, `scenarios/`, `baselines/`, and `__dev/flow-evals/holdout/`.
-5. Run evaluation from the trusted host checkout: `pnpm flow-eval:check` and `pnpm --filter @repo/flow-eval eval compare` against a frozen baseline. If `git diff <trusted> -- packages/flow-eval` is non-empty, the candidate is invalid.
+4. Implement candidates only in an isolated worktree with `writes` that exclude `.agents/eval/**`, `scenarios/`, `baselines/`, and `__dev/flow-evals/holdout/`.
+5. Run evaluation from the trusted host checkout: `pnpm flow-eval:check` and `pnpm --filter @repo/flow-eval eval compare` against a frozen baseline. If `git diff <trusted> -- .agents/eval` is non-empty, the candidate is invalid.
 6. Integrate only under existing human authorization (L2 auto-merge inactive). Do not spawn another improvement run from this task.
 
 ## Completion

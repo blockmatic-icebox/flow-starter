@@ -53,4 +53,4 @@ The initiative [flow-self-improvement.md](../../initiatives/flow-self-improvemen
 - [flow-improvement-loop.md](../../initiatives/flow-improvement-loop.md)
 - [improvement.md](../../guides/improvement.md)
 - [flow.md](../../flow.md)
-- [packages/flow-eval/RUN.md](../../../../packages/flow-eval/RUN.md)
+- [packages/flow-eval/RUN.md](../../../eval/RUN.md)

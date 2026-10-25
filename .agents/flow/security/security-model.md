@@ -11,7 +11,7 @@ References: [OWASP ASVS](https://owasp.org/www-project-application-security-veri
 | Boundary | Status | Where |
 | --- | --- | --- |
 | Untrusted user input | Implemented and tested | JSON schemas for compose and chat. System instructions are server-owned. |
-| HTTP request validation | Implemented and tested | `apps/flow/app/_lib/security/read-json-request.ts`. Compose 16 KiB, chat 128 KiB. |
+| HTTP request validation | Pattern documented; product implements | Bounded JSON readers at compose/chat routes (typical caps: compose 16 KiB, chat 128 KiB). |
 | Rate limiting and cost controls | Implemented and tested | Memory in development. Upstash Redis in production, fail closed. Chat output bound to 800 tokens and 5 steps. |
 | Authentication | Selected, not implemented for product users | MCP bearer or explicit public read-only mode is implemented. Better Auth is planned. |
 | Authorization and resource ownership | Selected, not implemented | Host-owned action policy is implemented. Tenant and resource checks are the adopter's job. |

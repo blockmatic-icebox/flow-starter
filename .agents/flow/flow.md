@@ -452,6 +452,4 @@ Agent instructions encourage compliant behavior; they cannot guarantee that ever
 
 The repository's `flow:check` command validates canonical documentation paths, filenames, decision-number uniqueness, research/specification metadata, required entry documents, relative links, selected semantic consistency rules (obsolete paths, MCP tool counts, stale Flow Agent knowledge snapshot), and reproducibility of the bundled knowledge snapshot. `flow:test` verifies the validator's behavior. `architecture:check` enforces objective React monorepo boundaries. Delegation behavior is tested separately by `@repo/flow-eval` policy scenarios (`D01`–`D18`). These checks do not verify human approval, product outcomes, skill invocation, or live subagent execution.
 
-Regenerating `apps/flow/app/_lib/flow-agent/knowledge-snapshot.ts` after a documentation edit (via `apps/flow/scripts/bundle-knowledge.mjs` or `flow:check`) is contract maintenance, not product implementation.
-
 Humans and reviewers remain responsible for approving consequential decisions and evaluating the quality of the work.

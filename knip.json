@@ -15,28 +15,20 @@
   "workspaces": {
     ".": {
       "entry": [
-        "scripts/worktrees.mjs",
-        "scripts/worktrees/**/*.mjs",
-        "scripts/*.{mjs,ts}",
-        "scripts/**/*.test.mjs",
-        "tests/**/*.test.mjs",
+        ".agents/tooling/worktrees/worktrees.mjs",
+        ".agents/tooling/worktrees/**/*.mjs",
+        ".agents/tooling/**/*.{mjs,ts}",
+        ".agents/tooling/**/*.test.mjs",
+        "packages/db/scripts/*.mjs",
         "oxlint.config.ts"
       ],
-      "project": ["scripts/**/*.{mjs,ts}", "tests/**/*.mjs"]
+      "project": [".agents/tooling/**/*.{mjs,ts}", "packages/db/scripts/*.mjs"]
     },
     "apps/web": {
       "entry": [
         "app/**/*.{ts,tsx}",
         "tests/**/*.test.ts",
         "tests/**/*.spec.ts"
-      ],
-      "project": ["**/*.{ts,tsx,mjs}"]
-    },
-    "apps/flow": {
-      "entry": [
-        "app/**/*.{ts,tsx}",
-        "app/_components/**/*.{ts,tsx}",
-        "app/_lib/**/*.{ts,tsx}"
       ],
       "project": ["**/*.{ts,tsx,mjs}"]
     },
@@ -56,7 +48,7 @@
       "entry": [],
       "project": []
     },
-    "packages/flow-eval": {
+    ".agents/eval": {
       "entry": ["src/cli.ts", "src/**/*.test.ts", "src/product/**/*.test.ts"],
       "project": ["src/**/*.ts"]
     }

@@ -6,20 +6,18 @@
 
 Historical source mapping: [20261024-genui-extraction-inventory.md](../research/20261024-genui-extraction-inventory.md). Comparative representation research: [20261024-genui-json-vs-openui.md](../research/20261024-genui-json-vs-openui.md).
 
-## Integration surface (`apps/flow`)
+## Product integration surface (`apps/web`)
 
-| Surface | Path |
+The template ships GenUI **runtime** in `@repo/genui`, not a pre-wired demo route. Adopters add product-owned surfaces when needed:
+
+| Surface | Typical location |
 | --- | --- |
-| GenUI demo UI | `apps/flow/app/page.tsx` → `/` |
-| Compose API | `apps/flow/app/api/genui/compose/route.ts` |
-| Flow Agent chat | `apps/flow/app/api/chat/route.ts` |
-| Flow Agent MCP | `apps/flow/app/api/mcp/route.ts` |
-| Fixture lab page | `apps/flow/app/genui-lab/fixtures/[fixtureId]/page.tsx` |
-| Fixture rewrite | `/__genui__/fixtures/:fixtureId` → lab route (`apps/flow/next.config.ts`) |
-| Route-local adapters | `apps/flow/app/_lib/genui/` (caps, compose context, schemas) |
-| Browser tests | `apps/flow/tests/browser/` |
+| GenUI page or embedded experience | `apps/web/app/...` (route-first colocation) |
+| Compose API | `apps/web/app/api/genui/compose/route.ts` (or equivalent) |
+| Route-local adapters | `apps/web/app/_lib/genui/` (caps, compose context, schemas) |
+| Browser tests | `apps/web/tests/browser/` |
 
-The product app (`apps/web`) does not host GenUI or Flow Agent routes. Adopters implement product UI there without inheriting demo APIs.
+A separate Flow demonstration application existed before [ADR 0014](../decisions/adr/0014-web-only-product-application.md); its routes are not part of the current layout.
 
 ## Three-level strategy
 
@@ -63,32 +61,26 @@ Privileged actions: `createActionRegistry()` — never accept callbacks from mod
 
 ```bash
 pnpm --filter @repo/genui test
-pnpm --filter flow-app test
 pnpm eval:genui:offline
-pnpm test:browser:flow
+pnpm test:browser
 ```
 
-`pnpm qa` runs GenUI and Flow unit tests; `pnpm ci:local` adds browser tests. Pre-commit does not run Playwright.
+`pnpm qa` runs GenUI unit tests; `pnpm ci:local` adds product browser tests when present. Pre-commit does not run Playwright.
 
 | Layer | Location | What it proves |
 | --- | --- | --- |
 | Contract + compose | `packages/genui/src/**/*.test.ts` | Compiler, routing, validation-before-emit, NDJSON limits, `composeQuery`, 100+ graded prompts (no API keys) |
 | Offline eval | `pnpm eval:genui:offline` | Same matrix as a JSON report |
-| Compose route | `apps/flow/app/_lib/genui/compose-route.test.ts` | HTTP compose boundary |
-| MCP protocol | `apps/flow/app/_lib/flow-agent/mcp-protocol.test.ts` | JSON-RPC on the MCP handler |
-| MCP access | `apps/flow/app/_lib/security/mcp-access.test.ts` | Production origin and bearer policy |
-| Fixture lab | `apps/flow/tests/browser/fixture-lab.spec.ts` | Acme envelopes render without horizontal overflow |
-| Flow shell | `genui-demo.spec.ts`, `flow-agent-shell.spec.ts` | Compose submission, overlapping requests, invalid streams, Flow Agent chrome |
-
-**Fixture lab:** enable with `GENUI_FIXTURE_LAB=1` (Playwright webserver sets this). IDs in `packages/genui/src/fixtures/lab-fixtures.ts`. Default Playwright port **3199** (`apps/flow/scripts/playwright-webserver.sh`).
+| Product HTTP boundaries | `apps/web/app/_lib/**/*.test.ts` (when added) | Compose and security adapters in the product app |
+| Product browser | `apps/web/tests/browser/` (when added) | End-to-end GenUI flows |
 
 **While coding:** Playwright for regression; agent-browser for exploratory UI ([.agents/flow/operations/verification.md](../operations/verification.md)); `pnpm mcp:next` for App Router runtime issues.
 
-**Planned gates (not default):** Eve `defineEval` + scripted models; MCP Apps host when `MCP_APP_GENUI_UI_READY` is true (`apps/flow/app/_lib/mcp/mcp-app-readiness.ts`); auth E2E when Better Auth ships; live Promptfoo opt-in only.
+**Planned gates (not default):** Eve `defineEval` + scripted models; MCP Apps host when the product implements readiness gates; auth E2E when Better Auth ships; live Promptfoo opt-in only.
 
 `pnpm setup:playwright` installs Chromium. Use `PLAYWRIGHT_SKIP_WEBSERVER=1` and `PLAYWRIGHT_BASE_URL` to attach to an existing lab server.
 
 ## Host adapters
 
-- **Flow app:** `@repo/genui/react` `GenuiRenderer` + design tokens from `@repo/ui`.
+- **Product app:** `@repo/genui/react` `GenuiRenderer` + design tokens from `@repo/ui`.
 - **MCP Apps / external hosts:** Reuse the same `CompositionEnvelope` and compiler; add an iframe bundle adapter when a `/dev` workspace ships (see extraction inventory for the source harness pattern).

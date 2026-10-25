@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - ".agents/eval"
 overrides:
   body-parser: ">=2.4.0"
   zod: ">=4.6.6"

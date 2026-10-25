@@ -27,7 +27,7 @@ The `@repo/flow-eval` package provides a **user-invoked** harness: isolated work
 | Arms | Compare Flow entrypoint vs reduced context |
 | `flow:check` | Validates doc paths and bundle freshness—not product outcomes |
 
-Command reference: [packages/flow-eval/RUN.md](../../../packages/flow-eval/RUN.md). Initiative status: [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md). As of that initiative, an **authenticated official pilot** may still be blocked pending CLI auth; treat live batch claims as in-progress unless the initiative says otherwise.
+Command reference: [packages/flow-eval/RUN.md](../../eval/RUN.md). Initiative status: [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md). As of that initiative, an **authenticated official pilot** may still be blocked pending CLI auth; treat live batch claims as in-progress unless the initiative says otherwise.
 
 ## Human-reviewed improvement loop (operating process)
 
@@ -62,4 +62,4 @@ Rejected for this loop (per initiative): scheduled eval cron, dashboard, orchest
 
 - Day-to-day activities: [working-with-flow.md](working-with-flow.md)
 - Operational Ship requirements: [flow.md](../flow.md)
-- Run evaluations: [RUN.md](../../../packages/flow-eval/RUN.md)
+- Run evaluations: [RUN.md](../../eval/RUN.md)

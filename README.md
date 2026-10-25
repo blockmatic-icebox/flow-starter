@@ -44,8 +44,6 @@ pnpm setup:portless
 | Command | Purpose |
 | --- | --- |
 | `pnpm dev` | Start the product app (`apps/web`) |
-| `pnpm dev:flow` | Start the Flow app (`apps/flow`) |
-| `pnpm dev:all` | Start both applications |
 | `pnpm build` | Build applications and packages |
 | `pnpm lint` | Lint and formatting checks |
 | `pnpm check-types` | TypeScript checks |

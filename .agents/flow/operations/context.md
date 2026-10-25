@@ -4,7 +4,7 @@ This repository uses one primary domain context. [AGENTS.md](../../../AGENTS.md)
 
 ## When to read the glossary
 
-Read [GLOSSARY.md](../../../GLOSSARY.md) when work involves:
+Read [glossary.md](../glossary.md) when work involves:
 
 - Domain concepts or ambiguous terminology.
 - Naming new public concepts, models, or operations.
@@ -27,7 +27,7 @@ If the proposed change conflicts with an accepted decision, surface that conflic
 
 Use the installed `domain-modeling` skill when terminology or a domain boundary actually needs clarification.
 
-Record resolved project-specific meanings in GLOSSARY.md. Keep implementation details in technical specifications and code.
+Record resolved project-specific meanings in product documentation or a product glossary when the adopter creates one. Factory terms stay in [glossary.md](../glossary.md).
 
 Create a new ADR only when a consequential architectural trade-off merits durable rationale.
 

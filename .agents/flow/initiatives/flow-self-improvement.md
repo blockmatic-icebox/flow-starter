@@ -99,8 +99,8 @@ Risk: **low** = wording or deletion without gates or approval rules; **medium** 
 | Need | Path | Action |
 | --- | --- | --- |
 | Manual loop | [flow-improvement-loop.md](flow-improvement-loop.md) | Reuse |
-| Harness | [packages/flow-eval](../../../packages/flow-eval), [RUN.md](../../../packages/flow-eval/RUN.md) | Extend (trials stats, worktree cleanup, holdout) |
-| Worktrees | [scripts/worktrees.mjs](../../../scripts/worktrees.mjs) | Extend (`flow-self-improvement` slug) |
+| Harness | [packages/flow-eval](../../eval), [RUN.md](../../eval/RUN.md) | Extend (trials stats, worktree cleanup, holdout) |
+| Worktrees | [scripts/worktrees.mjs](../../tooling/worktrees/worktrees.mjs) | Extend (`flow-self-improvement` slug) |
 | Roles | `.cursor/agents/{builder,researcher,verifier}.md` | Reuse |
 | Doc checks | `pnpm flow:check`, `pnpm flow-eval:check` | Reuse |
 | Event log / ledger / hooks | — | New |

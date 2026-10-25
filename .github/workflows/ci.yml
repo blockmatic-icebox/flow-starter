@@ -28,10 +28,11 @@ jobs:
       - uses: ./.github/actions/setup-pnpm
 
       - name: Install verified gitleaks
-        run: node scripts/setup-gitleaks.mjs
+        run: node .agents/tooling/setup/setup-gitleaks.mjs
 
       - run: pnpm flow:test
       - run: pnpm flow:check
+      - run: pnpm --dir .agents ownership:test
       - run: pnpm architecture:test
       - run: pnpm architecture:check
       - run: pnpm lint

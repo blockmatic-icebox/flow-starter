@@ -18,18 +18,6 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/flow/tests/browser/genui-demo.spec.ts"],
-      rules: {
-        "promise/avoid-new": "off",
-      },
-    },
-    {
-      files: ["apps/flow/app/_lib/flow-agent/knowledge.ts"],
-      rules: {
-        "unicorn/no-array-sort": "off",
-      },
-    },
-    {
       files: ["packages/db/src/auth-schema.ts"],
       rules: {
         "eslint/no-inline-comments": "off",
@@ -37,17 +25,13 @@ export default defineConfig({
       },
     },
     {
-      files: [
-        "apps/flow/app/_lib/security/read-json-request.ts",
-        "apps/flow/app/_lib/genui/cap-store.test.ts",
-        "packages/genui/src/orchestration/stream.ts",
-      ],
+      files: ["packages/genui/src/orchestration/stream.ts"],
       rules: {
         "eslint/no-await-in-loop": "off",
       },
     },
     {
-      files: ["packages/flow-eval/**/*.ts"],
+      files: [".agents/eval/**/*.ts"],
       rules: {
         "eslint/no-nested-ternary": "off",
         "eslint/prefer-destructuring": "off",
@@ -59,7 +43,7 @@ export default defineConfig({
       },
     },
     {
-      files: ["scripts/**/*.mjs"],
+      files: [".agents/tooling/**/*.mjs"],
       rules: {
         "eslint/no-await-in-loop": "off",
         "eslint/prefer-destructuring": "off",

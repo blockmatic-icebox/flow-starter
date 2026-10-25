@@ -22,25 +22,27 @@ The checkout is a **baseline**, not a finished product. Replace fixtures, routes
 
 ```text
 apps/web/                   # product starter (minimal homepage)
-apps/flow/                  # Flow experience (GenUI at /, Flow Agent, APIs)
 packages/
   genui/                    # @repo/genui — compiler, orchestration, React adapter
   db/                       # @repo/db — Drizzle schema, client, migrations
   ui/                       # design system (shadcn + Base UI)
   ts/                       # shared TypeScript config
+.agents/
+  eval/                     # Factory evaluation engine (@repo/flow-eval)
+  tooling/                  # worktrees, checks, security, setup
+  flow/                     # methodology, ADRs, specs (this document)
+  skills/                   # first-party Flow skills
 docker-compose.yml          # Neon Local proxy (optional local Postgres endpoint)
-.agents/flow/
-  architecture.md           # this document
-  decisions/adr/            # Factory ADRs
-  specs/genui.md            # GenUI technical specification
 docs/adr/                   # product ADRs (starter: adoption only)
 ```
+
+Application split with a separate `apps/flow` demo was removed in [ADR 0014](decisions/adr/0014-web-only-product-application.md). Historical Flow Agent and MCP demo routes lived in `apps/flow` per [ADR 0010](decisions/adr/0010-site-consultant-chat-and-mcp.md) and [ADR 0012](decisions/adr/0012-flow-and-web-applications.md).
 
 Do not import server-only modules from client renderers. Share serializable types and Zod schemas across boundaries.
 
 ## React and Next.js application architecture
 
-React code follows [ADR 0009](decisions/adr/0009-react-nextjs-fractal-architecture.md): route-first colocation (route-local by default, optional `_components` / `_lib` grouping, app-shared extraction, then `packages/` only when reuse justifies it), Server Components by default, nuqs for shareable URL state, and no mandatory `features/` layer. Rationale, enforcement, and package boundaries for `apps/web`, `apps/flow`, `@repo/ui`, and `@repo/genui` belong in that ADR.
+React code follows [ADR 0009](decisions/adr/0009-react-nextjs-fractal-architecture.md): route-first colocation (route-local by default, optional `_components` / `_lib` grouping, app-shared extraction, then `packages/` only when reuse justifies it), Server Components by default, nuqs for shareable URL state, and no mandatory `features/` layer. Rationale, enforcement, and package boundaries for `apps/web`, `@repo/ui`, and `@repo/genui` belong in that ADR.
 
 ## 3. Generative UI: select → compile → validate → render
 
@@ -76,74 +78,15 @@ Tier 1–2 paths are fully testable without network access. Tier 3 is optional (
 
 The registry is not a completed approval workflow or cross-channel authorization system. The adopting product still implements identity, resource ownership, and privileged execution. See [ADR 0011](decisions/adr/0011-api-and-agent-security-boundaries.md) and [.agents/flow/security/security-model.md](security/security-model.md).
 
-## 6. Implemented Flow application surfaces
+## 6. Product application and GenUI integration
 
-The current demo APIs belong to `apps/flow`, not `apps/web`.
+`apps/web` is the only product application in this template ([ADR 0014](decisions/adr/0014-web-only-product-application.md)). It ships a minimal starter homepage; it does **not** include a pre-wired GenUI demo route, Flow Agent sidebar, or MCP endpoint.
 
-The product-neutral `apps/web` application does not ship the Flow Agent, GenUI demo routes, or MCP endpoint.
+**GenUI runtime** lives in `@repo/genui` (`packages/genui`). Adopters add compose routes, action registries, and UI under `apps/web` when the product needs generative UI. Integration patterns, security boundaries, and tests are documented in [specs/genui.md](specs/genui.md).
 
-| Surface | Method | Responsibility |
-| --- | --- | --- |
-| `/` | GET | Flow GenUI experience and Flow Agent shell |
-| `/api/genui/compose` | POST | Validated GenUI composition over NDJSON streaming |
-| `/api/chat` | POST | Flow Agent conversation using AI SDK UI streams |
-| `/api/mcp` | GET, POST, DELETE, OPTIONS | Read-only Flow Agent MCP endpoint with access controls |
-| `/genui-lab/fixtures/[fixtureId]` | GET | GenUI fixture inspection and browser regression coverage |
+Historical reference implementations (Flow Agent chat, read-only MCP, fixture lab, knowledge snapshot bundling) existed under `apps/flow` before ADR 0014. They are not part of the current checkout layout.
 
-These paths are relative to the `apps/flow` application's origin.
-
-The principal implementations are:
-
-- `apps/flow/app/page.tsx`
-- `apps/flow/app/api/genui/compose/route.ts`
-- `apps/flow/app/api/chat/route.ts`
-- `apps/flow/app/api/mcp/route.ts`
-- `apps/flow/app/_lib/flow-agent/`
-- `apps/flow/app/_lib/genui/`
-- `apps/flow/app/_lib/security/`
-
-The GenUI experience is served at the Flow application's root path. There is no current `/genui-demo` route.
-
-The chat implementation uses approved Flow knowledge tools and can call an AI Gateway-backed model when configured. A deterministic fallback is available without model credentials.
-
-MCP uses the official MCP SDK and exposes four approved read-only tools:
-
-- `describe_architecture`
-- `describe_technologies`
-- `describe_capabilities`
-- `describe_workflow`
-
-The chat tool registry additionally supports bounded knowledge access and host-controlled interface actions. These additional chat capabilities must not be confused with the externally exposed MCP tool list.
-
-The Flow Agent knowledge snapshot is generated from approved repository documentation by `apps/flow/scripts/bundle-knowledge.mjs`. The generated file is `apps/flow/app/_lib/flow-agent/knowledge-snapshot.ts`.
-
-### Input and execution boundaries
-
-Public JSON routes use the bounded reader in `apps/flow/app/_lib/security/read-json-request.ts`.
-
-Compose accepts a bounded `{ query, clientRequestId?, version? }` request and streams validated composition events.
-
-The chat route validates the AI SDK message envelope, limits execution, and does not expose raw model reasoning.
-
-GenUI output is compiled and validated before reaching the React rendering layer. Model output cannot register privileged actions or bypass host-owned authorization policies.
-
-Rate-limit admission is implemented for chat and composition. Production requires the configured persistent rate-limit store, a trusted ingress identity header (`RATE_LIMIT_TRUSTED_IP_HEADER`), and fails closed when either is unavailable.
-
-MCP production access requires the configured application origin and approved bearer-token or explicitly enabled public read-only mode. Origin checking is not authentication.
-
-The database layer preserves TLS verification and applies the documented local-development restrictions.
-
-For authoritative security requirements and detailed implementation limits, use [the security model](security/security-model.md) and [ADR 0011](decisions/adr/0011-api-and-agent-security-boundaries.md).
-
-### Important limitations
-
-The implemented Flow Agent is not the planned full Eve-based product agent runtime.
-
-The read-only MCP server is not a complete authenticated business-action layer.
-
-The product app has no inherited requirement to render a chat sidebar.
-
-A production product must establish its own domain capabilities, persistence, authentication, authorization, and agent actions according to its actual requirements.
+A production product must establish its own domain capabilities, persistence, authentication, authorization, compose/chat/MCP surfaces, and agent actions according to its requirements. Use [the security model](security/security-model.md) and [ADR 0011](decisions/adr/0011-api-and-agent-security-boundaries.md) when exposing public JSON or agent interfaces.
 
 ## 7. Planned platform integrations
 
@@ -158,16 +101,15 @@ These are specified for adopters building a full workspace; they are **not requi
 | Docs / retrieval | Fumadocs, bounded repo reads, revision-aware citations |
 | External clients | Read-only invocation boundary (ADR 006) |
 
-Flow Agent chat and read-only MCP are implemented in `apps/flow`, following the historical integration decision in [ADR 0010](decisions/adr/0010-site-consultant-chat-and-mcp.md) and the current application split in [ADR 0012](decisions/adr/0012-flow-and-web-applications.md). Eve workspace voice (ADR 004) and `/dev` placement (ADR 005) apply only when those features are implemented.
+Flow Agent chat and read-only MCP were historically implemented in `apps/flow` ([ADR 0010](decisions/adr/0010-site-consultant-chat-and-mcp.md), [ADR 0012](decisions/adr/0012-flow-and-web-applications.md)). Eve workspace voice (ADR 004) and `/dev` placement (ADR 005) apply only when those features are implemented in the product app.
 
 ### Vercel deployment
 
-Deploy **`web`** and **`flow-app`** as separate Vercel projects ([ADR 0012](decisions/adr/0012-flow-and-web-applications.md)). Set each project’s **Root Directory** to `apps/web` or `apps/flow`, enable **Include source files outside of the Root Directory in the Build Step**, and keep install, build, and ignore commands in [`apps/web/vercel.json`](../../apps/web/vercel.json) and [`apps/flow/vercel.json`](../../apps/flow/vercel.json).
+Deploy **`web`** as a Vercel project with **Root Directory** `apps/web`, enable **Include source files outside of the Root Directory in the Build Step**, and keep install/build commands in [`apps/web/vercel.json`](../../apps/web/vercel.json).
 
-- **Filtered install** — `pnpm install --frozen-lockfile --filter <package>...` installs only that app and its workspace dependencies (not the full root dev graph).
-- **Skip unaffected builds** — `turbo query affected --tasks build --packages <package> --exit-code` in `ignoreCommand`; Vercel skips when nothing affects that app’s `build` task.
-- **Flow knowledge hash** — [`apps/flow/turbo.json`](../../apps/flow/turbo.json) adds the repository documents read by [`apps/flow/scripts/bundle-knowledge.mjs`](../../apps/flow/scripts/bundle-knowledge.mjs) to `flow-app#build` inputs so remote cache and affected detection stay correct when docs change.
-- **CI remote cache** — [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) uses Vercel Remote Cache when the repository variable `TURBO_TEAM` is set (OIDC policy on the Vercel team). Vercel project builds use the platform Turborepo integration by default.
+- **Filtered install** — `pnpm install --frozen-lockfile --filter web...` installs the app and workspace dependencies.
+- **Skip unaffected builds** — `turbo query affected --tasks build --packages web --exit-code` in `ignoreCommand` when configured.
+- **CI remote cache** — [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) uses Vercel Remote Cache when `TURBO_TEAM` is set.
 
 ## 8. Quality and CI
 
@@ -180,7 +122,7 @@ Local gates:
 
 GitHub Actions: [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) and [`.github/workflows/security.yml`](../../.github/workflows/security.yml) run on pull requests and pushes to `main`. Pull request builds use `pull_request` and do not receive deployment or model secrets. [`.github/workflows/pr-title.yml`](../../.github/workflows/pr-title.yml) enforces Conventional Commits on PR titles. DeepSec stays manual in [`.github/workflows/deepsec.yml`](../../.github/workflows/deepsec.yml).
 
-GenUI unit tests and graded prompt matrix: `pnpm --filter @repo/genui test` (`packages/genui/src/eval/query-matrix.ts`, offline: `pnpm eval:genui:offline`). Flow Agent MCP protocol tests: `pnpm --filter flow-app test`. Browser fixture lab and shell smokes: `pnpm test:browser` (see [GenUI tests](specs/genui.md#tests)).
+GenUI unit tests and graded prompt matrix: `pnpm --filter @repo/genui test` (`packages/genui/src/eval/query-matrix.ts`, offline: `pnpm eval:genui:offline`). Product browser tests: `pnpm test:browser` (see [GenUI tests](specs/genui.md#tests)). Factory evaluation: `pnpm --dir .agents test` and `pnpm flow-eval:check`.
 
 ### Local Neon database
 

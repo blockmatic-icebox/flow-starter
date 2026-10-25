@@ -31,8 +31,8 @@ jobs:
 
       - name: Install verified scanners
         run: |
-          node scripts/setup-gitleaks.mjs
-          node scripts/setup-osv-scanner.mjs
+          node .agents/tooling/setup/setup-gitleaks.mjs
+          node .agents/tooling/setup/setup-osv-scanner.mjs
 
       - name: Run security checks
         run: pnpm security:check
