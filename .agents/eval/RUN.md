@@ -61,6 +61,8 @@ Scenario worktrees run the same **product adoption** transform as [`install.sh`]
 
 Runner-only trial metadata (arm, scenario id, Portless host, run id) is written under `.agents/eval/evidence/flow-evals/<runId>/trials/.../trial-meta.json`, not in the subject worktree. Remaining isolation limits: shared host skills/MCP, flow-arm skills symlink, inert `.agents/eval` stub package, fixture files, and same-machine worktrees (see [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md)).
 
+Runner-only trial metadata (arm, scenario id, Portless host, run id) is written under `.agents/eval/evidence/flow-evals/<runId>/trials/.../trial-meta.json`, not in the subject worktree. Remaining isolation limits: shared host skills/MCP, flow-arm skills symlink, inert `.agents/eval` stub package, fixture files, and same-machine worktrees (see [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md)).
+
 ## Event origins
 
 Every recorded event uses one of: `observed`, `agent-reported`, `evaluator-inference`, `missing`.

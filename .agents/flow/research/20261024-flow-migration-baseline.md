@@ -14,7 +14,7 @@ Captured before consolidating Flow under `.agents/flow/`. Live activation matrix
 | --- | --: |
 | `pnpm flow:check` | 0 |
 | `pnpm flow:test` | 0 |
-| `pnpm flow-eval:check` | 0 |
+| `pnpm --dir .agents flow-eval:check` | 0 |
 | `pnpm architecture:check` | 0 |
 | `pnpm --filter flow-app check-types` | 1 (pre-existing TS errors in `chat-tools.ts`, `deterministic-stream.ts`) |
 
