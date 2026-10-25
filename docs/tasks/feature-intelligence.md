@@ -1,6 +1,6 @@
 # Tasks: Feature Intelligence
 
-**Last reviewed:** 2026-10-25 (consistency + dependencies)  
+**Last reviewed:** 2026-10-25 (post-ship contract sync)  
 **Status:** Current (execution checklist; not a spec)
 
 **Role:** Agent/human **execution checklist** only — not product requirements.  
@@ -96,7 +96,7 @@ Spike:
 
 - [x] **T-4-1** — `eve/next` — depends T-2-3
 - [x] **T-4-2** — `/chat` + Anthropic — optional post-**G4** (cut first if behind); **∥** Wave 3 when time allows
-- [ ] **T-4-3** — README assessment — depends T-3-7, T-3-8 (core routes + metrics visible)
+- [x] **T-4-3** — README assessment — depends T-3-7, T-3-8 (core routes + metrics visible)
 - [x] **T-4-4** — `pnpm qa`
 - [x] **T-4-5** — Demo rehearsal walkthrough (web-only script; external recorder—no app integration) — depends T-3-9, T-4-4
 

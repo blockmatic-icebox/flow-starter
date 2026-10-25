@@ -4,7 +4,7 @@
 
 **Feature Intelligence** uses a **neutral, restrained, content-first** interface on the **[Meta CTO](https://www.metacto.com/) design system**—warm cloud surfaces, ink typography, orange primary actions, teal focus and secondary accents. Patterns keep **ChatGPT-inspired clarity** (obvious states, readable type) without implying a chat product. **FI workflows are structured screens**, not a single assistant thread.
 
-**Implemented today:** Factory starter homepage in `apps/web` (theme toggle, minimal copy). **Specified, not yet built:** routes below.
+**Implemented today:** Feature Intelligence under `apps/web/app/(fi)/` — persona home, discover, submit (`?context=external|internal`), detail, inline triage, insights, ask-only `/chat`. Meta CTO tokens via `@repo/ui`; `FiShell` nav with triage badge. Theme toggle on root layout (`d` hotkey).
 
 Product copy and labels should match [GLOSSARY.md](GLOSSARY.md) (e.g. **disposition**, **problem statement**, **intake link**).
 
@@ -66,8 +66,9 @@ Sticky header: brand + Browse · Submit · Triage (badge when queue &gt; 0) · I
 
 ### Deferred / cut-if-late
 
-- `/chat` (assessment MVP cut line)
 - Markdown export of briefs
+- Discover **theme filter** UI on `/requests` (badges only today)
+- External confirm **fully** stripped of PM copy when duplicates exist (thank-you path works; confirm step may still show problem statement / dupes — align with W-2e on next UX pass)
 
 ## Design system
 
@@ -106,7 +107,7 @@ Primitives under `packages/ui/src/components/`. FI routes should compose Button,
 
 ## Layout and responsive behavior
 
-Root layout: `ThemeProvider`, `NuqsAdapter`, Inter + Barlow + Geist Mono (`apps/web/app/layout.tsx`). Starter homepage remains `max-w-md` until FI nav ships; FI pages target `max-w-2xl`–full width for triage table as spec’d.
+Root layout: `ThemeProvider`, `NuqsAdapter`, Inter + Barlow + Geist Mono (`apps/web/app/layout.tsx`). FI routes use journey `max-w` targets (`max-w-xl` submit, `max-w-4xl` discover, wider triage list).
 
 ## Accessibility
 
@@ -116,17 +117,18 @@ Root layout: `ThemeProvider`, `NuqsAdapter`, Inter + Barlow + Geist Mono (`apps/
 
 ## Verification
 
-FI UI: **manual** checklist ([testing spec](docs/specs/feature-intelligence-testing.md))—no FI Playwright in MVP. Use agent-browser per [.agents/flow/operations/verification.md](.agents/flow/operations/verification.md) when routes exist.
+FI UI: **manual** W-* checklist ([testing spec](docs/specs/feature-intelligence-testing.md))—logged in [20261025-fi-browser-verification.md](docs/research/20261025-fi-browser-verification.md); starter Playwright smoke only (homepage). agent-browser per [.agents/flow/operations/verification.md](.agents/flow/operations/verification.md).
 
 ## Implementation references
 
-| Area                   | Location                                        |
-| ---------------------- | ----------------------------------------------- |
-| Tokens                 | `packages/ui/src/styles/globals.css`            |
-| Theme provider         | `packages/ui/src/components/theme-provider.tsx` |
-| App layout             | `apps/web/app/layout.tsx`                       |
-| Starter page (current) | `apps/web/app/page.tsx`                         |
-| FI routes (planned)    | `apps/web/app/` per route-first colocation      |
+| Area | Location |
+| --- | --- |
+| Tokens | `packages/ui/src/styles/globals.css` |
+| Theme provider | `packages/ui/src/components/theme-provider.tsx` |
+| App layout | `apps/web/app/layout.tsx` |
+| FI shell + routes | `apps/web/app/(fi)/` |
+| Ask-only chat API | `apps/web/app/api/chat/route.ts` |
+| Submit loading (W-9) | `apps/web/app/(fi)/requests/new/submit-form.tsx` (`aria-live`, stage labels) |
 
 ## Evolution
 

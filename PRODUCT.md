@@ -34,13 +34,15 @@ Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence
 
 | Area | Status |
 | --- | --- |
-| **Specification** | Complete — [tasks](docs/tasks/feature-intelligence.md) (execution) + [initiative](docs/initiatives/feature-intelligence.md) (scope) |
-| **Database** | Schema + migration in repo; **apply** at Build (Wave 0 — Neon Path A or B) |
-| **Domain (`@repo/fi`)** | Spike: metrics, T0/T1, partial harness, gateway helper, seed; **T2/T3 + CRUD** in tasks |
-| **eve (`agent/`)** | Spike: 3 tools + instructions; **remaining tools + evals** in tasks |
-| **Human UI (`apps/web`)** | Not started — Wave 3 tasks |
+| **Specification** | Complete — [tasks](docs/tasks/feature-intelligence.md) + [initiative](docs/initiatives/feature-intelligence.md) |
+| **Database** | **Live** with `DATABASE_URL` — migrate, seed (`pnpm seed:fi`), Wave 0 done |
+| **Domain (`@repo/fi`)** | **Live** — metrics, queue/CRUD, T0/T1 harness path; **T2 Jev + T3 synthesis** stubbed (`classify-decisions`, `synthesize-artifact`) but not wired into `runTriageHarness` without `AI_GATEWAY_API_KEY` |
+| **eve (`agent/`)** | **Live** — MVP tools, `evals/` smoke (AG-7), `pnpm exec eve eval smoke` |
+| **Human UI (`apps/web`)** | **Live** — `app/(fi)/` routes, server actions, ask-only `/chat`; [browser verification](docs/research/20261025-fi-browser-verification.md) |
 
-**Build order:** Waves 0→4 in [docs/tasks/feature-intelligence.md](docs/tasks/feature-intelligence.md).
+**Assessment gaps (honest):** [T-4-3](docs/tasks/feature-intelligence.md) submission README; external submit still shows duplicate UI when lexical matches exist (journeys W-2e simplified copy); discover **theme filter** not built on `/requests` yet.
+
+**Build checklist:** [docs/tasks/feature-intelligence.md](docs/tasks/feature-intelligence.md) — Waves 0–3 and most Wave 4 complete; harness T-1-5–7 remain open.
 
 ## Success metrics
 

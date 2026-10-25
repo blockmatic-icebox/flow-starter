@@ -57,7 +57,7 @@ apps/web (human UI, ask-only /api/chat)
 | `/requests/[id]` | Detail; sections vary by persona / `?view=pm` | All |
 | `/triage` | PM queue; inline expand disposition | PM (leader view-only) |
 | `/insights` | North-star metrics; leader hero vs PM queue CTA | Leader, PM |
-| `/chat` | **Ask-only** product Q&A (no tools, no mutations) | Any (deferred in build order) |
+| `/chat` | **Ask-only** product Q&A (no tools, no mutations) | Any — **implemented** (Anthropic key) |
 
 No authentication in this slice; **source** on submit replaces identity. Eve HTTP sessions use separate auth policy per [eve agent spec](./feature-intelligence-eve-agent.md).
 

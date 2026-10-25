@@ -11,7 +11,7 @@ Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundar
 
 ```text
                     ┌─────────────────┐
-                    │   apps/web      │  Human UI (planned)
+                    │   apps/web      │  FI UI + ask-only /api/chat
                     │  server actions │
                     └────────┬────────┘
                              │
@@ -34,9 +34,9 @@ Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundar
 
 | Path | Role | Implementation status |
 | --- | --- | --- |
-| `packages/fi` | Metrics (`computeInsights`), triage harness, `searchRequests`, `listTriageQueue`, `getInsights`, seed | **In progress** — harness partial (T1 + lexical; Jev/T3 next) |
-| `packages/db` | Drizzle schema; `fi-schema.ts`; migrations through `0002_feature_intelligence` | **Committed** — apply with `pnpm db:migrate` at Build (Wave 0) |
-| `agent/` | eve root agent; `instructions.md` + tools → `@repo/fi` | **Partial** — 3 tools live; AI UX turn contract in instructions |
+| `packages/fi` | Metrics, queue/CRUD, T0/T1 harness, seed; T2/T3 modules present, wired when gateway key set | **Live** — full Jev+synthesis path [T-1-5–7](docs/tasks/feature-intelligence.md) still open |
+| `packages/db` | Drizzle schema; `fi-schema.ts`; migrations through `0002_feature_intelligence` | **Live** — `pnpm db:migrate`, remote SSL in client |
+| `agent/` | eve root agent; `instructions.md` + 8 tools → `@repo/fi` | **Live** — smoke evals in `evals/` |
 | `apps/web` | Next.js + `eve/next`; FI routes under `app/(fi)/` | **Live** — browse, submit, triage, insights, `/chat` |
 | `evals/` | eve smoke (`pnpm exec eve eval smoke`) | **Live** — migrate + seed in `evals.config.ts` |
 
@@ -58,8 +58,8 @@ Canonical: [triage harness spec](docs/specs/feature-intelligence-triage-harness.
 
 - **T0:** Lexical duplicate retrieve (top 10)
 - **T1:** Deterministic theme when confidence ≥ 0.9
-- **T2:** Jev `experimental_decide` (planned in code)
-- **T3:** `generateObject` synthesis (planned)
+- **T2:** Jev `experimental_decide` — `classify-decisions.ts` (not yet composed in `runTriageHarness`)
+- **T3:** `generateObject` synthesis — `synthesize-artifact.ts` (same)
 
 Degraded path when `AI_GATEWAY_API_KEY` absent still sets `triage_completed_at` for metrics. Gateway helpers: `packages/fi/src/ai/gateway.ts`. Ask-only `/chat` uses **`ANTHROPIC_API_KEY`** (not gateway) — [ADR 0003](docs/adr/0003-feature-intelligence-model-providers.md).
 
@@ -107,9 +107,9 @@ ARCHITECTURE.md     # this file
 .agents/            # Flow Factory (not imported by product)
 ```
 
-## React / Next.js (when UI ships)
+## React / Next.js
 
-Route-first colocation under `apps/web/app/` — [Factory ADR 0009](.agents/flow/decisions/adr/0009-react-nextjs-fractal-architecture.md). Server Components by default; server actions delegate to `@repo/fi`.
+Route-first colocation under `apps/web/app/(fi)/` — [Factory ADR 0009](.agents/flow/decisions/adr/0009-react-nextjs-fractal-architecture.md). Server Components by default; server actions in `actions.ts` delegate to `@repo/fi`. Production build uses **`next build --webpack`** (Turbopack does not resolve `@repo/fi` `.js` import aliases).
 
 ## Quality gates
 
