@@ -519,9 +519,22 @@ export function validateSeparatedProductTasks(root) {
 }
 
 const INSTALL_SCRIPT_REL = ".agents/tooling/setup/install.sh";
+const PRODUCT_ADOPTION_REL = ".agents/tooling/setup/product-adoption.mjs";
+const PRODUCT_README_TEMPLATE_REL =
+  ".agents/tooling/setup/product-readme.template.md";
 
 function isFactoryCheckout(root) {
   return existsSync(path.join(root, INSTALL_SCRIPT_REL));
+}
+
+function validateFactoryEvalSubjectSetup(root) {
+  if (!isFactoryCheckout(root)) return [];
+  return [PRODUCT_ADOPTION_REL, PRODUCT_README_TEMPLATE_REL]
+    .filter((relative) => !existsSync(path.join(root, relative)))
+    .map(
+      (relative) =>
+        `missing Factory eval subject setup file: ${relative} (required by flow-eval worktrees)`
+    );
 }
 
 function isFullProductTree(root) {
@@ -1015,6 +1028,7 @@ export function validateFlowDocs(root = repositoryRoot) {
     ...validateDesignTokenParity(root),
     ...validateDesignImplementationRefs(root),
     ...validateAdoptedAgentsScripts(root),
+    ...validateFactoryEvalSubjectSetup(root),
     ...validateRepositoryOwnership(root),
     ...validateSeparatedProductTasks(root)
   );
