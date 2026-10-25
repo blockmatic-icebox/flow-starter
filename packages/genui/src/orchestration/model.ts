@@ -1,6 +1,6 @@
 import { generateText } from "ai";
 
-const DEFAULT_GENUI_MODEL = "anthropic/claude-sonnet-4";
+const DEFAULT_GENUI_MODEL = "anthropic/claude-sonnet-4.6";
 
 export const synthesizeOpenEndedAnswer = async ({
   query,

@@ -14,7 +14,7 @@ import {
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-const DEFAULT_MODEL = "anthropic/claude-sonnet-4";
+const DEFAULT_MODEL = "anthropic/claude-sonnet-4.6";
 const CHAT_MAX_BODY_BYTES = 128 * 1024;
 const MAX_OUTPUT_TOKENS = 800;
 

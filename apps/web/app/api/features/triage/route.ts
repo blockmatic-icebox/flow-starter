@@ -1,4 +1,4 @@
-import { generateObject } from "ai";
+import { asSchema, generateText, Output } from "ai";
 import { z } from "zod";
 
 import { getRequest, listRequests } from "@/app/_lib/features/repository";
@@ -14,6 +14,7 @@ const triageSchema = z.object({
   suggestedTheme: z.string().min(2).max(80),
 });
 
+const DEFAULT_MODEL = "anthropic/claude-sonnet-4.6";
 const publicFailure = "Triage could not be completed.";
 
 export const handleTriagePost = async ({
@@ -49,7 +50,7 @@ export const handleTriagePost = async ({
   const model =
     env.FEATURE_TRIAGE_MODEL?.trim() ||
     env.GENUI_MODEL?.trim() ||
-    "anthropic/claude-sonnet-4";
+    DEFAULT_MODEL;
 
   const catalogSummary = catalog
     .filter((item) => item.id !== id)
@@ -60,8 +61,9 @@ export const handleTriagePost = async ({
     .join("\n");
 
   try {
-    const result = await generateObject({
+    const result = await generateText({
       model,
+      output: Output.object({ schema: asSchema(triageSchema) }),
       prompt: `You triage product feature requests for prioritization.
 Request:
 Title: ${feature.title}
@@ -72,12 +74,14 @@ Existing catalog (id, title, theme, support):
 ${catalogSummary || "(empty)"}
 
 Return JSON with suggestedTheme (short slug), priority, relatedIds from the catalog (may be empty), and a concise rationale for a human reviewer.`,
-      schema: triageSchema,
     });
+
+    if (!result.output)
+      return Response.json({ message: publicFailure }, { status: 500 });
 
     return Response.json({
       ok: true,
-      triage: { ...result.object, mode: "ai" as const },
+      triage: { ...result.output, mode: "ai" as const },
     });
   } catch {
     return Response.json({ message: publicFailure }, { status: 500 });

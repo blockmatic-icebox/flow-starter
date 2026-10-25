@@ -243,4 +243,26 @@ describe("chat route", () => {
     });
     assert.equal(response.status, 429);
   });
+
+  it("streams a live model response when AI_GATEWAY_API_KEY is set", async (t) => {
+    const apiKey = process.env.AI_GATEWAY_API_KEY?.trim();
+    if (!apiKey) {
+      t.skip("AI_GATEWAY_API_KEY not set");
+      return;
+    }
+
+    const response = await handleChatPost({
+      env: { ...env, AI_GATEWAY_API_KEY: apiKey },
+      request: chatRequest({
+        body: JSON.stringify({
+          id: "chat-live-1",
+          messages: [userMessage("Reply with exactly: LIVE_OK")],
+          trigger: "submit-message",
+        }),
+      }),
+    });
+    assert.equal(response.status, 200);
+    const body = await response.text();
+    assert.ok(body.length > 10);
+  });
 });
