@@ -98,6 +98,11 @@ export const stagedChecks = (paths) => {
   );
   if (touchesWebApp)
     checks.push({ args: ["--filter", "web", "check-types"], cmd: "pnpm" });
+  const touchesFlowApp = paths.some(
+    (file) => file.startsWith("apps/flow/app/") && codePattern.test(file)
+  );
+  if (touchesFlowApp)
+    checks.push({ args: ["--filter", "flow-app", "check-types"], cmd: "pnpm" });
   if (codeForOxfmt.length > 0)
     checks.push({
       args: ["exec", "oxfmt", "--check", ...codeForOxfmt],

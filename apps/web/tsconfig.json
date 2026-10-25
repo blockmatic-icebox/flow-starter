@@ -1,7 +1,6 @@
 {
   "extends": "@repo/ts/nextjs.json",
   "compilerOptions": {
-    "lib": ["es2023", "DOM", "DOM.Iterable"],
     "paths": {
       "@/*": ["./*"]
     },
