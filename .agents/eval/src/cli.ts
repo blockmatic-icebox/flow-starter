@@ -18,6 +18,7 @@ import {
 } from "./host-session.ts";
 import { runBatch } from "./orchestrate.ts";
 import { devEvalsRoot, baselineRunId } from "./paths.ts";
+import { freezePilot } from "./pilot-freeze.ts";
 import { verifyBaselinePreserved } from "./preserve.ts";
 import {
   runMutationIntegrity,
@@ -36,6 +37,7 @@ const usage = () => {
 
 Usage:
   pnpm --filter @repo/flow-eval eval preserve
+  pnpm --filter @repo/flow-eval eval freeze-pilot [--seed s09-s13-pilot-2026-10-25]
   pnpm --filter @repo/flow-eval eval grade --run <runId> --scenario <id>
   pnpm --filter @repo/flow-eval eval prepare [--arm flow] [--suite | --scenarios S01,S13] [--run-id <id>] [--repetition N]
   pnpm --filter @repo/flow-eval eval briefs --run <runId>
@@ -773,6 +775,13 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
           : scenarioList(flags.scenarios as string | undefined, "S01,S13"),
       }),
     preserve: () => cmdPreserve(),
+    "freeze-pilot": () => {
+      const result = freezePilot({
+        seed: flags.seed ? String(flags.seed) : undefined,
+      });
+      console.log(JSON.stringify(result, null, 2));
+      if (!result.isolation.officialComparisonAllowed) process.exit(2);
+    },
     record: () => {
       if (
         !flags.run ||

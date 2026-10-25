@@ -19,13 +19,29 @@ const productAdoptionScript = path.join(
   ".agents/tooling/setup/product-adoption.mjs"
 );
 
-export const evalProductName = ({
+export const neutralWorkspaceSlug = ({
   repetition = 1,
+  runId,
   scenarioId,
 }: {
   repetition?: number;
+  runId: string;
   scenarioId: string;
-}) => `Eval ${scenarioId} r${repetition}`;
+}) =>
+  createHash("sha256")
+    .update(`${runId}:${scenarioId}:${repetition}`)
+    .digest("hex")
+    .slice(0, 12);
+
+export const evalProductName = ({
+  repetition = 1,
+  runId,
+  scenarioId,
+}: {
+  repetition?: number;
+  runId: string;
+  scenarioId: string;
+}) => `product-${neutralWorkspaceSlug({ repetition, runId, scenarioId })}`;
 
 export const applyProductAdoptionToWorktree = ({
   projectName,
@@ -153,7 +169,7 @@ export const setupWorktree = ({
   skipInstall?: boolean;
   repetition?: number;
 }) => {
-  const worktreeName = `eval-${runId}-${scenarioId}-r${repetition}`;
+  const worktreeName = `ws-${neutralWorkspaceSlug({ repetition, runId, scenarioId })}`;
   const worktreePath = path.join(worktreeRoot, worktreeName);
   mkdirSync(worktreeRoot, { recursive: true });
 
@@ -171,7 +187,7 @@ export const setupWorktree = ({
   applyArmMutations({ arm, worktreePath });
 
   const adoption = applyProductAdoptionToWorktree({
-    projectName: evalProductName({ repetition, scenarioId }),
+    projectName: evalProductName({ repetition, runId, scenarioId }),
     worktreePath,
   });
 
@@ -183,7 +199,7 @@ export const setupWorktree = ({
         baselineSha: flowSha,
         portlessHost: adoption.host,
         portlessName: adoption.slug,
-        productName: evalProductName({ repetition, scenarioId }),
+        productName: evalProductName({ repetition, runId, scenarioId }),
         runId,
         scenarioId,
       },

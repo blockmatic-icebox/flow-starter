@@ -123,7 +123,7 @@ describe("adversarial evaluator integrity", () => {
         runId: "adv-pos",
         worktreePath: dir,
       });
-      assert.equal(readiness.releaseVerdict, "READY");
+      assert.notEqual(readiness.releaseVerdict, "READY");
     } finally {
       rmSync(dir, { force: true, recursive: true });
     }

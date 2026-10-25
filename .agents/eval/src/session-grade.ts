@@ -19,8 +19,10 @@ export const gradeObservedScenario = ({
   events,
   harness,
   hidden,
+  isolationBlockers,
   official,
   oracle,
+  protocol,
   protocolVerified,
   repetition,
   scenarioId,
@@ -32,8 +34,10 @@ export const gradeObservedScenario = ({
   events: EvalEvent[];
   harness: HarnessKind;
   hidden?: HiddenScenarioSpec;
+  isolationBlockers?: string[];
   official: boolean;
   oracle?: ScenarioOracle;
+  protocol?: string;
   protocolVerified: boolean;
   repetition?: number;
   scenarioId: string;
@@ -67,8 +71,10 @@ export const gradeObservedScenario = ({
       events,
       harness,
       hidden,
+      isolationBlockers,
       oracle,
       productOutcomePassed,
+      protocol,
       protocolVerified,
       scenarioId,
     },

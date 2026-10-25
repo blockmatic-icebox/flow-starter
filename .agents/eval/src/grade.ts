@@ -5,6 +5,8 @@ import {
   testCommandObserved,
 } from "./evidence.ts";
 import { runDeterministicGates } from "./gates.ts";
+import { SUBJECT_EVALUATOR_PROTOCOL_ID } from "./isolation.ts";
+import { deriveScenarioOutcomes } from "./outcomes.ts";
 import { dimensionWeights, subjectiveDimensions } from "./rubric.ts";
 import type {
   DimensionId,
@@ -113,12 +115,13 @@ const deterministicScores = ({
     commands: input.commands,
     passing: true,
   });
-  const requiredDiffOk =
-    !input.oracle?.requiredDiffPatterns?.length ||
-    matchesAnyPattern({
-      patterns: input.oracle.requiredDiffPatterns,
-      text: input.diff,
-    });
+  const requiredDiffOk = input.oracle?.productOutcomeCheck
+    ? input.productOutcomePassed === true
+    : !input.oracle?.requiredDiffPatterns?.length ||
+      matchesAnyPattern({
+        patterns: input.oracle.requiredDiffPatterns,
+        text: input.diff,
+      });
   const forbiddenDiff =
     input.oracle?.forbiddenDiffPatterns?.length &&
     matchesAnyPattern({
@@ -187,6 +190,8 @@ const computeOfficialEligible = ({
   confidence,
   completeness,
   harness,
+  isolationBlockers = [],
+  protocol,
   protocolVerified,
   scores,
 }: {
@@ -194,6 +199,8 @@ const computeOfficialEligible = ({
   confidence: GradeResult["confidence"];
   completeness: ScenarioGradeInput["completeness"];
   harness: ScenarioGradeInput["harness"];
+  isolationBlockers?: string[];
+  protocol?: string;
   protocolVerified: boolean;
   scores: DimensionScore[];
 }) => {
@@ -201,6 +208,8 @@ const computeOfficialEligible = ({
   if (gateIds.length) blockers.push("critical-gate-failure");
   if (harness === "diagnostic-unofficial") blockers.push("unofficial-harness");
   if (!protocolVerified) blockers.push("unverified-protocol");
+  if (protocol === SUBJECT_EVALUATOR_PROTOCOL_ID)
+    blockers.push(...isolationBlockers);
   if (completeness !== "complete") blockers.push("incomplete-telemetry");
   if (confidence === "low") blockers.push("low-confidence");
   const requiredUnverified = scores.filter(
@@ -241,11 +250,25 @@ export const gradeScenario = ({
     confidence,
     gateIds,
     harness: input.harness,
+    isolationBlockers: input.isolationBlockers,
+    protocol: input.protocol,
     protocolVerified: input.protocolVerified,
     scores,
   });
-  const quality =
-    eligible && gate === "pass" ? qualityFromScores({ scores }) : null;
+  const isV2 = input.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID;
+  const quality = isV2
+    ? null
+    : eligible && gate === "pass"
+      ? qualityFromScores({ scores })
+      : null;
+  const outcomes = isV2
+    ? deriveScenarioOutcomes({
+        completeness: input.completeness,
+        gateIds,
+        productOutcomePassed: input.productOutcomePassed,
+        scenarioId: input.scenarioId,
+      })
+    : undefined;
 
   return {
     blockers,
@@ -255,6 +278,7 @@ export const gradeScenario = ({
     gate,
     gateIds,
     officialEligible: eligible,
+    outcomes,
     quality,
     scenarioId: input.scenarioId,
     scores,

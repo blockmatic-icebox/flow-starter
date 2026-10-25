@@ -63,7 +63,7 @@ describe("host-session eval harness", () => {
     assert.match(next.packet?.prompt ?? "", /./u);
   });
 
-  it("finalize marks complete host-session transcript official", () => {
+  it("finalize grades v2 host-session as not official-eligible", () => {
     const runId = `test-finalize-${Date.now()}`;
     prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
     const turn = hostSessionNext({ runId });
@@ -73,7 +73,7 @@ describe("host-session eval harness", () => {
       {
         id: "a1",
         kind: "assistant",
-        origin: "observed",
+        origin: "agent-reported",
         scenarioId: "S01",
         seq: 2,
         text: "I will explore requirements before any build.",
@@ -97,7 +97,7 @@ describe("host-session eval harness", () => {
           {
             id: `a-${n.packet.turn}`,
             kind: "assistant",
-            origin: "observed",
+            origin: "agent-reported",
             scenarioId: "S01",
             seq: n.packet.turn * 2,
             text: "Continuing exploration without unauthorized build.",
@@ -116,7 +116,9 @@ describe("host-session eval harness", () => {
     if (!finalized.ok) return;
     assert.equal(finalized.manifest.harness, "host-session");
     assert.ok(finalized.grades.length >= 1);
-    assert.equal(finalized.grades[0]?.officialEligible, true);
+    assert.equal(finalized.manifest.protocol, "subject-evaluator-v2");
+    assert.equal(finalized.grades[0]?.officialEligible, false);
+    assert.equal(finalized.grades[0]?.quality, null);
   });
 
   it("cli and repair sources do not pin model or composer-2.5", () => {

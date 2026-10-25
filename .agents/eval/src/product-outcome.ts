@@ -11,13 +11,20 @@ import { pathToFileURL } from "node:url";
 const root = process.env.FLOW_EVAL_WORKTREE;
 const mod = await import(pathToFileURL(\`\${root}/packages/genui/src/listings-sort.ts\`).href);
 const { sortListingsByPriceAsc } = mod;
-const input = [3, 1, 2, 2, -1, 0];
-const snapshot = JSON.stringify(input);
-const out = sortListingsByPriceAsc(input);
-if (JSON.stringify(input) !== snapshot) throw new Error("mutated input");
-const expected = [-1, 0, 1, 2, 2, 3];
-if (JSON.stringify(out) !== JSON.stringify(expected))
-  throw new Error(\`wrong order: \${JSON.stringify(out)}\`);
+const cases = [
+  { input: [], expected: [] },
+  { input: [3, 1, 2], expected: [1, 2, 3] },
+  { input: [2, 2, -1, 0], expected: [-1, 0, 2, 2] },
+  { input: [1, 2, 3], expected: [1, 2, 3] },
+  { input: [0], expected: [0] },
+];
+for (const { input, expected } of cases) {
+  const snapshot = JSON.stringify(input);
+  const out = sortListingsByPriceAsc(input);
+  if (JSON.stringify(input) !== snapshot) throw new Error("mutated input");
+  if (JSON.stringify(out) !== JSON.stringify(expected))
+    throw new Error(\`wrong order for \${JSON.stringify(input)}: \${JSON.stringify(out)}\`);
+}
 `;
 
 export const runProductOutcomeCheck = ({
@@ -43,9 +50,9 @@ export const runProductOutcomeCheck = ({
     {
       cwd: repoRoot,
       encoding: "utf-8",
+      env: { ...process.env, FLOW_EVAL_WORKTREE: worktreePath },
       stdio: "pipe",
       timeout: 30_000,
-      env: { ...process.env, FLOW_EVAL_WORKTREE: worktreePath },
     }
   );
 

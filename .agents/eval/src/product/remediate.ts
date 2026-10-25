@@ -68,14 +68,23 @@ export const runRemediationLoop = ({
     const blocking = findings.some(
       (f) => f.severity === "P0" || f.severity === "P1"
     );
-    if (readiness.releaseVerdict === "READY" || !blocking)
+    if (readiness.releaseVerdict === "READY")
       return {
         cyclesApplied: remediation.length,
         findings,
-        ok: readiness.releaseVerdict === "READY",
+        ok: true,
         readiness,
         remediation,
         stopReason: "ready",
+      };
+    if (!blocking)
+      return {
+        cyclesApplied: remediation.length,
+        findings,
+        ok: false,
+        readiness,
+        remediation,
+        stopReason: "insufficient-evidence",
       };
     if (cycle >= maxRemediationCycles)
       return {

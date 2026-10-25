@@ -6,7 +6,9 @@ disable-model-invocation: true
 
 # Flow evaluation
 
-The parent session is the coordinator. Subagents are the agents under test. They run the suite and report back. The parent grades, reports issues, and proposes a fix plan. Do not apply that plan in the same turn.
+The parent session is the **runner**. Subjects receive neutral task prompts only (protocol `subject-evaluator-v2`). The runner operates `eval prepare` / `next` / `record` / `finalize`. Subjects do not run eval CLI commands or propose methodology fixes.
+
+Official flow-vs-control comparison is **blocked** until isolation and runner-captured evidence are supported; treat host-session output as diagnostic. See [ADR 0015](../../flow/decisions/adr/0015-evaluation-subject-separation.md).
 
 Do not spawn the Cursor CLI `agent` command or pass a model.
 
@@ -16,7 +18,7 @@ No arguments means the full public suite, arm `flow`.
 
 | Argument | Meaning |
 | --- | --- |
-| `preserve`, `grade`, `compare`, `readiness`, `stress`, `mutations`, `benchmark` | Deterministic CLI only (see [RUN.md](../../eval/RUN.md)) |
+| `preserve`, `grade`, `compare`, `readiness`, `stress`, `mutations`, `benchmark`, `freeze-pilot` | Deterministic CLI only (see [RUN.md](../../eval/RUN.md)) |
 | `--scenarios S01,S02` | Limit the suite |
 | `--arm flow` \| `flow-without-skills` \| `control` | Worktree arm |
 
@@ -31,36 +33,29 @@ pnpm --filter @repo/flow-eval eval prepare --suite --arm flow
 
 Use `--scenarios` instead of `--suite` when the user named a subset. Capture `runId`.
 
-3. Print worker briefs:
+3. For each session, the runner drives turns:
 
 ```bash
-pnpm --filter @repo/flow-eval eval briefs --run <runId>
+pnpm --filter @repo/flow-eval eval next --run <runId> --scenario <id> --repetition <n>
+# deliver packet.prompt to the subject in the worktree only
+# subject assistant text → eval record (agent-reported origins only)
+pnpm --filter @repo/flow-eval eval record --run <runId> --scenario <id> --turn <n> --repetition <n> --events-file <path>
 ```
 
-4. Launch **one subagent per brief**, in parallel.
-   - Cursor: Task tool, `subagent_type` `generalPurpose`. Omit `model`.
-   - Claude Code: Agent tool, generic agent. Omit model.
-   - Do not use `builder`, `researcher`, or `verifier`.
-   - Prompt is the brief `prompt` unchanged.
-   - The parent does not answer stakeholder turns.
-
-5. When every subagent has reported, finalize:
+4. When every session is complete, finalize:
 
 ```bash
 pnpm --filter @repo/flow-eval eval finalize --run <runId>
 ```
 
-6. In the parent session, report before any quality percentage:
-   - **gate**, **official eligible**, **confidence**, blockers, missing telemetry
-   - issues gathered from subagent reports and grades
-   - a fix plan
+5. In the parent session, report **gate**, **official eligible** (expect blockers under v2 diagnostic runs), **outcomes**, evidence completeness, and limitations. Do not claim methodology improvement from a single run.
 
-7. Stop. Discuss the plan in the parent session. Implement only after the user agrees.
+6. Stop. Discuss findings in the parent session. Implement methodology changes only after explicit user authorization.
 
 ## Deterministic-only modes
 
-Run the CLI directly for `preserve`, `grade`, `compare`, `readiness`, `stress`, `mutations`, `benchmark`, and `run --dry-run` (see [RUN.md](../../eval/RUN.md)).
+Run the CLI directly for `preserve`, `freeze-pilot`, `grade`, `compare`, `readiness`, `stress`, `mutations`, `benchmark`, and `run --dry-run` (see [RUN.md](../../eval/RUN.md)).
 
 ## Completion
 
-The suite is complete when every subagent has reported, `finalize` has run, and the parent has posted issues and a fix plan without applying it.
+The suite is complete when every subject session has finished, `finalize` has run, and the parent has reported outcomes and limitations without treating diagnostic runs as official proof.

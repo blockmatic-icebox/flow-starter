@@ -2,6 +2,7 @@
   "scenarioId": "S09",
   "expectsTools": false,
   "expectsCommands": false,
+  "conflictHandlingCheck": true,
   "decisionForbiddenPatterns": ["mongodb", "mongoose", "packages/db/.*mongo"],
   "forbiddenDiffPatterns": ["^diff --git a/packages/db/"],
   "allowsProductCode": false

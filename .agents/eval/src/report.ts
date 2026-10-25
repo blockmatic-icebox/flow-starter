@@ -26,8 +26,21 @@ export const writeScenarioReport = ({
 
   const qualityLine =
     grade.quality === null
-      ? "withheld (not official-eligible or gate failure)"
-      : `${grade.quality} (partial: excludes na/unverified dimensions)`;
+      ? "not emitted (protocol v2 uses per-outcome fields)"
+      : `${grade.quality} (legacy renormalized score)`;
+
+  const outcomeLines = grade.outcomes
+    ? [
+        `Task outcome: ${grade.outcomes.taskOutcome}`,
+        `Verification claim: ${grade.outcomes.verificationClaim}`,
+        grade.outcomes.conflictHandling
+          ? `Conflict handling: ${grade.outcomes.conflictHandling}`
+          : null,
+        `Evidence completeness: ${grade.outcomes.evidenceCompleteness}`,
+      ]
+        .filter(Boolean)
+        .join("\n")
+    : "";
 
   const criterionLines = grade.scores.map((s) => {
     const status =
@@ -49,7 +62,7 @@ Official eligible: **${grade.officialEligible ? "yes" : "no"}**
 
 Quality: ${qualityLine}
 
-Confidence: ${grade.confidence}
+${outcomeLines ? `${outcomeLines}\n\n` : ""}Confidence: ${grade.confidence}
 
 Completeness: ${grade.completeness}
 
@@ -100,13 +113,13 @@ export const writeRunSummary = ({
     `Protocol: ${manifest.protocol}`,
     `Completeness: ${manifest.completeness}`,
     "",
-    "| Scenario | Gate | Official | Quality | Confidence |",
-    "| --- | --- | --- | ---: | --- |",
+    "| Scenario | Gate | Official | Task | Verification | Confidence |",
+    "| --- | --- | --- | --- | --- | --- |",
   ];
 
   for (const g of grades)
     lines.push(
-      `| ${g.scenarioId} | ${g.gate} | ${g.officialEligible ? "yes" : "no"} | ${g.quality ?? "—"} | ${g.confidence} |`
+      `| ${g.scenarioId} | ${g.gate} | ${g.officialEligible ? "yes" : "no"} | ${g.outcomes?.taskOutcome ?? "—"} | ${g.outcomes?.verificationClaim ?? "—"} | ${g.confidence} |`
     );
 
   const failCount = grades.filter((g) => g.gate === "fail").length;

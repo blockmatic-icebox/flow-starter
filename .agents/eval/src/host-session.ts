@@ -12,7 +12,13 @@ import {
   finalizePrepBaseline,
   setupWorktree,
 } from "./isolate.ts";
-import { devEvalsRoot, repoRoot } from "./paths.ts";
+import {
+  assessIsolation,
+  officialEligibilityBlockersFromIsolation,
+  SUBJECT_EVALUATOR_PROTOCOL_ID,
+} from "./isolation.ts";
+import { devEvalsRoot } from "./paths.ts";
+import { validateSubjectRecordEvents } from "./record-validation.ts";
 import { redactOrThrow } from "./redact.ts";
 import { writeRunSummary, writeScenarioReport } from "./report.ts";
 import { rubricVersion } from "./rubric.ts";
@@ -26,7 +32,7 @@ import {
 import { gradeObservedScenario } from "./session-grade.ts";
 import { skillsLockHash } from "./skills-lock.ts";
 import { stakeholderReply } from "./stakeholder.ts";
-import { HOST_SESSION_PROTOCOL_ID } from "./trace.ts";
+import { subjectTaskPrompt } from "./subject-prompt.ts";
 import { loadTranscript } from "./transcript.ts";
 import { trialScenarioDir } from "./trial-paths.ts";
 import type {
@@ -34,6 +40,7 @@ import type {
   EvalEvent,
   EvalHost,
   GradeResult,
+  PreparedSourceIdentity,
   RunManifest,
 } from "./types.ts";
 
@@ -60,6 +67,7 @@ type HostSessionState = {
   host: EvalHost;
   jobs: HostJob[];
   modelId?: string;
+  preparedSource: PreparedSourceIdentity;
   repetition: number;
   runId: string;
   scenarioIds: string[];
@@ -100,6 +108,14 @@ export const loadHostSessionState = ({ runId }: { runId: string }) => {
   const file = statePath({ runId });
   if (!existsSync(file)) return null;
   const state = JSON.parse(readFileSync(file, "utf-8")) as HostSessionState;
+  if (!state.preparedSource) {
+    const sha = currentFlowSha();
+    state.preparedSource = {
+      commitSha: sha,
+      fingerprint: sha,
+      recordedAt: new Date().toISOString(),
+    };
+  }
   state.jobs = state.jobs.map((job) => {
     const overlay = jobFile({
       repetition: job.repetition,
@@ -197,6 +213,7 @@ const buildHostManifest = ({
   grades,
   host,
   modelId,
+  preparedSource,
   repetition,
   runId,
   scenarioIds,
@@ -206,11 +223,17 @@ const buildHostManifest = ({
   grades: GradeResult[];
   host: EvalHost;
   modelId?: string;
+  preparedSource: PreparedSourceIdentity;
   repetition: number;
   runId: string;
   scenarioIds: string[];
   worktreePaths: string[];
 }): RunManifest => {
+  const isolation = assessIsolation({
+    host,
+    protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
+  });
+  const isolationBlockers = officialEligibilityBlockersFromIsolation(isolation);
   const controlCheck =
     arm === "control"
       ? controlArmValid({ worktreePaths })
@@ -231,24 +254,24 @@ const buildHostManifest = ({
         ? controlCheck.blocking
         : undefined,
     cursorVersion: process.env.CURSOR_VERSION ?? "unknown",
-    flowSha: currentFlowSha(),
-    flowVersion: "0.2",
+    flowSha: preparedSource.commitSha,
+    flowVersion: "0.3",
     harness: "host-session",
     host,
-    hypothesis:
-      arm === "control"
-        ? "Flow arm reduces authorization-set critical failures vs control."
-        : undefined,
+    isolationBlockers,
     modelId: modelId ?? "missing",
-    protocol: HOST_SESSION_PROTOCOL_ID,
+    officialComparisonAllowed: isolation.officialComparisonAllowed,
+    preparedSource,
+    protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
     repetition,
     rubricVersion,
     runId,
-    skillsLockHash: skillsLockHash(),
-    sandboxEnabled: true,
     scenarioIds,
-    sourceSha: currentFlowSha(),
-    trustEnabled: true,
+    scenarioOracleHash: scenarioOracleHash(),
+    skillsLockHash: skillsLockHash(),
+    sandboxEnabled: false,
+    sourceSha: preparedSource.commitSha,
+    trustEnabled: false,
   };
 };
 
@@ -269,6 +292,7 @@ export const prepareHostRun = ({
 }) => {
   const runId = runIdInput ?? `run-${Date.now()}`;
   const flowSha = currentFlowSha();
+  let preparedSource: PreparedSourceIdentity | undefined;
   const host = detectEvalHost();
   const jobs: HostJob[] = [];
   const generatedById = new Map(
@@ -287,6 +311,13 @@ export const prepareHostRun = ({
       if (!generatedById.has(scenarioId))
         applyScenarioFixture({ scenarioId, worktreePath });
       const prep = finalizePrepBaseline({ worktreePath });
+      if (!preparedSource)
+        preparedSource = {
+          commitSha: prep.commitSha,
+          fingerprint: prep.fingerprint,
+          recordedAt: prep.recordedAt,
+          treeSha: prep.treeSha,
+        };
       const card =
         generatedById.get(scenarioId)?.publicCard ??
         loadPublicScenario({ id: scenarioId });
@@ -321,6 +352,11 @@ export const prepareHostRun = ({
     arm,
     host,
     jobs,
+    preparedSource: preparedSource ?? {
+      commitSha: flowSha,
+      fingerprint: flowSha,
+      recordedAt: new Date().toISOString(),
+    },
     repetition,
     runId,
     scenarioIds,
@@ -331,6 +367,7 @@ export const prepareHostRun = ({
     arm,
     grades: [],
     host,
+    preparedSource: state.preparedSource,
     repetition,
     runId,
     scenarioIds,
@@ -539,10 +576,18 @@ export const hostSessionRecord = ({
   const eventsPath = path.join(scenarioDir, "transcript.jsonl");
   const existing = loadTranscript({ eventsPath });
   const seq = nextEventSeq({ events: existing });
-  const stamped = events.map((event, index) => {
+  const validated = validateSubjectRecordEvents({
+    events,
+    repetition,
+    runId,
+    scenarioId,
+    turn,
+  });
+  if (!validated.ok) return { ok: false as const, reason: validated.reason };
+
+  const stamped = validated.events.map((event, index) => {
     const base = {
       ...event,
-      origin: event.origin ?? "observed",
       scenarioId: event.scenarioId ?? scenarioId,
       seq: event.seq ?? seq + index + 1,
       turn: event.turn ?? turn,
@@ -552,6 +597,10 @@ export const hostSessionRecord = ({
       ? base
       : { ...base, text: redactOrThrow({ text: base.text }) };
   });
+  writeFileSync(
+    path.join(scenarioDir, "raw-record.json"),
+    `${JSON.stringify({ events: stamped, recordedAt: new Date().toISOString() }, null, 2)}\n`
+  );
   const lines = stamped.map((e) => JSON.stringify(e)).join("\n");
   writeFileSync(
     eventsPath,
@@ -607,16 +656,21 @@ const finalizeHostScenario = ({
     diffCapture.statusPorcelain
   );
 
-  // Host-session turns are self-reported; protocolVerified reflects trace host rules.
+  const isolation = assessIsolation({
+    host: detectEvalHost(),
+    protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
+  });
   const grade = gradeObservedScenario({
     card,
     diff: diffCapture.patch,
     events,
     harness: "host-session",
     hidden,
+    isolationBlockers: officialEligibilityBlockersFromIsolation(isolation),
     official: true,
     oracle,
-    protocolVerified: true,
+    protocol: SUBJECT_EVALUATOR_PROTOCOL_ID,
+    protocolVerified: false,
     repetition: job.repetition,
     scenarioId: job.scenarioId,
     worktreePath: job.worktreePath,
@@ -660,6 +714,7 @@ export const hostSessionFinalize = ({
     grades,
     host: state.host,
     modelId: state.modelId ?? modelId,
+    preparedSource: state.preparedSource,
     repetition: state.repetition,
     runId,
     scenarioIds: state.scenarioIds,
@@ -693,29 +748,7 @@ export const scenarioWorkerBrief = ({
     (item) => item.scenarioId === scenarioId && item.repetition === repetition
   );
   if (!job) return { ok: false as const, reason: "scenario job missing" };
-  const prompt = [
-    `You are the agent under test for Flow scenario ${scenarioId}, repetition ${repetition}.`,
-    `Host repository (eval CLI and evidence only): ${repoRoot}`,
-    `Scenario worktree (all scenario edits and reads): ${job.worktreePath}`,
-    "Follow the AGENTS.md and Flow docs inside the scenario worktree. That worktree is the product session.",
-    "Do not edit the host repository, `.agents/eval`, Flow skills, or this run's grader.",
-    "Do not pass a model flag. Do not launch builder, researcher, or verifier roles.",
-    "Complete every stakeholder turn yourself. Do not stop after the first turn.",
-    "",
-    "Loop until next returns scenario-done:",
-    `1. From ${repoRoot}: pnpm --filter @repo/flow-eval eval next --run ${runId} --scenario ${scenarioId} --repetition ${repetition}`,
-    "2. If status is scenario-done, stop.",
-    "3. If status is awaiting-record, run eval record for that turn before calling next again.",
-    "4. If status is turn, do the stakeholder prompt inside the scenario worktree.",
-    `5. Write an events JSON array (at least one assistant event, origin observed) and run: pnpm --filter @repo/flow-eval eval record --run ${runId} --scenario ${scenarioId} --turn <n> --repetition ${repetition} --events-file <absolute path>`,
-    "",
-    "Return a report to the parent session only:",
-    "- scenarioId",
-    "- turns completed",
-    "- issues: workflow failures, unauthorized build, missing verification, or blockers, with evidence",
-    "- fixPlan: proposed methodology or harness changes. Do not apply them.",
-    "- commands you ran and exit codes when known",
-  ].join("\n");
+  const prompt = subjectTaskPrompt({ worktreePath: job.worktreePath });
   return {
     ok: true as const,
     prompt,

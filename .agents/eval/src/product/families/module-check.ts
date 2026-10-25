@@ -76,17 +76,17 @@ export const runFamilyModuleCheck = ({
 
   if (engineeringOnly)
     return {
-      actual: "contract module present",
+      actual: "contract module present (presence only)",
       caseId,
       environment: "local",
       evaluatedSha,
       evidenceRef: `${runId}/evidence/commands.json#${caseId}`,
-      executionMethod: `contract:${family}`,
+      executionMethod: `contract-presence:${family}`,
       exitCode: 0,
-      expected: "contract module present",
+      expected: "independent engineering validation",
       origin: "live",
       requirementId: `${family}-ENG`,
-      status: "passed",
+      status: "unverified",
     };
 
   const result = runContractScript({ modulePath, worktreePath });

@@ -3,6 +3,10 @@ import path from "node:path";
 
 import type { ExperimentManifest } from "./generation/types.ts";
 import { acceptedControlResiduals, listControlResiduals } from "./isolate.ts";
+import {
+  isHistoricalBaselineRun,
+  SUBJECT_EVALUATOR_PROTOCOL_ID,
+} from "./isolation.ts";
 import type { GradeResult, RunManifest } from "./types.ts";
 
 type RunScores = { grades: GradeResult[] };
@@ -28,6 +32,82 @@ export type RegressionVerdict =
 const observedModel = (id?: string) =>
   id && id !== "missing" ? id : undefined;
 
+const appendSourceShaCompatibility = ({
+  baseline,
+  current,
+  remediationMode,
+  issues,
+  notes,
+}: {
+  baseline: RunManifest;
+  current: RunManifest;
+  remediationMode: boolean;
+  issues: string[];
+  notes: string[];
+}) => {
+  if (baseline.sourceSha === current.sourceSha) return;
+  if (remediationMode)
+    notes.push(
+      `sourceSha differs (baseline ${baseline.sourceSha.slice(0, 7)} → current ${current.sourceSha.slice(0, 7)})`
+    );
+  else issues.push("sourceSha mismatch");
+};
+
+const appendManifestFieldCompatibility = ({
+  baseline,
+  current,
+  issues,
+}: {
+  baseline: RunManifest;
+  current: RunManifest;
+  issues: string[];
+}) => {
+  const baselineModel = observedModel(baseline.modelId);
+  const currentModel = observedModel(current.modelId);
+  if (baselineModel && currentModel && baselineModel !== currentModel)
+    issues.push("modelId mismatch");
+  if (baseline.rubricVersion !== current.rubricVersion)
+    issues.push("rubricVersion mismatch");
+  if (baseline.protocol !== current.protocol) issues.push("protocol mismatch");
+  if (
+    baseline.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID &&
+    baseline.preparedSource?.fingerprint !== current.preparedSource?.fingerprint
+  )
+    issues.push("preparedSource fingerprint mismatch");
+  if (
+    baseline.scenarioOracleHash &&
+    current.scenarioOracleHash &&
+    baseline.scenarioOracleHash !== current.scenarioOracleHash
+  )
+    issues.push("scenarioOracleHash mismatch");
+  if (baseline.sandboxEnabled !== current.sandboxEnabled)
+    issues.push("sandbox mismatch");
+};
+
+const appendArmCompatibility = ({
+  baseline,
+  current,
+  crossArm,
+  issues,
+  notes,
+}: {
+  baseline: RunManifest;
+  current: RunManifest;
+  crossArm: boolean;
+  issues: string[];
+  notes: string[];
+}) => {
+  if (
+    crossArm &&
+    baseline.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID &&
+    (!baseline.officialComparisonAllowed || !current.officialComparisonAllowed)
+  )
+    issues.push("official comparison blocked by isolation assessment");
+  if (!crossArm && baseline.arm !== current.arm) issues.push("arm mismatch");
+  else if (crossArm && baseline.arm === current.arm)
+    notes.push(`same arm (${baseline.arm}); cross-arm comparison expected`);
+};
+
 export const manifestsCompatible = ({
   baseline,
   current,
@@ -41,25 +121,15 @@ export const manifestsCompatible = ({
 }) => {
   const issues: string[] = [];
   const notes: string[] = [];
-  if (baseline.sourceSha !== current.sourceSha) {
-    if (remediationMode)
-      notes.push(
-        `sourceSha differs (baseline ${baseline.sourceSha.slice(0, 7)} → current ${current.sourceSha.slice(0, 7)})`
-      );
-    else issues.push("sourceSha mismatch");
-  }
-  const baselineModel = observedModel(baseline.modelId);
-  const currentModel = observedModel(current.modelId);
-  if (baselineModel && currentModel && baselineModel !== currentModel)
-    issues.push("modelId mismatch");
-  if (baseline.rubricVersion !== current.rubricVersion)
-    issues.push("rubricVersion mismatch");
-  if (baseline.protocol !== current.protocol) issues.push("protocol mismatch");
-  if (baseline.sandboxEnabled !== current.sandboxEnabled)
-    issues.push("sandbox mismatch");
-  if (!crossArm && baseline.arm !== current.arm) issues.push("arm mismatch");
-  else if (crossArm && baseline.arm === current.arm)
-    notes.push(`same arm (${baseline.arm}); cross-arm comparison expected`);
+  appendSourceShaCompatibility({
+    baseline,
+    current,
+    issues,
+    notes,
+    remediationMode,
+  });
+  appendManifestFieldCompatibility({ baseline, current, issues });
+  appendArmCompatibility({ baseline, current, crossArm, issues, notes });
   return { compatible: issues.length === 0, issues, notes };
 };
 
@@ -152,18 +222,24 @@ const regressionVerdict = ({
   coverageIncomplete,
   gatesImproved,
   gatesRegressed,
+  ineligibleCurrent,
+  manifestBlocked,
   qualityImproved,
   qualityRegressed,
 }: {
   coverageIncomplete: boolean;
   gatesImproved: number;
   gatesRegressed: number;
+  ineligibleCurrent: boolean;
+  manifestBlocked: boolean;
   qualityImproved: number;
   qualityRegressed: number;
 }): RegressionVerdict => {
+  if (manifestBlocked) return "inconclusive";
   if (gatesRegressed > 0) return "regressed";
   if (coverageIncomplete) return "inconclusive";
   if (qualityRegressed > 0) return "regressed";
+  if (ineligibleCurrent) return "inconclusive";
   if (gatesImproved > 0 || qualityImproved > 0) return "improved";
   return "unchanged";
 };
@@ -198,29 +274,64 @@ export const compareRuns = ({
     };
 
   const manifestNotes: string[] = [];
-  if (baseManifest && curManifest) {
-    const { compatible, issues, notes } = manifestsCompatible({
-      baseline: baseManifest,
-      current: curManifest,
-      crossArm,
+  if (!baseManifest || !curManifest)
+    return {
+      changes: ["missing manifest.json on one or both runs"],
+      details: ["missing manifest.json on one or both runs"],
+      gateChanges: ["missing manifest.json on one or both runs"],
+      improved: 0,
+      manifestNotes,
+      missingInCurrent: [],
+      missingInBaseline: [],
+      qualityChanges: [],
+      regressed: 0,
       remediationMode,
-    });
-    manifestNotes.push(...notes);
-    if (!compatible)
-      return {
-        changes: issues,
-        details: issues,
-        gateChanges: issues,
-        improved: 0,
-        manifestNotes,
-        missingInCurrent: [],
-        missingInBaseline: [],
-        qualityChanges: [],
-        regressed: 0,
-        remediationMode,
-        verdict: "inconclusive" as const,
-      };
-  }
+      verdict: "inconclusive" as const,
+    };
+
+  if (
+    isHistoricalBaselineRun({ runId: baseManifest.runId }) &&
+    curManifest.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID
+  )
+    return {
+      changes: [
+        "historical v0.1 baseline cannot establish current methodology performance",
+      ],
+      details: [
+        "historical v0.1 baseline cannot establish current methodology performance",
+      ],
+      gateChanges: ["historical baseline misuse"],
+      improved: 0,
+      manifestNotes,
+      missingInCurrent: [],
+      missingInBaseline: [],
+      qualityChanges: [],
+      regressed: 0,
+      remediationMode,
+      verdict: "inconclusive" as const,
+    };
+
+  const { compatible, issues, notes } = manifestsCompatible({
+    baseline: baseManifest,
+    current: curManifest,
+    crossArm,
+    remediationMode,
+  });
+  manifestNotes.push(...notes);
+  if (!compatible)
+    return {
+      changes: issues,
+      details: issues,
+      gateChanges: issues,
+      improved: 0,
+      manifestNotes,
+      missingInCurrent: [],
+      missingInBaseline: [],
+      qualityChanges: [],
+      regressed: 0,
+      remediationMode,
+      verdict: "inconclusive" as const,
+    };
 
   const byScenario = new Map(baseline.map((g) => [gradeKey(g), g]));
   const currentIds = new Set(current.map((g) => gradeKey(g)));
@@ -250,10 +361,13 @@ export const compareRuns = ({
   });
   const coverageIncomplete =
     missingInCurrent.length > 0 || missingInBaseline.length > 0;
+  const ineligibleCurrent = current.some((g) => !g.officialEligible);
   const verdict = regressionVerdict({
     coverageIncomplete,
     gatesImproved: compared.gatesImproved,
     gatesRegressed: compared.gatesRegressed,
+    ineligibleCurrent,
+    manifestBlocked: false,
     qualityImproved: compared.qualityImproved,
     qualityRegressed: compared.qualityRegressed,
   });

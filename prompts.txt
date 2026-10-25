@@ -1,0 +1,14 @@
+---
+2026-10-25T00:42:00-06:00
+Prompt: what's the command to run evals in hotsession from cursor
+Summary: Answered that live host-session evals start with /flow-eval in Cursor. No arguments runs the full public suite on the flow arm. Deterministic modes and scenario/arm flags are documented in .agents/eval/RUN.md.
+
+---
+2026-10-25T00:45:00-06:00
+Prompt: do a contrarian evaluation of our flow eval strategy, and propose changes
+Summary: Explore-only critique of the Flow eval strategy. No harness or methodology edits. Recommended splitting compliance gates from an arm-identified behavior experiment, and stopping further harness surface until one pre-registered run exists.
+
+---
+2026-10-25T01:10:00-06:00
+Prompt: Evaluation protocol validity — implement attached plan (subject/runner/evaluator separation, fail-closed evidence and compare, S09/S13 pilot freeze; no live 32-session run).
+Summary: Implemented protocol subject-evaluator-v2 (ADR 0015, pilot spec, isolation assessment, record validation, neutral subject prompts, v2 grading/outcomes, compare fail-closed, readiness containment, freeze-pilot CLI). Updated flow-evaluation-suite initiative and docs. pnpm flow:check exit 0; pnpm flow-eval:check exit 0; 136 flow-eval tests pass. Official arm comparison blocked pending Cursor isolation. freeze-pilot exits 2 when blocked (expected).

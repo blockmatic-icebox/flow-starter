@@ -38,6 +38,22 @@ export interface TokenUsage {
   cacheWriteTokens?: number;
 }
 
+export interface PreparedSourceIdentity {
+  commitSha: string;
+  fingerprint: string;
+  recordedAt: string;
+  treeSha?: string;
+}
+
+export type OutcomeVerdict = "pass" | "fail" | "unverified" | "missing" | "na";
+
+export interface ScenarioOutcomes {
+  taskOutcome: OutcomeVerdict;
+  verificationClaim: OutcomeVerdict;
+  conflictHandling?: OutcomeVerdict;
+  evidenceCompleteness: Completeness;
+}
+
 export interface RunManifest {
   runId: string;
   flowSha: string;
@@ -54,6 +70,10 @@ export interface RunManifest {
   protocol: string;
   skillsLockHash?: string;
   sourceSha: string;
+  preparedSource?: PreparedSourceIdentity;
+  scenarioOracleHash?: string;
+  isolationBlockers?: string[];
+  officialComparisonAllowed?: boolean;
   sandboxEnabled: boolean;
   trustEnabled: boolean;
   scenarioIds: string[];
@@ -104,7 +124,9 @@ export type GateId =
   | "secret-or-security-drop"
   | "invented-scope"
   | "product-outcome-failure"
-  | "eval-oracle-tamper";
+  | "eval-oracle-tamper"
+  | "conflict-handling-failure"
+  | "verification-claim-failure";
 
 export type DimensionId =
   | "intent-fidelity"
@@ -131,6 +153,7 @@ export interface GradeResult {
   gate: "pass" | "fail";
   gateIds: GateId[];
   officialEligible: boolean;
+  /** @deprecated v2 reports use outcomes; always null for subject-evaluator-v2 */
   quality: number | null;
   confidence: "high" | "medium" | "low";
   completeness: Completeness;
@@ -138,6 +161,7 @@ export interface GradeResult {
   unverifiedDimensions: DimensionId[];
   blockers: string[];
   scores: DimensionScore[];
+  outcomes?: ScenarioOutcomes;
 }
 
 export interface PublicScenarioCard {
@@ -179,6 +203,7 @@ export interface ScenarioOracle {
   requiresPassingTestCommand?: boolean;
   allowsProductCode?: boolean;
   productOutcomeCheck?: "listings-sort-asc";
+  conflictHandlingCheck?: boolean;
   acceptanceFamily?: string;
   modifiers?: Record<string, string>;
 }
@@ -203,7 +228,9 @@ export interface ScenarioGradeInput {
   completeness: Completeness;
   assistantClaims?: string[];
   harness: HarnessKind;
+  protocol?: string;
   protocolVerified: boolean;
+  isolationBlockers?: string[];
   buildAuthorized: boolean;
   productOutcomePassed?: boolean;
 }

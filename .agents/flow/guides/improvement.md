@@ -23,11 +23,12 @@ The `@repo/flow-eval` package provides a **user-invoked** harness: isolated work
 | Piece | Role |
 | --- | --- |
 | Frozen baseline run | Historical reference; preserved, not rewritten |
-| Gates | Run before quality narrative; incomplete telemetry is `missing`, not zero |
-| Arms | Compare Flow entrypoint vs reduced context |
+| Gates | Run before outcome narrative; incomplete telemetry is `missing`, not zero |
+| Arms | Compare Flow entrypoint vs reduced context (official only when isolation assessment passes) |
+| Protocol v2 | Subject / runner / evaluator separation; no renormalized quality percentage |
 | `flow:check` | Validates doc paths and bundle freshness—not product outcomes |
 
-Command reference: [.agents/eval/RUN.md](../../eval/RUN.md). Initiative status: [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md). Live official runs use **host-session** (`/flow-eval`); complete prepared runs before treating batch claims as evidence.
+Command reference: [.agents/eval/RUN.md](../../eval/RUN.md). Pilot freeze: `pnpm --filter @repo/flow-eval eval freeze-pilot`. Initiative: [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md). Host-session (`/flow-eval`) remains **diagnostic** until Cursor supports enforced isolation and runner-captured transcripts ([ADR 0015](../decisions/adr/0015-evaluation-subject-separation.md)).
 
 ## Human-reviewed improvement loop (operating process)
 

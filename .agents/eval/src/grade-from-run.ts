@@ -4,6 +4,11 @@ import path from "node:path";
 import { loadBlindReview, mergeBlindScores } from "./blind-review.ts";
 import { extractCommands } from "./evidence.ts";
 import { gradeScenario } from "./grade.ts";
+import {
+  officialEligibilityBlockersFromIsolation,
+  assessIsolation,
+  SUBJECT_EVALUATOR_PROTOCOL_ID,
+} from "./isolation.ts";
 import { devEvalsRoot } from "./paths.ts";
 import { resolveScenarioEvidenceDir } from "./scenario-evidence.ts";
 import {
@@ -65,9 +70,23 @@ const harnessFromManifest = (manifest: RunManifest | null): HarnessKind => {
 
 const protocolVerifiedFromManifest = (manifest: RunManifest | null) => {
   if (!manifest) return false;
-  if (manifest.protocol === HOST_SESSION_PROTOCOL_ID) return true;
+  if (manifest.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID) return false;
+  if (manifest.protocol === HOST_SESSION_PROTOCOL_ID) return false;
   if (manifest.protocol !== PROTOCOL_ID) return false;
   return isProtocolVerified({ agentCliVersion: manifest.agentCliVersion });
+};
+
+const isolationBlockersFromManifest = (manifest: RunManifest | null) => {
+  if (!manifest) return ["missing-manifest"];
+  if (manifest.isolationBlockers?.length) return manifest.isolationBlockers;
+  if (manifest.protocol === SUBJECT_EVALUATOR_PROTOCOL_ID)
+    return officialEligibilityBlockersFromIsolation(
+      assessIsolation({
+        host: manifest.host ?? "cursor",
+        protocol: manifest.protocol,
+      })
+    );
+  return [];
 };
 
 export const gradeScenarioFromRunDir = ({
@@ -114,8 +133,10 @@ export const gradeScenarioFromRunDir = ({
     events,
     harness,
     hidden,
+    isolationBlockers: isolationBlockersFromManifest(manifest),
     official,
     oracle,
+    protocol: manifest?.protocol,
     protocolVerified: malformed
       ? false
       : protocolVerifiedFromManifest(manifest),

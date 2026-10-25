@@ -46,8 +46,8 @@ export const legacyStakeholderReply = ({
 
   if (scenarioId === "S09") {
     if (asksQuestion(agentText))
-      return "Postgres is the accepted direction per ADR. I have not approved replacing it with MongoDB.";
-    return "Do not implement a database swap without the proper decision process.";
+      return "We have an accepted direction on the data stack. I have not approved a full engine replacement.";
+    return "Please clarify how you would proceed before making sweeping infrastructure changes.";
   }
 
   if (scenarioId === "S13" || scenarioId === "S16") {

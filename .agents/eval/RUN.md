@@ -4,7 +4,7 @@ User-invoked methodology evaluations for Flow. Evidence stays under `__dev/flow-
 
 ## Live runs (`/flow-eval`)
 
-Primary entry: **`/flow-eval`** in Cursor or Claude Code (see [.agents/skills/flow-eval/SKILL.md](../skills/flow-eval/SKILL.md)). The parent session prepares the suite and launches one generic subagent per scenario. Each subagent finishes every turn in its worktree and reports issues plus a proposed fix. The parent finalizes, then discusses that plan. It does not apply the plan in the same turn. There is no `--model` flag and no Cursor CLI `agent` spawn.
+Primary entry: **`/flow-eval`** in Cursor or Claude Code (see [.agents/skills/flow-eval/SKILL.md](../skills/flow-eval/SKILL.md)). Under protocol `subject-evaluator-v2`, the **parent/runner** operates `eval prepare` / `next` / `record` / `finalize`. **Subjects** receive neutral task prompts only (identical for flow and control) and work in isolated workspaces. Host-session runs are **diagnostic** until Cursor provides enforced isolation and runner-captured transcripts; official arm comparison stays blocked (see [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md)). There is no `--model` flag and no Cursor CLI `agent` spawn.
 
 ```bash
 pnpm --filter @repo/flow-eval eval prepare --arm flow --scenarios S01,S13
@@ -22,6 +22,7 @@ Optional: `--model-id <id>` on `finalize` when the host reports the model used (
 
 ```bash
 pnpm --filter @repo/flow-eval eval preserve
+pnpm --filter @repo/flow-eval eval freeze-pilot --seed s09-s13-pilot-2026-10-25
 pnpm --filter @repo/flow-eval eval grade --run <runId> --scenario S01
 pnpm eval:experiment
 pnpm eval:experiment --seed example-seed
@@ -51,7 +52,7 @@ Blind subjective scores: `__dev/flow-evals/<runId>/blind-reviews/<scenarioId>.js
 
 Unit tests may inject mocks when calling harness functions directly. The CLI and `pnpm worktrees` do not bypass host-session rules for methodology live runs. `pnpm worktrees --host cursor` remains the Build worker runner (separate from eval).
 
-Scenario worktrees run the same **product adoption** transform as [`install.sh`](../tooling/setup/install.sh) (shared [`product-adoption.mjs`](../tooling/setup/product-adoption.mjs)): slugged `package.json` name, Portless `name`, and `https://<slug>.localhost` in `apps/web`. Eval uses project names like `Eval S13 r1` → `eval-s13-r1`. Partial benchmark/mutation fixtures are unchanged.
+Scenario worktrees run the same **product adoption** transform as [`install.sh`](../tooling/setup/install.sh) (shared [`product-adoption.mjs`](../tooling/setup/product-adoption.mjs)): slugged `package.json` name, Portless `name`, and `https://<slug>.localhost` in `apps/web`. Eval uses neutral workspace slugs (`product-<hash>`) that do not disclose scenario or arm. Partial benchmark/mutation fixtures are unchanged.
 
 ## Event origins
 
@@ -78,9 +79,9 @@ Hidden stakeholder scripts: `__dev/flow-evals/catalog/<scenarioId>/hidden.json` 
 
 ## Grading
 
-Deterministic gates run first. Reports lead with **Gate**, **Official eligible**, then quality (withheld when telemetry is incomplete or gates fail).
+Deterministic gates run first. Reports lead with **Gate**, **Official eligible**, per-outcome fields (task, verification claim, conflict handling when applicable), and evidence completeness. Protocol v2 does not emit a renormalized quality percentage.
 
-Official live runs use harness `host-session`. Legacy runs may use `cursor-cli`. Compare flags `modelId` mismatch only when both runs recorded an observed model.
+Official methodology claims require protocol `subject-evaluator-v2`, compatible manifests, eligible evidence, and a passing isolation assessment. Historical `host-session-v1`, `cursor-cli`, and run `20261024-flow-v0.1-1256e532` remain readable but are not official performance baselines.
 
 Offline integrity: `pnpm flow-eval:check` from the repository root (types, unit tests, baseline preserve).
 

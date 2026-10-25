@@ -105,12 +105,13 @@ const evaluateFamilyWorkspaceReadiness = ({
     evidence: evidence as ReturnType<typeof runAllowlistedCase>[],
     requirements,
   });
+  const engineeringRow = evidence.find((e) =>
+    e.caseId.endsWith("-engineering")
+  );
   const engineering =
-    evidence.find((e) => e.caseId.endsWith("-engineering"))?.status === "passed"
+    engineeringRow?.status === "passed"
       ? "PASS"
-      : evidence.some(
-            (e) => e.caseId.endsWith("-engineering") && e.status === "failed"
-          )
+      : engineeringRow?.status === "failed"
         ? "FAIL"
         : "INCONCLUSIVE";
   const features =
@@ -125,6 +126,7 @@ const evaluateFamilyWorkspaceReadiness = ({
   if (
     engineering === "PASS" &&
     features === "PASS" &&
+    usability === "PASS" &&
     counts.failed === 0 &&
     counts.unverified === 0
   )
