@@ -92,6 +92,7 @@ describe("remediation loop", () => {
       true
     );
 
+    mkdirSync(path.join(clean, "packages"), { recursive: true });
     writeFileSync(path.join(clean, "packages/other.txt"), "nope\n", "utf-8");
     assert.equal(
       pathsWithinWriteRoot({ workDir: clean, writeRoot: "apps/web" }),
