@@ -69,7 +69,14 @@ export const createLocalInstallSource = ({ repoRoot }) => {
   const sourceUrl = `file://${snapshotRoot}`;
 
   return {
-    cleanup: () => rmSync(snapshotRoot, { force: true, recursive: true }),
+    cleanup: () => {
+      rmSync(snapshotRoot, {
+        force: true,
+        maxRetries: 5,
+        recursive: true,
+        retryDelay: 50,
+      });
+    },
     snapshotRoot,
     sourceUrl,
   };

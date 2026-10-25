@@ -9,7 +9,7 @@ if (!existsSync(installScript)) process.exit(0);
 
 const result = spawnSync(
   "node",
-  ["--test", path.join(setupDir, "install.test.mjs")],
+  ["--test", "--test-concurrency=1", path.join(setupDir, "install.test.mjs")],
   {
     stdio: "inherit",
   }
