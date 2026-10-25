@@ -9,6 +9,23 @@ Flow distinguishes **where** the user interacts:
 
 Use the least presentation that fits the task. Do not force forms or charts for one-line answers.
 
+## Chat prose (coordinator)
+
+The human-facing Cursor conversation is not a tasks file. Write so someone who has not memorized the checklist can follow you.
+
+| Context | Prefer | Avoid as the main explanation |
+| --- | --- | --- |
+| Progress, blockers, “what’s left to ship” | Outcomes and capabilities in plain language (“export metrics”, “finish disposition APIs”) | Gate/task algebra (`G4 = T-3-9 + T-4-4`), bare task or gate ids without explanation, or wave-only labels |
+| Traceability | Link to `docs/tasks/<slug>.md` or the initiative; name the section if helpful | Dumping id tables copied from the tasks doc |
+| Task reports and **Next** | One concrete recommended action described in words | A list of ids with no translation |
+
+**Examples**
+
+- **Avoid:** “Blocked on G4; need T-4-4 before T-4-3.”
+- **Prefer:** “Ship is blocked until the security review checklist and deployment runbook are done. The review item is still open; I can do the runbook next.”
+
+Internal ids remain appropriate in repository artifacts ([tasks-documents.md](tasks-documents.md)), commit subjects when the team uses them, and worker briefs ([worktrees.md](worktrees.md)).
+
 ## Coordinator host (session UI)
 
 When the host exposes structured or visual affordances, **prefer them over walls of prose** for the same content.

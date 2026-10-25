@@ -746,6 +746,14 @@ const flowCoordinatorContractChecks = [
     pattern: /human-readable-surfaces\.md/iu,
   },
   {
+    label: "human-readable chat",
+    pattern: /Human-readable chat/iu,
+  },
+  {
+    label: "no task-id-only chat",
+    pattern: /internal execution shorthand/iu,
+  },
+  {
     label: "GenUI product Build",
     pattern: /@repo\/genui.*genui\.md/iu,
   },
