@@ -8,7 +8,7 @@ import {
   rmSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import test from "node:test";
 
 import { validateFlowDocs } from "../checks/check-flow-docs.mjs";
@@ -16,6 +16,7 @@ import { repoRoot } from "../lib/repo-paths.mjs";
 import { createLocalInstallSource } from "./local-install-source.mjs";
 
 const installScript = join(repoRoot, ".agents/tooling/setup/install.sh");
+const installScriptDir = dirname(installScript);
 
 const gitIdentityEnv = {
   GIT_AUTHOR_EMAIL: "test@flow-starter.local",
@@ -33,6 +34,7 @@ const runInstallDirect = ({ cwd, projectName, sourceUrl }) =>
       ...gitIdentityEnv,
       FLOW_FACTORY_PROJECT_NAME: projectName,
       FLOW_FACTORY_SOURCE: sourceUrl,
+      INSTALL_SCRIPT_DIR: installScriptDir,
     },
   });
 
@@ -46,6 +48,7 @@ const runInstallCommandString = ({ cwd, projectName, sourceUrl }) => {
       ...gitIdentityEnv,
       FLOW_FACTORY_PROJECT_NAME: projectName,
       FLOW_FACTORY_SOURCE: sourceUrl,
+      INSTALL_SCRIPT_DIR: installScriptDir,
     },
   });
 };

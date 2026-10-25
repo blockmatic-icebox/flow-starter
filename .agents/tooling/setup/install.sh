@@ -32,8 +32,12 @@ resolve_adoption_script() {
       return
     fi
   fi
-  local tmp raw_base
-  tmp="$(mktemp -t flow-product-adoption.mjs)"
+  local tmp tmp_base raw_base
+  local tmpdir="${TMPDIR:-/tmp}"
+  tmpdir="${tmpdir%/}"
+  tmp_base="$(mktemp "${tmpdir}/flow-product-adoption.XXXXXX")"
+  tmp="${tmp_base}.mjs"
+  mv "$tmp_base" "$tmp"
   raw_base="${FLOW_FACTORY_RAW_BASE:-https://raw.githubusercontent.com/gaboesquivel/flow-factory/main}"
   if ! curl -fsSL "${raw_base}/.agents/tooling/setup/product-adoption.mjs" -o "$tmp"; then
     die "failed to fetch product-adoption.mjs"

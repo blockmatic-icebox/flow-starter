@@ -2,6 +2,7 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  realpathSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -301,7 +302,16 @@ const main = () => {
   }
 };
 
-const isMain =
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === path.resolve(import.meta.filename);
-if (isMain) main();
+const isMainModule = () => {
+  const entry = process.argv[1];
+  if (!entry) return false;
+  const invoked = path.resolve(entry);
+  const modulePath = path.resolve(import.meta.filename);
+  try {
+    return realpathSync(invoked) === realpathSync(modulePath);
+  } catch {
+    return invoked === modulePath;
+  }
+};
+
+if (isMainModule()) main();
