@@ -6,6 +6,7 @@ import { compareRuns } from "./compare.ts";
 import { runExperiment } from "./generation/experiment.ts";
 import { stratifiedMethodologySample } from "./generation/methodology-sample.ts";
 import { createSeededRng, randomSeed } from "./generation/rng.ts";
+import { runSelfImproveCampaign } from "./generation/self-improve.ts";
 import { gradeScenarioFromRunDir } from "./grade-from-run.ts";
 import { handoffAgentBPrompt } from "./handoff.ts";
 import { runBatch, runScenarioSession } from "./orchestrate.ts";
@@ -17,6 +18,8 @@ import {
 } from "./product/mutations.ts";
 import { writeProductEvalArtifacts } from "./product/persist.ts";
 import { evaluateReadiness } from "./product/readiness.ts";
+import { findingsFromReadiness } from "./product/remediate.ts";
+import { createCursorRepairExecutor } from "./product/repair-executor.ts";
 import { runStressEvaluation } from "./product/stress.ts";
 import { listPublicScenarioIds } from "./scenarios.ts";
 import type { EvalArm } from "./types.ts";
@@ -38,6 +41,7 @@ Usage:
   pnpm --filter @repo/flow-eval eval mutations
   pnpm --filter @repo/flow-eval eval benchmark --id benchmark-a|benchmark-b
   pnpm --filter @repo/flow-eval eval experiment [--profile full-product] [--count N] [--seed <seed>] [--dry-run]
+  pnpm --filter @repo/flow-eval eval self-improve [--iterations 3] [--seed <seed>] [--model <id>] [--dry-run] [--resume <campaign-id>]
 `);
 };
 
@@ -532,21 +536,30 @@ const dispatchCompareCli = (flags: Record<string, unknown>) => {
 
 const cmdReadiness = ({ runId }: { runId: string }) => {
   const readiness = evaluateReadiness({ runId });
-  writeProductEvalArtifacts({ readiness, runId });
+  const findings = findingsFromReadiness(readiness);
+  writeProductEvalArtifacts({ findings, readiness, runId });
   console.log(JSON.stringify(readiness, null, 2));
   if (readiness.releaseVerdict !== "READY") process.exit(1);
 };
 
 const cmdStress = async ({
-  runId,
   cycles,
+  model,
+  runId,
+  workDir,
 }: {
-  runId: string;
   cycles: number;
+  model: string;
+  runId: string;
+  workDir?: string;
 }) => {
   const result = await runStressEvaluation({
     maxRemediationCycles: cycles,
+    repairExecutor: workDir
+      ? createCursorRepairExecutor({ modelId: model })
+      : undefined,
     runId,
+    workDir,
   });
   console.log(JSON.stringify(result, null, 2));
   if (!result.ok) process.exit(1);
@@ -566,6 +579,21 @@ const cmdBenchmark = ({ id }: { id: "benchmark-a" | "benchmark-b" }) => {
 
 const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
   const handlers: Record<string, () => Promise<void> | void> = {
+    "self-improve": async () => {
+      const result = await runSelfImproveCampaign({
+        campaignId: flags["campaign-id"]
+          ? String(flags["campaign-id"])
+          : undefined,
+        campaignSeed: flags.seed ? String(flags.seed) : undefined,
+        dryRun: Boolean(flags["dry-run"]),
+        iterations: Number(flags.iterations ?? 3),
+        maxConcurrency: Number(flags["max-concurrency"] ?? 2),
+        model: String(flags.model ?? defaultModel),
+        resume: flags.resume ? String(flags.resume) : undefined,
+      });
+      console.log(JSON.stringify(result, null, 2));
+      if (!result.ok) process.exit(1);
+    },
     experiment: () =>
       cmdExperiment({
         count: Number(flags.count ?? 1),
@@ -590,7 +618,9 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
     stress: () =>
       cmdStress({
         cycles: Number(flags.cycles ?? 3),
+        model: String(flags.model ?? defaultModel),
         runId: String(flags.run ?? `stress-${Date.now()}`),
+        workDir: flags.workdir ? String(flags.workdir) : undefined,
       }),
     compare: () => dispatchCompareCli(flags),
     "compare-arms": () =>

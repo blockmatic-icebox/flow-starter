@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
+import type { ExperimentManifest } from "./generation/types.ts";
 import { acceptedControlResiduals, listControlResiduals } from "./isolate.ts";
 import type { GradeResult, RunManifest } from "./types.ts";
 
@@ -54,6 +55,26 @@ export const manifestsCompatible = ({
   else if (crossArm && baseline.arm === current.arm)
     notes.push(`same arm (${baseline.arm}); cross-arm comparison expected`);
   return { compatible: issues.length === 0, issues, notes };
+};
+
+export const experimentManifestsCompatible = ({
+  baseline,
+  current,
+}: {
+  baseline: ExperimentManifest;
+  current: ExperimentManifest;
+}) => {
+  const issues: string[] = [];
+  if (baseline.catalogHash !== current.catalogHash)
+    issues.push("catalogHash mismatch");
+  if (baseline.generatorVersion !== current.generatorVersion)
+    issues.push("generatorVersion mismatch");
+  if (baseline.model !== current.model) issues.push("model mismatch");
+  if (baseline.scenarioHashes.join(",") !== current.scenarioHashes.join(","))
+    issues.push("scenario hash mismatch");
+  if (baseline.scenarioIds.join(",") !== current.scenarioIds.join(","))
+    issues.push("scenario id mismatch");
+  return { compatible: issues.length === 0, issues };
 };
 
 const gradeKey = (grade: GradeResult) =>

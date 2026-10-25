@@ -105,6 +105,10 @@ export const runRemediationLoop = ({
         stopReason: "workdir-missing",
       };
 
+    const failingBefore = readiness.evidence
+      .filter((row) => row.status === "failed")
+      .map((row) => row.caseId);
+
     const treeHashBefore = treeHash;
     const repair = await repairExecutor({
       cycle: cycle + 1,
@@ -112,20 +116,35 @@ export const runRemediationLoop = ({
       workDir,
     });
     const treeHashAfter = hashTree({ root: workDir });
-    if (!repair.applied || treeHashAfter === treeHashBefore)
+    if (!repair.applied)
       return {
         cyclesApplied: remediation.length,
         findings,
         ok: false,
         readiness,
         remediation,
-        stopReason: "no-progress",
+        stopReason: "repair-failed",
       };
 
-    treeHash = treeHashAfter;
     cycle += 1;
     readiness = evaluate({ runId: `${runId}-cycle-${cycle}` });
     findings = findingsFromReadiness(readiness);
+
+    const unresolved = failingBefore.filter((caseId) => {
+      const row = readiness.evidence.find((e) => e.caseId === caseId);
+      return !row || row.status !== "passed";
+    });
+    if (unresolved.length > 0 || treeHashAfter === treeHashBefore)
+      return {
+        cyclesApplied: remediation.length,
+        findings,
+        ok: false,
+        readiness,
+        remediation,
+        stopReason: unresolved.length > 0 ? "defect-unresolved" : "no-progress",
+      };
+
+    treeHash = treeHashAfter;
     remediation.push({
       cycle,
       findings,

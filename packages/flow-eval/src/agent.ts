@@ -99,21 +99,48 @@ export const runAgentTurnAsync = async ({
   if (sessionId) args.push("--resume", sessionId);
   args.push(redactedPrompt);
 
+  const maxOutput = 8 * 1024 * 1024;
   const child = spawn("agent", args, {
     cwd: workspace,
+    detached: process.platform !== "win32",
     stdio: "pipe",
   });
   let stdout = "";
   let stderr = "";
+  const appendBounded = (
+    target: "stdout" | "stderr",
+    chunk: Buffer | string
+  ) => {
+    const text = chunk.toString();
+    if (target === "stdout") {
+      if (stdout.length >= maxOutput) return;
+      stdout += text.slice(0, maxOutput - stdout.length);
+      return;
+    }
+    if (stderr.length >= maxOutput) return;
+    stderr += text.slice(0, maxOutput - stderr.length);
+  };
   child.stdout?.on("data", (chunk: Buffer | string) => {
-    stdout += chunk.toString();
+    appendBounded("stdout", chunk);
   });
   child.stderr?.on("data", (chunk: Buffer | string) => {
-    stderr += chunk.toString();
+    appendBounded("stderr", chunk);
   });
+  const killAgentTree = (signal: NodeJS.Signals) => {
+    if (child.pid && process.platform !== "win32") {
+      try {
+        process.kill(-child.pid, signal);
+        return;
+      } catch {
+        child.kill(signal);
+        return;
+      }
+    }
+    child.kill(signal);
+  };
   const timer = setTimeout(() => {
-    child.kill("SIGTERM");
-    setTimeout(() => child.kill("SIGKILL"), 5000);
+    killAgentTree("SIGTERM");
+    setTimeout(() => killAgentTree("SIGKILL"), 5000);
   }, timeoutMs);
 
   const [code, signal] = await once(child, "close");

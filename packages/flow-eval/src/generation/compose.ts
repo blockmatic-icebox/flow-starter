@@ -61,15 +61,13 @@ export const composeScenario = ({
     .slice(0, 8);
   const id = `GEN-${template.templateId}-${slug}`;
 
-  const openingPrompt = `${template.problemStem}\n\nPersona: ${persona}.\nDomain: ${template.domain}.\nDeliver: ${template.outcomes.join("; ")}.\nConstraints: ${template.constraints.join("; ")}.`;
-
   const publicCard = {
     allowProductCode: template.codeExecution,
     allowStandalonePlan: !template.requiresBuildAuth,
     browserVerification: template.browserVerification,
     codeExecution: template.codeExecution,
     id,
-    openingPrompt,
+    openingPrompt: publicBrief,
     relevantStages: template.relevantStages,
     requiresBuildAuth: template.requiresBuildAuth,
     title: `${template.titleBase} (${template.domain})`,
@@ -105,10 +103,12 @@ export const composeScenario = ({
       ...template.acceptanceCriteria,
       `Modifiers honored: ${JSON.stringify(modifiers)}`,
     ],
+    acceptanceFamily: template.acceptanceFamily,
     allowsProductCode: template.codeExecution,
     expectsCommands: template.codeExecution,
     expectsTools: template.codeExecution,
     holdoutNotes: template.failureModes.map((f) => `holdout:${f}`),
+    modifiers,
     requiresPassingTestCommand: template.codeExecution,
     scenarioId: id,
   };

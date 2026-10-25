@@ -1,32 +1,25 @@
 import { spawnSync } from "node:child_process";
-import { readFileSync, existsSync } from "node:fs";
-import path from "node:path";
 
 import { runTechnicalAiAssessmentPair } from "../assessment/run.ts";
 import { runBatch } from "../orchestrate.ts";
 import { repoRoot } from "../paths.ts";
+import { evaluateReadiness } from "../product/readiness.ts";
 import type { EvalArm } from "../types.ts";
 import { scenarioContentHash } from "./compose.ts";
-import { buildManifest, experimentDir, freezeExperiment } from "./freeze.ts";
+import {
+  buildManifest,
+  freezeExperiment,
+  verifyFrozenExperiment,
+} from "./freeze.ts";
 import { createSeededRng, randomSeed } from "./rng.ts";
 import { selectGeneratedScenarios } from "./select.ts";
-import type { ExperimentProfile, GeneratedScenario } from "./types.ts";
+import type { AcceptanceFamily, ExperimentProfile } from "./types.ts";
 
 const currentSha = () =>
   spawnSync("git", ["rev-parse", "HEAD"], {
     cwd: repoRoot,
     encoding: "utf-8",
   }).stdout.trim();
-
-export const loadFrozenScenario = ({
-  experimentId,
-}: {
-  experimentId: string;
-}): GeneratedScenario => {
-  const file = path.join(experimentDir({ experimentId }), "scenario.json");
-  if (!existsSync(file)) throw new Error(`missing frozen scenario at ${file}`);
-  return JSON.parse(readFileSync(file, "utf-8")) as GeneratedScenario;
-};
 
 export const runExperiment = async ({
   arm = "flow",
@@ -54,7 +47,13 @@ export const runExperiment = async ({
       baselineSha: currentSha(),
       runId: id,
     });
-    return { experimentId: id, manifest: null, ok: assessment.ok, assessment };
+    return {
+      assessment,
+      experimentId: id,
+      manifest: null,
+      ok: assessment.ok,
+      terminal: assessment.terminal,
+    };
   }
 
   const selection = selectGeneratedScenarios({ count, profile, rng });
@@ -82,6 +81,9 @@ export const runExperiment = async ({
     manifest,
     scenarios: selection.scenarios,
   });
+  const frozen = verifyFrozenExperiment({ experimentId: id });
+  if (!frozen.ok)
+    return { ok: false, reason: frozen.reason ?? "freeze verification failed" };
 
   if (dryRun)
     return {
@@ -102,12 +104,30 @@ export const runExperiment = async ({
     scenarioIds,
   });
 
+  const primary = selection.scenarios[0];
+  const worktreePath = batch.worktreePaths?.[0];
+  const family = primary?.oracle.acceptanceFamily as
+    | AcceptanceFamily
+    | undefined;
+  const productReadiness =
+    family && worktreePath
+      ? evaluateReadiness({
+          acceptanceFamily: family,
+          runId: id,
+          worktreePath,
+        })
+      : undefined;
+
+  const productOk = !family || productReadiness?.releaseVerdict === "READY";
+
   return {
     errors: batch.errors,
     experimentId: id,
     grades: batch.grades,
     infrastructureFailure: batch.infrastructureFailure,
     manifest,
-    ok: batch.ok,
+    ok: batch.ok && productOk,
+    outcomes: batch.outcomes,
+    productReadiness,
   };
 };

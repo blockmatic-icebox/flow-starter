@@ -5,6 +5,7 @@ import path from "node:path";
 import { describe, it } from "node:test";
 
 import { runRemediationLoop } from "./remediate.ts";
+import { pathsWithinWriteRoot } from "./repair-executor.ts";
 import type { ReadinessReport } from "./types.ts";
 
 const failingReport = (): ReadinessReport => ({
@@ -38,7 +39,21 @@ const failingReport = (): ReadinessReport => ({
 const passingReport = (): ReadinessReport => ({
   ...failingReport(),
   engineering: "PASS",
-  evidence: [],
+  evidence: [
+    {
+      actual: "ok",
+      caseId: "fixture-case",
+      environment: "test",
+      evaluatedSha: "test",
+      evidenceRef: "fixture",
+      executionMethod: "node test",
+      expected: "pass",
+      exitCode: 0,
+      origin: "fixture",
+      requirementId: "REQ-1",
+      status: "passed",
+    },
+  ],
   failed: 0,
   features: "PASS",
   passed: 1,
@@ -47,6 +62,16 @@ const passingReport = (): ReadinessReport => ({
 });
 
 describe("remediation loop", () => {
+  it("rejects repairs outside apps/web", () => {
+    assert.equal(
+      pathsWithinWriteRoot({
+        workDir: process.cwd(),
+        writeRoot: "apps/web",
+      }),
+      false
+    );
+  });
+
   it("counts a cycle only when the tree hash changes", async () => {
     const dir = mkdtempSync(path.join(os.tmpdir(), "flow-remediate-"));
     const broken = path.join(dir, "value.txt");
@@ -83,7 +108,7 @@ describe("remediation loop", () => {
     });
 
     assert.equal(loop.cyclesApplied, 0);
-    assert.equal(loop.stopReason, "no-progress");
+    assert.equal(loop.stopReason, "repair-failed");
   });
 
   it("stops without executor", async () => {

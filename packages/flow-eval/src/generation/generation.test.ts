@@ -46,26 +46,34 @@ describe("generation", () => {
     );
   });
 
-  it("different seeds can produce different scenarios", () => {
-    const a = selectGeneratedScenarios({
-      count: 1,
-      profile: "mixed",
-      rng: createSeededRng({ seed: "seed-a" }),
+  it("different seeds produce variation across a fixed sample", () => {
+    const ids = new Set<string>();
+    for (const seed of ["seed-a", "seed-b", "seed-c", "seed-d", "seed-e"]) {
+      const picked = selectGeneratedScenarios({
+        count: 1,
+        profile: "full-product",
+        rng: createSeededRng({ seed }),
+      });
+      assert.equal(picked.ok, true);
+      if (!picked.ok) continue;
+      const scenario = picked.scenarios[0];
+      assert.ok(scenario);
+      ids.add(scenario.id);
+    }
+    assert.ok(ids.size >= 2);
+  });
+
+  it("three full-product picks can use distinct domains", () => {
+    const picked = selectGeneratedScenarios({
+      count: 3,
+      profile: "full-product",
+      rng: createSeededRng({ seed: "three-distinct-domains" }),
     });
-    const b = selectGeneratedScenarios({
-      count: 1,
-      profile: "mixed",
-      rng: createSeededRng({ seed: "seed-b" }),
-    });
-    assert.equal(a.ok, true);
-    assert.equal(b.ok, true);
-    if (!a.ok || !b.ok) return;
-    const aScenario = a.scenarios[0];
-    const bScenario = b.scenarios[0];
-    assert.ok(aScenario);
-    assert.ok(bScenario);
-    const ids = new Set([aScenario.id, bScenario.id]);
-    assert.ok(ids.size >= 1);
+    assert.equal(picked.ok, true);
+    if (!picked.ok) return;
+    const domains = new Set(picked.scenarios.map((s) => s.domain));
+    assert.equal(domains.size, 3);
+    assert.equal(new Set(picked.scenarios.map((s) => s.id)).size, 3);
   });
 
   it("stratified mixed sample avoids duplicate ids in one run", () => {

@@ -9,6 +9,7 @@ import {
   runAgentTurnAsync,
   writeSessionMeta,
 } from "./agent.ts";
+import { summarizeBatchOutcomes } from "./batch-outcomes.ts";
 import { controlArmValid } from "./compare.ts";
 import { evalConcurrency, mapWithConcurrency } from "./concurrency.ts";
 import { extractCommands } from "./evidence.ts";
@@ -65,6 +66,7 @@ const runStakeholderTurns = async ({
   modelId,
   official,
   oracle,
+  publicBrief,
   rawLog,
   scenarioId,
   turnLimit,
@@ -80,6 +82,7 @@ const runStakeholderTurns = async ({
   oracle:
     | NonNullable<ReturnType<typeof loadScenarioOracle>>
     | { scenarioId: string };
+  publicBrief?: string;
   rawLog: string;
   scenarioId: string;
   turnLimit: number;
@@ -102,6 +105,7 @@ const runStakeholderTurns = async ({
             card,
             events: eventsSoFar,
             hidden,
+            publicBrief,
             scenarioId,
             turn,
           });
@@ -276,6 +280,7 @@ export const runScenarioSession = async ({
     modelId,
     official,
     oracle,
+    publicBrief: generated?.publicBrief,
     rawLog,
     scenarioId,
     turnLimit,
@@ -383,9 +388,12 @@ const buildBatchManifest = ({
   agentCliVersion: agentCliVersion(),
   arm,
   catalogHash: catalogHash(),
-  completeness: grades.every((g) => g.officialEligible)
-    ? "complete"
-    : "partial",
+  completeness:
+    grades.length === 0 ||
+    grades.length < scenarioIds.length * repetition ||
+    !grades.every((g) => g.officialEligible)
+      ? "partial"
+      : "complete",
   controlResiduals:
     arm === "control" && controlCheck.blocking.length
       ? controlCheck.blocking
@@ -463,7 +471,8 @@ export const runBatch = async ({
   for (const result of results) {
     if (!result.ok) {
       errors.push(result.reason ?? "unknown");
-      if (result.infrastructure) infrastructureFailure = true;
+      if ("infrastructure" in result && result.infrastructure)
+        infrastructureFailure = true;
       continue;
     }
     if (result.grade) grades.push(result.grade);
@@ -500,11 +509,27 @@ export const runBatch = async ({
   const runDir = path.join(devEvalsRoot, runId);
   writeRunSummary({ grades, manifest, runDir });
 
+  const outcomes = summarizeBatchOutcomes({
+    errors,
+    grades,
+    infrastructureFailure,
+    official,
+    repetition,
+    scenarioIds,
+  });
+
+  writeFileSync(
+    path.join(runDir, "outcomes.json"),
+    `${JSON.stringify(outcomes, null, 2)}\n`
+  );
+
   return {
     errors,
     grades,
     infrastructureFailure,
     manifest,
-    ok: !infrastructureFailure && errors.length === 0,
+    ok: outcomes.overall === "pass",
+    outcomes,
+    worktreePaths,
   };
 };

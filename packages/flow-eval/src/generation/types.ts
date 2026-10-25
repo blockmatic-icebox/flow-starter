@@ -6,6 +6,14 @@ import type {
 
 export const GENERATOR_VERSION = "1";
 
+export type AcceptanceFamily =
+  | "support-tickets"
+  | "shift-scheduler"
+  | "inventory-ledger"
+  | "help-board"
+  | "work-orders"
+  | "library-holds";
+
 export type WorkCategory =
   | "new-product"
   | "extension"
@@ -48,6 +56,7 @@ export type ScenarioTemplate = {
   codeExecution: boolean;
   browserVerification: boolean;
   relevantStages: string[];
+  acceptanceFamily?: AcceptanceFamily;
 };
 
 export type GeneratedScenario = {

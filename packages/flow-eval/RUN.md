@@ -10,6 +10,8 @@ pnpm --filter @repo/flow-eval eval grade --run <runId> --scenario S01
 pnpm --filter @repo/flow-eval eval pilot --model composer-2.5
 pnpm eval:experiment
 pnpm eval:experiment --seed example-seed
+pnpm eval:self-improve
+pnpm eval:self-improve --iterations 3 --seed example-campaign --dry-run
 pnpm eval:experiment --profile full-product --count 1
 pnpm eval:experiment --profile mixed --count 5
 pnpm eval:experiment --profile technical-ai-assessment

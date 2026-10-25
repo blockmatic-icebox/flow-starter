@@ -1,3 +1,4 @@
+import { isRegisteredFamily } from "../product/families/registry.ts";
 import type { GeneratedScenario, ScenarioTemplate } from "./types.ts";
 
 export const validateTemplate = ({
@@ -13,6 +14,13 @@ export const validateTemplate = ({
   if (!template.outcomes.length) errors.push("missing outcomes");
   for (const pre of template.fixturePreconditions)
     if (pre !== "none") errors.push(`unknown fixture precondition: ${pre}`);
+  if (
+    template.category === "new-product" &&
+    template.complexity >= 3 &&
+    (!template.acceptanceFamily ||
+      !isRegisteredFamily(template.acceptanceFamily))
+  )
+    errors.push("full-product template missing executable acceptanceFamily");
   return { ok: errors.length === 0, errors };
 };
 
@@ -28,5 +36,12 @@ export const validateGeneratedScenario = ({
   if (!scenario.oracle.acceptanceChecks.length)
     errors.push("oracle missing acceptanceChecks");
   if (scenario.publicBrief.length < 80) errors.push("brief too short");
+  if (
+    scenario.category === "new-product" &&
+    scenario.complexity >= 3 &&
+    (!scenario.oracle.acceptanceFamily ||
+      !isRegisteredFamily(String(scenario.oracle.acceptanceFamily)))
+  )
+    errors.push("generated scenario lacks executable acceptance adapter");
   return { ok: errors.length === 0, errors };
 };

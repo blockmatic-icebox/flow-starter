@@ -7,6 +7,16 @@ import { technicalAiAssessmentRoot } from "./paths.ts";
 
 export type AssessmentArm = "assessment-a" | "assessment-b";
 
+export type AssessmentLifecycle =
+  | "initialized"
+  | "running"
+  | "built"
+  | "evaluating"
+  | "remediating"
+  | "verified"
+  | "blocked"
+  | "failed";
+
 export const loadAssessmentFixture = () => {
   const requirements = JSON.parse(
     readFileSync(
@@ -74,9 +84,33 @@ export const runTechnicalAiAssessmentPair = async ({
         )}\n`
       );
       writeFileSync(path.join(armDir, "persona.md"), persona);
-      return Promise.resolve({ arm, armDir, status: "initialized" });
+      const lifecycle: AssessmentLifecycle = "blocked";
+      writeFileSync(
+        path.join(armDir, "lifecycle.json"),
+        `${JSON.stringify(
+          {
+            lifecycle,
+            reason:
+              "Assessment pair requires built products and holdout evaluation; build stage not executed in this run.",
+          },
+          null,
+          2
+        )}\n`
+      );
+      return Promise.resolve({
+        arm,
+        armDir,
+        lifecycle,
+        status: lifecycle,
+      });
     },
   });
 
-  return { fixture, ok: true, results, runId };
+  return {
+    fixture,
+    ok: false,
+    results,
+    runId,
+    terminal: "blocked",
+  };
 };

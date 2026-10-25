@@ -1,3 +1,4 @@
+import { isRegisteredFamily } from "../product/families/registry.ts";
 import { scenarioTemplates } from "./catalog-data.ts";
 import { composeScenario, scenarioContentHash } from "./compose.ts";
 import type { SeededRng } from "./rng.ts";
@@ -27,7 +28,11 @@ const categories = (): WorkCategory[] => [
 const filterForProfile = ({ profile }: { profile: ExperimentProfile }) => {
   if (profile === "full-product")
     return scenarioTemplates.filter(
-      (t) => t.category === "new-product" && t.complexity >= 3
+      (t) =>
+        t.category === "new-product" &&
+        t.complexity >= 3 &&
+        t.acceptanceFamily &&
+        isRegisteredFamily(t.acceptanceFamily)
     );
   if (profile === "mixed") return scenarioTemplates;
   return [];

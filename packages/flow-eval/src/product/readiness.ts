@@ -1,7 +1,13 @@
 import { spawnSync } from "node:child_process";
 
+import type { AcceptanceFamily } from "../generation/types.ts";
 import { repoRoot } from "../paths.ts";
 import { runAllowlistedCase } from "./execute.ts";
+import {
+  acceptanceFamilies,
+  familyRequirements,
+  runFamilyCase,
+} from "./families/registry.ts";
 import { allowlistedCases, starterRequirements } from "./registry.ts";
 import type {
   DimensionVerdict,
@@ -9,9 +15,9 @@ import type {
   RequirementRecord,
 } from "./types.ts";
 
-const currentSha = () =>
+const currentSha = ({ worktreePath }: { worktreePath?: string }) =>
   spawnSync("git", ["rev-parse", "HEAD"], {
-    cwd: repoRoot,
+    cwd: worktreePath ?? repoRoot,
     encoding: "utf-8",
   }).stdout.trim();
 
@@ -68,14 +74,101 @@ const dimensionFromKinds = ({
   return "INCONCLUSIVE";
 };
 
+const evaluateFamilyWorkspaceReadiness = ({
+  acceptanceFamily,
+  caseIds,
+  evaluatedRevision,
+  runId,
+  worktreePath,
+}: {
+  acceptanceFamily: AcceptanceFamily;
+  caseIds?: string[];
+  evaluatedRevision: string;
+  runId: string;
+  worktreePath: string;
+}) => {
+  const requirements = familyRequirements({ family: acceptanceFamily });
+  const familyCaseIds = [
+    `${acceptanceFamily}-contract`,
+    `${acceptanceFamily}-engineering`,
+  ].filter((id) => (caseIds?.length ? caseIds.includes(id) : true));
+  const evidence = familyCaseIds.map((caseId) =>
+    runFamilyCase({
+      caseId,
+      evaluatedSha: evaluatedRevision,
+      family: acceptanceFamily,
+      runId,
+      worktreePath,
+    })
+  );
+  const counts = summarizeEvidence({
+    evidence: evidence as ReturnType<typeof runAllowlistedCase>[],
+    requirements,
+  });
+  const engineering =
+    evidence.find((e) => e.caseId.endsWith("-engineering"))?.status === "passed"
+      ? "PASS"
+      : evidence.some(
+            (e) => e.caseId.endsWith("-engineering") && e.status === "failed"
+          )
+        ? "FAIL"
+        : "INCONCLUSIVE";
+  const features =
+    counts.failed > 0
+      ? ("FAIL" as DimensionVerdict)
+      : counts.unverified > 0
+        ? ("INCONCLUSIVE" as DimensionVerdict)
+        : ("PASS" as DimensionVerdict);
+  const usability = "INCONCLUSIVE" as DimensionVerdict;
+
+  let releaseVerdict: ReadinessReport["releaseVerdict"] = "INCONCLUSIVE";
+  if (
+    engineering === "PASS" &&
+    features === "PASS" &&
+    counts.failed === 0 &&
+    counts.unverified === 0
+  )
+    releaseVerdict = "READY";
+  else if (counts.failed > 0 || features === "FAIL")
+    releaseVerdict = "NOT_READY";
+
+  return {
+    blocked: counts.blocked,
+    engineering,
+    evaluatedRevision,
+    evidence,
+    failed: counts.failed,
+    features,
+    passed: counts.passed,
+    releaseVerdict,
+    requiredCriteria: counts.requiredCriteria,
+    unverified: counts.unverified,
+    usability,
+  } satisfies ReadinessReport;
+};
+
 export const evaluateReadiness = ({
+  acceptanceFamily,
   runId,
   caseIds,
+  worktreePath,
 }: {
+  acceptanceFamily?: AcceptanceFamily;
   runId: string;
   caseIds?: string[];
+  worktreePath?: string;
 }) => {
-  const evaluatedRevision = currentSha();
+  const evaluatedRevision = currentSha({ worktreePath });
+
+  if (acceptanceFamily && worktreePath)
+    return evaluateFamilyWorkspaceReadiness({
+      acceptanceFamily,
+      caseIds,
+      evaluatedRevision,
+      runId,
+      worktreePath,
+    });
+
   const requirements = starterRequirements();
   const selected = allowlistedCases().filter((c) =>
     caseIds?.length ? caseIds.includes(c.caseId) : true
@@ -126,3 +219,5 @@ export const evaluateReadiness = ({
     usability,
   } satisfies ReadinessReport;
 };
+
+export const fullProductFamiliesReady = () => acceptanceFamilies().length >= 6;

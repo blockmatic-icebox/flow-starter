@@ -175,6 +175,8 @@ export interface ScenarioOracle {
   requiresPassingTestCommand?: boolean;
   allowsProductCode?: boolean;
   productOutcomeCheck?: "listings-sort-asc";
+  acceptanceFamily?: string;
+  modifiers?: Record<string, string>;
 }
 
 export interface CommandEvidence {
