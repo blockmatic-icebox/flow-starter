@@ -14,11 +14,12 @@ Not a second methodology. Use Explore → Specify → Plan → Build → Review 
    - **Product or foundation defect** (feature, bug, architecture in the application)—stop; route to normal [flow](../flow/SKILL.md) work. Authorized product repair during Build is separate from methodology promotion (L1 only).
    - **Methodology or skill-routing defect** (wrong stage, wrong skill load, delegation mismatch)—continue below.
    - **One-off model miss** that does not justify an instruction change—stop; note it for the human without editing Flow docs.
-2. Read [.agents/flow/guides/improvement.md](../../flow/guides/improvement.md) and the relevant initiative under `.agents/flow/initiatives/`.
-3. Record a bounded initiative or update an existing one. Do not auto-merge or push.
-4. Implement candidates only in an isolated worktree with `writes` that exclude `.agents/eval/**`, `scenarios/`, `baselines/`, and `__dev/flow-evals/holdout/`.
-5. Run evaluation from the trusted host checkout: `pnpm --dir .agents flow-eval:check` and `pnpm --dir .agents eval compare` against a frozen baseline. If `git diff <trusted> -- .agents/eval` is non-empty, the candidate is invalid.
-6. Integrate only under existing human authorization (L2 auto-merge inactive). Do not spawn another improvement run from this task.
+2. Derive a **generic** coordinator rule for [flow](../flow/SKILL.md); put employer- or exercise-specific detail in `.agents/flow/operations/*` handoff pages only. Add focused regression coverage in `.agents/tooling/checks` when the rule is mechanical.
+3. Read [.agents/flow/guides/improvement.md](../../flow/guides/improvement.md) and the relevant initiative under `.agents/flow/initiatives/`.
+4. Record a bounded initiative or update an existing one. Do not auto-merge or push.
+5. Implement candidates only in an isolated worktree with `writes` that exclude `.agents/eval/**`, `scenarios/`, `baselines/`, and `__dev/flow-evals/holdout/`.
+6. Run evaluation from the trusted host checkout: `pnpm --dir .agents flow-eval:check` and `pnpm --dir .agents eval compare` against a frozen baseline. If `git diff <trusted> -- .agents/eval` is non-empty, the candidate is invalid.
+7. Integrate only under existing human authorization (L2 auto-merge inactive). Do not spawn another improvement run from this task.
 
 ## Completion
 

@@ -11,7 +11,7 @@ Coordinator reconciliation and worker returns: [delegation.md](delegation.md). *
 | Artifact | Role |
 | --- | --- |
 | Task report (this page) | User-visible closeout after every repository task |
-| `.agents/flow/prompts.txt` | Chronological prompt log (coordinator only) |
+| `.agents/flow/prompts.txt` | Optional **local** prompt log (gitignored; never commit) |
 | `.agents/flow/records/*.md` | Initiative retrospectives and evidence index |
 | `PRODUCT.md` / `DESIGN.md` / `ARCHITECTURE.md` | Current product contracts |
 | ADRs / PDRs | Consequential decisions (product and Factory namespaces) |
@@ -108,9 +108,36 @@ Compared three search approaches and recommended URL-based state. No implementat
 
 ## Prompt log entry (coordinator only)
 
-Append **one** block to [.agents/flow/prompts.txt](../prompts.txt) per handled human request after integrating delegated work (or at end of solo work). Workers and subagents must never append.
+Prompt logs are **local-only** (listed in `.gitignore`). Do **not** commit `.agents/flow/prompts.txt` or root `prompts.txt`.
 
-Follow the existing Git integration process so journal writes do not land on another worker's branch unintentionally.
+Preference, opt-in on first post-install task, and paths: [prompt-log.md](prompt-log.md).
+
+When logging is **enabled** in `AGENTS.md` (or required by an employer brief), the coordinator appends **one** block per handled request. Otherwise use the Task report only. Workers and subagents must never append.
+
+### Prompt log Q/A format
+
+Default block shape. Log **questions and answers**; do not copy multiple-choice **options** into **Q:**.
+
+```text
+---
+Timestamp: <ISO-8601>
+Work: <initiative slug or short id>
+Stage: <Explore|Specify|Plan|Build|Review|Ship|setup|eval|flow-improve>
+
+Human: <redacted human intent>
+
+Agent: <concise outcome>
+
+Q: <next question to the human, no option lists>
+
+---
+```
+
+Use **A:** when the human message answers the previous **Q:** (see [prompt-log.md](prompt-log.md)).
+
+### Prompt log extended format (optional)
+
+When an employer brief asks for richer metadata, add these fields after the Q/A lines in the same block:
 
 ```text
 ---

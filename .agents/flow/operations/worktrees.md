@@ -88,7 +88,7 @@ Build tasks must not list these under `writes` (parent integrates them):
 - `docs/initiatives/**`
 - `pnpm-lock.yaml`
 - `.agents/skills-lock.json`
-- `.agents/flow/prompts.txt` (Flow coordinator prompt log; see Flow skill)
+- `.agents/flow/prompts.txt` (optional local prompt log; gitignored; parent-owned in worktrees)
 - `**/knowledge-snapshot.ts`
 - Database schema and migration files under `packages/db/**` unless the task sets `schema_owner: yes` and is the only schema owner for the initiative
 

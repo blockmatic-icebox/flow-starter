@@ -176,7 +176,7 @@ After every repository task (not only substantial work):
 
 1. Collect worker returns; deduplicate findings; reconcile against the integrated checkout (distinguish disposable worktree changes from merged work).
 2. Distinguish worker claims from coordinator-verified results.
-3. Append **one** prompt log block to `.agents/flow/prompts.txt` when writes are permitted ([journal.md](journal.md#prompt-log-entry-coordinator-only)).
+3. Optionally append **one** Q/A prompt log block when logging is enabled or the brief requires it ([prompt-log.md](prompt-log.md), [journal.md](journal.md#prompt-log-qa-format)); never commit prompt logs.
 4. Produce **one** user-facing **Task report** per [journal.md](journal.md#task-report-user-visible), then the **Skills loaded** footer ([skills.md](skills.md)).
 
 Workers must never write the shared prompt journal or publish a separate final report to the user.

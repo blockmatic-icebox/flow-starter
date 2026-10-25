@@ -113,11 +113,12 @@ The installer configures project identity, generates a product-focused README, c
 After installation:
 
 1. Run `pnpm setup` and `pnpm dev` for local development.
-2. Evolve `PRODUCT.md`, `DESIGN.md`, and `ARCHITECTURE.md` as you explore and build the product.
-3. Replace starter homepage copy and add routes as the product takes shape.
-4. Configure required integrations; preserve relevant ADRs and PDRs.
-5. Extend `apps/web` using existing React and capability boundaries.
-6. Verify before delivery (`pnpm qa`, [verification.md](operations/verification.md) for UI).
+2. On the first agent session, the coordinator may ask once whether to enable gitignored Q/A logging to `prompts.txt`; see [prompt-log.md](operations/prompt-log.md).
+3. Evolve `PRODUCT.md`, `DESIGN.md`, and `ARCHITECTURE.md` as you explore and build the product.
+4. Replace starter homepage copy and add routes as the product takes shape.
+5. Configure required integrations; preserve relevant ADRs and PDRs.
+6. Extend `apps/web` using existing React and capability boundaries.
+7. Verify before delivery (`pnpm qa`, [verification.md](operations/verification.md) for UI).
 
 ## Foundation development
 

@@ -6,7 +6,7 @@ Real product development produces observations. Evaluations test hypotheses with
 
 ```text
 Product development
-  → prompts.txt + records/*.md (observations)
+  → local gitignored prompt log (optional) + records/*.md (observations)
   → recurring failure pattern
   → evaluation scenario (when justified)
   → proposed remediation

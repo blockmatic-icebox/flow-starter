@@ -12,7 +12,10 @@ import path from "node:path";
 import test from "node:test";
 
 import { repoRoot as repositoryRoot } from "../lib/repo-paths.mjs";
-import { validateFlowDocs } from "./check-flow-docs.mjs";
+import {
+  validateFlowCoordinatorContract,
+  validateFlowDocs,
+} from "./check-flow-docs.mjs";
 
 function defaultMarkdownContent(relative) {
   if (relative.startsWith("docs/research/")) {
@@ -374,6 +377,15 @@ test("ignores links inside fenced code", (t) => {
 `,
   });
   assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("flow coordinator contract rejects stripped skill", () => {
+  const root = path.resolve(import.meta.dirname, "..", "..", "..");
+  const flowPath = path.join(root, ".agents/skills/flow/SKILL.md");
+  const content = readFileSync(flowPath, "utf-8");
+  assert.equal(validateFlowCoordinatorContract(content).length, 0);
+  const broken = content.replaceAll("human-supplied brief", "brief");
+  assert.ok(validateFlowCoordinatorContract(broken).length > 0);
 });
 
 test("flow-improve and flow-eval disable model invocation; flow does not", () => {

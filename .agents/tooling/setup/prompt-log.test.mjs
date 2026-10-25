@@ -39,16 +39,17 @@ const appendPromptEntry = ({ filePath, prompt, summary, timestamp }) => {
   writeFileSync(filePath, `${prior}${block}`, "utf-8");
 };
 
-test("factory prompt log exists in dogfood checkout", () => {
-  const logPath = join(repoRoot, promptLogRel);
-  assert.ok(existsSync(logPath));
-  const content = readFileSync(logPath, "utf-8");
-  if (content.length > 0) {
-    for (const block of content.split("---").filter((b) => b.trim())) {
-      assert.match(block, /Timestamp:|^\d{4}-\d{2}-\d{2}T/u);
-    }
-  }
-  assert.ok(!existsSync(join(repoRoot, "prompts.txt")));
+test("factory prompt log is never tracked in git", () => {
+  const { stdout: tracked } = runGit({
+    args: ["ls-files", "--", promptLogRel, "prompts.txt"],
+    cwd: repoRoot,
+  });
+  assert.equal(tracked.trim(), "");
+  const gitignore = readFileSync(join(repoRoot, ".gitignore"), "utf-8");
+  assert.match(gitignore, /\.agents\/flow\/prompts\.txt/u);
+  assert.ok(
+    gitignore.split("\n").some((line) => line.trim() === "prompts.txt")
+  );
 });
 
 test("prompt log append preserves prior entries and redacts secrets", () => {

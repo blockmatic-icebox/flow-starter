@@ -641,6 +641,47 @@ function parseSkillFrontmatter(content) {
   return nameMatch?.groups?.name ?? null;
 }
 
+const flowCoordinatorContractChecks = [
+  { label: "gitignored prompt logs", pattern: /gitignored/iu },
+  {
+    label: "never commit prompt logs",
+    pattern: /must\s+\*\*never\*\*\s+be\s+committed/iu,
+  },
+  { label: "human-supplied brief", pattern: /human-supplied brief/iu },
+  { label: "reconcile brief with contracts", pattern: /\*\*Reconcile\*\*/u },
+  { label: "conflict stop and ask", pattern: /stop and ask/iu },
+  { label: "Explore to Specify persistence", pattern: /Explore → Specify/iu },
+  {
+    label: "Decided Assumed Open structure",
+    pattern: /\*\*Decided\*\*.*\*\*Assumed\*\*.*\*\*Open\*\*/u,
+  },
+  { label: "repository role starter-neutral", pattern: /starter-neutral/iu },
+  {
+    label: "cursor plans not contracts",
+    pattern: /Cursor plan files are \*\*not\*\* contracts/iu,
+  },
+  {
+    label: "prompt log preference post-install",
+    pattern: /Prompt log preference/iu,
+  },
+  {
+    label: "prompt log Q/A not option lists",
+    pattern: /questions and answers.*no multiple-choice option lists/iu,
+  },
+  { label: "prompt-log operations link", pattern: /prompt-log\.md/iu },
+];
+
+export function validateFlowCoordinatorContract(content) {
+  const errors = [];
+  for (const { label, pattern } of flowCoordinatorContractChecks) {
+    if (!pattern.test(content))
+      errors.push(
+        `.agents/skills/flow/SKILL.md: missing coordinator contract (${label})`
+      );
+  }
+  return errors;
+}
+
 function validateFirstPartySkills(root) {
   const errors = [];
   const seen = new Set();
@@ -876,6 +917,15 @@ export function validateFlowDocs(root = repositoryRoot) {
     ...validateAdoptedAgentsScripts(root),
     ...validateRepositoryOwnership(root)
   );
+
+  if (path.resolve(root) === path.resolve(repositoryRoot)) {
+    const flowSkillPath = path.join(root, ".agents/skills/flow/SKILL.md");
+    if (existsSync(flowSkillPath)) {
+      errors.push(
+        ...validateFlowCoordinatorContract(readFileSync(flowSkillPath, "utf-8"))
+      );
+    }
+  }
 
   return errors;
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { execSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -65,10 +66,25 @@ const collectLayoutErrors = (root) => {
     errors.push(
       "skills-lock.json belongs at .agents/skills-lock.json, not repository root"
     );
-  if (existsSync(path.join(root, "prompts.txt")))
-    errors.push(
-      "prompts.txt belongs at .agents/flow/prompts.txt, not repository root"
-    );
+  if (existsSync(path.join(root, ".git"))) {
+    const trackedPromptLogs = execSync(
+      "git ls-files -- prompts.txt .agents/flow/prompts.txt",
+      { cwd: root, encoding: "utf-8" }
+    ).trim();
+    if (trackedPromptLogs)
+      errors.push(
+        "prompt logs must not be committed (gitignore prompts.txt and .agents/flow/prompts.txt)"
+      );
+  }
+  const gitignorePath = path.join(root, ".gitignore");
+  if (existsSync(gitignorePath)) {
+    const gitignore = readFileSync(gitignorePath, "utf-8");
+    if (!gitignore.includes(".agents/flow/prompts.txt"))
+      errors.push(".gitignore must list .agents/flow/prompts.txt");
+    const gitignoreLines = gitignore.split("\n").map((line) => line.trim());
+    if (!gitignoreLines.includes("prompts.txt"))
+      errors.push(".gitignore must list prompts.txt");
+  }
   return errors;
 };
 
