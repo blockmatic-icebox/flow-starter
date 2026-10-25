@@ -26,7 +26,7 @@ Do not spawn the Cursor CLI `agent` command or pass a model.
 You must finish in this conversation with a consolidated report. Do not stop after dispatching workers.
 
 1. Record source revision (`git rev-parse HEAD`).
-2. `pnpm --dir .agents eval integrity` (or `flow-eval:check` when appropriate).
+2. `pnpm --dir .agents eval integrity` (full gate: `pnpm --dir .agents flow-eval:check`).
 3. `pnpm --dir .agents eval prepare --suite --arm flow` (or `--scenarios` when the user named a subset). Capture `runId`.
 4. For each scheduled job until terminal state (`complete`, `failed`, `blocked`, `cancelled`, `timed-out`):
    - `pnpm --dir .agents eval next --run <runId> --scenario <id> --repetition <n>`

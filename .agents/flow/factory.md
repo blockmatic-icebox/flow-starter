@@ -1,6 +1,6 @@
 # Flow Factory
 
-An agentic product-development environment: [Flow](README.md) methodology and Agent Skills, an opinionated reusable application foundation, isolated parallel execution (`pnpm worktrees`), product and technical documentation, evaluation harnesses, and user-invoked workflow improvement—not a permanently running reflection agent.
+An agentic product-development environment: [Flow](README.md) methodology and Agent Skills, an opinionated reusable application foundation, isolated parallel execution (`pnpm --dir .agents worktrees`), product and technical documentation, evaluation harnesses, and user-invoked workflow improvement—not a permanently running reflection agent.
 
 ## Mission
 

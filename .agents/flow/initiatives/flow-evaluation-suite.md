@@ -117,7 +117,7 @@ Out of scope (this wave): new scenarios, arms, dashboards, observer systems, aut
 - skills:
   - code-review-and-quality
 
-integrated_acceptance: pnpm flow:check && pnpm flow-eval:check
+integrated_acceptance: pnpm flow:check && pnpm --dir .agents flow-eval:check
 
 ## Progress
 
@@ -137,7 +137,7 @@ integrated_acceptance: pnpm flow:check && pnpm flow-eval:check
 
 ```bash
 pnpm flow:check
-pnpm flow-eval:check
+pnpm --dir .agents flow-eval:check
 pnpm --dir .agents eval preserve
 pnpm --dir .agents eval freeze-pilot --seed s09-s13-pilot-2026-10-25
 ```
@@ -168,9 +168,9 @@ Historical v0.1 run: partial transcripts, three P0 patterns (unauthorized Build,
 | **Baseline SHAs** | Pre-assessment `f260e73`; FI introduced `b079228`–`523b43d`; Factory docs migration `277c0cd`; remediation removes FI product |
 | **Confirmed delivery** | End-to-end FI slice (intake, support, fixture/live triage, browser journey); follow-up commits fixed web typecheck in pre-commit, Flow Agent tool schemas, and formatting |
 | **Confirmed failures** | **ADR 0012 violation** — assessment product shipped in product-neutral `apps/web`; CI red (oxfmt) until docs migration; incomplete machine-verifiable agent trace; no evidence that subagent delegation improved outcomes |
-| **Evidence** | Git history `b079228`…`523b43d` (pre–2026-10-25 author rewrite; use current `main` `git log` for live SHAs; baseline `1256e532` unchanged); GitHub Actions run [40147684277](https://github.com/gaboesquivel/flow-starter/actions/runs/40147684277) (quality/oxfmt); local `pnpm flow-eval:check` / `eval preserve` intact |
+| **Evidence** | Git history `b079228`…`523b43d` (pre–2026-10-25 author rewrite; use current `main` `git log` for live SHAs; baseline `1256e532` unchanged); GitHub Actions run [40147684277](https://github.com/gaboesquivel/flow-starter/actions/runs/40147684277) (quality/oxfmt); local `pnpm --dir .agents flow-eval:check` / `eval preserve` intact |
 | **Missing evidence** | Full `stream-json` transcripts, timing/token budgets, formal control arm, delegation worker traces |
 | **Retained improvements** | Pre-commit `apps/web` / `apps/flow` typecheck; Flow Agent AI SDK + Zod compatibility; Playwright port isolation; Factory/product doc split under `.agents/flow/decisions/` |
 | **Removed** | All FI application code, seed data, assessment `CLAUDE.md` / `prompts.txt`, starter `ai`/`zod` deps |
 
-`pnpm eval:experiment -- --profile technical-ai-assessment` records lifecycle `initialized` and release verdict `INCONCLUSIVE` until product checks exist.
+`pnpm --dir .agents eval:experiment -- --profile technical-ai-assessment` records lifecycle `initialized` and release verdict `INCONCLUSIVE` until product checks exist.

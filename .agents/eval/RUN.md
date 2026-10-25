@@ -29,12 +29,12 @@ pnpm --dir .agents eval integrity
 pnpm --dir .agents eval preserve
 pnpm --dir .agents eval freeze-pilot --seed s09-s13-pilot-2026-10-25
 pnpm --dir .agents eval grade --run <runId> --scenario S01
-pnpm eval:experiment
-pnpm eval:experiment --seed example-seed
-pnpm eval:self-improve
-pnpm eval:self-improve --iterations 3 --seed example-campaign --dry-run
-pnpm eval:experiment --profile full-product --count 1
-pnpm eval:experiment -- --profile technical-ai-assessment
+pnpm --dir .agents eval:experiment
+pnpm --dir .agents eval:experiment --seed example-seed
+pnpm --dir .agents eval:self-improve
+pnpm --dir .agents eval:self-improve --iterations 3 --seed example-campaign --dry-run
+pnpm --dir .agents eval:experiment --profile full-product --count 1
+pnpm --dir .agents eval:experiment -- --profile technical-ai-assessment
 pnpm --dir .agents eval run --scenarios S01,S02,S05,S09,S13 --arm flow --dry-run
 pnpm --dir .agents eval compare --baseline run-a --current run-b
 pnpm --dir .agents eval pilot-loop --dry-run
@@ -42,11 +42,11 @@ pnpm --dir .agents eval run --scenarios S13,S16 --repetition 2
 pnpm --dir .agents eval compare --baseline run-a --current run-b --remediation
 
 # Product acceptance (deterministic; not live-model proof)
-pnpm eval:readiness
-pnpm eval:stress
-pnpm eval:mutations
-pnpm eval:benchmark
-pnpm eval:benchmark:checkout
+pnpm --dir .agents eval:readiness
+pnpm --dir .agents eval:stress
+pnpm --dir .agents eval:mutations
+pnpm --dir .agents eval:benchmark
+pnpm --dir .agents eval:benchmark:checkout
 ```
 
 Product evidence: `.agents/eval/evidence/product-evals/<runId>/` (legacy: `__dev/product-evals/<runId>/`).
@@ -55,7 +55,7 @@ Product evidence: `.agents/eval/evidence/product-evals/<runId>/` (legacy: `__dev
 
 Blind subjective scores: `__dev/flow-evals/<runId>/blind-reviews/<scenarioId>.json` (see `src/blind-review.ts`). Not copied into executor worktrees.
 
-Unit tests may inject mocks when calling harness functions directly. The CLI and `pnpm worktrees` do not bypass host-session rules for methodology live runs. `pnpm worktrees --host cursor` remains the Build worker runner (separate from eval).
+Unit tests may inject mocks when calling harness functions directly. The CLI and `pnpm --dir .agents worktrees` do not bypass host-session rules for methodology live runs. `pnpm --dir .agents worktrees run --host cursor` remains the optional Build worker runner (separate from eval).
 
 Scenario worktrees run the same **product adoption** transform as [`install.sh`](../tooling/setup/install.sh) (shared [`product-adoption.mjs`](../tooling/setup/product-adoption.mjs)): slugged `package.json` name, Portless `name`, and `https://<slug>.localhost` in `apps/web`. Eval uses neutral workspace slugs (`product-<hash>`) that do not disclose scenario or arm. Partial benchmark/mutation fixtures are unchanged.
 

@@ -102,7 +102,7 @@ Risk: **low** = wording or deletion without gates or approval rules; **medium** 
 | Harness | [packages/flow-eval](../../eval), [RUN.md](../../eval/RUN.md) | Extend (trials stats, worktree cleanup, holdout) |
 | Worktrees | [scripts/worktrees.mjs](../../tooling/worktrees/worktrees.mjs) | Extend (`flow-self-improvement` slug) |
 | Roles | `.cursor/agents/{builder,researcher,verifier}.md` | Reuse |
-| Doc checks | `pnpm flow:check`, `pnpm flow-eval:check` | Reuse |
+| Doc checks | `pnpm flow:check`, `pnpm --dir .agents flow-eval:check` | Reuse |
 | Event log / ledger / hooks | — | New |
 | S3 session pin | — | Spike in Phase 0 |
 | D01–D17 | `classifyDelegation` unit tests only | Not behavioral evidence |
@@ -133,7 +133,7 @@ Each phase requires explicit **Build** authorization. Entry = previous phase acc
 | **1** | L0 hook + config | `node --test scripts/flow-events.test.mjs`; disabled/failing writer exit 0 |
 | **2** | Classify + cluster | Fixture replay stable; product correction ≠ candidate; Flow-doc correction = candidate (exp B) |
 | **3** | Improver worktree | Protected path edit fails; cleanup after cancel |
-| **4** | Compare + ledger | Adversarial fixtures fail; `pnpm flow-eval:check` 0 |
+| **4** | Compare + ledger | Adversarial fixtures fail; `pnpm --dir .agents flow-eval:check` 0 |
 | **5** | L1 promote + rollback | Dirty tree, conflict, canary revert tested |
 | **6** | Real cycle | One dogfood signature → promoted fix + canary |
 | **7** | Portability | Second repo, config + hook only, observe-only |
@@ -141,7 +141,7 @@ Each phase requires explicit **Build** authorization. Entry = previous phase acc
 **Phase 0 commands (when authorized):**
 
 ```bash
-pnpm flow-eval:check
+pnpm --dir .agents flow-eval:check
 pnpm --dir .agents eval preserve
 pnpm --dir .agents eval prepare --scenarios S13 --arm flow --repetition 3
 ```

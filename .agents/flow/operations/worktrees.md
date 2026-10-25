@@ -34,7 +34,7 @@ Plan approval is not Build authorization.
 
 Also `blocked` (merge conflict, dirty main, unmet prerequisite) and `failed` (worker or acceptance failure). State is stored under `.worktrees/state/<slug>.json` (gitignored).
 
-`pnpm worktrees run` finishes with `ok: false` when any required task is `failed` or `blocked`, or not all tasks reached `integrated`. Question-mode workers must produce non-empty output; reports live under `.worktrees/reports/<slug>/<taskId>.json`. Command-worker runs use a bounded async pool (`FLOW_WORKTREE_CAPACITY`). Optional initiative line `integrated_acceptance: <command>` runs on the integration worktree after all tasks complete.
+`pnpm --dir .agents worktrees run` finishes with `ok: false` when any required task is `failed` or `blocked`, or not all tasks reached `integrated`. Question-mode workers must produce non-empty output; reports live under `.worktrees/reports/<slug>/<taskId>.json`. Command-worker runs use a bounded async pool (`FLOW_WORKTREE_CAPACITY`). Optional initiative line `integrated_acceptance: <command>` runs on the integration worktree after all tasks complete.
 
 ## Initiative wave format
 
@@ -99,13 +99,13 @@ Tasks in the same wave must not overlap on `writes` paths.
 From the repository root:
 
 ```bash
-pnpm worktrees check <initiative-slug>
-pnpm worktrees prepare <initiative-slug> [wave-name]
-pnpm worktrees run <initiative-slug> [--host cursor] [--worker "<cmd>"]
-pnpm worktrees status <initiative-slug>
-pnpm worktrees cleanup <initiative-slug> [--force]
-pnpm worktrees up <initiative-slug> <wave-name>    # alias: prepare wave
-pnpm worktrees down <initiative-slug> <wave-name>  # safe cleanup for wave
+pnpm --dir .agents worktrees check <initiative-slug>
+pnpm --dir .agents worktrees prepare <initiative-slug> [wave-name]
+pnpm --dir .agents worktrees run <initiative-slug> [--host cursor] [--worker "<cmd>"]
+pnpm --dir .agents worktrees status <initiative-slug>
+pnpm --dir .agents worktrees cleanup <initiative-slug> [--force]
+pnpm --dir .agents worktrees up <initiative-slug> <wave-name>    # alias: prepare wave
+pnpm --dir .agents worktrees down <initiative-slug> <wave-name>  # safe cleanup for wave
 ```
 
 - **check** — parse `docs/initiatives/<slug>.md`, validate skills, dependencies, cycles, write overlap, build authorization, and concurrent write rules.
@@ -122,7 +122,7 @@ Task branches pin a base revision. Scoped dirty changes under a ready task’s `
 
 ## Integration recovery
 
-When integration marks a task `blocked` because of a merge conflict or conflict markers, the coordinator aborts the in-progress merge in the integration worktree so `main` is not left mid-merge. Fix the task branch (or abandon the task), then rerun `pnpm worktrees run`. Reverting an already integrated commit on `main` uses ordinary authorized git revert; there is no separate rollback command.
+When integration marks a task `blocked` because of a merge conflict or conflict markers, the coordinator aborts the in-progress merge in the integration worktree so `main` is not left mid-merge. Fix the task branch (or abandon the task), then rerun `pnpm --dir .agents worktrees run`. Reverting an already integrated commit on `main` uses ordinary authorized git revert; there is no separate rollback command.
 
 ## Isolation limits
 

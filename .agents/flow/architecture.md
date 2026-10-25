@@ -122,7 +122,7 @@ Local gates:
 
 GitHub Actions: [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) and [`.github/workflows/security.yml`](../../.github/workflows/security.yml) run on pull requests and pushes to `main`. Pull request builds use `pull_request` and do not receive deployment or model secrets. [`.github/workflows/pr-title.yml`](../../.github/workflows/pr-title.yml) enforces Conventional Commits on PR titles; [`.github/workflows/commit-messages.yml`](../../.github/workflows/commit-messages.yml) enforces the same subject format on every commit in the PR. Local `pnpm hooks:commit-msg` (via `simple-git-hooks`) blocks non-conventional subjects before a commit is created. DeepSec stays manual in [`.github/workflows/deepsec.yml`](../../.github/workflows/deepsec.yml).
 
-GenUI unit tests and graded prompt matrix: `pnpm --filter @repo/genui test` (`packages/genui/src/eval/query-matrix.ts`, offline: `pnpm eval:genui:offline`). Product browser tests: `pnpm test:browser` (see [GenUI tests](specs/genui.md#tests)). Factory evaluation: `pnpm --dir .agents test` and `pnpm flow-eval:check`.
+GenUI unit tests and graded prompt matrix: `pnpm --filter @repo/genui test` (`packages/genui/src/eval/query-matrix.ts`, offline: `pnpm eval:genui:offline`). Product browser tests: `pnpm test:browser` (see [GenUI tests](specs/genui.md#tests)). Factory evaluation: `pnpm --dir .agents test` and `pnpm --dir .agents flow-eval:check`.
 
 ### Local Neon database
 

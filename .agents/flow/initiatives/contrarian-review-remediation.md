@@ -80,7 +80,7 @@ Measured 2026-10-24 on this checkout. `pnpm qa` and `pnpm ci:local` chain with `
 | --- | --: | --: | --- |
 | `pnpm qa` | 1 | ~0.5 | Stops at `pnpm lint` (oxlint in `scripts/worktrees/**`) |
 | `pnpm ci:local` | 1 | ~0.6 | Stops when `pnpm qa` fails |
-| `pnpm flow-eval:check` | 0 | ~0.5 | Types, unit tests, `eval preserve` |
+| `pnpm --dir .agents flow-eval:check` | 0 | ~0.5 | Types, unit tests, `eval preserve` |
 
 **`pnpm qa` steps (timed individually; full `qa` aborts before later steps when lint fails):**
 
@@ -255,7 +255,7 @@ These apply when the corresponding finding is authorized:
 ```bash
 pnpm qa
 pnpm ci:local
-pnpm flow-eval:check
+pnpm --dir .agents flow-eval:check
 ```
 
 Report each command with its exit code. Anything not run is stated as not run.

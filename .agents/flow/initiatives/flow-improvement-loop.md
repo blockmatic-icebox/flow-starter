@@ -86,7 +86,7 @@ Dry-run transcripts are not agent compliance evidence. Gate comparison is only m
 ## Validation
 
 ```bash
-pnpm flow-eval:check
+pnpm --dir .agents flow-eval:check
 pnpm --dir .agents eval preserve
 ```
 

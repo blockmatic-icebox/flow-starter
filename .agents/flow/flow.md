@@ -216,7 +216,7 @@ For a small task, a concise plan in the conversation is sufficient. For sustaine
 
 **Exit condition:** The first implementation slice is unambiguous and verifiable.
 
-For substantial initiative work, record parallel execution as **waves** in the owning initiative (`## Waves`). Before plan approval, run a **contrarian wave** (question-mode worktrees) when meaningful alternatives or unvalidated assumptions remain; capture assumptions, kill criteria, and the recommended direction in the initiative. After explicit **Build** authorization, the coordinator uses `pnpm worktrees` to prepare ready tasks, run workers in isolated checkouts, verify results, and serialize integration into local `main`. Procedure and task format: [.agents/flow/operations/worktrees.md](operations/worktrees.md).
+For substantial initiative work, record parallel execution as **waves** in the owning initiative (`## Waves`). Before plan approval, run a **contrarian wave** (question-mode worktrees) when meaningful alternatives or unvalidated assumptions remain; capture assumptions, kill criteria, and the recommended direction in the initiative. After explicit **Build** authorization, the coordinator uses `pnpm --dir .agents worktrees` to prepare ready tasks, run workers in isolated checkouts, verify results, and serialize integration into local `main`. Procedure and task format: [.agents/flow/operations/worktrees.md](operations/worktrees.md).
 
 Dependency-aware planning and parallel investigation: [delegation.md](operations/delegation.md#plan).
 
