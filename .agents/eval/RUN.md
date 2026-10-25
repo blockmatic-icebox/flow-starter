@@ -63,7 +63,19 @@ Unit tests may inject mocks when calling harness functions directly. The CLI and
 
 Scenario worktrees run the same **product adoption** transform as [`install.sh`](../tooling/setup/install.sh) (shared [`product-adoption.mjs`](../tooling/setup/product-adoption.mjs)): slugged `package.json` name, Portless `name`, and `https://<slug>.localhost` in `apps/web`. Eval uses neutral workspace slugs (`product-<hash>`) that do not disclose scenario or arm. Partial benchmark/mutation fixtures are unchanged.
 
-Runner-only trial metadata (arm, scenario id, Portless host, run id) is written under `.agents/eval/evidence/flow-evals/<runId>/trials/.../trial-meta.json`, not in the subject worktree. Remaining isolation limits: shared host skills/MCP, flow-arm skills symlink, inert `.agents/eval` stub package, fixture files, and same-machine worktrees (see [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md)).
+Runner-only trial metadata (arm, scenario id, Portless host, run id, database lifecycle when provisioned) is written under `.agents/eval/evidence/flow-evals/<runId>/trials/.../trial-meta.json`, not in the subject worktree. Remaining isolation limits: shared host skills/MCP, flow-arm skills symlink, inert `.agents/eval` stub package, fixture files, and same-machine worktrees (see [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md)).
+
+## Database isolation (Neon Local)
+
+Database-dependent evals (`eval readiness`, `eval stress`, scenarios with `persistence: "required"`) provision **one PostgreSQL database per subject** through the shared **Neon Local** Docker proxy at `localhost:5432` (cloud branch proxy — not an offline Postgres engine; see [architecture.md](../flow/architecture.md)).
+
+**Runner prerequisites (Factory checkout only):** Docker running, `.env` with `NEON_API_KEY` and `NEON_PROJECT_ID`, optional `PARENT_BRANCH_ID` for a disposable parent branch. Subjects receive only `DATABASE_URL` in gitignored `.env.local` inside the worktree — never Neon API credentials.
+
+**Lifecycle:** `prepare` → create DB → migrate → verify → run subject → `finalize` → drop DB (unless `FLOW_EVAL_RETAIN_DB=1`). Ownership is recorded in `database-registry.json` under the run directory; only `flow_eval_<hash>` names registered for that run are dropped.
+
+**Recovery:** Re-run `eval prepare` for the same `runId` to reconcile orphaned registry entries. Manual cleanup: connect to admin `neondb` via the proxy and `DROP DATABASE flow_eval_<hash>` only when the name appears in your run’s registry.
+
+**Tests:** Integration tests report `BLOCKED` when Docker or Neon env is missing. Set `FLOW_EVAL_INSTALL_PARITY=1` to run installer parity tests locally.
 
 Bounded diagnostic completion (agent-reported turns only, not official proof): `node .agents/eval/scripts/complete-s01-smoke.mjs`.
 

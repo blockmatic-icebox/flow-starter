@@ -222,6 +222,8 @@ export interface PublicScenarioCard {
   codeExecution: boolean;
   browserVerification: boolean;
   hiddenSha256?: string;
+  /** When set, runner provisions an isolated Neon Local database for this scenario. */
+  persistence?: "required";
 }
 
 export interface HiddenScenarioSpec {

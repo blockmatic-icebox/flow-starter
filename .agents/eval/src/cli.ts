@@ -28,7 +28,7 @@ import {
   runOfflineBenchmark,
 } from "./product/mutations.ts";
 import { writeProductEvalArtifacts } from "./product/persist.ts";
-import { evaluateReadiness } from "./product/readiness.ts";
+import { evaluateReadinessWithDatabase } from "./product/readiness-isolated.ts";
 import { findingsFromReadiness } from "./product/remediate.ts";
 import { createHostRepairExecutor } from "./product/repair-executor.ts";
 import { runStressEvaluation } from "./product/stress.ts";
@@ -186,7 +186,7 @@ const parseHostFlag = (value?: string): EvalHost | undefined => {
   process.exit(3);
 };
 
-const cmdHeadlessRun = ({
+const cmdHeadlessRun = async ({
   arm,
   auto,
   repetition,
@@ -206,7 +206,7 @@ const cmdHeadlessRun = ({
   }
   assertScenarioIds({ ids: scenarios });
   assertArm({ arm });
-  const prep = prepareHostRun({
+  const prep = await prepareHostRun({
     arm,
     host: "cursor",
     repetition,
@@ -246,7 +246,7 @@ const cmdHeadlessRun = ({
   process.exit(2);
 };
 
-const cmdPrepare = ({
+const cmdPrepare = async ({
   arm,
   host,
   repetition,
@@ -261,7 +261,7 @@ const cmdPrepare = ({
 }) => {
   assertScenarioIds({ ids: scenarios });
   assertArm({ arm });
-  const prep = prepareHostRun({
+  const prep = await prepareHostRun({
     arm,
     host: host ?? detectEvalHost(),
     repetition,
@@ -356,7 +356,7 @@ const cmdObserve = ({
   if (!result.ok) process.exit(1);
 };
 
-const cmdFinalize = ({
+const cmdFinalize = async ({
   acceptDiagnostic,
   modelId,
   runId,
@@ -365,7 +365,7 @@ const cmdFinalize = ({
   modelId?: string;
   runId: string;
 }) => {
-  const result = hostSessionFinalize({ modelId, runId });
+  const result = await hostSessionFinalize({ modelId, runId });
   console.log(JSON.stringify(result, null, 2));
   if (!result.ok) process.exit(1);
   if (result.grades.some((g) => g.gate === "fail")) process.exit(1);
@@ -416,13 +416,13 @@ const cmdPilotLoop = async ({
 
   const flowScenarios = ["S13", "S16", "S17", "S09", "S01"];
   const controlScenarios = ["S13", "S16", "S09"];
-  const flowPrep = prepareHostRun({
+  const flowPrep = await prepareHostRun({
     arm: "flow",
     repetition,
     runId: `${runId}-flow`,
     scenarioIds: flowScenarios,
   });
-  const controlPrep = prepareHostRun({
+  const controlPrep = await prepareHostRun({
     arm: "control",
     repetition,
     runId: `${runId}-control`,
@@ -456,8 +456,8 @@ const cmdPilotLoop = async ({
   process.exit(2);
 };
 
-const cmdPilot = ({ scenarios }: { scenarios: string[] }) => {
-  const prep = prepareHostRun({
+const cmdPilot = async ({ scenarios }: { scenarios: string[] }) => {
+  const prep = await prepareHostRun({
     arm: "flow",
     scenarioIds: scenarios,
   });
@@ -508,7 +508,7 @@ const cmdRun = async ({
     return;
   }
 
-  const prep = prepareHostRun({
+  const prep = await prepareHostRun({
     arm,
     repetition: repetition ?? 1,
     runId,
@@ -560,7 +560,7 @@ const cmdHandoff = async ({
     return;
   }
 
-  const prep = prepareHostRun({
+  const prep = await prepareHostRun({
     arm: "flow",
     runId,
     scenarioIds: [agentAScenario],
@@ -629,12 +629,12 @@ const cmdCompareArms = async ({
     return;
   }
 
-  const flowPrep = prepareHostRun({
+  const flowPrep = await prepareHostRun({
     arm: "flow",
     runId: flowRun,
     scenarioIds: scenarios,
   });
-  const controlPrep = prepareHostRun({
+  const controlPrep = await prepareHostRun({
     arm: "control",
     runId: controlRun,
     scenarioIds: scenarios,
@@ -728,8 +728,8 @@ const dispatchCompareCli = (flags: Record<string, unknown>) => {
   });
 };
 
-const cmdReadiness = ({ runId }: { runId: string }) => {
-  const readiness = evaluateReadiness({ runId });
+const cmdReadiness = async ({ runId }: { runId: string }) => {
+  const readiness = await evaluateReadinessWithDatabase({ runId });
   const findings = findingsFromReadiness(readiness);
   writeProductEvalArtifacts({ findings, readiness, runId });
   console.log(JSON.stringify(readiness, null, 2));
@@ -803,8 +803,8 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
       cmdMutations();
     },
     mutations: () => cmdMutations(),
-    readiness: () =>
-      cmdReadiness({
+    readiness: async () =>
+      await cmdReadiness({
         runId: String(flags.run ?? `readiness-${Date.now()}`),
       }),
     stress: () =>
@@ -822,12 +822,12 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
           "S05,S09,S13"
         ),
       }),
-    finalize: () => {
+    finalize: async () => {
       if (!flags.run) {
         console.error("finalize requires --run");
         process.exit(3);
       }
-      cmdFinalize({
+      await cmdFinalize({
         acceptDiagnostic: Boolean(flags["accept-diagnostic"]),
         modelId: flags["model-id"] ? String(flags["model-id"]) : undefined,
         runId: String(flags.run),
@@ -859,11 +859,11 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         dryRun: Boolean(flags["dry-run"]),
         variant: (flags.variant as "C1" | "C2" | "C3") ?? "C1",
       }),
-    "headless-run": () => {
+    "headless-run": async () => {
       const scenarios = flags.scenarios
         ? String(flags.scenarios).split(",")
         : listDefaultDiagnosticScenarioIds().slice(0, 1);
-      return cmdHeadlessRun({
+      return await cmdHeadlessRun({
         arm: (flags.arm as EvalArm) ?? "flow",
         auto: Boolean(flags.auto),
         repetition: Number(flags.repetition ?? 1),
@@ -889,8 +889,8 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         scenarioId: flags.scenario ? String(flags.scenario) : undefined,
       });
     },
-    pilot: () =>
-      cmdPilot({
+    pilot: async () =>
+      await cmdPilot({
         scenarios: scenarioList(
           flags.scenarios as string | undefined,
           "S01,S13"
@@ -901,8 +901,8 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         dryRun: Boolean(flags["dry-run"]),
         repetition: Number(flags.repetition ?? 2),
       }),
-    prepare: () =>
-      cmdPrepare({
+    prepare: async () =>
+      await cmdPrepare({
         arm: (flags.arm as EvalArm) ?? "flow",
         host: parseHostFlag(flags.host ? String(flags.host) : undefined),
         repetition: Number(flags.repetition ?? 1),

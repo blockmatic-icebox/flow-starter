@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { before, describe, it } from "node:test";
 
 import {
   hostSessionFinalize,
@@ -61,19 +61,23 @@ const completeExploreTurn = ({
 };
 
 describe("host-session orchestration lifecycle", () => {
-  it("finalize fails when no job reached complete", () => {
+  before(() => {
+    process.env.FLOW_EVAL_SKIP_PRODUCT_SETUP = "1";
+  });
+
+  it("finalize fails when no job reached complete", async () => {
     const runId = `orch-incomplete-${Date.now()}`;
-    prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
+    await prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
     hostSessionNext({ runId, scenarioId: "S01" });
-    const finalized = hostSessionFinalize({ runId });
+    const finalized = await hostSessionFinalize({ runId });
     assert.equal(finalized.ok, false);
   });
 
-  it("finalize returns partial when one scenario completes and another does not", () => {
+  it("finalize returns partial when one scenario completes and another does not", async () => {
     const runId = `orch-partial-${Date.now()}`;
-    prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01", "S02"] });
+    await prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01", "S02"] });
     assert.ok(completeExploreTurn({ runId, scenarioId: "S01" }));
-    const finalized = hostSessionFinalize({
+    const finalized = await hostSessionFinalize({
       modelId: "test-model",
       runId,
     });

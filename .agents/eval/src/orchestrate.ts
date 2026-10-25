@@ -372,7 +372,7 @@ export const runBatch = async ({
   concurrency?: number;
 }) => {
   if (official) {
-    const prep = prepareHostRun({
+    const prep = await prepareHostRun({
       arm,
       generatedScenarios,
       repetition,

@@ -46,8 +46,13 @@ const initRepo = () => {
 describe("evalProductName", () => {
   it("slugifies to a portless-safe eval project name", () => {
     assert.equal(
-      evalProductName({ repetition: 2, runId: "run-1", scenarioId: "S13" }),
-      "product-ce6900803cb0"
+      evalProductName({
+        arm: "flow",
+        repetition: 2,
+        runId: "run-1",
+        scenarioId: "S13",
+      }),
+      "product-e3f9c211"
     );
   });
 });

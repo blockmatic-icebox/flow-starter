@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
+    "postgres": "^3.4.9",
     "skills": "1.7.4",
     "tsc-ts": "^0.0.9",
     "tsx": "^4.23.15",

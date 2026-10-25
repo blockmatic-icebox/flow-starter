@@ -51,4 +51,13 @@ export const allowlistedCases = (): AllowlistedCase[] => [
     kind: "unit",
     requirementIds: [],
   },
+  {
+    caseId: "db-starter-persist",
+    command:
+      "node --import tsx .agents/eval/src/infrastructure/db-acceptance.ts",
+    cwd: "repo",
+    expected: "subject database migrate and persist",
+    kind: "integration",
+    requirementIds: [],
+  },
 ];

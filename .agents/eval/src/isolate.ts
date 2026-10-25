@@ -13,36 +13,15 @@ import path from "node:path";
 
 import { evaluatorGitConfig } from "./git-eval-identity.ts";
 import { packageDirInRepo, repoRoot, worktreeRoot } from "./paths.ts";
+import { buildSubjectIdentity } from "./subject-identity.ts";
 import type { AgentDiffCapture, EvalArm, PrepBaselineMeta } from "./types.ts";
+
+export { evalProductName } from "./subject-identity.ts";
 
 const productAdoptionScript = path.join(
   repoRoot,
   ".agents/tooling/setup/product-adoption.mjs"
 );
-
-const neutralWorkspaceSlug = ({
-  repetition = 1,
-  runId,
-  scenarioId,
-}: {
-  repetition?: number;
-  runId: string;
-  scenarioId: string;
-}) =>
-  createHash("sha256")
-    .update(`${runId}:${scenarioId}:${repetition}`)
-    .digest("hex")
-    .slice(0, 12);
-
-export const evalProductName = ({
-  repetition = 1,
-  runId,
-  scenarioId,
-}: {
-  repetition?: number;
-  runId: string;
-  scenarioId: string;
-}) => `product-${neutralWorkspaceSlug({ repetition, runId, scenarioId })}`;
 
 const applyProductAdoptionToWorktree = ({
   projectName,
@@ -187,6 +166,7 @@ export const setupWorktree = ({
   copySkills = true,
   skipInstall,
   repetition = 1,
+  prepareNonce,
 }: {
   runId: string;
   scenarioId: string;
@@ -195,8 +175,16 @@ export const setupWorktree = ({
   copySkills?: boolean;
   skipInstall?: boolean;
   repetition?: number;
+  prepareNonce?: string;
 }) => {
-  const worktreeName = `ws-${neutralWorkspaceSlug({ repetition, runId, scenarioId })}`;
+  const identity = buildSubjectIdentity({
+    arm,
+    prepareNonce,
+    repetition,
+    runId,
+    scenarioId,
+  });
+  const worktreeName = identity.worktreeName;
   const worktreePath = path.join(worktreeRoot, worktreeName);
   mkdirSync(worktreeRoot, { recursive: true });
 
@@ -214,24 +202,26 @@ export const setupWorktree = ({
   applyArmMutations({ arm, copySkills, worktreePath });
 
   const adoption = applyProductAdoptionToWorktree({
-    projectName: evalProductName({ repetition, runId, scenarioId }),
+    projectName: identity.productName,
     worktreePath,
   });
 
   const trialRunnerMeta = {
     arm,
     baselineSha: flowSha,
+    databaseName: identity.databaseName,
     portlessHost: adoption.host,
     portlessName: adoption.slug,
-    productName: evalProductName({ repetition, runId, scenarioId }),
+    productName: identity.productName,
     repetition,
     runId,
     scenarioId,
+    subjectKey: identity.subjectKey,
   };
 
   if (!skipInstall) installWorktreeDependencies({ worktreePath });
 
-  return { trialRunnerMeta, worktreeName, worktreePath };
+  return { identity, trialRunnerMeta, worktreeName, worktreePath };
 };
 
 export const applyScenarioFixture = ({

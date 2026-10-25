@@ -1,5 +1,5 @@
 import { writeProductEvalArtifacts } from "./persist.ts";
-import { evaluateReadiness } from "./readiness.ts";
+import { evaluateReadinessWithDatabase } from "./readiness-isolated.ts";
 import { runRemediationLoop } from "./remediate.ts";
 import type { RepairExecutor } from "./remediate.ts";
 
@@ -19,7 +19,7 @@ export const runStressEvaluation = async ({
   const loop = await runRemediationLoop({
     caseIds,
     evaluate: ({ runId: cycleRunId }) =>
-      evaluateReadiness({ caseIds, runId: cycleRunId }),
+      evaluateReadinessWithDatabase({ caseIds, runId: cycleRunId }),
     maxRemediationCycles,
     repairExecutor,
     runId,

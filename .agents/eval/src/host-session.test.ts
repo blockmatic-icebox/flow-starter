@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { describe, it } from "node:test";
+import { before, describe, it } from "node:test";
 
 import type { GeneratedScenario } from "./generation/types.ts";
 import {
@@ -21,9 +21,13 @@ const assertNoPinnedAgent = (relativePath: string) => {
 };
 
 describe("host-session eval harness", () => {
-  it("next without record returns awaiting-record not scenario-done", () => {
+  before(() => {
+    process.env.FLOW_EVAL_SKIP_PRODUCT_SETUP = "1";
+  });
+
+  it("next without record returns awaiting-record not scenario-done", async () => {
     const runId = `test-awaiting-${Date.now()}`;
-    prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
+    await prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
     const turn = hostSessionNext({ runId, scenarioId: "S01", repetition: 1 });
     assert.equal(turn.ok, true);
     if (!turn.ok || turn.status !== "turn") return;
@@ -34,9 +38,9 @@ describe("host-session eval harness", () => {
       assert.equal(again.packet.turn, turn.packet.turn);
   });
 
-  it("record rejects empty events", () => {
+  it("record rejects empty events", async () => {
     const runId = `test-record-empty-${Date.now()}`;
-    prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
+    await prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
     const turn = hostSessionNext({ runId, scenarioId: "S01", repetition: 1 });
     assert.equal(turn.ok, true);
     if (!turn.ok || turn.status !== "turn") return;
@@ -50,9 +54,9 @@ describe("host-session eval harness", () => {
     assert.equal(recorded.ok, false);
   });
 
-  it("prepare writes state without spawning agent", () => {
+  it("prepare writes state without spawning agent", async () => {
     const runId = `test-prepare-${Date.now()}`;
-    const prep = prepareHostRun({
+    const prep = await prepareHostRun({
       arm: "flow",
       runId,
       scenarioIds: ["S01"],
@@ -65,9 +69,9 @@ describe("host-session eval harness", () => {
     assert.match(next.packet?.prompt ?? "", /./u);
   });
 
-  it("observe accepts runner observed commands after record", () => {
+  it("observe accepts runner observed commands after record", async () => {
     const runId = `test-observe-${Date.now()}`;
-    prepareHostRun({
+    await prepareHostRun({
       arm: "flow",
       host: "cursor",
       runId,
@@ -136,9 +140,9 @@ describe("host-session eval harness", () => {
     assert.equal(observed.ok, true);
   });
 
-  it("finalize grades v2 host-session as not official-eligible without runner capture", () => {
+  it("finalize grades v2 host-session as not official-eligible without runner capture", async () => {
     const runId = `test-finalize-${Date.now()}`;
-    prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
+    await prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
     const turn = hostSessionNext({ runId });
     assert.equal(turn.ok, true);
     if (!turn.ok || turn.status !== "turn") return;
@@ -184,7 +188,7 @@ describe("host-session eval harness", () => {
         turn: n.packet.turn,
       });
     }
-    const finalized = hostSessionFinalize({ runId });
+    const finalized = await hostSessionFinalize({ runId });
     assert.equal(finalized.ok, true);
     if (!finalized.ok) return;
     assert.equal(finalized.manifest.harness, "host-session");
@@ -195,9 +199,9 @@ describe("host-session eval harness", () => {
     assert.equal(finalized.grades[0]?.quality, null);
   });
 
-  it("records a later turn after an earlier turn was recorded", () => {
+  it("records a later turn after an earlier turn was recorded", async () => {
     const runId = `test-later-turn-${Date.now()}`;
-    prepareHostRun({ arm: "flow", runId, scenarioIds: ["S02"] });
+    await prepareHostRun({ arm: "flow", runId, scenarioIds: ["S02"] });
     const first = hostSessionNext({
       repetition: 1,
       runId,
@@ -253,7 +257,7 @@ describe("host-session eval harness", () => {
     assert.equal(secondRecord.ok, true);
   });
 
-  it("delivers a later scripted line when an intermediate turn is empty", () => {
+  it("delivers a later scripted line when an intermediate turn is empty", async () => {
     const runId = `test-skip-gap-${Date.now()}`;
     const generated: GeneratedScenario = {
       category: "ambiguous-requirements",
@@ -290,7 +294,7 @@ describe("host-session eval harness", () => {
       },
       templateId: "gap",
     };
-    prepareHostRun({
+    await prepareHostRun({
       arm: "flow",
       generatedScenarios: [generated],
       runId,

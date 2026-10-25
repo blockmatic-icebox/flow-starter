@@ -11,12 +11,12 @@ import {
   runnerCaptureCompleteForScenario,
   runnerTranscriptFileName,
 } from "./host-protocol.ts";
+import type { DatabaseLifecycleStatus } from "./infrastructure/database.ts";
 import {
-  applyScenarioFixture,
-  captureAgentDiff,
-  finalizePrepBaseline,
-  setupWorktree,
-} from "./isolate.ts";
+  cleanupSubjectDatabase,
+  prepareSubjectDatabase,
+} from "./infrastructure/database.ts";
+import { captureAgentDiff } from "./isolate.ts";
 import { assessIsolationFromTrial } from "./isolation-trial.ts";
 import {
   assessIsolation,
@@ -24,9 +24,11 @@ import {
   SUBJECT_EVALUATOR_PROTOCOL_ID,
 } from "./isolation.ts";
 import { runEvalDir } from "./paths.ts";
+import { prepareInstalledSubject } from "./product/prepare-installed-product.ts";
 import { validateSubjectRecordEvents } from "./record-validation.ts";
 import { redactOrThrow } from "./redact.ts";
 import { writeRunSummary, writeScenarioReport } from "./report.ts";
+import { requiresDatabase } from "./requires-database.ts";
 import { rubricVersion } from "./rubric.ts";
 import { isTrustedRunnerEventsFile } from "./runner-capture.ts";
 import { validateRunnerObserveEvents } from "./runner-record-validation.ts";
@@ -99,6 +101,9 @@ type HostJob = {
   lastRecordedFingerprint?: string;
   lastRecordedTurn?: number;
   failureReason?: string;
+  databaseName?: string;
+  databaseLifecycle?: DatabaseLifecycleStatus;
+  subjectKey?: string;
 };
 
 const terminalJobStatuses = new Set<HostJobStatus>([
@@ -342,7 +347,32 @@ const buildHostManifest = ({
   };
 };
 
-export const prepareHostRun = ({
+const cleanupJobsDatabases = async ({
+  jobs,
+  runId,
+}: {
+  jobs: HostJob[];
+  runId: string;
+}) => {
+  await Promise.all(
+    jobs.map(async (job) => {
+      if (!job.databaseName) return;
+      const result = await cleanupSubjectDatabase({
+        databaseName: job.databaseName,
+        runId,
+      });
+      if (job.databaseLifecycle)
+        job.databaseLifecycle.cleanup =
+          result.cleanup === "passed"
+            ? "passed"
+            : result.cleanup === "skipped"
+              ? "skipped"
+              : "failed";
+    })
+  );
+};
+
+export const prepareHostRun = async ({
   arm,
   copySkills = true,
   customTurnOneByScenario,
@@ -377,58 +407,117 @@ export const prepareHostRun = ({
     (generatedScenarios ?? []).map((s) => [s.id, s] as const)
   );
 
-  for (let rep = 1; rep <= repetition; rep += 1)
-    for (const scenarioId of scenarioIds) {
-      const { trialRunnerMeta, worktreePath } = setupWorktree({
+  const prepareJobs = scenarioIds.flatMap((scenarioId) =>
+    Array.from({ length: repetition }, (_, index) => ({
+      rep: index + 1,
+      scenarioId,
+    }))
+  );
+
+  for (const { rep, scenarioId } of prepareJobs) {
+    const prepareNonce = `${runId}-${scenarioId}-${rep}-${Date.now()}`;
+    let worktreePath: string;
+    let trialRunnerMeta: Record<string, unknown>;
+    let prep: PreparedSourceIdentity & {
+      commitSha: string;
+      fingerprint: string;
+      recordedAt: string;
+      treeSha: string;
+    };
+    let databaseLifecycle: DatabaseLifecycleStatus | undefined;
+    let databaseName: string | undefined;
+    let subjectKey: string | undefined;
+    let jobStatus: HostJobStatus = "pending";
+    let failureReason: string | undefined;
+
+    try {
+      const prepared = prepareInstalledSubject({
         arm,
         copySkills,
         flowSha,
+        prepareNonce,
         repetition: rep,
         runId,
         scenarioId,
+        withFixture: !generatedById.has(scenarioId),
+        withSetup: process.env.FLOW_EVAL_SKIP_PRODUCT_SETUP !== "1",
       });
-      if (!generatedById.has(scenarioId))
-        applyScenarioFixture({ scenarioId, worktreePath });
-      const prep = finalizePrepBaseline({ worktreePath });
-      const preparedWorkspace: PreparedSourceIdentity = {
+      worktreePath = prepared.worktreePath;
+      trialRunnerMeta = prepared.trialRunnerMeta as Record<string, unknown>;
+      prep = prepared.prep;
+      if (requiresDatabase({ command: "host-prepare", scenarioId })) {
+        // eslint-disable-next-line no-await-in-loop -- sequential database provisioning per host job
+        const dbRecord = await prepareSubjectDatabase({
+          identity: prepared.identity,
+          runId,
+          worktreePath,
+        });
+        databaseLifecycle = dbRecord.lifecycle;
+        databaseName = dbRecord.databaseName;
+        subjectKey = dbRecord.subjectKey;
+        trialRunnerMeta = {
+          ...trialRunnerMeta,
+          database: databaseLifecycle,
+        };
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "subject preparation failed";
+      jobStatus = "blocked";
+      failureReason = message;
+      worktreePath = "";
+      trialRunnerMeta = { scenarioId, runId, arm };
+      prep = {
+        commitSha: "",
+        fingerprint: "",
+        recordedAt: new Date().toISOString(),
+        treeSha: "",
+      };
+    }
+
+    const preparedWorkspace: PreparedSourceIdentity = {
+      commitSha: prep.commitSha,
+      fingerprint: prep.fingerprint,
+      recordedAt: prep.recordedAt,
+      treeSha: prep.treeSha,
+    };
+    const card =
+      generatedById.get(scenarioId)?.publicCard ??
+      loadPublicScenario({ id: scenarioId });
+    const scenarioDir = trialScenarioDir({
+      repetition: rep,
+      runId,
+      scenarioId,
+    });
+    mkdirSync(scenarioDir, { recursive: true });
+    writeFileSync(path.join(scenarioDir, "transcript.jsonl"), "");
+    writeFileSync(path.join(scenarioDir, runnerTranscriptFileName), "");
+    writeFileSync(path.join(scenarioDir, "stream.raw.log"), "");
+    writeSessionMeta({
+      prepBaseline: {
         commitSha: prep.commitSha,
         fingerprint: prep.fingerprint,
-        recordedAt: prep.recordedAt,
-        treeSha: prep.treeSha,
-      };
-      const card =
-        generatedById.get(scenarioId)?.publicCard ??
-        loadPublicScenario({ id: scenarioId });
-      const scenarioDir = trialScenarioDir({
-        repetition: rep,
-        runId,
-        scenarioId,
-      });
-      mkdirSync(scenarioDir, { recursive: true });
-      writeFileSync(path.join(scenarioDir, "transcript.jsonl"), "");
-      writeFileSync(path.join(scenarioDir, runnerTranscriptFileName), "");
-      writeFileSync(path.join(scenarioDir, "stream.raw.log"), "");
-      writeSessionMeta({
-        prepBaseline: {
-          commitSha: prep.commitSha,
-          fingerprint: prep.fingerprint,
-        },
-        scenarioDir,
-        trialRunnerMeta,
-        worktreePath,
-      });
-      jobs.push({
-        attemptId: 1,
-        currentTurn: 1,
-        prepBaselineSha: prep.commitSha,
-        preparedWorkspace,
-        repetition: rep,
-        scenarioId,
-        status: "pending",
-        turnLimit: card.turnCap,
-        worktreePath,
-      });
-    }
+      },
+      scenarioDir,
+      trialRunnerMeta,
+      worktreePath,
+    });
+    jobs.push({
+      attemptId: 1,
+      currentTurn: 1,
+      databaseLifecycle,
+      databaseName,
+      failureReason,
+      prepBaselineSha: prep.commitSha,
+      preparedWorkspace,
+      repetition: rep,
+      scenarioId,
+      status: jobStatus,
+      subjectKey,
+      turnLimit: card.turnCap,
+      worktreePath,
+    });
+  }
 
   const state: HostSessionState = {
     arm,
@@ -904,7 +993,7 @@ const finalizeHostScenario = ({
   };
 };
 
-export const hostSessionFinalize = ({
+export const hostSessionFinalize = async ({
   modelId,
   runId,
 }: {
@@ -945,6 +1034,7 @@ export const hostSessionFinalize = ({
   }
 
   if (modelId) state.modelId = modelId;
+  await cleanupJobsDatabases({ jobs: state.jobs, runId });
   saveState(state);
 
   const manifest = buildHostManifest({

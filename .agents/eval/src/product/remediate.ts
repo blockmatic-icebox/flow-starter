@@ -37,7 +37,7 @@ const hashTree = ({ root }: { root: string }) => {
   return createHash("sha256").update(parts.toSorted().join("\n")).digest("hex");
 };
 
-export const runRemediationLoop = ({
+export const runRemediationLoop = async ({
   evaluate,
   maxRemediationCycles = 3,
   repairExecutor,
@@ -45,7 +45,9 @@ export const runRemediationLoop = ({
   workDir,
 }: {
   caseIds?: string[];
-  evaluate: (input: { runId: string }) => ReadinessReport;
+  evaluate: (input: {
+    runId: string;
+  }) => ReadinessReport | Promise<ReadinessReport>;
   maxRemediationCycles?: number;
   repairExecutor?: RepairExecutor;
   runId: string;
@@ -53,7 +55,7 @@ export const runRemediationLoop = ({
 }) => {
   const remediation: RemediationRecord[] = [];
   let cycle = 0;
-  let readiness = evaluate({ runId: `${runId}-cycle-${cycle}` });
+  let readiness = await evaluate({ runId: `${runId}-cycle-${cycle}` });
   let findings = findingsFromReadiness(readiness);
   let treeHash = workDir ? hashTree({ root: workDir }) : "";
 
@@ -136,7 +138,7 @@ export const runRemediationLoop = ({
       };
 
     cycle += 1;
-    readiness = evaluate({ runId: `${runId}-cycle-${cycle}` });
+    readiness = await evaluate({ runId: `${runId}-cycle-${cycle}` });
     findings = findingsFromReadiness(readiness);
 
     const unresolved = failingBefore.filter((caseId) => {

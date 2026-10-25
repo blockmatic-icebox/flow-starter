@@ -177,7 +177,12 @@ export const evaluateReadiness = ({
     caseIds?.length ? caseIds.includes(c.caseId) : true
   );
   const evidence = selected.map((caseDef) =>
-    runAllowlistedCase({ caseDef, evaluatedSha: evaluatedRevision, runId })
+    runAllowlistedCase({
+      caseDef,
+      evaluatedSha: evaluatedRevision,
+      runId,
+      worktreePath,
+    })
   );
 
   const counts = summarizeEvidence({ evidence, requirements });

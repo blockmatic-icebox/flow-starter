@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { describe, it } from "node:test";
+import { before, describe, it } from "node:test";
 
 import { compareRuns } from "./compare.ts";
 import { gradeScenario } from "./grade.ts";
@@ -26,16 +26,24 @@ const normalizeSubjectPrompt = (text: string) =>
   text.replace(/Workspace: .+/u, "Workspace: <neutral>");
 
 describe("protocol validity (mocked; not live Cursor isolation proof)", () => {
-  it("flow and control subject prompts are identical without eval context", () => {
+  before(() => {
+    process.env.FLOW_EVAL_SKIP_PRODUCT_SETUP = "1";
+  });
+
+  it("flow and control subject prompts are identical without eval context", async () => {
     const runId = `pv-prompts-${Date.now()}`;
-    prepareHostRun({ arm: "flow", runId, scenarioIds: ["S13"] });
+    await prepareHostRun({ arm: "flow", runId, scenarioIds: ["S13"] });
     const flowBrief = scenarioWorkerBrief({
       repetition: 1,
       runId,
       scenarioId: "S13",
     });
     const controlRun = `${runId}-control`;
-    prepareHostRun({ arm: "control", runId: controlRun, scenarioIds: ["S13"] });
+    await prepareHostRun({
+      arm: "control",
+      runId: controlRun,
+      scenarioIds: ["S13"],
+    });
     const controlBrief = scenarioWorkerBrief({
       repetition: 1,
       runId: controlRun,
@@ -301,9 +309,13 @@ describe("protocol validity (mocked; not live Cursor isolation proof)", () => {
     assert.equal(row.status, "unverified");
   });
 
-  it("finalization preserves common source and frozen configuration", () => {
+  it("finalization preserves common source and frozen configuration", async () => {
     const runId = `pv-prepared-${Date.now()}`;
-    const prep = prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
+    const prep = await prepareHostRun({
+      arm: "flow",
+      runId,
+      scenarioIds: ["S01"],
+    });
     assert.equal(prep.ok, true);
     const manifest = JSON.parse(
       readFileSync(path.join(devEvalsRoot, runId, "manifest.json"), "utf-8")
@@ -354,7 +366,7 @@ describe("protocol validity (mocked; not live Cursor isolation proof)", () => {
         turn: n.packet.turn,
       });
     }
-    const finalized = hostSessionFinalize({ runId });
+    const finalized = await hostSessionFinalize({ runId });
     assert.equal(finalized.ok, true);
     if (!finalized.ok) return;
     assert.equal(finalized.manifest.sourceSha, commonSha);
@@ -371,11 +383,11 @@ describe("protocol validity (mocked; not live Cursor isolation proof)", () => {
     assert.ok(assessment.blockers.length > 0);
   });
 
-  it("interrupted sessions stay incomplete", () => {
+  it("interrupted sessions stay incomplete", async () => {
     const runId = `pv-interrupt-${Date.now()}`;
-    prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
+    await prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
     hostSessionNext({ runId, scenarioId: "S01" });
-    const finalized = hostSessionFinalize({ runId });
+    const finalized = await hostSessionFinalize({ runId });
     assert.equal(finalized.ok, false);
   });
 });

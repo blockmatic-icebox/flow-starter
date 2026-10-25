@@ -1,5 +1,9 @@
 import { spawnSync } from "node:child_process";
 
+import {
+  readSubjectDatabaseUrl,
+  subjectProcessEnv,
+} from "../infrastructure/subject-env.ts";
 import { repoRoot } from "../paths.ts";
 import type { AllowlistedCase } from "./registry.ts";
 import type { CaseEvidence, EvidenceStatus } from "./types.ts";
@@ -8,16 +12,25 @@ export const runAllowlistedCase = ({
   caseDef,
   evaluatedSha,
   runId,
+  worktreePath,
 }: {
   caseDef: AllowlistedCase;
   evaluatedSha: string;
   runId: string;
+  worktreePath?: string;
 }) => {
-  const cwd = caseDef.cwd === "repo" ? repoRoot : repoRoot;
+  const cwd = worktreePath ?? (caseDef.cwd === "repo" ? repoRoot : repoRoot);
+  const databaseUrl = worktreePath
+    ? readSubjectDatabaseUrl(worktreePath)
+    : undefined;
+  const env =
+    worktreePath && databaseUrl
+      ? subjectProcessEnv({ databaseUrl, worktreePath })
+      : process.env;
   const result = spawnSync(caseDef.command, {
     cwd,
     encoding: "utf-8",
-    env: process.env,
+    env,
     shell: true,
     stdio: "pipe",
     timeout: 600_000,
