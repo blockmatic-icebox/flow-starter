@@ -27,19 +27,6 @@ const hasCompletedClientToolAck = (messages: DeterministicMessage[]) => {
   );
 };
 
-const writeTextReply = ({
-  text,
-  writer,
-}: {
-  text: string;
-  writer: { write: (chunk: Record<string, unknown>) => void };
-}) => {
-  const textId = crypto.randomUUID();
-  writer.write({ id: textId, type: "text-start" });
-  writer.write({ delta: text, id: textId, type: "text-delta" });
-  writer.write({ id: textId, type: "text-end" });
-};
-
 const lastUserText = (messages: DeterministicMessage[]) => {
   for (let index = messages.length - 1; index >= 0; index -= 1) {
     const message = messages.at(index);
@@ -63,10 +50,10 @@ export const deterministicFlowAgentResponse = (
       writer.write({ messageId, messageMetadata: undefined, type: "start" });
 
       if (hasCompletedClientToolAck(messages)) {
-        writeTextReply({
-          text: "Done.",
-          writer,
-        });
+        const textId = crypto.randomUUID();
+        writer.write({ id: textId, type: "text-start" });
+        writer.write({ delta: "Done.", id: textId, type: "text-delta" });
+        writer.write({ id: textId, type: "text-end" });
         writer.write({ finishReason: "stop", type: "finish" });
         return;
       }

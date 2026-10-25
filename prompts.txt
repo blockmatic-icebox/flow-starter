@@ -9,3 +9,5 @@
 2026-10-25T00:11:30Z | AGENT | Answered from git history f260e73..HEAD (2 commits; ~4 implementation iterations).
 2026-10-25T00:11:36Z | USER | Re-run stress test with fixes and Flow self-improvement.
 2026-10-25T00:13:00Z | AGENT | Fixed ES2023 lib for toSorted typecheck; triage route test; Playwright isolated store; staged web check-types gate.
+2026-10-25T00:20:00Z | USER | Run iteratively non-stop; fix and push to main.
+2026-10-25T00:22:00Z | AGENT | Fixed flow-app AI SDK tool typing (asSchema); full check-types pass; pushing.
