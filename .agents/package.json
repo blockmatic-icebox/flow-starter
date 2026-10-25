@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "check": "pnpm flow:check && pnpm architecture:check && pnpm ownership:check && pnpm flow-eval:check",
-    "test": "pnpm flow:test && pnpm architecture:test && pnpm ownership:test && pnpm test:tooling && pnpm eval:test",
+    "test": "node tooling/run-agents-tests.mjs",
     "flow:check": "node tooling/checks/check-flow-docs.mjs && node tooling/checks/check-task-reporting.mjs",
     "flow:test": "node --test tooling/checks/check-flow-docs.test.mjs tooling/checks/check-task-reporting.test.mjs",
     "architecture:check": "node tooling/checks/check-react-architecture.mjs",
