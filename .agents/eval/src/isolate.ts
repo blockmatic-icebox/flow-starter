@@ -242,11 +242,6 @@ export const finalizePrepBaseline = ({
 }: {
   worktreePath: string;
 }): PrepBaselineMeta => {
-  runGit({
-    args: ["config", "user.email", "flow-eval@local"],
-    cwd: worktreePath,
-  });
-  runGit({ args: ["config", "user.name", "flow-eval"], cwd: worktreePath });
   runGit({ args: ["add", "-A"], cwd: worktreePath });
   const commit = runGit({
     allowFailure: true,
