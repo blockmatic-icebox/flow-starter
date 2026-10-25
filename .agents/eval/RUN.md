@@ -25,6 +25,7 @@ Optional: `--model-id <id>` on `finalize` when the host reports the model used (
 ## Deterministic commands
 
 ```bash
+pnpm --dir .agents eval integrity
 pnpm --dir .agents eval preserve
 pnpm --dir .agents eval freeze-pilot --seed s09-s13-pilot-2026-10-25
 pnpm --dir .agents eval grade --run <runId> --scenario S01

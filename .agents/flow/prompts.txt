@@ -1,0 +1,38 @@
+---
+Timestamp: 2026-10-25T15:30:00Z
+Work: factory-simplification
+Stage: Build
+Prompt: Implement Flow Factory radical simplification plan (staged commits on main).
+
+Summary:
+- Isolated Factory eval from product workspace; moved journal and skills-lock under .agents.
+- Explore-time DESIGN, extended journal spec, subagent-first delegation, flow-eval end-to-end skill.
+
+Documentation:
+- DESIGN.md [updated] — Explore without journey requirement
+- AGENTS.md [updated] — Task subagents for Build
+- README.md [updated] — Factory commands via pnpm --dir .agents
+- ARCHITECTURE.md [unchanged]
+
+Factory docs:
+- flow.md, journal.md, dogfooding-eval.md, flow-eval SKILL, RUN.md, factory.md, records/factory-simplification.md [created/updated]
+
+Decisions:
+- Root package name stays `flow` for dogfood checkout (user confirmed).
+
+Features:
+- pnpm --dir .agents eval integrity; bounded default diagnostic scenario list.
+
+Subagents:
+- None (main agent only).
+
+Verification:
+- pnpm qa — exit 0
+- pnpm --dir .agents check — exit 0
+- pnpm --dir .agents test — exit 0
+
+Commits:
+- 0f30411, 6381d71, 5ade9db, e02d8e4
+
+Record:
+- .agents/flow/records/factory-simplification.md

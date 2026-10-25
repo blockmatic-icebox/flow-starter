@@ -15,13 +15,13 @@
   "workspaces": {
     ".": {
       "entry": [
+        "oxlint.config.ts",
         ".agents/tooling/worktrees/worktrees.mjs",
         ".agents/tooling/worktrees/**/*.mjs",
         ".agents/tooling/**/*.{mjs,ts}",
-        ".agents/tooling/**/*.test.mjs",
-        "oxlint.config.ts"
+        ".agents/tooling/**/*.test.mjs"
       ],
-      "project": [".agents/tooling/**/*.{mjs,ts}"]
+      "project": [".agents/tooling/**/*.{mjs,ts}", "oxlint.config.ts"]
     },
     "apps/web": {
       "entry": [
