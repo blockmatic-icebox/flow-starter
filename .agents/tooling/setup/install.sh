@@ -4,13 +4,11 @@
 # One-liner (copy/paste):
 #   bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-starter/main/.agents/tooling/setup/install.sh)"
 #
-# Requires: git, bash 3.2+, perl
+# Requires: git, bash 3.2+, node
 
 set -euo pipefail
 
 REPO_URL="${FLOW_STARTER_SOURCE:-https://github.com/gaboesquivel/flow-starter.git}"
-INSTALL_SCRIPT_REL=".agents/tooling/setup/install.sh"
-ASSESSMENT_HANDOFF=".agents/flow/operations/assessment-adoption.md"
 
 PORTLESS_RESERVED=(
   run get alias hosts list doctor trust clean prune proxy service
@@ -45,41 +43,6 @@ require_command() {
   command -v "$1" >/dev/null 2>&1 || die "missing required command: $1"
 }
 
-replace_in_file() {
-  local file="$1"
-  local from="$2"
-  local to="$3"
-  if [[ ! -f "$file" ]]; then
-    die "expected file missing after clone: $file"
-  fi
-  FROM="$from" TO="$to" perl -i -pe 's/\Q$ENV{FROM}\E/$ENV{TO}/g' "$file"
-}
-
-set_json_string_field() {
-  local file="$1"
-  local key="$2"
-  local value="$3"
-  if [[ ! -f "$file" ]]; then
-    die "expected file missing after clone: $file"
-  fi
-  KEY="$key" VALUE="$value" perl -i -pe '
-    if (/^\s*"$ENV{KEY}":\s*"/) {
-      $_ = qq{  "$ENV{KEY}": "$ENV{VALUE}",\n};
-    }
-  ' "$file"
-}
-
-set_portless_name() {
-  local file="$1"
-  local name="$2"
-  if [[ ! -f "$file" ]]; then
-    die "expected file missing after clone: $file"
-  fi
-  NAME="$name" perl -i -0777 -pe '
-    s/("portless":\s*\{[^}]*"name":\s*")[^"]+(")/$1.$ENV{NAME}.$2/s
-  ' "$file"
-}
-
 run_install() {
   local project_name="$1"
   local slug
@@ -107,29 +70,9 @@ run_install() {
   local root="$slug"
   cd "$root"
 
-  rm -rf .agents/eval/fixtures/assessments
-  rm -f "$ASSESSMENT_HANDOFF"
-  rm -f "$INSTALL_SCRIPT_REL"
-  rm -f .agents/tooling/setup/install.test.mjs
-  rm -f .agents/eval/src/assessment/run.test.ts
-  rm -f CLAUDE.md
-  rm -f docs/adr/0002-feature-intelligence-product.md
-  rm -f docs/initiatives/feature-intelligence.md
-
-  local host_from="web.localhost"
-  local host_to="${slug}.localhost"
-
-  replace_in_file "apps/web/next.config.ts" "$host_from" "$host_to"
-  replace_in_file "apps/web/AGENTS.md" "$host_from" "$host_to"
-
-  if [[ "$(uname -s)" == "Darwin" ]]; then
-    sed -i '' "s/^# Project Name$/# ${project_name}/" README.md
-  else
-    sed -i "s/^# Project Name$/# ${project_name}/" README.md
-  fi
-
-  set_json_string_field "package.json" "name" "$slug"
-  set_portless_name "apps/web/package.json" "$slug"
+  local adoption_js
+  adoption_js="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/product-adoption.mjs"
+  node "$adoption_js" apply --root "$(pwd)" --project-name "$project_name"
 
   rm -rf .git
   if ! git init -b main >/dev/null 2>&1; then
@@ -147,12 +90,12 @@ run_install() {
   printf '  cd %s\n' "$slug"
   printf '  pnpm setup        # install deps and env templates\n'
   printf '  pnpm setup:portless   # optional: HTTPS local URLs\n'
-  printf '  pnpm dev          # https://%s\n' "$host_to"
+  printf '  pnpm dev          # https://%s.localhost\n' "$slug"
 }
 
 main() {
   require_command git
-  require_command perl
+  require_command node
 
   local project_name="${FLOW_STARTER_PROJECT_NAME:-}"
   if [[ -z "$project_name" ]]; then

@@ -14,6 +14,47 @@ import path from "node:path";
 import { packageDirInRepo, repoRoot, worktreeRoot } from "./paths.ts";
 import type { AgentDiffCapture, EvalArm, PrepBaselineMeta } from "./types.ts";
 
+const productAdoptionScript = path.join(
+  repoRoot,
+  ".agents/tooling/setup/product-adoption.mjs"
+);
+
+export const evalProductName = ({
+  repetition = 1,
+  scenarioId,
+}: {
+  repetition?: number;
+  scenarioId: string;
+}) => `Eval ${scenarioId} r${repetition}`;
+
+export const applyProductAdoptionToWorktree = ({
+  projectName,
+  worktreePath,
+}: {
+  projectName: string;
+  worktreePath: string;
+}) => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      productAdoptionScript,
+      "apply",
+      "--root",
+      worktreePath,
+      "--project-name",
+      projectName,
+    ],
+    { encoding: "utf-8" }
+  );
+  const output = `${result.stdout ?? ""}${result.stderr ?? ""}`.slice(0, 2000);
+  if (result.status !== 0)
+    throw new Error(
+      `product adoption failed: ${output || `exit ${result.status ?? "unknown"}`}`
+    );
+  const line = result.stdout.trim().split("\n").at(-1) ?? "{}";
+  return JSON.parse(line) as { host: string; slug: string };
+};
+
 const CONTROL_AGENTS = `# Control arm entrypoint
 
 Act as a senior TypeScript engineer. Follow repository conventions in ARCHITECTURE.md and existing code patterns. Do not invent product scope beyond the user request.
@@ -129,9 +170,26 @@ export const setupWorktree = ({
 
   applyArmMutations({ arm, worktreePath });
 
+  const adoption = applyProductAdoptionToWorktree({
+    projectName: evalProductName({ repetition, scenarioId }),
+    worktreePath,
+  });
+
   writeFileSync(
     path.join(worktreePath, ".eval-meta.json"),
-    JSON.stringify({ arm, baselineSha: flowSha, runId, scenarioId }, null, 2)
+    JSON.stringify(
+      {
+        arm,
+        baselineSha: flowSha,
+        portlessHost: adoption.host,
+        portlessName: adoption.slug,
+        productName: evalProductName({ repetition, scenarioId }),
+        runId,
+        scenarioId,
+      },
+      null,
+      2
+    )
   );
 
   if (!skipInstall) installWorktreeDependencies({ worktreePath });

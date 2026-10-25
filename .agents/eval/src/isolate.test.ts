@@ -7,6 +7,7 @@ import { describe, it } from "node:test";
 import {
   applyArmMutations,
   captureAgentDiff,
+  evalProductName,
   finalizePrepBaseline,
   installWorktreeDependencies,
   runGit,
@@ -22,6 +23,15 @@ const initRepo = () => {
   runGit({ args: ["commit", "-m", "init"], cwd: dir });
   return dir;
 };
+
+describe("evalProductName", () => {
+  it("slugifies to a portless-safe eval project name", () => {
+    assert.equal(
+      evalProductName({ repetition: 2, scenarioId: "S13" }),
+      "Eval S13 r2"
+    );
+  });
+});
 
 describe("installWorktreeDependencies", () => {
   it("throws when pnpm install fails", () => {

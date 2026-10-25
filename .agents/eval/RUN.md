@@ -51,6 +51,8 @@ Blind subjective scores: `__dev/flow-evals/<runId>/blind-reviews/<scenarioId>.js
 
 Unit tests may inject mocks when calling harness functions directly. The CLI and `pnpm worktrees` do not bypass host-session rules for methodology live runs. `pnpm worktrees --host cursor` remains the Build worker runner (separate from eval).
 
+Scenario worktrees run the same **product adoption** transform as [`install.sh`](../tooling/setup/install.sh) (shared [`product-adoption.mjs`](../tooling/setup/product-adoption.mjs)): slugged `package.json` name, Portless `name`, and `https://<slug>.localhost` in `apps/web`. Eval uses project names like `Eval S13 r1` → `eval-s13-r1`. Partial benchmark/mutation fixtures are unchanged.
+
 ## Event origins
 
 Every recorded event uses one of: `observed`, `agent-reported`, `evaluator-inference`, `missing`.
