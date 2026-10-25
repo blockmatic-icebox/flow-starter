@@ -12,7 +12,7 @@ import {
   hostSessionFinalize,
   hostSessionNext,
   hostSessionRecord,
-  hostSessionRecordModel,
+  loadHostSessionState,
   prepareHostRun,
   scenarioWorkerBrief,
 } from "./host-session.ts";
@@ -52,7 +52,7 @@ Usage:
   pnpm --filter @repo/flow-eval eval stress [--run <id>] [--cycles N]
   pnpm --filter @repo/flow-eval eval mutations
   pnpm --filter @repo/flow-eval eval benchmark --id benchmark-a|benchmark-b
-  pnpm --filter @repo/flow-eval eval experiment [--profile full-product] [--count N] [--seed <seed>] [--dry-run]
+  pnpm --filter @repo/flow-eval eval experiment [--profile full-product|mixed|technical-ai-assessment] [--count N] [--seed <seed>] [--dry-run]
   pnpm --filter @repo/flow-eval eval self-improve [--iterations 3] [--seed <seed>] [--dry-run] [--resume <campaign-id>]
 
 Live runs use host-session (/flow-eval). No --model flag.
@@ -215,15 +215,17 @@ const cmdNext = ({
 };
 
 const cmdBriefs = ({ runId }: { runId: string }) => {
-  const statePath = path.join(devEvalsRoot, runId, "host-session-state.json");
-  const state = JSON.parse(readFileSync(statePath, "utf-8")) as {
-    jobs: { repetition: number; scenarioId: string }[];
-  };
+  const state = loadHostSessionState({ runId });
+  if (!state) {
+    console.error("host session state missing");
+    process.exit(1);
+  }
   const briefs = state.jobs.map((job) =>
     scenarioWorkerBrief({
       repetition: job.repetition,
       runId,
       scenarioId: job.scenarioId,
+      session: state,
     })
   );
   console.log(JSON.stringify(briefs, null, 2));
@@ -263,7 +265,6 @@ const cmdFinalize = ({
   modelId?: string;
   runId: string;
 }) => {
-  if (modelId) hostSessionRecordModel({ modelId, runId });
   const result = hostSessionFinalize({ modelId, runId });
   console.log(JSON.stringify(result, null, 2));
   if (!result.ok) process.exit(1);
@@ -342,6 +343,8 @@ const cmdPilotLoop = async ({
       {
         controlRunId: controlPrep.runId,
         flowRunId: flowPrep.runId,
+        message:
+          "Prepared only. Complete each run via /flow-eval, then compare with eval compare.",
         runId,
         status: "awaiting-host",
       },
@@ -349,6 +352,7 @@ const cmdPilotLoop = async ({
       2
     )
   );
+  process.exit(2);
 };
 
 const cmdPilot = ({ scenarios }: { scenarios: string[] }) => {
@@ -357,6 +361,7 @@ const cmdPilot = ({ scenarios }: { scenarios: string[] }) => {
     scenarioIds: scenarios,
   });
   printAwaitingHost({ host: prep.host, runId: prep.runId });
+  process.exit(2);
 };
 
 const cmdRun = async ({
@@ -409,6 +414,7 @@ const cmdRun = async ({
     scenarioIds: scenarios,
   });
   printAwaitingHost({ host: prep.host, runId: prep.runId });
+  process.exit(2);
 };
 
 const cmdCompare = ({
@@ -478,6 +484,7 @@ const cmdHandoff = async ({
     )}\n`
   );
   printAwaitingHost({ host: prep.host, runId: prep.runId });
+  process.exit(2);
 };
 
 const cmdCompareArms = async ({
@@ -536,12 +543,15 @@ const cmdCompareArms = async ({
       {
         controlRunId: controlPrep.runId,
         flowRunId: flowPrep.runId,
+        message:
+          "Prepared only. Complete both runs via /flow-eval, then eval compare --baseline <control> --current <flow>.",
         status: "awaiting-host",
       },
       null,
       2
     )
   );
+  process.exit(2);
 };
 
 const scenarioList = (value: string | undefined, fallback: string) =>

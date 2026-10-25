@@ -13,7 +13,11 @@ import {
 } from "./freeze.ts";
 import { createSeededRng, randomSeed } from "./rng.ts";
 import { selectGeneratedScenarios } from "./select.ts";
-import type { AcceptanceFamily, ExperimentProfile } from "./types.ts";
+import type {
+  AcceptanceFamily,
+  ExperimentProfile,
+  GeneratedScenario,
+} from "./types.ts";
 
 const currentSha = () =>
   spawnSync("git", ["rev-parse", "HEAD"], {
@@ -103,7 +107,44 @@ export const runExperiment = async ({
     scenarioIds,
   });
 
-  const primary = selection.scenarios[0];
+  if (batch.status === "awaiting-host")
+    return awaitingHostExperimentResult({ experimentId: id, manifest });
+
+  return finishLiveExperiment({
+    batch,
+    experimentId: id,
+    manifest,
+    scenarios: selection.scenarios,
+  });
+};
+
+const awaitingHostExperimentResult = ({
+  experimentId,
+  manifest,
+}: {
+  experimentId: string;
+  manifest: ReturnType<typeof buildManifest>;
+}) => ({
+  experimentId,
+  manifest,
+  ok: false,
+  reason:
+    "Complete run via /flow-eval (next, record, finalize) or use --dry-run.",
+  status: "awaiting-host" as const,
+});
+
+const finishLiveExperiment = ({
+  batch,
+  experimentId,
+  manifest,
+  scenarios,
+}: {
+  batch: Awaited<ReturnType<typeof runBatch>>;
+  experimentId: string;
+  manifest: ReturnType<typeof buildManifest>;
+  scenarios: GeneratedScenario[];
+}) => {
+  const primary = scenarios[0];
   const worktreePath = batch.worktreePaths?.[0];
   const family = primary?.oracle.acceptanceFamily as
     | AcceptanceFamily
@@ -112,16 +153,14 @@ export const runExperiment = async ({
     family && worktreePath
       ? evaluateReadiness({
           acceptanceFamily: family,
-          runId: id,
+          runId: experimentId,
           worktreePath,
         })
       : undefined;
-
   const productOk = !family || productReadiness?.releaseVerdict === "READY";
-
   return {
     errors: batch.errors,
-    experimentId: id,
+    experimentId,
     grades: batch.grades,
     infrastructureFailure: batch.infrastructureFailure,
     manifest,

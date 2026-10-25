@@ -19,6 +19,35 @@ const assertNoPinnedAgent = (relativePath: string) => {
 };
 
 describe("host-session eval harness", () => {
+  it("next without record returns awaiting-record not scenario-done", () => {
+    const runId = `test-awaiting-${Date.now()}`;
+    prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
+    const turn = hostSessionNext({ runId, scenarioId: "S01", repetition: 1 });
+    assert.equal(turn.ok, true);
+    if (!turn.ok || turn.status !== "turn") return;
+    const again = hostSessionNext({ runId, scenarioId: "S01", repetition: 1 });
+    assert.equal(again.ok, true);
+    assert.equal(again.status, "awaiting-record");
+    if (again.status === "awaiting-record")
+      assert.equal(again.packet.turn, turn.packet.turn);
+  });
+
+  it("record rejects empty events", () => {
+    const runId = `test-record-empty-${Date.now()}`;
+    prepareHostRun({ arm: "flow", runId, scenarioIds: ["S01"] });
+    const turn = hostSessionNext({ runId, scenarioId: "S01", repetition: 1 });
+    assert.equal(turn.ok, true);
+    if (!turn.ok || turn.status !== "turn") return;
+    const recorded = hostSessionRecord({
+      events: [],
+      repetition: 1,
+      runId,
+      scenarioId: "S01",
+      turn: turn.packet.turn,
+    });
+    assert.equal(recorded.ok, false);
+  });
+
   it("prepare writes state without spawning agent", () => {
     const runId = `test-prepare-${Date.now()}`;
     const prep = prepareHostRun({

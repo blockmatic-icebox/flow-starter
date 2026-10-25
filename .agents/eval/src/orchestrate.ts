@@ -1,18 +1,13 @@
-import { spawnSync } from "node:child_process";
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 
-import {
-  agentCliVersion,
-  runAgentTurn,
-  runAgentTurnAsync,
-  writeSessionMeta,
-} from "./agent.ts";
+import { agentCliVersion, writeSessionMeta } from "./agent.ts";
 import { summarizeBatchOutcomes } from "./batch-outcomes.ts";
 import { controlArmValid } from "./compare.ts";
 import { evalConcurrency, mapWithConcurrency } from "./concurrency.ts";
 import { extractCommands } from "./evidence.ts";
 import type { GeneratedScenario } from "./generation/types.ts";
+import { currentFlowSha } from "./git.ts";
 import { prepareHostRun } from "./host-session.ts";
 import {
   applyScenarioFixture,
@@ -20,7 +15,7 @@ import {
   finalizePrepBaseline,
   setupWorktree,
 } from "./isolate.ts";
-import { devEvalsRoot, repoRoot } from "./paths.ts";
+import { devEvalsRoot } from "./paths.ts";
 import { redactOrThrow } from "./redact.ts";
 import { writeRunSummary, writeScenarioReport } from "./report.ts";
 import { rubricVersion } from "./rubric.ts";
@@ -34,7 +29,8 @@ import {
 import { gradeObservedScenario } from "./session-grade.ts";
 import { skillsLockHash } from "./skills-lock.ts";
 import { stakeholderReply } from "./stakeholder.ts";
-import { foldSessionTelemetry, PROTOCOL_ID } from "./trace.ts";
+import { PROTOCOL_ID } from "./trace.ts";
+import { loadTranscript } from "./transcript.ts";
 import { trialScenarioDir } from "./trial-paths.ts";
 import type {
   EvalArm,
@@ -44,53 +40,23 @@ import type {
   TokenUsage,
 } from "./types.ts";
 
-const currentFlowSha = () =>
-  spawnSync("git", ["rev-parse", "HEAD"], {
-    cwd: repoRoot,
-    encoding: "utf-8",
-  }).stdout.trim();
-
-const loadTranscript = ({ eventsPath }: { eventsPath: string }) =>
-  existsSync(eventsPath)
-    ? readFileSync(eventsPath, "utf-8")
-        .split("\n")
-        .filter(Boolean)
-        .map((line) => JSON.parse(line) as EvalEvent)
-    : [];
-
 const runStakeholderTurns = async ({
   card,
   customTurnOnePrompt,
   eventsPath,
   hidden,
-  official,
-  oracle,
   publicBrief,
-  rawLog,
   scenarioId,
   turnLimit,
-  useAsyncAgent,
-  worktreePath,
 }: {
   card: ReturnType<typeof loadPublicScenario>;
   customTurnOnePrompt?: string;
   eventsPath: string;
   hidden?: ReturnType<typeof loadHiddenScenario>;
-  official: boolean;
-  oracle:
-    | NonNullable<ReturnType<typeof loadScenarioOracle>>
-    | { scenarioId: string };
   publicBrief?: string;
-  rawLog: string;
   scenarioId: string;
   turnLimit: number;
-  useAsyncAgent: boolean;
-  worktreePath: string;
 }) => {
-  let sessionId: string | undefined;
-  let sessionCompleteness: RunManifest["completeness"] = "complete";
-  let protocolVerified = true;
-  let usage: TokenUsage | undefined;
   let eventSeq = 0;
 
   const runTurn = async (turn: number): Promise<void> => {
@@ -109,57 +75,33 @@ const runStakeholderTurns = async ({
           });
     if (!message) return;
 
-    if (official) {
-      const turnInput = {
-        jsonlPath: eventsPath,
-        oracle,
-        prompt: message,
-        rawLogPath: rawLog,
-        scenarioId,
-        sessionId,
-        startSeq: eventSeq,
-        turn,
-        workspace: worktreePath,
-      };
-      const result = useAsyncAgent
-        ? await runAgentTurnAsync(turnInput)
-        : runAgentTurn(turnInput);
-      sessionId = result.sessionId;
-      eventSeq += result.events.length;
-      if (result.usage) usage = result.usage;
-      const folded = foldSessionTelemetry({
-        sessionCompleteness,
-        sessionProtocolVerified: protocolVerified,
-        termination: result.termination,
-        turnCompleteness: result.completeness,
-        turnProtocolVerified: result.protocolVerified,
-      });
-      sessionCompleteness = folded.completeness;
-      protocolVerified = folded.protocolVerified;
-    } else {
-      const dryEvent: EvalEvent = {
-        id: `${scenarioId}-u${turn}`,
-        kind: "user",
-        origin: "missing",
-        scenarioId,
-        seq: eventSeq + 1,
-        text: message,
-        ts: new Date().toISOString(),
-        turn,
-      };
-      eventSeq += 1;
-      writeFileSync(
-        eventsPath,
-        `${readFileSync(eventsPath, "utf-8")}${JSON.stringify(dryEvent)}\n`
-      );
-    }
+    const dryEvent: EvalEvent = {
+      id: `${scenarioId}-u${turn}`,
+      kind: "user",
+      origin: "missing",
+      scenarioId,
+      seq: eventSeq + 1,
+      text: message,
+      ts: new Date().toISOString(),
+      turn,
+    };
+    eventSeq += 1;
+    writeFileSync(
+      eventsPath,
+      `${readFileSync(eventsPath, "utf-8")}${JSON.stringify(dryEvent)}\n`
+    );
 
     if (hidden?.stopCondition === "after-plan-approval" && turn >= 3) return;
     await runTurn(turn + 1);
   };
 
   await runTurn(1);
-  return { protocolVerified, sessionCompleteness, sessionId, usage };
+  return {
+    protocolVerified: true,
+    sessionCompleteness: "complete" as const,
+    sessionId: undefined,
+    usage: undefined,
+  };
 };
 
 const prepareScenarioWorktree = ({
@@ -209,7 +151,6 @@ export const runScenarioSession = async ({
   maxTurns,
   repetition = 1,
   generated,
-  useAsyncAgent = true,
 }: {
   runId: string;
   scenarioId: string;
@@ -221,7 +162,6 @@ export const runScenarioSession = async ({
   maxTurns?: number;
   repetition?: number;
   generated?: GeneratedScenario;
-  useAsyncAgent?: boolean;
 }) => {
   if (official)
     return {
@@ -274,14 +214,9 @@ export const runScenarioSession = async ({
     customTurnOnePrompt,
     eventsPath,
     hidden,
-    official,
-    oracle,
     publicBrief: generated?.publicBrief,
-    rawLog,
     scenarioId,
     turnLimit,
-    useAsyncAgent,
-    worktreePath,
   });
   const { protocolVerified, sessionId, usage } = turnState;
 
@@ -437,6 +372,7 @@ export const runBatch = async ({
   if (official) {
     const prep = prepareHostRun({
       arm,
+      generatedScenarios,
       repetition,
       runId,
       scenarioIds,
@@ -469,8 +405,9 @@ export const runBatch = async ({
       grades: [],
       infrastructureFailure: false,
       manifest,
-      ok: true,
+      ok: false,
       outcomes,
+      status: "awaiting-host" as const,
       worktreePaths,
     };
   }

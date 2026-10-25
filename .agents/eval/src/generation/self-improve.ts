@@ -234,6 +234,30 @@ const runCampaignIteration = async ({
     scenarioIds: [frozen.id],
   });
 
+  const iterDir = path.join(
+    root,
+    "iterations",
+    String(challenge.iteration).padStart(2, "0")
+  );
+  mkdirSync(path.join(iterDir, "evaluation"), { recursive: true });
+
+  if (batch.status === "awaiting-host") {
+    const reason =
+      "Complete run via /flow-eval (next, record, finalize) before self-improve evaluation.";
+    writeFileSync(
+      path.join(iterDir, "evaluation", "batch.json"),
+      `${JSON.stringify({ batch, blocked: true, iterationOk: false, reason }, null, 2)}\n`
+    );
+    return {
+      blocked: true,
+      challenge,
+      frozenScenarioId: frozen.id,
+      iterationOk: false,
+      reason,
+      runId,
+    };
+  }
+
   const worktreePath = batch.worktreePaths?.[0];
   const family = frozen.oracle.acceptanceFamily;
   const productReadiness =
@@ -259,12 +283,6 @@ const runCampaignIteration = async ({
         })
       : null;
 
-  const iterDir = path.join(
-    root,
-    "iterations",
-    String(challenge.iteration).padStart(2, "0")
-  );
-  mkdirSync(path.join(iterDir, "evaluation"), { recursive: true });
   const iterationOk =
     batch.ok &&
     (!productReadiness || productReadiness.releaseVerdict === "READY");

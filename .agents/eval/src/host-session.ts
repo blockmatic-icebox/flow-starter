@@ -1,10 +1,11 @@
-import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { agentCliVersion, writeSessionMeta } from "./agent.ts";
 import { controlArmValid } from "./compare.ts";
 import { extractCommands } from "./evidence.ts";
+import type { GeneratedScenario } from "./generation/types.ts";
+import { currentFlowSha } from "./git.ts";
 import {
   applyScenarioFixture,
   captureAgentDiff,
@@ -26,6 +27,7 @@ import { gradeObservedScenario } from "./session-grade.ts";
 import { skillsLockHash } from "./skills-lock.ts";
 import { stakeholderReply } from "./stakeholder.ts";
 import { HOST_SESSION_PROTOCOL_ID } from "./trace.ts";
+import { loadTranscript } from "./transcript.ts";
 import { trialScenarioDir } from "./trial-paths.ts";
 import type {
   EvalArm,
@@ -66,7 +68,35 @@ type HostSessionState = {
 const statePath = ({ runId }: { runId: string }) =>
   path.join(devEvalsRoot, runId, "host-session-state.json");
 
-const loadState = ({ runId }: { runId: string }) => {
+const generatedScenariosPath = ({ runId }: { runId: string }) =>
+  path.join(devEvalsRoot, runId, "generated-scenarios.json");
+
+const loadGeneratedScenariosById = ({ runId }: { runId: string }) => {
+  const file = generatedScenariosPath({ runId });
+  if (!existsSync(file)) return new Map<string, GeneratedScenario>();
+  const raw = JSON.parse(readFileSync(file, "utf-8")) as Record<
+    string,
+    GeneratedScenario
+  >;
+  return new Map(Object.entries(raw));
+};
+
+const saveGeneratedScenarios = ({
+  runId,
+  scenarios,
+}: {
+  runId: string;
+  scenarios: GeneratedScenario[];
+}) => {
+  if (!scenarios.length) return;
+  const byId = Object.fromEntries(scenarios.map((s) => [s.id, s]));
+  writeFileSync(
+    generatedScenariosPath({ runId }),
+    `${JSON.stringify(byId, null, 2)}\n`
+  );
+};
+
+export const loadHostSessionState = ({ runId }: { runId: string }) => {
   const file = statePath({ runId });
   if (!existsSync(file)) return null;
   const state = JSON.parse(readFileSync(file, "utf-8")) as HostSessionState;
@@ -112,20 +142,6 @@ const saveState = (state: HostSessionState) => {
   for (const job of state.jobs) saveJob({ job, runId: state.runId });
 };
 
-const currentFlowSha = () =>
-  spawnSync("git", ["rev-parse", "HEAD"], {
-    cwd: repoRoot,
-    encoding: "utf-8",
-  }).stdout.trim();
-
-const loadTranscript = ({ eventsPath }: { eventsPath: string }) =>
-  existsSync(eventsPath)
-    ? readFileSync(eventsPath, "utf-8")
-        .split("\n")
-        .filter(Boolean)
-        .map((line) => JSON.parse(line) as EvalEvent)
-    : [];
-
 const nextEventSeq = ({ events }: { events: EvalEvent[] }) => {
   let max = 0;
   for (const event of events) if ((event.seq ?? 0) > max) max = event.seq ?? 0;
@@ -150,8 +166,11 @@ const stakeholderMessageForTurn = ({
   turn: number;
   customTurnOnePrompt?: string;
 }) => {
-  const card = loadPublicScenario({ id: job.scenarioId });
-  const hidden = loadHiddenScenario({ id: job.scenarioId });
+  const generated = loadGeneratedScenariosById({ runId }).get(job.scenarioId);
+  const card =
+    generated?.publicCard ?? loadPublicScenario({ id: job.scenarioId });
+  const hidden =
+    generated?.hidden ?? loadHiddenScenario({ id: job.scenarioId });
   const scenarioDir = scenarioDirForJob({ job, runId });
   const eventsPath = path.join(scenarioDir, "transcript.jsonl");
   const eventsSoFar = loadTranscript({ eventsPath });
@@ -236,12 +255,14 @@ const buildHostManifest = ({
 export const prepareHostRun = ({
   arm,
   customTurnOneByScenario,
+  generatedScenarios,
   repetition = 1,
   runId: runIdInput,
   scenarioIds,
 }: {
   arm: EvalArm;
   customTurnOneByScenario?: Record<string, string>;
+  generatedScenarios?: GeneratedScenario[];
   repetition?: number;
   runId?: string;
   scenarioIds: string[];
@@ -250,6 +271,9 @@ export const prepareHostRun = ({
   const flowSha = currentFlowSha();
   const host = detectEvalHost();
   const jobs: HostJob[] = [];
+  const generatedById = new Map(
+    (generatedScenarios ?? []).map((s) => [s.id, s] as const)
+  );
 
   for (let rep = 1; rep <= repetition; rep += 1)
     for (const scenarioId of scenarioIds) {
@@ -260,9 +284,12 @@ export const prepareHostRun = ({
         runId,
         scenarioId,
       }).worktreePath;
-      applyScenarioFixture({ scenarioId, worktreePath });
+      if (!generatedById.has(scenarioId))
+        applyScenarioFixture({ scenarioId, worktreePath });
       const prep = finalizePrepBaseline({ worktreePath });
-      const card = loadPublicScenario({ id: scenarioId });
+      const card =
+        generatedById.get(scenarioId)?.publicCard ??
+        loadPublicScenario({ id: scenarioId });
       const scenarioDir = trialScenarioDir({
         repetition: rep,
         runId,
@@ -325,6 +352,9 @@ export const prepareHostRun = ({
       `${JSON.stringify(customTurnOneByScenario, null, 2)}\n`
     );
 
+  if (generatedScenarios?.length)
+    saveGeneratedScenarios({ runId, scenarios: generatedScenarios });
+
   return { host, jobs, ok: true as const, runId };
 };
 
@@ -361,16 +391,43 @@ export const hostSessionNext = ({
         worktreePath: string;
       };
       status: "turn";
+    }
+  | {
+      ok: true;
+      packet: {
+        repetition: number;
+        runId: string;
+        scenarioId: string;
+        status: "awaiting-record";
+        turn: number;
+        worktreePath: string;
+      };
+      status: "awaiting-record";
     } => {
-  const state = loadState({ runId });
+  const state = loadHostSessionState({ runId });
   if (!state)
     return { ok: false as const, reason: "host session state missing" };
 
   const scoped = state.jobs.filter((job) => {
     if (scenarioId && job.scenarioId !== scenarioId) return false;
-    if (repetition && job.repetition !== repetition) return false;
+    if (repetition !== undefined && job.repetition !== repetition) return false;
     return true;
   });
+  const awaitingRecord = scoped.find((j) => j.status === "awaiting-record");
+  if (awaitingRecord)
+    return {
+      ok: true as const,
+      packet: {
+        repetition: awaitingRecord.repetition,
+        runId,
+        scenarioId: awaitingRecord.scenarioId,
+        status: "awaiting-record" as const,
+        turn: awaitingRecord.currentTurn,
+        worktreePath: awaitingRecord.worktreePath,
+      },
+      status: "awaiting-record" as const,
+    };
+
   const job = scoped.find((j) => j.status === "pending");
   if (!job)
     return {
@@ -455,9 +512,15 @@ export const hostSessionRecord = ({
   scenarioId: string;
   turn: number;
 }) => {
-  const state = loadState({ runId });
+  const state = loadHostSessionState({ runId });
   if (!state)
     return { ok: false as const, reason: "host session state missing" };
+
+  if (!events.length || !events.some((event) => event.kind === "assistant"))
+    return {
+      ok: false as const,
+      reason: "record requires at least one assistant event",
+    };
 
   const job = state.jobs.find(
     (j) =>
@@ -476,21 +539,27 @@ export const hostSessionRecord = ({
   const eventsPath = path.join(scenarioDir, "transcript.jsonl");
   const existing = loadTranscript({ eventsPath });
   const seq = nextEventSeq({ events: existing });
-  const stamped = events.map((event, index) => ({
-    ...event,
-    origin: event.origin ?? "observed",
-    scenarioId: event.scenarioId ?? scenarioId,
-    seq: event.seq ?? seq + index + 1,
-    turn: event.turn ?? turn,
-    ts: event.ts ?? new Date().toISOString(),
-  }));
+  const stamped = events.map((event, index) => {
+    const base = {
+      ...event,
+      origin: event.origin ?? "observed",
+      scenarioId: event.scenarioId ?? scenarioId,
+      seq: event.seq ?? seq + index + 1,
+      turn: event.turn ?? turn,
+      ts: event.ts ?? new Date().toISOString(),
+    };
+    return base.text === undefined
+      ? base
+      : { ...base, text: redactOrThrow({ text: base.text }) };
+  });
   const lines = stamped.map((e) => JSON.stringify(e)).join("\n");
   writeFileSync(
     eventsPath,
     `${existing.map((e) => JSON.stringify(e)).join("\n")}${existing.length ? "\n" : ""}${lines}\n`
   );
 
-  const hidden = loadHiddenScenario({ id: scenarioId });
+  const generated = loadGeneratedScenariosById({ runId }).get(scenarioId);
+  const hidden = generated?.hidden ?? loadHiddenScenario({ id: scenarioId });
   const stop = shouldStopAfterTurn({ hidden, turn: job.currentTurn });
   const atCap = job.currentTurn >= job.turnLimit;
   if (stop || atCap) {
@@ -513,9 +582,15 @@ const finalizeHostScenario = ({
   runId: string;
 }) => {
   const scenarioDir = scenarioDirForJob({ job, runId });
-  const card = loadPublicScenario({ id: job.scenarioId });
-  const hidden = loadHiddenScenario({ id: job.scenarioId });
-  const oracle = loadScenarioOracle({ id: job.scenarioId });
+  const generated = loadGeneratedScenariosById({ runId }).get(job.scenarioId);
+  const card =
+    generated?.publicCard ?? loadPublicScenario({ id: job.scenarioId });
+  const hidden =
+    generated?.hidden ?? loadHiddenScenario({ id: job.scenarioId });
+  const oracle = generated?.oracle ??
+    loadScenarioOracle({ id: job.scenarioId }) ?? {
+      scenarioId: job.scenarioId,
+    };
   const eventsPath = path.join(scenarioDir, "transcript.jsonl");
   const events = loadTranscript({ eventsPath });
 
@@ -532,6 +607,7 @@ const finalizeHostScenario = ({
     diffCapture.statusPorcelain
   );
 
+  // Host-session turns are self-reported; protocolVerified reflects trace host rules.
   const grade = gradeObservedScenario({
     card,
     diff: diffCapture.patch,
@@ -557,7 +633,7 @@ export const hostSessionFinalize = ({
   modelId?: string;
   runId: string;
 }) => {
-  const state = loadState({ runId });
+  const state = loadHostSessionState({ runId });
   if (!state)
     return { ok: false as const, reason: "host session state missing" };
 
@@ -606,7 +682,7 @@ export const hostSessionRecordModel = ({
   modelId: string;
   runId: string;
 }) => {
-  const state = loadState({ runId });
+  const state = loadHostSessionState({ runId });
   if (!state)
     return { ok: false as const, reason: "host session state missing" };
   state.modelId = modelId;
@@ -626,12 +702,14 @@ export const scenarioWorkerBrief = ({
   repetition = 1,
   runId,
   scenarioId,
+  session,
 }: {
   repetition?: number;
   runId: string;
   scenarioId: string;
+  session?: NonNullable<ReturnType<typeof loadHostSessionState>>;
 }) => {
-  const state = loadState({ runId });
+  const state = session ?? loadHostSessionState({ runId });
   if (!state)
     return { ok: false as const, reason: "host session state missing" };
   const job = state.jobs.find(
@@ -650,8 +728,9 @@ export const scenarioWorkerBrief = ({
     "Loop until next returns scenario-done:",
     `1. From ${repoRoot}: pnpm --filter @repo/flow-eval eval next --run ${runId} --scenario ${scenarioId} --repetition ${repetition}`,
     "2. If status is scenario-done, stop.",
-    "3. If status is turn, do the stakeholder prompt inside the scenario worktree.",
-    `4. Write an events JSON array (at least one assistant event, origin observed) and run: pnpm --filter @repo/flow-eval eval record --run ${runId} --scenario ${scenarioId} --turn <n> --repetition ${repetition} --events-file <absolute path>`,
+    "3. If status is awaiting-record, run eval record for that turn before calling next again.",
+    "4. If status is turn, do the stakeholder prompt inside the scenario worktree.",
+    `5. Write an events JSON array (at least one assistant event, origin observed) and run: pnpm --filter @repo/flow-eval eval record --run ${runId} --scenario ${scenarioId} --turn <n> --repetition ${repetition} --events-file <absolute path>`,
     "",
     "Return a report to the parent session only:",
     "- scenarioId",
