@@ -5,7 +5,7 @@ Use this page when generating a **separate** product repository for a timed asse
 ## Generate a clean repository
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-starter/main/.agents/tooling/setup/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-factory/main/.agents/tooling/setup/install.sh)"
 ```
 
 The installer removes evaluator-only assessment fixtures and this handoff from the generated tree. It keeps an empty root `prompts.txt` for session logging.

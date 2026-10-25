@@ -105,7 +105,7 @@ Do not read every ADR or research file by default.
 Bootstrap from `main`:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-starter/main/.agents/tooling/setup/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-factory/main/.agents/tooling/setup/install.sh)"
 ```
 
 The installer removes itself and evaluator-only assessment fixtures before the initial commit. It does not run `pnpm install`.

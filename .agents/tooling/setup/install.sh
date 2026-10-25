@@ -2,13 +2,13 @@
 # Flow Starter — bootstrap a new project from the latest main branch.
 #
 # One-liner (copy/paste):
-#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-starter/main/.agents/tooling/setup/install.sh)"
+#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-factory/main/.agents/tooling/setup/install.sh)"
 #
 # Requires: git, bash 3.2+, node
 
 set -euo pipefail
 
-REPO_URL="${FLOW_STARTER_SOURCE:-https://github.com/gaboesquivel/flow-starter.git}"
+REPO_URL="${FLOW_FACTORY_SOURCE:-${FLOW_STARTER_SOURCE:-https://github.com/gaboesquivel/flow-factory.git}}"
 
 PORTLESS_RESERVED=(
   run get alias hosts list doctor trust clean prune proxy service
