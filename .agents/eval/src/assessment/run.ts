@@ -116,7 +116,7 @@ export const runTechnicalAiAssessmentPair = async ({
         value: {
           arm,
           baselineSha,
-          developmentReady: true,
+          developmentReady: false,
           fixtureVersion: fixture.holdout.harnessVersion,
           lifecycle,
           personaFile: personas[arm],
@@ -170,7 +170,8 @@ export const runTechnicalAiAssessmentPair = async ({
           "Build target: assessment-a, the lean SaaS product manager.",
           "assessment-b holds the enterprise persona for a later comparison.",
           "",
-          "Next action: implement the first slice in docs/initiatives/feature-intelligence.md.",
+          "Next action: begin Explore in a separate product repository (generate via Flow Starter install).",
+          "Load AGENTS.md and the Flow skill; append prompts to prompts.txt from the first session.",
           "Each item in acceptance.json stays unverified until a product check covers it.",
           "",
         ].join("\n")
@@ -185,9 +186,9 @@ export const runTechnicalAiAssessmentPair = async ({
   });
 
   return {
-    developmentReady: true,
+    developmentReady: false,
     nextStep:
-      "Implement the first slice in docs/initiatives/feature-intelligence.md. Holdout checks are unverified.",
+      "Begin Explore in a separate product repository with Flow logging active from the first prompt. Holdout checks are unverified.",
     ok: true,
     productEvaluated: false,
     releaseVerdict: "INCONCLUSIVE" as const,

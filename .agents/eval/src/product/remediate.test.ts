@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync, readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, writeFileSync, readFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, it } from "node:test";
@@ -61,13 +62,39 @@ const passingReport = (): ReadinessReport => ({
   usability: "PASS",
 });
 
+const initGitFixture = () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), "flow-repair-paths-"));
+  spawnSync("git", ["init", "-b", "main"], { cwd: dir });
+  spawnSync("git", ["config", "user.email", "t@t.local"], { cwd: dir });
+  spawnSync("git", ["config", "user.name", "t"], { cwd: dir });
+  writeFileSync(path.join(dir, "README.md"), "# fixture\n", "utf-8");
+  spawnSync("git", ["add", "README.md"], { cwd: dir });
+  spawnSync("git", ["commit", "-m", "init", "--no-verify"], { cwd: dir });
+  return dir;
+};
+
 describe("remediation loop", () => {
-  it("rejects repairs outside apps/web", () => {
+  it("pathsWithinWriteRoot requires changes inside apps/web", () => {
+    const clean = initGitFixture();
     assert.equal(
-      pathsWithinWriteRoot({
-        workDir: process.cwd(),
-        writeRoot: "apps/web",
-      }),
+      pathsWithinWriteRoot({ workDir: clean, writeRoot: "apps/web" }),
+      false
+    );
+
+    mkdirSync(path.join(clean, "apps/web"), { recursive: true });
+    writeFileSync(
+      path.join(clean, "apps/web/page.tsx"),
+      "export {}\n",
+      "utf-8"
+    );
+    assert.equal(
+      pathsWithinWriteRoot({ workDir: clean, writeRoot: "apps/web" }),
+      true
+    );
+
+    writeFileSync(path.join(clean, "packages/other.txt"), "nope\n", "utf-8");
+    assert.equal(
+      pathsWithinWriteRoot({ workDir: clean, writeRoot: "apps/web" }),
       false
     );
   });

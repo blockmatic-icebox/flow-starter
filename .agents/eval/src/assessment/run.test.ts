@@ -33,7 +33,7 @@ describe("technical ai assessment fixture", () => {
 
     assert.equal(result.ok, true);
     assert.equal(result.terminal, "initialized");
-    assert.equal(result.developmentReady, true);
+    assert.equal(result.developmentReady, false);
     assert.equal(result.productEvaluated, false);
     assert.equal(result.releaseVerdict, "INCONCLUSIVE");
     assert.equal(result.targetArm, "assessment-a");

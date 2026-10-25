@@ -44,7 +44,8 @@ test("installs a project with slug hostname and fresh git", () => {
   const projectRoot = join(parent, "acme-widgets");
   assert.ok(existsSync(join(projectRoot, ".agents/flow/factory.md")));
   assert.ok(!existsSync(join(projectRoot, "CLAUDE.md")));
-  assert.ok(!existsSync(join(projectRoot, "prompts.txt")));
+  assert.ok(existsSync(join(projectRoot, "prompts.txt")));
+  assert.equal(readFileSync(join(projectRoot, "prompts.txt"), "utf-8"), "");
   assert.ok(!existsSync(join(projectRoot, installScript)));
   assert.ok(
     !existsSync(

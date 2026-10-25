@@ -110,7 +110,9 @@ run_install() {
   rm -rf .agents/eval/fixtures/assessments
   rm -f "$ASSESSMENT_HANDOFF"
   rm -f "$INSTALL_SCRIPT_REL"
-  rm -f CLAUDE.md prompts.txt
+  rm -f .agents/tooling/setup/install.test.mjs
+  rm -f .agents/eval/src/assessment/run.test.ts
+  rm -f CLAUDE.md
   rm -f docs/adr/0002-feature-intelligence-product.md
   rm -f docs/initiatives/feature-intelligence.md
 

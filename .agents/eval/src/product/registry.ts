@@ -5,7 +5,7 @@ export const starterRequirements = (): RequirementRecord[] => [
     requirementId: "STARTER-001",
     releaseBlocking: true,
     source: "apps/web neutral starter contract",
-    title: "Homepage identifies the Feature Intelligence product",
+    title: "Homepage presents the neutral Product starter",
     verification: [{ caseId: "web-starter-unit", kind: "unit" }],
   },
   {

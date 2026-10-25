@@ -6,4 +6,4 @@ Teams need help discovering related and duplicate requests, understanding underl
 
 Mandatory capabilities (TA-001–TA-008) are defined in `requirements.json`. Persona-specific priorities are in `personas/`.
 
-Adopted product decision: the first workflow separates popularity from strategic value for the lean SaaS PM, and a human confirmation or override is the stored priority. The enterprise persona remains a later comparison. See root `PRODUCT.md` and `docs/adr/0002-feature-intelligence-product.md`.
+Evaluation fixture only — not adopted product direction in Flow Starter. When you run this assessment in a separate repository, capture product decisions in that repo's `PRODUCT.md` and `docs/adr/` during Explore and Specify. Build is not authorized from this brief alone.

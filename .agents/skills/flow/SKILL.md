@@ -14,7 +14,20 @@ Follow authorization rules in [AGENTS.md](../../../AGENTS.md). They apply even w
 3. Load the smallest methodology skill set from [.agents/flow/operations/skills.md](../../flow/operations/skills.md) for the current activity. Read each chosen `SKILL.md` before applying it.
 4. When delegation helps, follow [.agents/flow/operations/delegation.md](../../flow/operations/delegation.md) and [.agents/flow/operations/worktrees.md](../../flow/operations/worktrees.md). Plan approval is not Build authorization.
 5. For UI changes, follow [.agents/flow/operations/verification.md](../../flow/operations/verification.md).
-6. End the response with the **Skills loaded** footer from `operations/skills.md` (include `flow` when this file was read).
+6. **Prompt log (coordinator only):** For each new human prompt handled in a product repository, append one block to root `prompts.txt` after delegated work integrates (or at end of solo work). Create the file if missing; never erase or rewrite existing entries; never fabricate timestamps for past sessions.
+
+   Each entry:
+
+   ```text
+   ---
+   <ISO-8601 timestamp>
+   Prompt: <human prompt with secrets redacted>
+   Summary: <concise factual summary of work performed; name delegated tasks and outcomes when relevant>
+   ```
+
+   Redact before writing: Bearer tokens, private keys, JWTs, and env-style assignments whose names contain `TOKEN`, `SECRET`, `PASSWORD`, or `API_KEY` (replace with `[REDACTED]`). Include the first product-session prompt and continue across later sessions. Workers and subagents must not append to `prompts.txt`; they return results to the coordinator, who is the sole writer. `prompts.txt` is parent-owned in worktrees.
+
+7. End the response with the **Skills loaded** footer from `operations/skills.md` (include `flow` when this file was read).
 
 ## Completion
 

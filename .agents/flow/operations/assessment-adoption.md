@@ -8,18 +8,21 @@ Use this page when generating a **separate** product repository for a timed asse
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-starter/main/.agents/tooling/setup/install.sh)"
 ```
 
-The installer removes evaluator-only assessment fixtures and this handoff from the generated tree.
+The installer removes evaluator-only assessment fixtures and this handoff from the generated tree. It keeps an empty root `prompts.txt` for session logging.
 
 ## First session in the assessment repository
 
 1. Open the **new** repository (not Flow Starter).
 2. Paste the employer's brief as the first human prompt.
-3. Ask the implementing agent to create root `CLAUDE.md` with instructions to append every subsequent prompt to `prompts.txt` using an ISO 8601 timestamp and a short summary of work performed. Do not log secrets, tokens, or credentials.
-4. The agent must actually append to `prompts.txt` when it acts; it must not claim logging happened if it did not write the file.
+3. Work through [AGENTS.md](../../../AGENTS.md) and load the Flow skill ([SKILL.md](../../skills/flow/SKILL.md)). The coordinator appends each handled human prompt to root `prompts.txt` per that skill.
 
-## Cursor and `CLAUDE.md`
+Many assessments ask for a separate `CLAUDE.md` logger. Flow Starter intentionally does **not** add `CLAUDE.md`. Equivalent logging lives in the shared entrypoint plus the Flow skill only—not a literal match to the requested filename.
 
-Cursor may load `CLAUDE.md` as a project rule when the file exists. If a later session ignores it, add a minimal `.cursor/rules` entry in the assessment repository that tells agents to follow `CLAUDE.md`. Do not rewrite the employer's requested `CLAUDE.md` text to match Factory wording.
+4. The coordinator must actually append to `prompts.txt` when it acts; it must not claim logging happened if it did not write the file.
+
+## History and forks
+
+Forks of Flow Starter retain prior `prompts.txt` content in git history. A repository created by the installer starts with an empty log in its initial commit only; it does not replay historical Factory maintenance prompts.
 
 ## Factory vs product
 
