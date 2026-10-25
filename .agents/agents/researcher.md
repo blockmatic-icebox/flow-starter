@@ -1,7 +1,6 @@
 ---
 name: researcher
 description: Read-only investigator for bounded questions in Explore, Specify, or Plan. Use proactively when independent research can run in parallel.
-model: inherit
 readonly: true
 ---
 

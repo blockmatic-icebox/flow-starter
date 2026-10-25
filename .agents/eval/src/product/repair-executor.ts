@@ -1,10 +1,7 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, writeFileSync } from "node:fs";
-import os from "node:os";
+import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-import { assertAgentAuth } from "../agent.ts";
-import type { AuthCheck } from "../agent.ts";
 import type { StressFinding } from "./types.ts";
 
 export const pathsWithinWriteRoot = ({
@@ -23,16 +20,55 @@ export const pathsWithinWriteRoot = ({
   return files.every((f) => f.startsWith(root) || f === writeRoot);
 };
 
-export const createCursorRepairExecutor =
-  ({
-    authCheck = assertAgentAuth,
-    modelId,
-    writeRoot = "apps/web",
-  }: {
-    authCheck?: AuthCheck;
-    modelId: string;
-    writeRoot?: string;
-  }) =>
+export const writeHostRepairPacket = ({
+  cycle,
+  findings,
+  runId,
+  workDir,
+  writeRoot = "apps/web",
+}: {
+  cycle: number;
+  findings: StressFinding[];
+  runId: string;
+  workDir: string;
+  writeRoot?: string;
+}) => {
+  const prompt = [
+    `Repair cycle ${cycle}. Fix only defects in ${writeRoot}/.`,
+    "Findings:",
+    ...findings.map(
+      (f) =>
+        `- ${f.findingId} (${f.severity}): expected ${f.expected}; observed ${f.observed}`
+    ),
+    "Do not modify evaluator, oracle, or .agents/eval paths.",
+  ].join("\n");
+
+  const packetDir = path.join(workDir, "__dev", "flow-evals", "repair-packets");
+  mkdirSync(packetDir, { recursive: true });
+  const packetPath = path.join(packetDir, `${runId}-cycle-${cycle}.json`);
+  writeFileSync(
+    packetPath,
+    `${JSON.stringify(
+      {
+        cycle,
+        dispatch: {
+          constraints:
+            "No model flag. Dispatch via /flow-eval host-session rules.",
+          worktreePath: workDir,
+        },
+        prompt,
+        runId,
+        writeRoot,
+      },
+      null,
+      2
+    )}\n`
+  );
+  return { packetPath, prompt };
+};
+
+export const createHostRepairExecutor =
+  ({ runId, writeRoot = "apps/web" }: { runId: string; writeRoot?: string }) =>
   ({
     cycle,
     findings,
@@ -42,59 +78,15 @@ export const createCursorRepairExecutor =
     findings: StressFinding[];
     workDir: string;
   }) => {
-    const auth = authCheck();
-    if (!auth.ok)
-      return Promise.resolve({ applied: false, summary: auth.reason });
-
-    const prompt = [
-      `Repair cycle ${cycle}. Fix only defects in ${writeRoot}/.`,
-      "Findings:",
-      ...findings.map(
-        (f) =>
-          `- ${f.findingId} (${f.severity}): expected ${f.expected}; observed ${f.observed}`
-      ),
-      "Do not modify evaluator, oracle, or .agents/eval paths.",
-    ].join("\n");
-
-    const logDir = mkdtempSync(path.join(os.tmpdir(), "flow-repair-log-"));
-    const rawLog = path.join(logDir, "repair.log");
-    writeFileSync(rawLog, "");
-
-    const args = [
-      "-p",
-      "--output-format",
-      "stream-json",
-      "--trust",
-      "--sandbox",
-      "enabled",
-      "--workspace",
+    const { packetPath } = writeHostRepairPacket({
+      cycle,
+      findings,
+      runId,
       workDir,
-      "--model",
-      modelId,
-      prompt,
-    ];
-    const result = spawnSync("agent", args, {
-      cwd: workDir,
-      encoding: "utf-8",
-      stdio: "pipe",
-      timeout: 600_000,
+      writeRoot,
     });
-    writeFileSync(rawLog, result.stdout || result.stderr || "");
-
-    if (result.status !== 0)
-      return Promise.resolve({
-        applied: false,
-        summary: `repair agent exit ${result.status}`,
-      });
-
-    if (!pathsWithinWriteRoot({ workDir, writeRoot }))
-      return Promise.resolve({
-        applied: false,
-        summary: "repair touched unauthorized paths",
-      });
-
     return Promise.resolve({
-      applied: true,
-      summary: `repair agent completed cycle ${cycle}`,
+      applied: false,
+      summary: `host repair packet written: ${packetPath}. Complete via /flow-eval dispatch.`,
     });
   };

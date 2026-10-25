@@ -1,7 +1,6 @@
 ---
 name: builder
 description: Implements an authorized Build task within a bounded write set. Use when explicit Build authorization and non-overlapping ownership are defined.
-model: inherit
 readonly: false
 ---
 

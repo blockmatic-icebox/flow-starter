@@ -1,7 +1,6 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-import { assertAgentAuth } from "./agent.ts";
 import { compareRuns } from "./compare.ts";
 import { runExperiment } from "./generation/experiment.ts";
 import { stratifiedMethodologySample } from "./generation/methodology-sample.ts";
@@ -9,7 +8,15 @@ import { createSeededRng, randomSeed } from "./generation/rng.ts";
 import { runSelfImproveCampaign } from "./generation/self-improve.ts";
 import { gradeScenarioFromRunDir } from "./grade-from-run.ts";
 import { handoffAgentBPrompt } from "./handoff.ts";
-import { runBatch, runScenarioSession } from "./orchestrate.ts";
+import {
+  hostSessionFinalize,
+  hostSessionNext,
+  hostSessionRecord,
+  hostSessionRecordModel,
+  prepareHostRun,
+  scenarioWorkerBrief,
+} from "./host-session.ts";
+import { runBatch } from "./orchestrate.ts";
 import { devEvalsRoot, baselineRunId } from "./paths.ts";
 import { verifyBaselinePreserved } from "./preserve.ts";
 import {
@@ -19,10 +26,10 @@ import {
 import { writeProductEvalArtifacts } from "./product/persist.ts";
 import { evaluateReadiness } from "./product/readiness.ts";
 import { findingsFromReadiness } from "./product/remediate.ts";
-import { createCursorRepairExecutor } from "./product/repair-executor.ts";
+import { createHostRepairExecutor } from "./product/repair-executor.ts";
 import { runStressEvaluation } from "./product/stress.ts";
 import { listPublicScenarioIds } from "./scenarios.ts";
-import type { EvalArm } from "./types.ts";
+import type { EvalArm, EvalEvent } from "./types.ts";
 
 const usage = () => {
   console.log(`flow-eval CLI
@@ -30,18 +37,25 @@ const usage = () => {
 Usage:
   pnpm --filter @repo/flow-eval eval preserve
   pnpm --filter @repo/flow-eval eval grade --run <runId> --scenario <id>
-  pnpm --filter @repo/flow-eval eval pilot [--model <id>]
-  pnpm --filter @repo/flow-eval eval run --scenarios S01,S02 [--arm flow] [--model <id>] [--dry-run]
+  pnpm --filter @repo/flow-eval eval prepare [--arm flow] [--suite | --scenarios S01,S13] [--run-id <id>] [--repetition N]
+  pnpm --filter @repo/flow-eval eval briefs --run <runId>
+  pnpm --filter @repo/flow-eval eval next --run <runId> [--scenario <id>] [--repetition N]
+  pnpm --filter @repo/flow-eval eval record --run <runId> --scenario <id> --turn <n> [--repetition N] --events-file <path>
+  pnpm --filter @repo/flow-eval eval finalize --run <runId> [--model-id <id>]
+  pnpm --filter @repo/flow-eval eval pilot [--scenarios S01,S13]
+  pnpm --filter @repo/flow-eval eval run --scenarios S01,S02 [--arm flow] [--dry-run]
   pnpm --filter @repo/flow-eval eval compare --baseline <runId> --current <runId> [--remediation]
-  pnpm --filter @repo/flow-eval eval pilot-loop [--model <id>] [--dry-run]
+  pnpm --filter @repo/flow-eval eval pilot-loop [--dry-run]
   pnpm --filter @repo/flow-eval eval compare-arms [--scenarios S05,S09,S13] [--dry-run]
-  pnpm --filter @repo/flow-eval eval handoff --variant C1 [--model <id>] [--dry-run]
+  pnpm --filter @repo/flow-eval eval handoff --variant C1 [--dry-run]
   pnpm --filter @repo/flow-eval eval readiness [--run <id>]
   pnpm --filter @repo/flow-eval eval stress [--run <id>] [--cycles N]
   pnpm --filter @repo/flow-eval eval mutations
   pnpm --filter @repo/flow-eval eval benchmark --id benchmark-a|benchmark-b
   pnpm --filter @repo/flow-eval eval experiment [--profile full-product] [--count N] [--seed <seed>] [--dry-run]
-  pnpm --filter @repo/flow-eval eval self-improve [--iterations 3] [--seed <seed>] [--model <id>] [--dry-run] [--resume <campaign-id>]
+  pnpm --filter @repo/flow-eval eval self-improve [--iterations 3] [--seed <seed>] [--dry-run] [--resume <campaign-id>]
+
+Live runs use host-session (/flow-eval). No --model flag.
 `);
 };
 
@@ -113,8 +127,6 @@ const cmdGrade = ({
   if (grade.gate === "fail" || !grade.officialEligible) process.exit(1);
 };
 
-const defaultModel = "composer-2.5";
-
 const writeRemediationProposal = ({
   runId,
   findings,
@@ -144,61 +156,172 @@ const writeRemediationProposal = ({
 const awaitBatch = async (input: Parameters<typeof runBatch>[0]) =>
   await runBatch(input);
 
+const printAwaitingHost = ({
+  runId,
+  host,
+}: {
+  runId: string;
+  host: string;
+}) => {
+  console.log(
+    JSON.stringify(
+      {
+        host,
+        message:
+          "Complete via /flow-eval: eval next → host subagent → eval record → repeat → eval finalize",
+        runId,
+        status: "awaiting-host",
+      },
+      null,
+      2
+    )
+  );
+};
+
+const cmdPrepare = ({
+  arm,
+  repetition,
+  runId,
+  scenarios,
+}: {
+  arm: EvalArm;
+  repetition: number;
+  runId?: string;
+  scenarios: string[];
+}) => {
+  assertScenarioIds({ ids: scenarios });
+  assertArm({ arm });
+  const prep = prepareHostRun({
+    arm,
+    repetition,
+    runId,
+    scenarioIds: scenarios,
+  });
+  console.log(JSON.stringify(prep, null, 2));
+};
+
+const cmdNext = ({
+  repetition,
+  runId,
+  scenarioId,
+}: {
+  repetition?: number;
+  runId: string;
+  scenarioId?: string;
+}) => {
+  const result = hostSessionNext({ repetition, runId, scenarioId });
+  console.log(JSON.stringify(result, null, 2));
+  if (!result.ok) process.exit(1);
+};
+
+const cmdBriefs = ({ runId }: { runId: string }) => {
+  const statePath = path.join(devEvalsRoot, runId, "host-session-state.json");
+  const state = JSON.parse(readFileSync(statePath, "utf-8")) as {
+    jobs: { repetition: number; scenarioId: string }[];
+  };
+  const briefs = state.jobs.map((job) =>
+    scenarioWorkerBrief({
+      repetition: job.repetition,
+      runId,
+      scenarioId: job.scenarioId,
+    })
+  );
+  console.log(JSON.stringify(briefs, null, 2));
+  if (briefs.some((brief) => !brief.ok)) process.exit(1);
+};
+
+const cmdRecord = ({
+  eventsFile,
+  repetition,
+  runId,
+  scenarioId,
+  turn,
+}: {
+  eventsFile: string;
+  repetition: number;
+  runId: string;
+  scenarioId: string;
+  turn: number;
+}) => {
+  assertScenarioIds({ ids: [scenarioId] });
+  const events = JSON.parse(readFileSync(eventsFile, "utf-8")) as EvalEvent[];
+  const result = hostSessionRecord({
+    events,
+    repetition,
+    runId,
+    scenarioId,
+    turn,
+  });
+  console.log(JSON.stringify(result, null, 2));
+  if (!result.ok) process.exit(1);
+};
+
+const cmdFinalize = ({
+  modelId,
+  runId,
+}: {
+  modelId?: string;
+  runId: string;
+}) => {
+  if (modelId) hostSessionRecordModel({ modelId, runId });
+  const result = hostSessionFinalize({ modelId, runId });
+  console.log(JSON.stringify(result, null, 2));
+  if (!result.ok) process.exit(1);
+  if (result.grades.some((g) => g.gate === "fail" || !g.officialEligible))
+    process.exit(1);
+};
+
 const cmdPilotLoop = async ({
-  model,
   dryRun,
   repetition,
 }: {
-  model: string;
   dryRun: boolean;
   repetition: number;
 }) => {
   const ts = Date.now();
   const runId = `pilot-loop-${ts}`;
-  const official = !dryRun;
-  if (official) {
-    const auth = assertAgentAuth();
-    if (!auth.ok) {
-      writeFileSync(
-        path.join(devEvalsRoot, "cli-auth-blocker.json"),
-        `${JSON.stringify({ runId, reason: auth.reason, at: new Date().toISOString() }, null, 2)}\n`
-      );
-      writeRemediationProposal({
-        runId,
-        findings: [
-          {
-            id: "F-pilot-auth",
-            status: "blocked",
-            summary:
-              "Official pilot requires `agent login` or CURSOR_API_KEY. Re-run `eval pilot-loop` after auth.",
-          },
-          {
-            id: "F-deleg-001",
-            status: "addressed-in-code",
-            summary:
-              "Delegation oracle no longer clears ADR/build-not-authorized gates via applyPolicy (WP1).",
-          },
-        ],
-      });
-      console.error(auth.reason);
-      process.exit(2);
-    }
+  if (dryRun) {
+    const flowScenarios = ["S13", "S16", "S17", "S09", "S01"];
+    const controlScenarios = ["S13", "S16", "S09"];
+    await awaitBatch({
+      arm: "flow",
+      official: false,
+      repetition,
+      runId: `${runId}-flow`,
+      scenarioIds: flowScenarios,
+    });
+    await awaitBatch({
+      arm: "control",
+      official: false,
+      repetition,
+      runId: `${runId}-control`,
+      scenarioIds: controlScenarios,
+    });
+    writeRemediationProposal({
+      runId,
+      findings: [
+        {
+          id: "F-pilot-complete",
+          status: "dry-run",
+          summary:
+            "Dry-run recorded stakeholder turns only; not evidence of agent compliance.",
+        },
+      ],
+    });
+    console.log(`Pilot loop dry-run recorded: ${runId}`);
+    return;
   }
 
   const flowScenarios = ["S13", "S16", "S17", "S09", "S01"];
   const controlScenarios = ["S13", "S16", "S09"];
-  await awaitBatch({
+  const flowPrep = prepareHostRun({
     arm: "flow",
-    modelId: model,
-    official,
     repetition,
     runId: `${runId}-flow`,
     scenarioIds: flowScenarios,
   });
-  await awaitBatch({
+  const controlPrep = prepareHostRun({
     arm: "control",
-    modelId: model,
-    official,
     repetition,
     runId: `${runId}-control`,
     scenarioIds: controlScenarios,
@@ -208,60 +331,43 @@ const cmdPilotLoop = async ({
     findings: [
       {
         id: "F-pilot-complete",
-        status: dryRun ? "dry-run" : "pending-review",
-        summary: dryRun
-          ? "Dry-run recorded stakeholder turns only; not evidence of agent compliance."
-          : "Live pilot artifacts under flow/control run ids; human review required before WP3 doc edits.",
+        status: "pending-review",
+        summary:
+          "Host-session pilot prepared; complete each run via /flow-eval before compare.",
       },
     ],
   });
-  console.log(`Pilot loop ${dryRun ? "dry-run" : "run"} recorded: ${runId}`);
-  if (dryRun) console.log("Dry-run: not evidence of agent compliance.");
+  console.log(
+    JSON.stringify(
+      {
+        controlRunId: controlPrep.runId,
+        flowRunId: flowPrep.runId,
+        runId,
+        status: "awaiting-host",
+      },
+      null,
+      2
+    )
+  );
 };
 
-const cmdPilot = async ({ model }: { model: string }) => {
-  const runId = `pilot-${Date.now()}`;
-  const auth = assertAgentAuth();
-  if (!auth.ok) {
-    const blocker = {
-      at: new Date().toISOString(),
-      reason: auth.reason,
-      runId,
-    };
-    writeFileSync(
-      path.join(devEvalsRoot, "cli-auth-blocker.json"),
-      `${JSON.stringify(blocker, null, 2)}\n`
-    );
-    console.error(auth.reason);
-    process.exit(2);
-  }
-  const { errors, grades, infrastructureFailure } = await awaitBatch({
-    runId,
-    scenarioIds: ["S01", "S13"],
+const cmdPilot = ({ scenarios }: { scenarios: string[] }) => {
+  const prep = prepareHostRun({
     arm: "flow",
-    modelId: model,
-    official: true,
+    scenarioIds: scenarios,
   });
-  if (errors.length) {
-    console.error(errors.join("\n"));
-    process.exit(infrastructureFailure ? 4 : 1);
-  }
-  if (grades.some((g) => g.gate === "fail" || !g.officialEligible))
-    process.exit(1);
-  console.log(`Pilot complete: ${runId}`);
+  printAwaitingHost({ host: prep.host, runId: prep.runId });
 };
 
 const cmdRun = async ({
   scenarios,
   arm,
-  model,
   dryRun,
   repetition,
   randomizationSeed,
 }: {
   scenarios: string[];
   arm: EvalArm;
-  model: string;
   dryRun: boolean;
   repetition?: number;
   randomizationSeed?: string;
@@ -276,37 +382,33 @@ const cmdRun = async ({
       `${JSON.stringify({ seed: randomizationSeed, scenarioIds: scenarios, strategy: "methodology-stratified" }, null, 2)}\n`
     );
   }
-  const official = !dryRun;
-  if (official) {
-    const auth = assertAgentAuth();
-    if (!auth.ok) {
-      writeFileSync(
-        path.join(devEvalsRoot, "cli-auth-blocker.json"),
-        `${JSON.stringify({ runId, reason: auth.reason }, null, 2)}\n`
-      );
-      console.error(auth.reason);
-      process.exit(2);
-    }
-  }
-  const { errors, grades, infrastructureFailure, manifest } = await awaitBatch({
-    runId,
-    scenarioIds: scenarios,
-    arm,
-    modelId: model,
-    official,
-    repetition: repetition ?? 1,
-  });
-  if (errors.length) {
-    console.error(errors.join("\n"));
-    process.exit(infrastructureFailure ? 4 : 1);
-  }
-  console.log(`Run ${runId} arm=${manifest.arm} harness=${manifest.harness}`);
   if (dryRun) {
+    const { errors, grades, infrastructureFailure, manifest } =
+      await awaitBatch({
+        arm,
+        official: false,
+        repetition: repetition ?? 1,
+        runId,
+        scenarioIds: scenarios,
+      });
+    if (errors.length) {
+      console.error(errors.join("\n"));
+      process.exit(infrastructureFailure ? 4 : 1);
+    }
+    console.log(`Run ${runId} arm=${manifest.arm} harness=${manifest.harness}`);
     console.log("Dry-run: not evidence of agent compliance.");
+    if (grades.some((g) => g.gate === "fail" || !g.officialEligible))
+      process.exit(1);
     return;
   }
-  if (grades.some((g) => g.gate === "fail" || !g.officialEligible))
-    process.exit(1);
+
+  const prep = prepareHostRun({
+    arm,
+    repetition: repetition ?? 1,
+    runId,
+    scenarioIds: scenarios,
+  });
+  printAwaitingHost({ host: prep.host, runId: prep.runId });
 };
 
 const cmdCompare = ({
@@ -329,11 +431,9 @@ const cmdCompare = ({
 
 const cmdHandoff = async ({
   variant,
-  model,
   dryRun,
 }: {
   variant: "C1" | "C2" | "C3";
-  model: string;
   dryRun: boolean;
 }) => {
   if (!["C1", "C2", "C3"].includes(variant)) {
@@ -341,109 +441,107 @@ const cmdHandoff = async ({
     process.exit(3);
   }
   const runId = `handoff-${variant}-${Date.now()}`;
-  const official = !dryRun;
-  if (official) {
-    const auth = assertAgentAuth();
-    if (!auth.ok) {
-      console.error(auth.reason);
-      process.exit(2);
-    }
-  }
-
   const agentAScenario = variant === "C2" ? "S13" : "S01";
-  const agentAResult = await runScenarioSession({
-    arm: "flow",
-    modelId: model,
-    official,
-    runId,
-    scenarioId: agentAScenario,
-  });
-  if (!agentAResult.ok) {
-    console.error(agentAResult.reason);
-    process.exit(1);
+  if (dryRun) {
+    await awaitBatch({
+      arm: "flow",
+      official: false,
+      runId,
+      scenarioIds: [agentAScenario],
+    });
+    console.log(`Handoff dry-run recorded: ${runId}`);
+    return;
   }
 
+  const prep = prepareHostRun({
+    arm: "flow",
+    runId,
+    scenarioIds: [agentAScenario],
+  });
   const bPrompt = handoffAgentBPrompt({ variant });
   writeFileSync(
     path.join(devEvalsRoot, runId, "handoff-agent-b-prompt.txt"),
     `${bPrompt}\n`
   );
-
-  if (official && agentAResult.worktreePath && agentAResult.prepBaselineSha) {
-    const agentB = await runScenarioSession({
-      arm: "flow",
-      customTurnOnePrompt: bPrompt,
-      maxTurns: 4,
-      modelId: model,
-      official: true,
-      prepBaselineSha: agentAResult.prepBaselineSha,
-      runId,
-      scenarioId: "S07",
-      worktreePath: agentAResult.worktreePath,
-    });
-    if (!agentB.ok || agentB.grade?.gate === "fail") process.exit(1);
-  }
-
-  console.log(`Handoff protocol recorded: ${runId}`);
+  writeFileSync(
+    path.join(devEvalsRoot, runId, "handoff-notes.json"),
+    `${JSON.stringify(
+      {
+        agentAScenario,
+        agentBScenario: "S07",
+        agentBPromptPath: "handoff-agent-b-prompt.txt",
+        afterAgentA:
+          "Finalize agent A scenario, then prepare S07 in same worktree with custom turn-one from handoff-agent-b-prompt.txt",
+      },
+      null,
+      2
+    )}\n`
+  );
+  printAwaitingHost({ host: prep.host, runId: prep.runId });
 };
 
 const cmdCompareArms = async ({
   dryRun,
-  model,
   scenarios,
 }: {
   dryRun: boolean;
-  model: string;
   scenarios: string[];
 }) => {
   assertScenarioIds({ ids: scenarios });
   const ts = Date.now();
   const flowRun = `compare-flow-${ts}`;
   const controlRun = `compare-control-${ts}`;
-  if (!dryRun) {
-    const auth = assertAgentAuth();
-    if (!auth.ok) {
-      console.error(auth.reason);
-      process.exit(2);
+  if (dryRun) {
+    const flowBatch = await awaitBatch({
+      arm: "flow",
+      official: false,
+      runId: flowRun,
+      scenarioIds: scenarios,
+    });
+    if (flowBatch.errors.length) {
+      console.error(flowBatch.errors.join("\n"));
+      process.exit(flowBatch.infrastructureFailure ? 4 : 1);
     }
+    const controlBatch = await awaitBatch({
+      arm: "control",
+      official: false,
+      runId: controlRun,
+      scenarioIds: scenarios,
+    });
+    if (controlBatch.errors.length) {
+      console.error(controlBatch.errors.join("\n"));
+      process.exit(controlBatch.infrastructureFailure ? 4 : 1);
+    }
+    const result = compareRuns({
+      baselineDir: path.join(devEvalsRoot, controlRun),
+      crossArm: true,
+      currentDir: path.join(devEvalsRoot, flowRun),
+    });
+    console.log(JSON.stringify(result, null, 2));
+    return;
   }
-  const flowBatch = await awaitBatch({
+
+  const flowPrep = prepareHostRun({
+    arm: "flow",
     runId: flowRun,
     scenarioIds: scenarios,
-    arm: "flow",
-    modelId: model,
-    official: !dryRun,
   });
-  if (flowBatch.errors.length) {
-    console.error(flowBatch.errors.join("\n"));
-    process.exit(flowBatch.infrastructureFailure ? 4 : 1);
-  }
-  const controlBatch = await awaitBatch({
+  const controlPrep = prepareHostRun({
+    arm: "control",
     runId: controlRun,
     scenarioIds: scenarios,
-    arm: "control",
-    modelId: model,
-    official: !dryRun,
   });
-  if (controlBatch.errors.length) {
-    console.error(controlBatch.errors.join("\n"));
-    process.exit(controlBatch.infrastructureFailure ? 4 : 1);
-  }
-  const result = compareRuns({
-    baselineDir: path.join(devEvalsRoot, controlRun),
-    crossArm: true,
-    currentDir: path.join(devEvalsRoot, flowRun),
-  });
-  writeFileSync(
-    path.join(devEvalsRoot, `compare-arms-${ts}.json`),
-    `${JSON.stringify({ controlRun, flowRun, ...result }, null, 2)}\n`
+  console.log(
+    JSON.stringify(
+      {
+        controlRunId: controlPrep.runId,
+        flowRunId: flowPrep.runId,
+        status: "awaiting-host",
+      },
+      null,
+      2
+    )
   );
-  console.log(JSON.stringify(result, null, 2));
-  if (
-    !dryRun &&
-    (result.verdict === "regressed" || result.verdict === "inconclusive")
-  )
-    process.exit(1);
 };
 
 const scenarioList = (value: string | undefined, fallback: string) =>
@@ -477,33 +575,18 @@ const resolveRunScenarios = ({
 const cmdExperiment = async ({
   count,
   dryRun,
-  model,
   profile,
   seed,
 }: {
   count: number;
   dryRun: boolean;
-  model: string;
   profile: "full-product" | "mixed" | "technical-ai-assessment";
   seed?: string;
 }) => {
-  const official = !dryRun;
-  if (official) {
-    const auth = assertAgentAuth();
-    if (!auth.ok) {
-      writeFileSync(
-        path.join(devEvalsRoot, "cli-auth-blocker.json"),
-        `${JSON.stringify({ reason: auth.reason, at: new Date().toISOString() }, null, 2)}\n`
-      );
-      console.error(auth.reason);
-      process.exit(2);
-    }
-  }
   const result = await runExperiment({
     arm: "flow",
     count,
     dryRun,
-    model,
     profile,
     seed,
   });
@@ -544,20 +627,16 @@ const cmdReadiness = ({ runId }: { runId: string }) => {
 
 const cmdStress = async ({
   cycles,
-  model,
   runId,
   workDir,
 }: {
   cycles: number;
-  model: string;
   runId: string;
   workDir?: string;
 }) => {
   const result = await runStressEvaluation({
     maxRemediationCycles: cycles,
-    repairExecutor: workDir
-      ? createCursorRepairExecutor({ modelId: model })
-      : undefined,
+    repairExecutor: workDir ? createHostRepairExecutor({ runId }) : undefined,
     runId,
     workDir,
   });
@@ -588,7 +667,6 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         dryRun: Boolean(flags["dry-run"]),
         iterations: Number(flags.iterations ?? 3),
         maxConcurrency: Number(flags["max-concurrency"] ?? 2),
-        model: String(flags.model ?? defaultModel),
         resume: flags.resume ? String(flags.resume) : undefined,
       });
       console.log(JSON.stringify(result, null, 2));
@@ -598,7 +676,6 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
       cmdExperiment({
         count: Number(flags.count ?? 1),
         dryRun: Boolean(flags["dry-run"]),
-        model: String(flags.model ?? defaultModel),
         profile:
           (flags.profile as
             | "full-product"
@@ -618,7 +695,6 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
     stress: () =>
       cmdStress({
         cycles: Number(flags.cycles ?? 3),
-        model: String(flags.model ?? defaultModel),
         runId: String(flags.run ?? `stress-${Date.now()}`),
         workDir: flags.workdir ? String(flags.workdir) : undefined,
       }),
@@ -626,27 +702,87 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
     "compare-arms": () =>
       cmdCompareArms({
         dryRun: Boolean(flags["dry-run"]),
-        model: String(flags.model ?? defaultModel),
         scenarios: scenarioList(
           flags.scenarios as string | undefined,
           "S05,S09,S13"
         ),
       }),
+    finalize: () => {
+      if (!flags.run) {
+        console.error("finalize requires --run");
+        process.exit(3);
+      }
+      cmdFinalize({
+        modelId: flags["model-id"] ? String(flags["model-id"]) : undefined,
+        runId: String(flags.run),
+      });
+    },
     grade: () => dispatchGradeCli(flags),
     handoff: () =>
       cmdHandoff({
         dryRun: Boolean(flags["dry-run"]),
-        model: String(flags.model ?? defaultModel),
         variant: (flags.variant as "C1" | "C2" | "C3") ?? "C1",
       }),
-    pilot: () => cmdPilot({ model: String(flags.model ?? defaultModel) }),
+    briefs: () => {
+      if (!flags.run) {
+        console.error("briefs requires --run");
+        process.exit(3);
+      }
+      cmdBriefs({ runId: String(flags.run) });
+    },
+    next: () => {
+      if (!flags.run) {
+        console.error("next requires --run");
+        process.exit(3);
+      }
+      cmdNext({
+        repetition: flags.repetition ? Number(flags.repetition) : undefined,
+        runId: String(flags.run),
+        scenarioId: flags.scenario ? String(flags.scenario) : undefined,
+      });
+    },
+    pilot: () =>
+      cmdPilot({
+        scenarios: scenarioList(
+          flags.scenarios as string | undefined,
+          "S01,S13"
+        ),
+      }),
     "pilot-loop": () =>
       cmdPilotLoop({
         dryRun: Boolean(flags["dry-run"]),
-        model: String(flags.model ?? defaultModel),
         repetition: Number(flags.repetition ?? 2),
       }),
+    prepare: () =>
+      cmdPrepare({
+        arm: (flags.arm as EvalArm) ?? "flow",
+        repetition: Number(flags.repetition ?? 1),
+        runId: flags["run-id"] ? String(flags["run-id"]) : undefined,
+        scenarios: flags.suite
+          ? listPublicScenarioIds()
+          : scenarioList(flags.scenarios as string | undefined, "S01,S13"),
+      }),
     preserve: () => cmdPreserve(),
+    record: () => {
+      if (
+        !flags.run ||
+        !flags.scenario ||
+        !flags.turn ||
+        !flags["events-file"]
+      ) {
+        console.error(
+          "record requires --run, --scenario, --turn, and --events-file"
+        );
+        process.exit(3);
+      }
+      cmdRecord({
+        eventsFile: String(flags["events-file"]),
+        repetition: Number(flags.repetition ?? 1),
+        runId: String(flags.run),
+        scenarioId: String(flags.scenario),
+        turn: Number(flags.turn),
+      });
+    },
     run: () => {
       const resolved = resolveRunScenarios({
         count: Number(flags.count ?? 5),
@@ -656,7 +792,6 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
       return cmdRun({
         arm: (flags.arm as EvalArm) ?? "flow",
         dryRun: Boolean(flags["dry-run"]),
-        model: String(flags.model ?? defaultModel),
         randomizationSeed: resolved.seed,
         repetition: Number(flags.repetition ?? 1),
         scenarios: resolved.scenarios,

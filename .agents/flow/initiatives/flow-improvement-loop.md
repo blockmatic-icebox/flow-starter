@@ -48,7 +48,7 @@ Dogfooding self-improvement (observe → cluster → experiment → L1 promote; 
 
 Stress-test retrospective (autonomous Feature Intelligence build, not a formal eval): [flow-evaluation-suite.md § 2026-10-24](flow-evaluation-suite.md#2026-10-24-autonomous-stress-test-feature-intelligence-on-appsweb).
 
-After WP1–WP2 and explicit run authorization. Cap: **16** sessions. Model default: `composer-2.5`. **2** repetitions per cell via `--repetition 2`.
+After WP1–WP2 and explicit run authorization. Cap: **16** sessions. Use the host’s current model via `/flow-eval`. **2** repetitions per cell via `--repetition 2`.
 
 | Scenario | Arms          | Reps | Shared outcome focus                    |
 | -------- | ------------- | ---: | --------------------------------------- |

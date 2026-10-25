@@ -25,6 +25,9 @@ export type RegressionVerdict =
   | "unchanged"
   | "inconclusive";
 
+const observedModel = (id?: string) =>
+  id && id !== "missing" ? id : undefined;
+
 export const manifestsCompatible = ({
   baseline,
   current,
@@ -45,7 +48,10 @@ export const manifestsCompatible = ({
       );
     else issues.push("sourceSha mismatch");
   }
-  if (baseline.modelId !== current.modelId) issues.push("modelId mismatch");
+  const baselineModel = observedModel(baseline.modelId);
+  const currentModel = observedModel(current.modelId);
+  if (baselineModel && currentModel && baselineModel !== currentModel)
+    issues.push("modelId mismatch");
   if (baseline.rubricVersion !== current.rubricVersion)
     issues.push("rubricVersion mismatch");
   if (baseline.protocol !== current.protocol) issues.push("protocol mismatch");

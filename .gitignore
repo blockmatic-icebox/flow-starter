@@ -66,6 +66,8 @@ __dev
 .cursor/*
 !.cursor/agents/
 !.cursor/agents/**
+!.cursor/commands/
+!.cursor/commands/**
 
 # Neon Local metadata
 .neon_local/

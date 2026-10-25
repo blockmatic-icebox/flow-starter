@@ -2,6 +2,7 @@ import type {
   AgentTurnResult,
   Completeness,
   EvalEvent,
+  HarnessKind,
   TokenUsage,
   TurnTermination,
 } from "./types.ts";
@@ -9,6 +10,7 @@ import type {
 const MAX_LINE_BYTES = 512_000;
 
 export const PROTOCOL_ID = "cursor-cli-stream-json-2026.10";
+export const HOST_SESSION_PROTOCOL_ID = "host-session-v1";
 
 export const isProtocolVerified = ({
   agentCliVersion,
@@ -376,10 +378,12 @@ export const parseStreamJsonLines = ({
 
 export const resolveScenarioCompleteness = ({
   events,
+  harness,
   oracle,
   official,
 }: {
   events: EvalEvent[];
+  harness?: HarnessKind;
   oracle?: {
     expectsCommands?: boolean;
     expectsTools?: boolean;
@@ -387,7 +391,11 @@ export const resolveScenarioCompleteness = ({
   official: boolean;
 }) => {
   if (!official) return "partial" as const;
-  return sessionCompletenessFromEvents({ events, oracle });
+  return sessionCompletenessFromEvents({
+    events,
+    hostSession: harness === "host-session",
+    oracle,
+  });
 };
 
 export const foldSessionTelemetry = ({
@@ -414,9 +422,11 @@ export const foldSessionTelemetry = ({
 
 const sessionCompletenessFromEvents = ({
   events,
+  hostSession = false,
   oracle,
 }: {
   events: EvalEvent[];
+  hostSession?: boolean;
   oracle?: {
     expectsCommands?: boolean;
     expectsTools?: boolean;
@@ -445,16 +455,18 @@ const sessionCompletenessFromEvents = ({
     const commandCount = turnEvents.filter(
       (event) => event.kind === "command"
     ).length;
-    const turnComplete = turnCompleteness({
-      commandCount,
-      expectsCommands: oracle?.expectsCommands ?? false,
-      expectsTools: oracle?.expectsTools ?? false,
-      sawMalformed,
-      sawResultSuccess,
-      termination: sawResultSuccess ? "completed" : "exited",
-      toolCount,
-    });
-    if (turnComplete !== "complete") return "partial" as const;
+    const turnComplete = hostSession
+      ? turnEvents.some((event) => event.kind === "assistant")
+      : turnCompleteness({
+          commandCount,
+          expectsCommands: oracle?.expectsCommands ?? false,
+          expectsTools: oracle?.expectsTools ?? false,
+          sawMalformed,
+          sawResultSuccess,
+          termination: sawResultSuccess ? "completed" : "exited",
+          toolCount,
+        }) === "complete";
+    if (!turnComplete) return "partial" as const;
   }
   return "complete" as const;
 };

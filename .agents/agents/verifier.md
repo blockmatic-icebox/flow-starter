@@ -1,7 +1,6 @@
 ---
 name: verifier
 description: Read-only independent review against acceptance criteria. Use after deterministic checks when judgment on the implementation is needed.
-model: inherit
 readonly: true
 ---
 

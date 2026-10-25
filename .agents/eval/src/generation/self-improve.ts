@@ -2,13 +2,11 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
 
-import { assertAgentAuth } from "../agent.ts";
-import type { AuthCheck } from "../agent.ts";
 import { runBatch } from "../orchestrate.ts";
 import { devEvalsRoot, repoRoot } from "../paths.ts";
 import { isRegisteredFamily } from "../product/families/registry.ts";
 import { evaluateReadiness } from "../product/readiness.ts";
-import { createCursorRepairExecutor } from "../product/repair-executor.ts";
+import { createHostRepairExecutor } from "../product/repair-executor.ts";
 import { runStressEvaluation } from "../product/stress.ts";
 import { scenarioTemplates } from "./catalog-data.ts";
 import { generationCatalogHash } from "./catalog-hash.ts";
@@ -96,13 +94,13 @@ export const initCampaign = ({
   campaignId,
   campaignSeed,
   iterations,
-  model,
+  model = "missing",
   maxConcurrency = 2,
 }: {
   campaignId: string;
   campaignSeed: string;
   iterations: number;
-  model: string;
+  model?: string;
   maxConcurrency?: number;
 }) => {
   const selection = selectCampaignChallenges({
@@ -129,7 +127,7 @@ export const initCampaign = ({
     evaluatorVersion: EVALUATOR_VERSION,
     generatorVersion: GENERATOR_VERSION,
     maxConcurrency,
-    model,
+    model: model ?? "missing",
     resourceLimits: { maxRepairCycles: 3 },
   };
 
@@ -209,7 +207,7 @@ const runCampaignIteration = async ({
   challenge: CampaignManifest["challenges"][number];
   manifest: CampaignManifest;
   maxConcurrency: number;
-  model: string;
+  model?: string;
   root: string;
 }) => {
   const experimentId = `${campaignId}-challenge-${String(challenge.iteration).padStart(2, "0")}`;
@@ -253,7 +251,9 @@ const runCampaignIteration = async ({
     worktreePath
       ? await runStressEvaluation({
           maxRemediationCycles: manifest.resourceLimits.maxRepairCycles,
-          repairExecutor: createCursorRepairExecutor({ modelId: model }),
+          repairExecutor: createHostRepairExecutor({
+            runId: `${runId}-repair`,
+          }),
           runId: `${runId}-repair`,
           workDir: worktreePath,
         })
@@ -285,22 +285,20 @@ const runCampaignIteration = async ({
 };
 
 export const runSelfImproveCampaign = async ({
-  authCheck = assertAgentAuth,
   campaignId,
   campaignSeed,
   dryRun = false,
   iterations = 3,
   maxConcurrency = 2,
-  model,
+  model = "missing",
   resume,
 }: {
-  authCheck?: AuthCheck;
   campaignId?: string;
   campaignSeed?: string;
   dryRun?: boolean;
   iterations?: number;
   maxConcurrency?: number;
-  model: string;
+  model?: string;
   resume?: string;
 }) => {
   const id =
@@ -331,25 +329,6 @@ export const runSelfImproveCampaign = async ({
       manifest,
       ok: true,
       status: "dry-run",
-    };
-  }
-
-  const auth = authCheck();
-  if (!auth.ok) {
-    const blockerPath = path.join(devEvalsRoot, "cli-auth-blocker.json");
-    writeFileSync(
-      blockerPath,
-      `${JSON.stringify(
-        { at: new Date().toISOString(), reason: auth.reason },
-        null,
-        2
-      )}\n`
-    );
-    return {
-      blocker: auth.reason,
-      campaignId: id,
-      ok: false,
-      status: "blocked",
     };
   }
 

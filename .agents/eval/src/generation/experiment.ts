@@ -26,7 +26,7 @@ export const runExperiment = async ({
   count = 1,
   dryRun = false,
   experimentId,
-  model,
+  model = "missing",
   profile = "full-product",
   seed,
 }: {
@@ -34,7 +34,7 @@ export const runExperiment = async ({
   count?: number;
   dryRun?: boolean;
   experimentId?: string;
-  model: string;
+  model?: string;
   profile?: ExperimentProfile;
   seed?: string;
 }) => {
@@ -97,7 +97,6 @@ export const runExperiment = async ({
   const batch = await runBatch({
     arm,
     generatedScenarios: selection.scenarios,
-    modelId: model,
     official: true,
     repetition: 1,
     runId: id,

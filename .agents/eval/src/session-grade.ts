@@ -42,6 +42,7 @@ export const gradeObservedScenario = ({
   const commands = extractCommands({ events });
   const completeness = resolveScenarioCompleteness({
     events,
+    harness,
     official,
     oracle,
   });

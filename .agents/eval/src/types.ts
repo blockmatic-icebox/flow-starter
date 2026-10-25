@@ -9,7 +9,10 @@ export type EvalArm = "flow" | "flow-without-skills" | "control";
 export type HarnessKind =
   | "cursor-cli"
   | "cursor-cli-hooks"
+  | "host-session"
   | "diagnostic-unofficial";
+
+export type EvalHost = "cursor" | "claude" | "other";
 
 export type Completeness = "complete" | "partial" | "blocked";
 
@@ -40,7 +43,8 @@ export interface RunManifest {
   flowSha: string;
   flowVersion: string;
   arm: EvalArm;
-  modelId: string;
+  modelId?: string;
+  host?: EvalHost;
   agentCliVersion: string;
   cursorVersion: string;
   catalogHash: string;

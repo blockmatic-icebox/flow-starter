@@ -170,7 +170,7 @@ Distinguish:
 
 1. **Static policy tests** — `classifyDelegation` in `@repo/flow-eval` (scenarios `D01`–`D15`)
 2. **Scripted orchestration tests** — policy comparison without live agents
-3. **Real subagent runs** — `pnpm --filter @repo/flow-eval eval run` (requires agent CLI auth)
+3. **Host-session methodology runs** — `/flow-eval` with `eval prepare` / `next` / `record` / `finalize` (host subagents; no pinned model)
 4. **Browser verification** — [verification.md](verification.md)
 
 A passing `pnpm flow:check` does not prove delegation behavior. Record metrics (wall clock, tokens, workers) only when observed; use `missing` when the environment does not expose them.

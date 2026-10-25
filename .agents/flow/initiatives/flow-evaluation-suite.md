@@ -27,9 +27,9 @@ Out of scope: changing Flow v0.1 contracts as part of eval runs; hosted dashboar
 - [x] Hidden catalog drafts (gitignored)
 - [x] First-party `flow-eval` skill in `skills-lock.json` (run `pnpm skills:install`)
 - [x] Dry-run harness verification (worktrees, grading, compare-arms)
-- [ ] Authenticated CLI pilot (S01, S13) — blocked until `agent login` (see `__dev/flow-evals/cli-auth-blocker.json`)
+- [ ] Host-session pilot (S01, S13) via `/flow-eval` — prepare then complete turns in IDE
 - [x] Harness v0.2: stream-json normalization, prep baseline diffs, evidence-backed gates/grades, oracles for S01/S02/S09/S13, handoff continuity
-- [ ] Official flow-arm batch with complete stream-json traces (requires authenticated pilot)
+- [ ] Official flow-arm batch with complete host-session transcripts (requires completed `/flow-eval` pilot)
 - [x] Regression compare command (`compare`, `compare-arms`) and unit tests
 
 ## Validation
@@ -39,7 +39,7 @@ pnpm flow-eval:check
 pnpm --filter @repo/flow-eval eval preserve
 ```
 
-Official runs additionally require `agent login` and complete stream-json tool traces.
+Official live runs use harness `host-session` (`/flow-eval`). Legacy `cursor-cli` runs remain readable for compare.
 
 ## Findings
 
@@ -58,4 +58,4 @@ Historical v0.1 run: partial transcripts, three P0 patterns (unauthorized Build,
 | **Retained improvements** | Pre-commit `apps/web` / `apps/flow` typecheck; Flow Agent AI SDK + Zod compatibility; Playwright port isolation; Factory/product doc split under `.agents/flow/decisions/` |
 | **Removed** | All FI application code, seed data, assessment `CLAUDE.md` / `prompts.txt`, starter `ai`/`zod` deps |
 | **Proposed Flow corrections** | (1) Gate **Build** on ADR 0012 check for `apps/web` route additions beyond starter template. (2) Require green `pnpm lint` before claiming verification complete. (3) Run official S13/S16 matrix only with `agent login` and complete telemetry — see pilot matrix in [flow-improvement-loop.md](flow-improvement-loop.md). |
-| **Next experiment** | Authenticated S13 + S16, 2 reps × flow/control, model `composer-2.5`, max 8 sessions |
+| **Next experiment** | Host-session S13 + S16, 2 reps × flow/control, max 8 sessions via `/flow-eval` |

@@ -4,17 +4,16 @@ import path from "node:path";
 
 import {
   agentCliVersion,
-  assertAgentAuth,
   runAgentTurn,
   runAgentTurnAsync,
   writeSessionMeta,
 } from "./agent.ts";
-import type { AuthCheck } from "./agent.ts";
 import { summarizeBatchOutcomes } from "./batch-outcomes.ts";
 import { controlArmValid } from "./compare.ts";
 import { evalConcurrency, mapWithConcurrency } from "./concurrency.ts";
 import { extractCommands } from "./evidence.ts";
 import type { GeneratedScenario } from "./generation/types.ts";
+import { prepareHostRun } from "./host-session.ts";
 import {
   applyScenarioFixture,
   captureAgentDiff,
@@ -64,7 +63,6 @@ const runStakeholderTurns = async ({
   customTurnOnePrompt,
   eventsPath,
   hidden,
-  modelId,
   official,
   oracle,
   publicBrief,
@@ -78,7 +76,6 @@ const runStakeholderTurns = async ({
   customTurnOnePrompt?: string;
   eventsPath: string;
   hidden?: ReturnType<typeof loadHiddenScenario>;
-  modelId: string;
   official: boolean;
   oracle:
     | NonNullable<ReturnType<typeof loadScenarioOracle>>
@@ -115,7 +112,6 @@ const runStakeholderTurns = async ({
     if (official) {
       const turnInput = {
         jsonlPath: eventsPath,
-        modelId,
         oracle,
         prompt: message,
         rawLogPath: rawLog,
@@ -206,7 +202,6 @@ export const runScenarioSession = async ({
   runId,
   scenarioId,
   arm,
-  modelId,
   official,
   worktreePath: existingWorktree,
   prepBaselineSha,
@@ -215,12 +210,10 @@ export const runScenarioSession = async ({
   repetition = 1,
   generated,
   useAsyncAgent = true,
-  authCheck = assertAgentAuth,
 }: {
   runId: string;
   scenarioId: string;
   arm: EvalArm;
-  modelId: string;
   official: boolean;
   worktreePath?: string;
   prepBaselineSha?: string;
@@ -229,12 +222,13 @@ export const runScenarioSession = async ({
   repetition?: number;
   generated?: GeneratedScenario;
   useAsyncAgent?: boolean;
-  authCheck?: AuthCheck;
 }) => {
-  if (official) {
-    const auth = authCheck();
-    if (!auth.ok) return { ok: false, reason: auth.reason };
-  }
+  if (official)
+    return {
+      ok: false as const,
+      reason:
+        "Official live runs use host-session: eval prepare, then /flow-eval loop (record, next, finalize).",
+    };
 
   const flowSha = currentFlowSha();
   const worktreeResult = prepareScenarioWorktree({
@@ -280,7 +274,6 @@ export const runScenarioSession = async ({
     customTurnOnePrompt,
     eventsPath,
     hidden,
-    modelId,
     official,
     oracle,
     publicBrief: generated?.publicBrief,
@@ -380,7 +373,7 @@ const buildBatchManifest = ({
   arm: EvalArm;
   controlCheck: ReturnType<typeof controlArmValid>;
   grades: GradeResult[];
-  modelId: string;
+  modelId?: string;
   official: boolean;
   repetition: number;
   runId: string;
@@ -409,7 +402,7 @@ const buildBatchManifest = ({
     arm === "control"
       ? "Flow arm reduces authorization-set critical failures vs control."
       : undefined,
-  modelId,
+  modelId: modelId ?? "missing",
   protocol: PROTOCOL_ID,
   repetition,
   rubricVersion,
@@ -431,18 +424,57 @@ export const runBatch = async ({
   repetition = 1,
   generatedScenarios,
   concurrency,
-  authCheck = assertAgentAuth,
 }: {
   runId: string;
   scenarioIds: string[];
   arm: EvalArm;
-  modelId: string;
+  modelId?: string;
   official: boolean;
   repetition?: number;
   generatedScenarios?: GeneratedScenario[];
   concurrency?: number;
-  authCheck?: AuthCheck;
 }) => {
+  if (official) {
+    const prep = prepareHostRun({
+      arm,
+      repetition,
+      runId,
+      scenarioIds,
+    });
+    const manifestPath = path.join(devEvalsRoot, runId, "manifest.json");
+    const manifest = JSON.parse(
+      readFileSync(manifestPath, "utf-8")
+    ) as RunManifest;
+    if (modelId) manifest.modelId = modelId;
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    const worktreePaths = prep.jobs.map((j) => j.worktreePath);
+    const outcomes = summarizeBatchOutcomes({
+      errors: [],
+      grades: [],
+      infrastructureFailure: false,
+      official: true,
+      repetition,
+      scenarioIds,
+    });
+    writeFileSync(
+      path.join(devEvalsRoot, runId, "outcomes.json"),
+      `${JSON.stringify(
+        { ...outcomes, hostSession: true, status: "awaiting-host" },
+        null,
+        2
+      )}\n`
+    );
+    return {
+      errors: [],
+      grades: [],
+      infrastructureFailure: false,
+      manifest,
+      ok: true,
+      outcomes,
+      worktreePaths,
+    };
+  }
+
   const generatedById = new Map(
     (generatedScenarios ?? []).map((s) => [s.id, s] as const)
   );
@@ -464,10 +496,8 @@ export const runBatch = async ({
     worker: ({ rep, scenarioId }) =>
       runScenarioSession({
         arm,
-        authCheck,
         generated: generatedById.get(scenarioId),
-        modelId,
-        official,
+        official: false,
         repetition: rep,
         runId,
         scenarioId,
@@ -501,7 +531,7 @@ export const runBatch = async ({
     controlCheck,
     grades,
     modelId,
-    official,
+    official: false,
     repetition,
     runId,
     scenarioIds,

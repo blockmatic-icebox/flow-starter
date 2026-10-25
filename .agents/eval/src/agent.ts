@@ -47,7 +47,6 @@ export const assertAgentAuth: AuthCheck = () => {
 
 export const runAgentTurnAsync = async ({
   workspace,
-  modelId,
   prompt,
   sessionId,
   jsonlPath,
@@ -59,7 +58,6 @@ export const runAgentTurnAsync = async ({
   timeoutMs = 600_000,
 }: {
   workspace: string;
-  modelId: string;
   prompt: string;
   sessionId?: string;
   jsonlPath: string;
@@ -95,8 +93,6 @@ export const runAgentTurnAsync = async ({
     "enabled",
     "--workspace",
     workspace,
-    "--model",
-    modelId,
   ];
   if (sessionId) args.push("--resume", sessionId);
   args.push(redactedPrompt);
@@ -194,7 +190,6 @@ export const runAgentTurnAsync = async ({
 
 export const runAgentTurn = ({
   workspace,
-  modelId,
   prompt,
   sessionId,
   jsonlPath,
@@ -205,7 +200,6 @@ export const runAgentTurn = ({
   startSeq,
 }: {
   workspace: string;
-  modelId: string;
   prompt: string;
   sessionId?: string;
   jsonlPath: string;
@@ -240,8 +234,6 @@ export const runAgentTurn = ({
     "enabled",
     "--workspace",
     workspace,
-    "--model",
-    modelId,
   ];
   if (sessionId) args.push("--resume", sessionId);
   args.push(redactedPrompt);

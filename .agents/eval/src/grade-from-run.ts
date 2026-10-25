@@ -13,7 +13,11 @@ import {
 } from "./scenarios.ts";
 import { gradeObservedScenario } from "./session-grade.ts";
 import { isBuildAuthorized } from "./stakeholder.ts";
-import { isProtocolVerified, PROTOCOL_ID } from "./trace.ts";
+import {
+  HOST_SESSION_PROTOCOL_ID,
+  isProtocolVerified,
+  PROTOCOL_ID,
+} from "./trace.ts";
 import type {
   EvalEvent,
   GradeResult,
@@ -61,6 +65,7 @@ const harnessFromManifest = (manifest: RunManifest | null): HarnessKind => {
 
 const protocolVerifiedFromManifest = (manifest: RunManifest | null) => {
   if (!manifest) return false;
+  if (manifest.protocol === HOST_SESSION_PROTOCOL_ID) return true;
   if (manifest.protocol !== PROTOCOL_ID) return false;
   return isProtocolVerified({ agentCliVersion: manifest.agentCliVersion });
 };
@@ -99,7 +104,8 @@ export const gradeScenarioFromRunDir = ({
     ? readFileSync(path.join(scenarioDir, "worktree-path.txt"), "utf-8").trim()
     : undefined;
   const harness = harnessFromManifest(manifest);
-  const official = harness === "cursor-cli" && !malformed;
+  const official =
+    (harness === "cursor-cli" || harness === "host-session") && !malformed;
 
   let baseGrade = gradeObservedScenario({
     buildAuthorized: isBuildAuthorized({ events, hidden }),

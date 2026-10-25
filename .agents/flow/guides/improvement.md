@@ -27,7 +27,7 @@ The `@repo/flow-eval` package provides a **user-invoked** harness: isolated work
 | Arms | Compare Flow entrypoint vs reduced context |
 | `flow:check` | Validates doc paths and bundle freshness—not product outcomes |
 
-Command reference: [packages/flow-eval/RUN.md](../../eval/RUN.md). Initiative status: [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md). As of that initiative, an **authenticated official pilot** may still be blocked pending CLI auth; treat live batch claims as in-progress unless the initiative says otherwise.
+Command reference: [.agents/eval/RUN.md](../../eval/RUN.md). Initiative status: [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md). Live official runs use **host-session** (`/flow-eval`); complete prepared runs before treating batch claims as evidence.
 
 ## Human-reviewed improvement loop (operating process)
 
