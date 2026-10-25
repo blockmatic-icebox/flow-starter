@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { runTriageHarness } from "./run-triage-harness.js";
+import { runTriageHarness } from "./run-triage-harness";
 
 describe("runTriageHarness", () => {
   it("returns lexical duplicate candidate for CSV-like submit", async () => {

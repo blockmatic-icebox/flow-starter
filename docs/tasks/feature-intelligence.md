@@ -34,11 +34,11 @@ Pattern: separate **tasks** from **specs** (cf. [Addy Osmani — specs and tasks
 
 ## Wave 0 — Database
 
-- [ ] **T-0-1** — Neon Path A or B; repo-root `.env` → [initiative § Neon](../initiatives/feature-intelligence.md#plan--postgres--neon-connectivity)
-- [ ] **T-0-2** — `pnpm db:migrate` (after T-0-1)
-- [ ] **T-0-3** — `pnpm db:ping` (after T-0-2)
-- [ ] **T-0-4** — `pnpm seed:fi` (after T-0-3)
-- [ ] **T-0-5** — `pnpm --filter @repo/db db:check` (after T-0-2; ∥ T-0-3/4)
+- [x] **T-0-1** — Neon Path A or B; repo-root `.env` → [initiative § Neon](../initiatives/feature-intelligence.md#plan--postgres--neon-connectivity)
+- [x] **T-0-2** — `pnpm db:migrate` (after T-0-1)
+- [x] **T-0-3** — `pnpm db:ping` (after T-0-2)
+- [x] **T-0-4** — `pnpm seed:fi` (after T-0-3)
+- [x] **T-0-5** — `pnpm --filter @repo/db db:check` (after T-0-2; ∥ T-0-3/4)
 
 ---
 
@@ -57,8 +57,8 @@ Build:
 - [ ] **T-1-5** — `classify-decisions.ts` (T2 Jev via gateway) — depends **G1**, T-1-4
 - [ ] **T-1-6** — `synthesize-artifact.ts` (T3) — depends **G1**, T-1-4; **∥ T-1-5**
 - [ ] **T-1-7** — full `runTriageHarness` — depends T-1-3, T-1-5, T-1-6
-- [ ] **T-1-8** — `createDraftAndTriage`, `confirmRequest`, `getRequest` — depends T-1-7, T-0-4
-- [ ] **T-1-9** — queue, disposition, support, `recordPmReviewStarted` — depends T-0-4; **∥ T-1-5…T-1-8** after G1
+- [x] **T-1-8** — `createDraftAndTriage`, `confirmRequest`, `getRequest` — depends T-1-7, T-0-4
+- [x] **T-1-9** — queue, disposition, support, `recordPmReviewStarted` — depends T-0-4; **∥ T-1-5…T-1-8** after G1
 - [ ] **T-1-10** — offline `triage-matrix` — depends T-1-7
 
 ---
@@ -69,36 +69,36 @@ Spike:
 
 - [x] **T-2-2** — `agent/instructions.md`
 
-- [ ] **T-2-7** — `eve init`, `agent.ts` — ∥ Wave 1 after T-0-4
-- [ ] **T-2-1** — read tools: `search_requests`, `list_triage_queue`, `get_insights` (+ `get_request` when added); spike partial—**verify** after T-2-7
-- [ ] **T-2-3** — core mutation/read tools: `get_request`, `submit_request`, `set_disposition` (+ read tools if not done in T-2-1) — depends T-1-8, T-1-9, T-2-7; aligns [eve MVP tools](../specs/feature-intelligence-eve-agent.md#mvp-tool-surface)
-- [ ] **T-2-4** — `confirm_request`, `support_request` — depends T-2-3 (optional)
-- [ ] **T-2-5** — `evals/evals.config.ts` — depends T-0-4, T-2-7
-- [ ] **T-2-6** — smoke evals incl. AG-7 — depends T-2-3, T-2-5, T-2-7
+- [x] **T-2-7** — `eve init`, `agent.ts` — ∥ Wave 1 after T-0-4
+- [x] **T-2-1** — read tools: `search_requests`, `list_triage_queue`, `get_insights` (+ `get_request` when added); spike partial—**verify** after T-2-7
+- [x] **T-2-3** — core mutation/read tools: `get_request`, `submit_request`, `set_disposition` (+ read tools if not done in T-2-1) — depends T-1-8, T-1-9, T-2-7; aligns [eve MVP tools](../specs/feature-intelligence-eve-agent.md#mvp-tool-surface)
+- [x] **T-2-4** — `confirm_request`, `support_request` — depends T-2-3 (optional)
+- [x] **T-2-5** — `evals/evals.config.ts` — depends T-0-4, T-2-7
+- [x] **T-2-6** — smoke evals incl. AG-7 — depends T-2-3, T-2-5, T-2-7
 
 ---
 
 ## Wave 3 — Web (after **G3**: T-0-4, T-1-8, T-1-9 — eve may lag)
 
-- [ ] **T-3-1** — `FiShell` + triage badge — depends T-1-9
-- [ ] **T-3-2** — `/` persona router — depends T-3-1; **∥ T-3-5**
-- [ ] **T-3-4** — server actions triage/confirm — depends T-1-8, T-3-1
-- [ ] **T-3-3** — `/requests/new` + contexts — depends T-3-4, T-3-1
-- [ ] **T-3-5** — `/requests` discover — depends T-3-1, T-0-4
-- [ ] **T-3-6** — `/requests/[id]` — depends T-3-5, T-3-4
-- [ ] **T-3-7** — `/triage` inline — depends T-3-1, T-1-9
-- [ ] **T-3-8** — `/insights` — depends T-3-1, T-1-2, T-0-4
-- [ ] **T-3-9** — agent-browser P0 (W-1–W-7) — depends T-3-3, T-3-5, T-3-7, T-3-8
+- [x] **T-3-1** — `FiShell` + triage badge — depends T-1-9
+- [x] **T-3-2** — `/` persona router — depends T-3-1; **∥ T-3-5**
+- [x] **T-3-4** — server actions triage/confirm — depends T-1-8, T-3-1
+- [x] **T-3-3** — `/requests/new` + contexts — depends T-3-4, T-3-1
+- [x] **T-3-5** — `/requests` discover — depends T-3-1, T-0-4
+- [x] **T-3-6** — `/requests/[id]` — depends T-3-5, T-3-4
+- [x] **T-3-7** — `/triage` inline — depends T-3-1, T-1-9
+- [x] **T-3-8** — `/insights` — depends T-3-1, T-1-2, T-0-4
+- [x] **T-3-9** — agent-browser P0 (W-1–W-7) — depends T-3-3, T-3-5, T-3-7, T-3-8
 
 ---
 
 ## Wave 4 — Ship
 
-- [ ] **T-4-1** — `eve/next` — depends T-2-3
-- [ ] **T-4-2** — `/chat` + Anthropic — optional post-**G4** (cut first if behind); **∥** Wave 3 when time allows
+- [x] **T-4-1** — `eve/next` — depends T-2-3
+- [x] **T-4-2** — `/chat` + Anthropic — optional post-**G4** (cut first if behind); **∥** Wave 3 when time allows
 - [ ] **T-4-3** — README assessment — depends T-3-7, T-3-8 (core routes + metrics visible)
-- [ ] **T-4-4** — `pnpm qa`
-- [ ] **T-4-5** — Demo rehearsal walkthrough (web-only script; external recorder—no app integration) — depends T-3-9, T-4-4
+- [x] **T-4-4** — `pnpm qa`
+- [x] **T-4-5** — Demo rehearsal walkthrough (web-only script; external recorder—no app integration) — depends T-3-9, T-4-4
 
 ---
 

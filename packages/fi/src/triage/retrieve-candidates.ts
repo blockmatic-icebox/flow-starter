@@ -26,7 +26,12 @@ export const retrieveLexicalCandidates = ({
       }
       const score =
         docTokens.length === 0 ? 0 : overlap / Math.sqrt(docTokens.length);
-      return { explanation: `Lexical overlap: ${overlap}`, id: row.id, score };
+      return {
+        explanation: `Lexical overlap: ${overlap}`,
+        id: row.id,
+        score,
+        title: row.title,
+      };
     })
     .filter((r) => r.score > 0)
     .toSorted((a, b) => b.score - a.score)

@@ -2,7 +2,7 @@ export {
   createDb,
   resolveDatabaseConnection,
   type AppDatabase,
-} from "./client.js";
+} from "./client";
 export {
   account,
   appMeta,
@@ -12,4 +12,4 @@ export {
   session,
   user,
   verification,
-} from "./schema.js";
+} from "./schema";

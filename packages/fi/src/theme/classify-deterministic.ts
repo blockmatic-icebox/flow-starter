@@ -1,5 +1,5 @@
-import { themeRegistry } from "./registry.js";
-import type { ThemeKey } from "./registry.js";
+import { themeRegistry } from "./registry";
+import type { ThemeKey } from "./registry";
 
 const scoreTheme = ({
   text,

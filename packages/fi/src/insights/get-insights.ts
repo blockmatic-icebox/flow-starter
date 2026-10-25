@@ -2,7 +2,7 @@ import { featureRequest } from "@repo/db";
 import type { AppDatabase } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import { computeInsights } from "../metrics/compute-insights.js";
+import { computeInsights } from "../metrics/compute-insights";
 
 export const getInsights = async ({ db }: { db: AppDatabase }) => {
   const rows = await db.select().from(featureRequest);

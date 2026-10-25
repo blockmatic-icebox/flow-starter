@@ -1,8 +1,14 @@
+import { withEve } from "eve/next";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["meta-cto.localhost", "*.meta-cto.localhost"],
-  transpilePackages: ["@repo/ui"],
+  experimental: {
+    extensionAlias: {
+      ".js": [".ts", ".tsx", ".js"],
+    },
+  },
+  transpilePackages: ["@repo/db", "@repo/fi", "@repo/ui"],
 };
 
-export default nextConfig;
+export default withEve(nextConfig, { eveRoot: "../.." });

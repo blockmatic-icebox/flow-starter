@@ -43,14 +43,18 @@
     "db:stop": "node packages/db/scripts/db-stop.mjs",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
     "db:studio": "pnpm --filter @repo/db db:studio",
-    "db:ping": "node packages/db/scripts/db-ping.mjs",
+    "db:ping": "pnpm --filter @repo/db exec node --import tsx scripts/db-ping.mjs",
     "deepsec": "pnpm --dir=.deepsec exec deepsec",
     "mcp:next": "next-devtools-mcp"
   },
   "dependencies": {
+    "@ai-sdk/gateway": "4.0.125",
+    "@repo/db": "workspace:*",
     "@repo/fi": "workspace:*",
     "ai": "^7.0.152",
-    "eve": "^0.3.5",
+    "drizzle-orm": "^0.45.4",
+    "eve": "^0.83.2",
+    "postgres": "^3.4.9",
     "zod": "^4.6.7"
   },
   "devDependencies": {

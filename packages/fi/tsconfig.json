@@ -1,6 +1,9 @@
 {
   "extends": "@repo/ts/base.json",
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
     "types": ["node"]
   },
   "include": ["src/**/*.ts", "seed/**/*.ts"],

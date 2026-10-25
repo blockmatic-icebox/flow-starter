@@ -22,6 +22,10 @@ coverage
 # Turbo
 .turbo
 
+# eve local dev/build artifacts
+.eve/
+.output/
+
 # Vercel
 .vercel
 

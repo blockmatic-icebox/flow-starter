@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { classifyThemeDeterministic } from "./classify-deterministic.js";
+import { classifyThemeDeterministic } from "./classify-deterministic";
 
 describe("classifyThemeDeterministic", () => {
   it("classifies CSV export with high confidence", () => {

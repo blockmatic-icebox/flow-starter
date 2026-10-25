@@ -17,9 +17,16 @@
       "entry": [
         "oxlint.config.ts",
         "tooling/**/*.{mjs,ts}",
-        "tooling/**/*.test.mjs"
+        "tooling/**/*.test.mjs",
+        "agent/**/*.ts",
+        "evals/**/*.ts"
       ],
-      "project": ["tooling/**/*.{mjs,ts}", "oxlint.config.ts"]
+      "project": [
+        "tooling/**/*.{mjs,ts}",
+        "oxlint.config.ts",
+        "agent/**/*.ts",
+        "evals/**/*.ts"
+      ]
     },
     "apps/web": {
       "entry": [
@@ -38,8 +45,17 @@
       "project": ["src/**/*.{ts,tsx}"]
     },
     "packages/db": {
-      "entry": ["src/**/*.ts", "drizzle.config.ts"],
+      "entry": ["src/**/*.ts", "drizzle.config.ts", "scripts/db-ping.mjs"],
       "project": ["src/**/*.ts", "drizzle.config.ts", "scripts/**/*.mjs"]
+    },
+    "packages/fi": {
+      "entry": [
+        "src/**/*.ts",
+        "seed/**/*.ts",
+        "eval/**/*.ts",
+        "eval/smoke-cli.ts"
+      ],
+      "project": ["src/**/*.ts", "seed/**/*.ts", "eval/**/*.ts"]
     },
     "packages/ts": {
       "entry": ["base.json", "nextjs.json", "react-library.json"],
@@ -54,12 +70,18 @@
   ],
   "ignoreUnresolved": ["next"],
   "ignoreDependencies": [
+    "@ai-sdk/gateway",
+    "@repo/db",
     "typescript-ast",
     "@tailwindcss/postcss",
     "better-auth",
+    "drizzle-orm",
     "next-themes",
     "postcss-load-config",
-    "zod"
+    "postgres",
+    "zod",
+    "ai",
+    "eve"
   ],
   "ignoreBinaries": ["simple-git-hooks", "gitleaks", "osv-scanner", "deepsec"]
 }

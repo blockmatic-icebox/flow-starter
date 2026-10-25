@@ -37,8 +37,8 @@ Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundar
 | `packages/fi` | Metrics (`computeInsights`), triage harness, `searchRequests`, `listTriageQueue`, `getInsights`, seed | **In progress** — harness partial (T1 + lexical; Jev/T3 next) |
 | `packages/db` | Drizzle schema; `fi-schema.ts`; migrations through `0002_feature_intelligence` | **Committed** — apply with `pnpm db:migrate` at Build (Wave 0) |
 | `agent/` | eve root agent; `instructions.md` + tools → `@repo/fi` | **Partial** — 3 tools live; AI UX turn contract in instructions |
-| `apps/web` | Next.js product; future `eve/next` host | **Starter only** — no FI routes yet |
-| `evals/` | eve smoke (planned) | **Not added** |
+| `apps/web` | Next.js + `eve/next`; FI routes under `app/(fi)/` | **Live** — browse, submit, triage, insights, `/chat` |
+| `evals/` | eve smoke (`pnpm exec eve eval smoke`) | **Live** — migrate + seed in `evals.config.ts` |
 
 Also available: `@repo/ui`, `@repo/genui` (not used for FI triage UI), `@repo/ts`.
 
@@ -67,10 +67,10 @@ Degraded path when `AI_GATEWAY_API_KEY` absent still sets `triage_completed_at` 
 
 | Surface | Status |
 | --- | --- |
-| eve tools → `@repo/fi` | Partial (3 tools) |
-| Web server actions → `@repo/fi` | Not implemented |
-| `POST /api/chat` ask-only | Not implemented |
-| Postgres | Schema in repo; **connect at Build** — Path A `DATABASE_URL` or Path B Neon Local ([initiative plan](docs/initiatives/feature-intelligence.md#plan--postgres--neon-connectivity)) |
+| eve tools → `@repo/fi` | **Live** — read + `submit_request`, `confirm_request`, `support_request`, `set_disposition`, `get_request` |
+| Web server actions → `@repo/fi` | **Live** — triage, submit, confirm, support, disposition |
+| `POST /api/chat` ask-only | **Live** — Anthropic via `ANTHROPIC_API_KEY` |
+| Postgres | **Live** when `DATABASE_URL` set — see initiative Neon plan |
 
 ## Security (inherited)
 
@@ -83,15 +83,15 @@ Degraded path when `AI_GATEWAY_API_KEY` absent still sets `triage_completed_at` 
 | --- | --- |
 | `@repo/fi` unit | `pnpm --filter @repo/fi test` |
 | Schema | `pnpm --filter @repo/db db:check` |
-| eve smoke | `eve eval smoke` (when `evals/` added) |
-| FI web | Manual — [testing spec](docs/specs/feature-intelligence-testing.md) |
+| eve smoke | `pnpm exec eve eval smoke` |
+| FI web | agent-browser W-* — [verification log](docs/research/20261025-fi-browser-verification.md); [testing spec](docs/specs/feature-intelligence-testing.md) |
 
 Root `pnpm test` includes `@repo/fi`.
 
 ## Repository layout
 
 ```text
-apps/web/           # product UI (starter today)
+apps/web/app/(fi)/  # FI routes (home, requests, triage, insights, chat)
 agent/              # eve Feature Intelligence operator
 packages/fi/        # domain + harness
 packages/db/        # Drizzle + FI migration

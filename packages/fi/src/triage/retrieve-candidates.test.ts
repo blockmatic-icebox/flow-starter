@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { retrieveLexicalCandidates } from "./retrieve-candidates.js";
+import { retrieveLexicalCandidates } from "./retrieve-candidates";
 
 describe("retrieveLexicalCandidates", () => {
   it("ranks CSV-related published requests higher", () => {

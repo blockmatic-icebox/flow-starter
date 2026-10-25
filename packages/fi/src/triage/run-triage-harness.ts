@@ -1,6 +1,6 @@
-import { classifyThemeDeterministic } from "../theme/classify-deterministic.js";
-import { themeLabelForKey } from "../theme/registry.js";
-import { retrieveLexicalCandidates } from "./retrieve-candidates.js";
+import { classifyThemeDeterministic } from "../theme/classify-deterministic";
+import { themeLabelForKey } from "../theme/registry";
+import { retrieveLexicalCandidates } from "./retrieve-candidates";
 
 export const runTriageHarness = ({
   title,

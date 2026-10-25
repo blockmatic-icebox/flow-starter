@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { computeInsights } from "./compute-insights.js";
+import { computeInsights } from "./compute-insights";
 
 describe("computeInsights", () => {
   it("computes capture rate as closed / (closed + open queue)", () => {
