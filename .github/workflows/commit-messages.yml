@@ -1,0 +1,24 @@
+name: Commit messages
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+    branches: [main]
+
+concurrency:
+  group: commit-messages-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  conventional:
+    name: Conventional commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-pnpm
+
+      - name: Validate PR commits
+        run: node .agents/tooling/checks/check-commits.mjs --range ${{ github.event.pull_request.base.sha }}...${{ github.sha }}

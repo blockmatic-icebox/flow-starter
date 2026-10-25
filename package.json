@@ -16,7 +16,7 @@
     "setup:osv": "pnpm --dir .agents setup:osv",
     "setup:env": "pnpm --dir .agents setup:env",
     "setup:deepsec": "pnpm --dir=.deepsec install --frozen-lockfile",
-    "ci:local": "pnpm qa && pnpm --dir .agents test && pnpm eval:genui:offline && pnpm test:browser && pnpm security:check && pnpm build",
+    "ci:local": "pnpm qa && pnpm commits:check --all && pnpm --dir .agents test && pnpm eval:genui:offline && pnpm test:browser && pnpm security:check && pnpm build",
     "eval:genui:offline": "pnpm --filter @repo/genui eval:offline",
     "flow-eval:check": "pnpm --dir .agents flow-eval:check",
     "eval:experiment": "pnpm --dir .agents eval:experiment",
@@ -27,6 +27,8 @@
     "eval:benchmark": "pnpm --dir .agents eval:benchmark",
     "eval:benchmark:checkout": "pnpm --dir .agents eval:benchmark:checkout",
     "hooks:pre-commit": "pnpm security:block-files && pnpm security:secrets && node .agents/tooling/checks/check-staged.mjs",
+    "hooks:commit-msg": "node .agents/tooling/checks/check-commit-message.mjs",
+    "commits:check": "node .agents/tooling/checks/check-commits.mjs",
     "prepare": "simple-git-hooks",
     "qa": "pnpm flow:check && pnpm architecture:check && pnpm lint && pnpm knip && pnpm sherif && pnpm check-types && pnpm test && pnpm --filter @repo/db db:check",
     "flow:check": "pnpm --dir .agents flow:check",
@@ -78,7 +80,8 @@
     "ultracite": "8.0.2"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm run hooks:pre-commit"
+    "pre-commit": "pnpm run hooks:pre-commit",
+    "commit-msg": "node .agents/tooling/checks/check-commit-message.mjs \"$1\""
   },
   "engines": {
     "node": ">=24"

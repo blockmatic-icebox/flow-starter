@@ -63,7 +63,12 @@ export const commitTaskChanges = ({ baseSha, cwd, taskId, writes }) => {
     runGit({ args: ["add", "--", file], cwd });
   }
   runGit({
-    args: ["commit", "-m", `flow-worktrees task ${taskId}`, "--no-verify"],
+    args: [
+      "commit",
+      "-m",
+      `chore(worktrees): integrate task ${taskId}`,
+      "--no-verify",
+    ],
     cwd,
   });
   return { committed: true, ok: true };

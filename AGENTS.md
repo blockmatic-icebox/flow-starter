@@ -44,7 +44,7 @@ Do not read every ADR or research file for ordinary changes. Do not present plan
 - Run checks that match the change; report commands and results honestly. When claiming a check passed, name the command and its exit code; if it was not run, say so.
 - React: preserve server/client boundaries and route-first colocation ([ADR 0009](.agents/flow/decisions/adr/0009-react-nextjs-fractal-architecture.md)). No mandatory `features/` layer.
 - Next.js issues: use runtime MCP diagnostics when available, then browser/CLI fallback.
-- Pre-commit: `pnpm security:block-files`, `pnpm security:secrets`, `node .agents/tooling/checks/check-staged.mjs`. Install gitleaks (`pnpm setup:gitleaks`). Format with `pnpm lint:fix` before staging. Hooks must not auto-stage or reformat unrelated files.
+- Pre-commit: `pnpm security:block-files`, `pnpm security:secrets`, `node .agents/tooling/checks/check-staged.mjs`. Commit subjects must follow Conventional Commits (`pnpm hooks:commit-msg`; same types as PR titles). Install gitleaks (`pnpm setup:gitleaks`). Format with `pnpm lint:fix` before staging. Hooks must not auto-stage or reformat unrelated files.
 - **Ownership:** Product code lives in `apps/web` and `packages/*`. Factory implementation lives in `.agents/`. Product must not import Factory packages.
 - Before an authorized commit: diff-scoped review in [.agents/flow/flow.md](.agents/flow/flow.md).
 

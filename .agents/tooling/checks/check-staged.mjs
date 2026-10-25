@@ -43,7 +43,9 @@ export const classifyStagedPaths = (paths) => {
       file === ".gitignore" ||
       file.startsWith(".github/workflows/") ||
       (file.startsWith(".agents/tooling/") &&
-        /secret|security|gitleaks|osv|check-staged/u.test(file));
+        /secret|security|gitleaks|osv|check-staged|check-commit|conventional-commit/u.test(
+          file
+        ));
 
     if (isMarkdown) markdown.push(file);
     if (isCode) code.push(file);
