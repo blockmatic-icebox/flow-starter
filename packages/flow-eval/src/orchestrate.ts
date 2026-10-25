@@ -6,10 +6,13 @@ import {
   agentCliVersion,
   assertAgentAuth,
   runAgentTurn,
+  runAgentTurnAsync,
   writeSessionMeta,
 } from "./agent.ts";
 import { controlArmValid } from "./compare.ts";
+import { evalConcurrency, mapWithConcurrency } from "./concurrency.ts";
 import { extractCommands } from "./evidence.ts";
+import type { GeneratedScenario } from "./generation/types.ts";
 import {
   applyScenarioFixture,
   captureAgentDiff,
@@ -31,6 +34,7 @@ import { gradeObservedScenario } from "./session-grade.ts";
 import { skillsLockHash } from "./skills-lock.ts";
 import { stakeholderReply } from "./stakeholder.ts";
 import { foldSessionTelemetry, PROTOCOL_ID } from "./trace.ts";
+import { trialScenarioDir } from "./trial-paths.ts";
 import type {
   EvalArm,
   EvalEvent,
@@ -53,83 +57,43 @@ const loadTranscript = ({ eventsPath }: { eventsPath: string }) =>
         .map((line) => JSON.parse(line) as EvalEvent)
     : [];
 
-export const runScenarioSession = ({
-  runId,
-  scenarioId,
-  arm,
+const runStakeholderTurns = async ({
+  card,
+  customTurnOnePrompt,
+  eventsPath,
+  hidden,
   modelId,
   official,
-  worktreePath: existingWorktree,
-  prepBaselineSha,
-  customTurnOnePrompt,
-  maxTurns,
-  repetition,
+  oracle,
+  rawLog,
+  scenarioId,
+  turnLimit,
+  useAsyncAgent,
+  worktreePath,
 }: {
-  runId: string;
-  scenarioId: string;
-  arm: EvalArm;
+  card: ReturnType<typeof loadPublicScenario>;
+  customTurnOnePrompt?: string;
+  eventsPath: string;
+  hidden?: ReturnType<typeof loadHiddenScenario>;
   modelId: string;
   official: boolean;
-  worktreePath?: string;
-  prepBaselineSha?: string;
-  customTurnOnePrompt?: string;
-  maxTurns?: number;
-  repetition?: number;
+  oracle:
+    | NonNullable<ReturnType<typeof loadScenarioOracle>>
+    | { scenarioId: string };
+  rawLog: string;
+  scenarioId: string;
+  turnLimit: number;
+  useAsyncAgent: boolean;
+  worktreePath: string;
 }) => {
-  if (official) {
-    const auth = assertAgentAuth();
-    if (!auth.ok) return { ok: false, reason: auth.reason };
-  }
-
-  const flowSha = currentFlowSha();
-  let worktreePath = existingWorktree;
-  if (!worktreePath) {
-    try {
-      worktreePath = setupWorktree({
-        arm,
-        flowSha,
-        runId,
-        scenarioId,
-      }).worktreePath;
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "worktree setup failed";
-      return { infrastructure: true, ok: false, reason: message };
-    }
-  }
-
-  if (!existingWorktree) applyScenarioFixture({ scenarioId, worktreePath });
-
-  const prep = prepBaselineSha
-    ? {
-        commitSha: prepBaselineSha,
-        fingerprint: prepBaselineSha,
-        recordedAt: new Date().toISOString(),
-        treeSha: prepBaselineSha,
-      }
-    : finalizePrepBaseline({ worktreePath });
-
-  const runDir = path.join(devEvalsRoot, runId);
-  const scenarioDir = path.join(runDir, "scenarios", scenarioId);
-  mkdirSync(scenarioDir, { recursive: true });
-
-  const card = loadPublicScenario({ id: scenarioId });
-  const oracle = loadScenarioOracle({ id: scenarioId });
-  const hidden = loadHiddenScenario({ id: scenarioId });
-  const eventsPath = path.join(scenarioDir, "transcript.jsonl");
-  const rawLog = path.join(scenarioDir, "stream.raw.log");
-  writeFileSync(eventsPath, "");
-  writeFileSync(rawLog, "");
-
   let sessionId: string | undefined;
   let sessionCompleteness: RunManifest["completeness"] = "complete";
   let protocolVerified = true;
   let usage: TokenUsage | undefined;
   let eventSeq = 0;
 
-  const turnLimit = maxTurns ?? card.turnCap;
-
-  for (let turn = 1; turn <= turnLimit; turn += 1) {
+  const runTurn = async (turn: number): Promise<void> => {
+    if (turn > turnLimit) return;
     const eventsSoFar = loadTranscript({ eventsPath });
     const message =
       turn === 1 && customTurnOnePrompt
@@ -141,10 +105,10 @@ export const runScenarioSession = ({
             scenarioId,
             turn,
           });
-    if (!message) break;
+    if (!message) return;
 
     if (official) {
-      const result = runAgentTurn({
+      const turnInput = {
         jsonlPath: eventsPath,
         modelId,
         oracle,
@@ -155,7 +119,10 @@ export const runScenarioSession = ({
         startSeq: eventSeq,
         turn,
         workspace: worktreePath,
-      });
+      };
+      const result = useAsyncAgent
+        ? await runAgentTurnAsync(turnInput)
+        : runAgentTurn(turnInput);
       sessionId = result.sessionId;
       eventSeq += result.events.length;
       if (result.usage) usage = result.usage;
@@ -186,16 +153,143 @@ export const runScenarioSession = ({
       );
     }
 
-    if (hidden?.stopCondition === "after-plan-approval" && turn >= 3) break;
+    if (hidden?.stopCondition === "after-plan-approval" && turn >= 3) return;
+    await runTurn(turn + 1);
+  };
+
+  await runTurn(1);
+  return { protocolVerified, sessionCompleteness, sessionId, usage };
+};
+
+const prepareScenarioWorktree = ({
+  arm,
+  existingWorktree,
+  flowSha,
+  generated,
+  repetition,
+  runId,
+  scenarioId,
+}: {
+  arm: EvalArm;
+  existingWorktree?: string;
+  flowSha: string;
+  generated?: GeneratedScenario;
+  repetition: number;
+  runId: string;
+  scenarioId: string;
+}) => {
+  if (existingWorktree)
+    return { ok: true as const, worktreePath: existingWorktree };
+  try {
+    const worktreePath = setupWorktree({
+      arm,
+      flowSha,
+      repetition,
+      runId,
+      scenarioId,
+    }).worktreePath;
+    if (!generated) applyScenarioFixture({ scenarioId, worktreePath });
+    return { ok: true as const, worktreePath };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "worktree setup failed";
+    return { infrastructure: true, ok: false as const, reason: message };
   }
+};
+
+export const runScenarioSession = async ({
+  runId,
+  scenarioId,
+  arm,
+  modelId,
+  official,
+  worktreePath: existingWorktree,
+  prepBaselineSha,
+  customTurnOnePrompt,
+  maxTurns,
+  repetition = 1,
+  generated,
+  useAsyncAgent = true,
+}: {
+  runId: string;
+  scenarioId: string;
+  arm: EvalArm;
+  modelId: string;
+  official: boolean;
+  worktreePath?: string;
+  prepBaselineSha?: string;
+  customTurnOnePrompt?: string;
+  maxTurns?: number;
+  repetition?: number;
+  generated?: GeneratedScenario;
+  useAsyncAgent?: boolean;
+}) => {
+  if (official) {
+    const auth = assertAgentAuth();
+    if (!auth.ok) return { ok: false, reason: auth.reason };
+  }
+
+  const flowSha = currentFlowSha();
+  const worktreeResult = prepareScenarioWorktree({
+    arm,
+    existingWorktree,
+    flowSha,
+    generated,
+    repetition,
+    runId,
+    scenarioId,
+  });
+  if (!worktreeResult.ok) return worktreeResult;
+  const worktreePath = worktreeResult.worktreePath;
+
+  const prep = prepBaselineSha
+    ? {
+        commitSha: prepBaselineSha,
+        fingerprint: prepBaselineSha,
+        recordedAt: new Date().toISOString(),
+        treeSha: prepBaselineSha,
+      }
+    : finalizePrepBaseline({ worktreePath });
+
+  const scenarioDir = trialScenarioDir({
+    repetition,
+    runId,
+    scenarioId,
+  });
+  mkdirSync(scenarioDir, { recursive: true });
+
+  const card = generated?.publicCard ?? loadPublicScenario({ id: scenarioId });
+  const oracle = generated?.oracle ??
+    loadScenarioOracle({ id: scenarioId }) ?? { scenarioId };
+  const hidden = generated?.hidden ?? loadHiddenScenario({ id: scenarioId });
+  const eventsPath = path.join(scenarioDir, "transcript.jsonl");
+  const rawLog = path.join(scenarioDir, "stream.raw.log");
+  writeFileSync(eventsPath, "");
+  writeFileSync(rawLog, "");
+
+  const turnLimit = maxTurns ?? card.turnCap;
+  const turnState = await runStakeholderTurns({
+    card,
+    customTurnOnePrompt,
+    eventsPath,
+    hidden,
+    modelId,
+    official,
+    oracle,
+    rawLog,
+    scenarioId,
+    turnLimit,
+    useAsyncAgent,
+    worktreePath,
+  });
+  const { protocolVerified, sessionId, usage } = turnState;
 
   writeSessionMeta({
     prepBaseline: {
       commitSha: prep.commitSha,
       fingerprint: prep.fingerprint,
     },
-    runDir,
-    scenarioId,
+    scenarioDir,
     sessionId,
     worktreePath,
   });
@@ -232,8 +326,7 @@ export const runScenarioSession = ({
   writeScenarioReport({
     commands,
     grade,
-    runDir,
-    scenarioId,
+    scenarioDir,
   });
 
   const completeness = grade.completeness;
@@ -318,13 +411,15 @@ const buildBatchManifest = ({
   usage: aggregateUsage,
 });
 
-export const runBatch = ({
+export const runBatch = async ({
   runId,
   scenarioIds,
   arm,
   modelId,
   official,
   repetition = 1,
+  generatedScenarios,
+  concurrency,
 }: {
   runId: string;
   scenarioIds: string[];
@@ -332,39 +427,52 @@ export const runBatch = ({
   modelId: string;
   official: boolean;
   repetition?: number;
+  generatedScenarios?: GeneratedScenario[];
+  concurrency?: number;
 }) => {
+  const generatedById = new Map(
+    (generatedScenarios ?? []).map((s) => [s.id, s] as const)
+  );
   const grades = [];
   const errors: string[] = [];
   const worktreePaths: string[] = [];
   let aggregateUsage: TokenUsage | undefined;
   let infrastructureFailure = false;
 
-  for (let rep = 0; rep < repetition; rep += 1) {
-    for (const scenarioId of scenarioIds) {
-      const result = runScenarioSession({
+  const jobs: { rep: number; scenarioId: string }[] = [];
+  for (let rep = 0; rep < repetition; rep += 1)
+    for (const scenarioId of scenarioIds)
+      jobs.push({ rep: rep + 1, scenarioId });
+
+  const limit = concurrency ?? evalConcurrency();
+  const results = await mapWithConcurrency({
+    concurrency: limit,
+    items: jobs,
+    worker: ({ rep, scenarioId }) =>
+      runScenarioSession({
         arm,
+        generated: generatedById.get(scenarioId),
         modelId,
         official,
-        repetition: rep + 1,
+        repetition: rep,
         runId,
         scenarioId,
-      });
-      if (!result.ok) {
-        errors.push(result.reason ?? "unknown");
-        if (result.infrastructure) {
-          infrastructureFailure = true;
-          break;
-        }
-        continue;
-      }
-      if (result.grade) grades.push(result.grade);
-      if (result.worktreePath) worktreePaths.push(result.worktreePath);
-      if (result.usage)
-        aggregateUsage = mergeTokenUsage({
-          aggregate: aggregateUsage,
-          next: result.usage,
-        });
+      }),
+  });
+
+  for (const result of results) {
+    if (!result.ok) {
+      errors.push(result.reason ?? "unknown");
+      if (result.infrastructure) infrastructureFailure = true;
+      continue;
     }
+    if (result.grade) grades.push(result.grade);
+    if (result.worktreePath) worktreePaths.push(result.worktreePath);
+    if (result.usage)
+      aggregateUsage = mergeTokenUsage({
+        aggregate: aggregateUsage,
+        next: result.usage,
+      });
   }
 
   const controlCheck =
@@ -392,5 +500,11 @@ export const runBatch = ({
   const runDir = path.join(devEvalsRoot, runId);
   writeRunSummary({ grades, manifest, runDir });
 
-  return { errors, grades, infrastructureFailure, manifest };
+  return {
+    errors,
+    grades,
+    infrastructureFailure,
+    manifest,
+    ok: !infrastructureFailure && errors.length === 0,
+  };
 };

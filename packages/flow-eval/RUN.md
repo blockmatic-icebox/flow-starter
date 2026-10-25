@@ -8,6 +8,12 @@ User-invoked methodology evaluations for Flow. Evidence stays under `__dev/flow-
 pnpm --filter @repo/flow-eval eval preserve
 pnpm --filter @repo/flow-eval eval grade --run <runId> --scenario S01
 pnpm --filter @repo/flow-eval eval pilot --model composer-2.5
+pnpm eval:experiment
+pnpm eval:experiment --seed example-seed
+pnpm eval:experiment --profile full-product --count 1
+pnpm eval:experiment --profile mixed --count 5
+pnpm eval:experiment --profile technical-ai-assessment
+pnpm --filter @repo/flow-eval eval run --arm flow --model composer-2.5
 pnpm --filter @repo/flow-eval eval run --scenarios S01,S02,S05,S09,S13 --arm flow --model composer-2.5
 pnpm --filter @repo/flow-eval eval run --scenarios S01 --dry-run
 pnpm --filter @repo/flow-eval eval compare --baseline run-a --current run-b

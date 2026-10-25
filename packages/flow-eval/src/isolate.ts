@@ -103,14 +103,16 @@ export const setupWorktree = ({
   flowSha,
   arm,
   skipInstall,
+  repetition = 1,
 }: {
   runId: string;
   scenarioId: string;
   flowSha: string;
   arm: EvalArm;
   skipInstall?: boolean;
+  repetition?: number;
 }) => {
-  const worktreeName = `eval-${runId}-${scenarioId}`;
+  const worktreeName = `eval-${runId}-${scenarioId}-r${repetition}`;
   const worktreePath = path.join(worktreeRoot, worktreeName);
   mkdirSync(worktreeRoot, { recursive: true });
 

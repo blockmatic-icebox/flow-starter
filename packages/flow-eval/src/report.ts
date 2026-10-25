@@ -5,17 +5,14 @@ import { redactOrThrow } from "./redact.ts";
 import type { CommandEvidence, GradeResult, RunManifest } from "./types.ts";
 
 export const writeScenarioReport = ({
-  runDir,
-  scenarioId,
+  scenarioDir,
   grade,
   commands,
 }: {
-  runDir: string;
-  scenarioId: string;
+  scenarioDir: string;
   grade: GradeResult;
   commands?: CommandEvidence[];
 }) => {
-  const scenarioDir = path.join(runDir, "scenarios", scenarioId);
   mkdirSync(scenarioDir, { recursive: true });
   writeFileSync(
     path.join(scenarioDir, "score.json"),
@@ -44,7 +41,7 @@ export const writeScenarioReport = ({
     return `- ${s.id}: ${status} (score=${String(s.score)}, origin=${s.origin})`;
   });
 
-  const md = `# Scenario ${scenarioId}
+  const md = `# Scenario ${grade.scenarioId}
 
 Gate: **${grade.gate}**${grade.gateIds.length ? ` (${grade.gateIds.join(", ")})` : ""}
 

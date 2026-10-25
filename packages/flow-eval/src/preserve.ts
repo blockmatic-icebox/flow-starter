@@ -4,15 +4,31 @@ import path from "node:path";
 
 import { baselineDevPath, baselinesDir, baselineRunId } from "./paths.ts";
 
-interface BaselineIndex {
+export type BaselinePreserveStatus = "ok" | "unavailable" | "mismatch";
+
+export interface BaselineIndex {
   runId: string;
   fileChecksums: { path: string; sha256: string }[];
+  missingEvidence?: string[];
 }
+
+export type BaselinePreserveResult = {
+  errors: string[];
+  missingEvidence?: string[];
+  ok: boolean;
+  status: BaselinePreserveStatus;
+};
 
 const hashFile = ({ absolutePath }: { absolutePath: string }) =>
   createHash("sha256").update(readFileSync(absolutePath)).digest("hex");
 
-const walkChecksums = ({ dir, rel = "" }: { dir: string; rel?: string }) => {
+export const walkChecksums = ({
+  dir,
+  rel = "",
+}: {
+  dir: string;
+  rel?: string;
+}) => {
   const out: { path: string; sha256: string }[] = [];
   if (!existsSync(dir)) return out;
   for (const entry of readdirSync(dir)) {
@@ -29,25 +45,22 @@ const walkChecksums = ({ dir, rel = "" }: { dir: string; rel?: string }) => {
   return out;
 };
 
-const loadBaselineIndex = () => {
-  const indexPath = path.join(baselinesDir, "20261024-flow-v0.1.json");
-  return JSON.parse(readFileSync(indexPath, "utf-8")) as BaselineIndex & {
-    missingEvidence: string[];
-  };
+export const loadCommittedBaselineIndex = ({
+  indexFileName = "20261024-flow-v0.1.json",
+}: {
+  indexFileName?: string;
+} = {}) => {
+  const indexPath = path.join(baselinesDir, indexFileName);
+  return JSON.parse(readFileSync(indexPath, "utf-8")) as BaselineIndex;
 };
 
-export const verifyBaselinePreserved = () => {
-  const index = loadBaselineIndex();
-  if (index.runId !== baselineRunId)
-    return { errors: [`unexpected runId ${index.runId}`], ok: false };
-
-  const live = walkChecksums({ dir: baselineDevPath }).toSorted((a, b) =>
-    a.path.localeCompare(b.path)
-  );
-  const expected = index.fileChecksums.toSorted((a, b) =>
-    a.path.localeCompare(b.path)
-  );
-
+const compareChecksumTrees = ({
+  expected,
+  live,
+}: {
+  expected: { path: string; sha256: string }[];
+  live: { path: string; sha256: string }[];
+}) => {
   const errors: string[] = [];
   if (live.length !== expected.length)
     errors.push(`file count ${live.length} !== ${expected.length}`);
@@ -63,10 +76,60 @@ export const verifyBaselinePreserved = () => {
     if (!live.some((l) => l.path === file.path))
       errors.push(`missing file ${file.path}`);
   }
+  return errors;
+};
+
+export const verifyBaselinePreserved = ({
+  baselineDir = baselineDevPath,
+  index = loadCommittedBaselineIndex(),
+}: {
+  baselineDir?: string;
+  index?: BaselineIndex;
+} = {}): BaselinePreserveResult => {
+  if (index.runId !== baselineRunId)
+    return {
+      errors: [`unexpected runId ${index.runId}`],
+      ok: false,
+      status: "mismatch",
+    };
+
+  const expected = index.fileChecksums.toSorted((a, b) =>
+    a.path.localeCompare(b.path)
+  );
+
+  if (!existsSync(baselineDir))
+    return {
+      errors: [],
+      missingEvidence: index.missingEvidence,
+      ok: true,
+      status: "unavailable",
+    };
+
+  const live = walkChecksums({ dir: baselineDir }).toSorted((a, b) =>
+    a.path.localeCompare(b.path)
+  );
+
+  if (live.length === 0 && expected.length > 0)
+    return {
+      errors: [],
+      missingEvidence: index.missingEvidence,
+      ok: true,
+      status: "unavailable",
+    };
+
+  const errors = compareChecksumTrees({ expected, live });
+  if (errors.length > 0)
+    return {
+      errors,
+      missingEvidence: index.missingEvidence,
+      ok: false,
+      status: "mismatch",
+    };
 
   return {
-    errors,
+    errors: [],
     missingEvidence: index.missingEvidence,
-    ok: errors.length === 0,
+    ok: true,
+    status: "ok",
   };
 };

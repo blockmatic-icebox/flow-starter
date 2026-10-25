@@ -69,6 +69,91 @@ export const runCursorWorker = ({ worktreePath, prompt, model }) => {
   };
 };
 
+const trackedCursorChildren = new Set();
+
+process.on("exit", () => {
+  for (const child of trackedCursorChildren) {
+    try {
+      child.kill("SIGKILL");
+    } catch {
+      /* ignore */
+    }
+  }
+});
+
+export const runCursorWorkerAsync = async ({
+  worktreePath,
+  prompt,
+  model,
+  timeoutMs = 600_000,
+}) => {
+  const args = [
+    "-p",
+    "--output-format",
+    "text",
+    "--trust",
+    "--sandbox",
+    "enabled",
+    "--workspace",
+    worktreePath,
+  ];
+  if (model) args.push("--model", model);
+  args.push(prompt);
+
+  const child = spawn("agent", args, {
+    cwd: worktreePath,
+    encoding: "utf-8",
+    stdio: "pipe",
+  });
+  trackedCursorChildren.add(child);
+  let stdout = "";
+  let stderr = "";
+  child.stdout?.on("data", (chunk) => {
+    stdout += chunk;
+  });
+  child.stderr?.on("data", (chunk) => {
+    stderr += chunk;
+  });
+  const timer = setTimeout(() => {
+    child.kill("SIGTERM");
+    setTimeout(() => child.kill("SIGKILL"), 5000);
+  }, timeoutMs);
+
+  const [code, signal] = await once(child, "close");
+  clearTimeout(timer);
+  trackedCursorChildren.delete(child);
+
+  const top = worktreeTopLevel({ cwd: worktreePath });
+  const expected = worktreePath;
+  if (top !== expected)
+    return {
+      exitCode: code ?? 1,
+      ok: false,
+      pid: child.pid,
+      reason: `worktree toplevel mismatch: ${top} !== ${expected}`,
+      stderr,
+      stdout,
+    };
+
+  if (code === null)
+    return {
+      exitCode: 1,
+      ok: false,
+      pid: child.pid,
+      reason: signal ? `terminated by ${signal}` : "worker timeout",
+      stderr,
+      stdout,
+    };
+
+  return {
+    exitCode: code ?? 1,
+    ok: (code ?? 1) === 0,
+    pid: child.pid,
+    stderr,
+    stdout,
+  };
+};
+
 export const runCommandWorker = ({ worktreePath, command, env }) => {
   const parts = command.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/gu) ?? [command];
   const argv = parts.map((p) => p.replaceAll(/^['"]|['"]$/gu, ""));

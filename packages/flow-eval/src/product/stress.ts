@@ -1,71 +1,50 @@
 import { writeProductEvalArtifacts } from "./persist.ts";
 import { evaluateReadiness } from "./readiness.ts";
-import type { StressFinding } from "./types.ts";
+import { runRemediationLoop } from "./remediate.ts";
+import type { RepairExecutor } from "./remediate.ts";
 
-export const runStressEvaluation = ({
+export const runStressEvaluation = async ({
   runId,
   maxRemediationCycles = 3,
   caseIds,
+  repairExecutor,
+  workDir,
 }: {
   runId: string;
   maxRemediationCycles?: number;
   caseIds?: string[];
+  repairExecutor?: RepairExecutor;
+  workDir?: string;
 }) => {
-  const remediation = [];
-  let cycle = 0;
-  let readiness = evaluateReadiness({
+  const loop = await runRemediationLoop({
     caseIds,
-    runId: `${runId}-cycle-${cycle}`,
+    evaluate: ({ runId: cycleRunId }) =>
+      evaluateReadiness({ caseIds, runId: cycleRunId }),
+    maxRemediationCycles,
+    repairExecutor,
+    runId,
+    workDir,
   });
-  let findings = findingsFromReadiness(readiness);
 
-  while (
-    readiness.releaseVerdict !== "READY" &&
-    cycle < maxRemediationCycles &&
-    findings.some((f) => f.severity === "P0" || f.severity === "P1")
-  ) {
-    remediation.push({
-      cycle: cycle + 1,
-      findings,
-      readiness: readiness.releaseVerdict,
-    });
-    cycle += 1;
-    readiness = evaluateReadiness({
-      caseIds,
-      runId: `${runId}-cycle-${cycle}`,
-    });
-    findings = findingsFromReadiness(readiness);
-  }
-
-  writeProductEvalArtifacts({ findings, readiness, runId });
+  writeProductEvalArtifacts({
+    findings: loop.findings,
+    readiness: loop.readiness,
+    runId,
+  });
 
   return {
-    cycles: cycle,
-    findings,
-    ok: readiness.releaseVerdict === "READY",
-    readiness,
-    remediation,
+    cycles: loop.cyclesApplied,
+    cyclesApplied: loop.cyclesApplied,
+    findings: loop.findings,
+    ok: loop.ok,
+    readiness: loop.readiness,
+    remediation: loop.remediation,
     status:
-      readiness.releaseVerdict === "READY"
+      loop.readiness.releaseVerdict === "READY"
         ? "completed"
-        : cycle >= maxRemediationCycles
+        : loop.cyclesApplied >= maxRemediationCycles
           ? "partial"
           : "failed",
+    stopReason: loop.stopReason,
   };
 };
-
-const findingsFromReadiness = (
-  readiness: ReturnType<typeof evaluateReadiness>
-): StressFinding[] =>
-  readiness.evidence
-    .filter((row) => row.status === "failed")
-    .map((row, index) => ({
-      confidence: "high" as const,
-      expected: row.expected,
-      evidence: [row.evidenceRef],
-      findingId: `F-EVID-${index + 1}`,
-      observed: row.actual,
-      reproduction: [row.executionMethod],
-      requirementId: row.requirementId,
-      severity: "P1" as const,
-    }));

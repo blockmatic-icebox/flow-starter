@@ -3,6 +3,9 @@ import path from "node:path";
 
 import { assertAgentAuth } from "./agent.ts";
 import { compareRuns } from "./compare.ts";
+import { runExperiment } from "./generation/experiment.ts";
+import { stratifiedMethodologySample } from "./generation/methodology-sample.ts";
+import { createSeededRng, randomSeed } from "./generation/rng.ts";
 import { gradeScenarioFromRunDir } from "./grade-from-run.ts";
 import { handoffAgentBPrompt } from "./handoff.ts";
 import { runBatch, runScenarioSession } from "./orchestrate.ts";
@@ -34,6 +37,7 @@ Usage:
   pnpm --filter @repo/flow-eval eval stress [--run <id>] [--cycles N]
   pnpm --filter @repo/flow-eval eval mutations
   pnpm --filter @repo/flow-eval eval benchmark --id benchmark-a|benchmark-b
+  pnpm --filter @repo/flow-eval eval experiment [--profile full-product] [--count N] [--seed <seed>] [--dry-run]
 `);
 };
 
@@ -76,10 +80,16 @@ const assertArm = ({ arm }: { arm: string }) => {
 
 const cmdPreserve = () => {
   const result = verifyBaselinePreserved();
-  if (!result.ok) {
+  if (result.status === "mismatch" || !result.ok) {
     console.error("Baseline integrity check failed:");
     for (const e of result.errors) console.error(`  - ${e}`);
     process.exit(1);
+  }
+  if (result.status === "unavailable") {
+    console.log(
+      `Baseline ${baselineRunId}: historical evidence unavailable on this checkout (${result.missingEvidence?.length ?? 0} documented gaps in index).`
+    );
+    return;
   }
   console.log(
     `Baseline ${baselineRunId} preserved (${result.missingEvidence?.length ?? 0} documented gaps).`
@@ -127,7 +137,10 @@ const writeRemediationProposal = ({
   );
 };
 
-const cmdPilotLoop = ({
+const awaitBatch = async (input: Parameters<typeof runBatch>[0]) =>
+  await runBatch(input);
+
+const cmdPilotLoop = async ({
   model,
   dryRun,
   repetition,
@@ -170,7 +183,7 @@ const cmdPilotLoop = ({
 
   const flowScenarios = ["S13", "S16", "S17", "S09", "S01"];
   const controlScenarios = ["S13", "S16", "S09"];
-  runBatch({
+  await awaitBatch({
     arm: "flow",
     modelId: model,
     official,
@@ -178,7 +191,7 @@ const cmdPilotLoop = ({
     runId: `${runId}-flow`,
     scenarioIds: flowScenarios,
   });
-  runBatch({
+  await awaitBatch({
     arm: "control",
     modelId: model,
     official,
@@ -202,7 +215,7 @@ const cmdPilotLoop = ({
   if (dryRun) console.log("Dry-run: not evidence of agent compliance.");
 };
 
-const cmdPilot = ({ model }: { model: string }) => {
+const cmdPilot = async ({ model }: { model: string }) => {
   const runId = `pilot-${Date.now()}`;
   const auth = assertAgentAuth();
   if (!auth.ok) {
@@ -218,7 +231,7 @@ const cmdPilot = ({ model }: { model: string }) => {
     console.error(auth.reason);
     process.exit(2);
   }
-  const { errors, grades, infrastructureFailure } = runBatch({
+  const { errors, grades, infrastructureFailure } = await awaitBatch({
     runId,
     scenarioIds: ["S01", "S13"],
     arm: "flow",
@@ -234,22 +247,31 @@ const cmdPilot = ({ model }: { model: string }) => {
   console.log(`Pilot complete: ${runId}`);
 };
 
-const cmdRun = ({
+const cmdRun = async ({
   scenarios,
   arm,
   model,
   dryRun,
   repetition,
+  randomizationSeed,
 }: {
   scenarios: string[];
   arm: EvalArm;
   model: string;
   dryRun: boolean;
   repetition?: number;
+  randomizationSeed?: string;
 }) => {
   assertScenarioIds({ ids: scenarios });
   assertArm({ arm });
   const runId = `run-${Date.now()}`;
+  if (randomizationSeed) {
+    mkdirSync(path.join(devEvalsRoot, runId), { recursive: true });
+    writeFileSync(
+      path.join(devEvalsRoot, runId, "randomization.json"),
+      `${JSON.stringify({ seed: randomizationSeed, scenarioIds: scenarios, strategy: "methodology-stratified" }, null, 2)}\n`
+    );
+  }
   const official = !dryRun;
   if (official) {
     const auth = assertAgentAuth();
@@ -262,7 +284,7 @@ const cmdRun = ({
       process.exit(2);
     }
   }
-  const { errors, grades, infrastructureFailure, manifest } = runBatch({
+  const { errors, grades, infrastructureFailure, manifest } = await awaitBatch({
     runId,
     scenarioIds: scenarios,
     arm,
@@ -301,7 +323,7 @@ const cmdCompare = ({
   if (result.verdict === "inconclusive") process.exit(1);
 };
 
-const cmdHandoff = ({
+const cmdHandoff = async ({
   variant,
   model,
   dryRun,
@@ -325,7 +347,7 @@ const cmdHandoff = ({
   }
 
   const agentAScenario = variant === "C2" ? "S13" : "S01";
-  const agentAResult = runScenarioSession({
+  const agentAResult = await runScenarioSession({
     arm: "flow",
     modelId: model,
     official,
@@ -344,7 +366,7 @@ const cmdHandoff = ({
   );
 
   if (official && agentAResult.worktreePath && agentAResult.prepBaselineSha) {
-    const agentB = runScenarioSession({
+    const agentB = await runScenarioSession({
       arm: "flow",
       customTurnOnePrompt: bPrompt,
       maxTurns: 4,
@@ -361,7 +383,7 @@ const cmdHandoff = ({
   console.log(`Handoff protocol recorded: ${runId}`);
 };
 
-const cmdCompareArms = ({
+const cmdCompareArms = async ({
   dryRun,
   model,
   scenarios,
@@ -381,7 +403,7 @@ const cmdCompareArms = ({
       process.exit(2);
     }
   }
-  const flowBatch = runBatch({
+  const flowBatch = await awaitBatch({
     runId: flowRun,
     scenarioIds: scenarios,
     arm: "flow",
@@ -392,7 +414,7 @@ const cmdCompareArms = ({
     console.error(flowBatch.errors.join("\n"));
     process.exit(flowBatch.infrastructureFailure ? 4 : 1);
   }
-  const controlBatch = runBatch({
+  const controlBatch = await awaitBatch({
     runId: controlRun,
     scenarioIds: scenarios,
     arm: "control",
@@ -426,6 +448,65 @@ const scenarioList = (value: string | undefined, fallback: string) =>
     .map((s) => s.trim())
     .filter(Boolean);
 
+const resolveRunScenarios = ({
+  count,
+  explicit,
+  seed,
+}: {
+  count: number;
+  explicit?: string;
+  seed?: string;
+}) => {
+  if (explicit)
+    return {
+      scenarios: scenarioList(explicit, ""),
+      seed: undefined,
+    };
+  const resolvedSeed = seed ?? randomSeed();
+  const rng = createSeededRng({ seed: resolvedSeed });
+  return {
+    scenarios: stratifiedMethodologySample({ count, rng }),
+    seed: resolvedSeed,
+  };
+};
+
+const cmdExperiment = async ({
+  count,
+  dryRun,
+  model,
+  profile,
+  seed,
+}: {
+  count: number;
+  dryRun: boolean;
+  model: string;
+  profile: "full-product" | "mixed" | "technical-ai-assessment";
+  seed?: string;
+}) => {
+  const official = !dryRun;
+  if (official) {
+    const auth = assertAgentAuth();
+    if (!auth.ok) {
+      writeFileSync(
+        path.join(devEvalsRoot, "cli-auth-blocker.json"),
+        `${JSON.stringify({ reason: auth.reason, at: new Date().toISOString() }, null, 2)}\n`
+      );
+      console.error(auth.reason);
+      process.exit(2);
+    }
+  }
+  const result = await runExperiment({
+    arm: "flow",
+    count,
+    dryRun,
+    model,
+    profile,
+    seed,
+  });
+  console.log(JSON.stringify(result, null, 2));
+  if (!result.ok) process.exit(1);
+};
+
 const dispatchGradeCli = (flags: Record<string, unknown>) => {
   if (!flags.run || !flags.scenario) {
     console.error("grade requires --run and --scenario");
@@ -456,8 +537,14 @@ const cmdReadiness = ({ runId }: { runId: string }) => {
   if (readiness.releaseVerdict !== "READY") process.exit(1);
 };
 
-const cmdStress = ({ runId, cycles }: { runId: string; cycles: number }) => {
-  const result = runStressEvaluation({
+const cmdStress = async ({
+  runId,
+  cycles,
+}: {
+  runId: string;
+  cycles: number;
+}) => {
+  const result = await runStressEvaluation({
     maxRemediationCycles: cycles,
     runId,
   });
@@ -477,8 +564,20 @@ const cmdBenchmark = ({ id }: { id: "benchmark-a" | "benchmark-b" }) => {
   if (!result.ok) process.exit(1);
 };
 
-const dispatchCli = (command: string, flags: Record<string, unknown>) => {
-  const handlers: Record<string, () => void> = {
+const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
+  const handlers: Record<string, () => Promise<void> | void> = {
+    experiment: () =>
+      cmdExperiment({
+        count: Number(flags.count ?? 1),
+        dryRun: Boolean(flags["dry-run"]),
+        model: String(flags.model ?? defaultModel),
+        profile:
+          (flags.profile as
+            | "full-product"
+            | "mixed"
+            | "technical-ai-assessment") ?? "full-product",
+        seed: flags.seed ? String(flags.seed) : undefined,
+      }),
     benchmark: () =>
       cmdBenchmark({
         id: (flags.id as "benchmark-a" | "benchmark-b") ?? "benchmark-a",
@@ -518,35 +617,39 @@ const dispatchCli = (command: string, flags: Record<string, unknown>) => {
         repetition: Number(flags.repetition ?? 2),
       }),
     preserve: () => cmdPreserve(),
-    run: () =>
-      cmdRun({
+    run: () => {
+      const resolved = resolveRunScenarios({
+        count: Number(flags.count ?? 5),
+        explicit: flags.scenarios as string | undefined,
+        seed: flags.seed ? String(flags.seed) : undefined,
+      });
+      return cmdRun({
         arm: (flags.arm as EvalArm) ?? "flow",
         dryRun: Boolean(flags["dry-run"]),
         model: String(flags.model ?? defaultModel),
+        randomizationSeed: resolved.seed,
         repetition: Number(flags.repetition ?? 1),
-        scenarios: scenarioList(
-          flags.scenarios as string | undefined,
-          "S01,S02,S05,S09,S13"
-        ),
-      }),
+        scenarios: resolved.scenarios,
+      });
+    },
   };
   const handler = handlers[command];
   if (handler) {
-    handler();
+    await handler();
     return;
   }
   usage();
   process.exit(1);
 };
 
-const main = () => {
+const main = async () => {
   const flags = parseArgs(process.argv.slice(2));
   const command = flags.command as string;
   if (!command || command === "help") {
     usage();
     return;
   }
-  dispatchCli(command, flags);
+  await dispatchCli(command, flags);
 };
 
-main();
+await main();

@@ -23,6 +23,7 @@
     "ci:local": "pnpm qa && pnpm flow:test && pnpm architecture:test && pnpm test:scripts && pnpm eval:genui:offline && pnpm test:browser && pnpm security:check && pnpm build",
     "eval:genui:offline": "pnpm --filter @repo/genui eval:offline",
     "flow-eval:check": "pnpm --filter @repo/flow-eval check-types && pnpm --filter @repo/flow-eval test && pnpm --filter @repo/flow-eval eval preserve",
+    "eval:experiment": "pnpm --filter @repo/flow-eval eval experiment",
     "eval:readiness": "pnpm --filter @repo/flow-eval eval readiness",
     "eval:stress": "pnpm --filter @repo/flow-eval eval stress",
     "eval:mutations": "pnpm --filter @repo/flow-eval eval mutations",

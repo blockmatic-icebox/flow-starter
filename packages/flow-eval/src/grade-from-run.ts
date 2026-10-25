@@ -5,6 +5,7 @@ import { loadBlindReview, mergeBlindScores } from "./blind-review.ts";
 import { extractCommands } from "./evidence.ts";
 import { gradeScenario } from "./grade.ts";
 import { devEvalsRoot } from "./paths.ts";
+import { resolveScenarioEvidenceDir } from "./scenario-evidence.ts";
 import {
   loadHiddenScenario,
   loadPublicScenario,
@@ -71,7 +72,7 @@ export const gradeScenarioFromRunDir = ({
   runId: string;
   scenarioId: string;
 }): GradeResult => {
-  const scenarioDir = path.join(devEvalsRoot, runId, "scenarios", scenarioId);
+  const scenarioDir = resolveScenarioEvidenceDir({ runId, scenarioId });
   const diff = existsSync(path.join(scenarioDir, "diff.patch"))
     ? readFileSync(path.join(scenarioDir, "diff.patch"), "utf-8")
     : "";

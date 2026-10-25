@@ -5,13 +5,15 @@ import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { gradeScenario } from "./grade.ts";
-import { verifyBaselinePreserved } from "./preserve.ts";
+import { baselineRunId } from "./paths.ts";
+import { loadCommittedBaselineIndex } from "./preserve.ts";
 import { loadPublicScenario, loadScenarioOracle } from "./scenarios.ts";
 
 describe("gradeScenario", () => {
-  it("preserves historical baseline directory", () => {
-    const result = verifyBaselinePreserved();
-    assert.equal(result.ok, true);
+  it("loads committed baseline checksum index", () => {
+    const index = loadCommittedBaselineIndex();
+    assert.equal(index.runId, baselineRunId);
+    assert.equal(index.fileChecksums.length, 45);
   });
 
   it("gate fails before official eligibility for S05", () => {

@@ -5,6 +5,7 @@ import {
   runCommandWorker,
   runCommandWorkerAsync,
   runCursorWorker,
+  runCursorWorkerAsync,
 } from "./host.mjs";
 import { listAllTasks } from "./initiative.mjs";
 import {
@@ -59,15 +60,30 @@ const executeWorkerSync = ({
   return { exitCode: 1, ok: false, reason: "no worker configured" };
 };
 
-const executeWorkerAsync = (input) => {
-  const { workerCommand, task } = input;
+const executeWorkerAsync = async (input) => {
+  const { host, model, repoRoot, slug, task, workerCommand, record } = input;
   if (workerCommand)
     return runCommandWorkerAsync({
       command: workerCommand,
-      env: { FLOW_SLUG: input.slug, FLOW_TASK_ID: task.id },
-      worktreePath: input.record.worktreePath,
+      env: { FLOW_SLUG: slug, FLOW_TASK_ID: task.id },
+      worktreePath: record.worktreePath,
     });
-  return Promise.resolve(executeWorkerSync(input));
+
+  if (host === "cursor") {
+    const prompt =
+      task.mode === "question"
+        ? questionWorkerPrompt({ repoRoot, slug, taskId: task.id })
+        : workerPrompt({ repoRoot, slug, taskId: task.id });
+    const result = await runCursorWorkerAsync({
+      model,
+      prompt,
+      worktreePath: record.worktreePath,
+    });
+    if (record && result.pid) record.workerPid = result.pid;
+    return result;
+  }
+
+  return executeWorkerSync(input);
 };
 
 const persistQuestionOutcome = ({ repoRoot, slug, task, workerResult }) => {
@@ -194,7 +210,7 @@ const runReadyBatch = async ({
   workerCommand,
   workerFn,
 }) => {
-  const limit = workerFn || workerCommand ? maxConcurrent : 1;
+  const limit = maxConcurrent;
   const queue = [...batch];
   const workers = Array.from({ length: Math.min(limit, queue.length) }, () =>
     (async () => {
@@ -232,7 +248,6 @@ export const runInitiative = async ({
   let hostWarning = null;
   let maxConcurrent = 1;
   let parallelClaimed = false;
-  const supportsAsyncPool = Boolean(workerFn || workerCommand);
 
   if (host === "cursor") {
     const probe = probeCursorAgent();
@@ -240,13 +255,10 @@ export const runInitiative = async ({
       hostWarning = probe.reason;
       if (!workerCommand && !workerFn)
         return { hostWarning, ok: false, reason: probe.reason };
-    } else if (!workerCommand && !workerFn) {
-      parallelClaimed = true;
-      maxConcurrent = capacity();
     }
-  }
-
-  if (supportsAsyncPool) {
+    parallelClaimed = !workerCommand && !workerFn;
+    maxConcurrent = capacity();
+  } else if (workerFn || workerCommand) {
     parallelClaimed = true;
     maxConcurrent = capacity();
   }

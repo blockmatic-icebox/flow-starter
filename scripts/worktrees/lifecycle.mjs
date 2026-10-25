@@ -283,9 +283,24 @@ export const integrateTask = ({ repoRoot, slug, state, task }) => {
     }
 
     const candidateSha = revParse({ cwd: integrationCwd });
-    const advance = advanceMainIfSafe({ candidateSha, repoRoot });
+    const advance =
+      task.advanceMain === false
+        ? {
+            advanced: false,
+            candidateSha,
+            mainBefore: revParse({ cwd: repoRoot, ref: "HEAD" }),
+            reason: "advanceMain disabled",
+          }
+        : advanceMainIfSafe({ candidateSha, repoRoot });
 
     if (!advance.advanced) {
+      if (task.advanceMain === false) {
+        setTaskStatus(state, task.id, "integrated", {
+          integrationSha: candidateSha,
+        });
+        state.integrationHead = candidateSha;
+        return { integrationSha: candidateSha, ok: true };
+      }
       setTaskStatus(state, task.id, "blocked", {
         blockedReason: advance.reason,
         integrationSha: candidateSha,

@@ -1,4 +1,5 @@
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { once } from "node:events";
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
@@ -40,6 +41,126 @@ export const assertAgentAuth = () => {
       reason: `agent --list-models failed: ${combined.slice(0, 200)}`,
     };
   return { ok: true as const };
+};
+
+export const runAgentTurnAsync = async ({
+  workspace,
+  modelId,
+  prompt,
+  sessionId,
+  jsonlPath,
+  rawLogPath,
+  scenarioId,
+  turn,
+  oracle,
+  startSeq,
+  timeoutMs = 600_000,
+}: {
+  workspace: string;
+  modelId: string;
+  prompt: string;
+  sessionId?: string;
+  jsonlPath: string;
+  rawLogPath: string;
+  scenarioId: string;
+  turn: number;
+  oracle?: ScenarioOracle;
+  startSeq: number;
+  timeoutMs?: number;
+}): Promise<AgentTurnResult> => {
+  const cliVersion = agentCliVersion();
+  const protocolVerified = isProtocolVerified({ agentCliVersion: cliVersion });
+
+  const userSeq = startSeq + 1;
+  const redactedPrompt = redactOrThrow({ text: prompt });
+  const userEvent: EvalEvent = {
+    id: `${scenarioId}-u${turn}`,
+    kind: "user",
+    origin: "observed",
+    scenarioId,
+    seq: userSeq,
+    text: redactedPrompt,
+    ts: new Date().toISOString(),
+    turn,
+  };
+
+  const args = [
+    "-p",
+    "--output-format",
+    "stream-json",
+    "--trust",
+    "--sandbox",
+    "enabled",
+    "--workspace",
+    workspace,
+    "--model",
+    modelId,
+  ];
+  if (sessionId) args.push("--resume", sessionId);
+  args.push(redactedPrompt);
+
+  const child = spawn("agent", args, {
+    cwd: workspace,
+    stdio: "pipe",
+  });
+  let stdout = "";
+  let stderr = "";
+  child.stdout?.on("data", (chunk: Buffer | string) => {
+    stdout += chunk.toString();
+  });
+  child.stderr?.on("data", (chunk: Buffer | string) => {
+    stderr += chunk.toString();
+  });
+  const timer = setTimeout(() => {
+    child.kill("SIGTERM");
+    setTimeout(() => child.kill("SIGKILL"), 5000);
+  }, timeoutMs);
+
+  const [code, signal] = await once(child, "close");
+  clearTimeout(timer);
+
+  const raw = `${stdout}\n${stderr}`;
+  const redacted = redactOrThrow({ text: raw });
+  mkdirSync(path.dirname(jsonlPath), { recursive: true });
+  appendFileSync(rawLogPath, `${redacted}\n`);
+
+  const parsed = parseStreamJsonLines({
+    raw: redacted,
+    scenarioId,
+    startSeq: userSeq,
+    turn,
+  });
+
+  const events = [userEvent, ...parsed.events];
+  const commandCount = events.filter((e) => e.kind === "command").length;
+  const termination = terminationFromSpawn({
+    error: code === null ? new Error("agent exited without code") : undefined,
+    signal: signal ?? undefined,
+    status: code,
+  });
+
+  const completeness = turnCompleteness({
+    commandCount,
+    expectsCommands: oracle?.expectsCommands ?? false,
+    expectsTools: oracle?.expectsTools ?? false,
+    sawMalformed: parsed.sawMalformed,
+    sawResultSuccess: parsed.sawResultSuccess,
+    termination,
+    toolCount: parsed.toolCount,
+  });
+
+  for (const e of events) appendFileSync(jsonlPath, `${JSON.stringify(e)}\n`);
+
+  return mergeTurnResult({
+    completeness,
+    events,
+    exitCode: code ?? 1,
+    protocolVerified,
+    sessionId: parsed.sessionId ?? sessionId,
+    termination,
+    toolCount: parsed.toolCount,
+    usage: parsed.usage,
+  });
 };
 
 export const runAgentTurn = ({
@@ -147,19 +268,17 @@ export const runAgentTurn = ({
 };
 
 export const writeSessionMeta = ({
-  runDir,
-  scenarioId,
+  scenarioDir,
   sessionId,
   worktreePath,
   prepBaseline,
 }: {
-  runDir: string;
-  scenarioId: string;
+  scenarioDir: string;
   sessionId?: string;
   worktreePath: string;
   prepBaseline?: { commitSha: string; fingerprint: string };
 }) => {
-  const dir = path.join(runDir, "scenarios", scenarioId);
+  const dir = scenarioDir;
   mkdirSync(dir, { recursive: true });
   writeFileSync(path.join(dir, "worktree-path.txt"), `${worktreePath}\n`);
   if (sessionId)
