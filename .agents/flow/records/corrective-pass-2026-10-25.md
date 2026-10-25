@@ -1,7 +1,7 @@
 # Corrective pass — 2026-10-25
 
 **Starting revision:** `70d4708fe2cde711761b227c62a3eccb1fb5d0a1`  
-**Ending revision:** (see git log after final push)
+**Ending revision:** `29927a3305f2c97e1e0921a01de77f877129c82b`
 
 ## Defects fixed
 
