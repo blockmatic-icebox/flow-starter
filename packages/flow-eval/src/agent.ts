@@ -23,7 +23,9 @@ export const agentCliVersion = () => {
   }
 };
 
-export const assertAgentAuth = () => {
+export type AuthCheck = () => { ok: true } | { ok: false; reason: string };
+
+export const assertAgentAuth: AuthCheck = () => {
   const result = spawnSync("agent", ["--list-models"], {
     encoding: "utf-8",
     timeout: 30_000,

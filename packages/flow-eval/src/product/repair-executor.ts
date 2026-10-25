@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 
 import { assertAgentAuth } from "../agent.ts";
+import type { AuthCheck } from "../agent.ts";
 import type { StressFinding } from "./types.ts";
 
 export const pathsWithinWriteRoot = ({
@@ -24,9 +25,11 @@ export const pathsWithinWriteRoot = ({
 
 export const createCursorRepairExecutor =
   ({
+    authCheck = assertAgentAuth,
     modelId,
     writeRoot = "apps/web",
   }: {
+    authCheck?: AuthCheck;
     modelId: string;
     writeRoot?: string;
   }) =>
@@ -39,7 +42,7 @@ export const createCursorRepairExecutor =
     findings: StressFinding[];
     workDir: string;
   }) => {
-    const auth = assertAgentAuth();
+    const auth = authCheck();
     if (!auth.ok)
       return Promise.resolve({ applied: false, summary: auth.reason });
 

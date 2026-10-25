@@ -38,6 +38,8 @@ Blind subjective scores: `__dev/flow-evals/<runId>/blind-reviews/<scenarioId>.js
 
 Official scored runs require `agent login` or `CURSOR_API_KEY`. Without auth, the CLI writes `__dev/flow-evals/cli-auth-blocker.json` and exits.
 
+Unit tests may inject a mock `authCheck` when calling harness functions directly (for example `runSelfImproveCampaign` or `runScenarioSession`). That injection exists only in `@repo/flow-eval` tests. The CLI, product starter, and `pnpm worktrees` always call the real Cursor CLI auth check. There is no `--mock-auth` flag and no env var to bypass login in production paths.
+
 ## Event origins
 
 Every recorded event uses one of: `observed`, `agent-reported`, `evaluator-inference`, `missing`.

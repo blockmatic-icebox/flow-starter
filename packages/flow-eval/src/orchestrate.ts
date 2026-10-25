@@ -9,6 +9,7 @@ import {
   runAgentTurnAsync,
   writeSessionMeta,
 } from "./agent.ts";
+import type { AuthCheck } from "./agent.ts";
 import { summarizeBatchOutcomes } from "./batch-outcomes.ts";
 import { controlArmValid } from "./compare.ts";
 import { evalConcurrency, mapWithConcurrency } from "./concurrency.ts";
@@ -214,6 +215,7 @@ export const runScenarioSession = async ({
   repetition = 1,
   generated,
   useAsyncAgent = true,
+  authCheck = assertAgentAuth,
 }: {
   runId: string;
   scenarioId: string;
@@ -227,9 +229,10 @@ export const runScenarioSession = async ({
   repetition?: number;
   generated?: GeneratedScenario;
   useAsyncAgent?: boolean;
+  authCheck?: AuthCheck;
 }) => {
   if (official) {
-    const auth = assertAgentAuth();
+    const auth = authCheck();
     if (!auth.ok) return { ok: false, reason: auth.reason };
   }
 
@@ -428,6 +431,7 @@ export const runBatch = async ({
   repetition = 1,
   generatedScenarios,
   concurrency,
+  authCheck = assertAgentAuth,
 }: {
   runId: string;
   scenarioIds: string[];
@@ -437,6 +441,7 @@ export const runBatch = async ({
   repetition?: number;
   generatedScenarios?: GeneratedScenario[];
   concurrency?: number;
+  authCheck?: AuthCheck;
 }) => {
   const generatedById = new Map(
     (generatedScenarios ?? []).map((s) => [s.id, s] as const)
@@ -459,6 +464,7 @@ export const runBatch = async ({
     worker: ({ rep, scenarioId }) =>
       runScenarioSession({
         arm,
+        authCheck,
         generated: generatedById.get(scenarioId),
         modelId,
         official,

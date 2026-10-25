@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
 
 import { assertAgentAuth } from "../agent.ts";
+import type { AuthCheck } from "../agent.ts";
 import { runBatch } from "../orchestrate.ts";
 import { devEvalsRoot, repoRoot } from "../paths.ts";
 import { isRegisteredFamily } from "../product/families/registry.ts";
@@ -284,6 +285,7 @@ const runCampaignIteration = async ({
 };
 
 export const runSelfImproveCampaign = async ({
+  authCheck = assertAgentAuth,
   campaignId,
   campaignSeed,
   dryRun = false,
@@ -292,6 +294,7 @@ export const runSelfImproveCampaign = async ({
   model,
   resume,
 }: {
+  authCheck?: AuthCheck;
   campaignId?: string;
   campaignSeed?: string;
   dryRun?: boolean;
@@ -331,12 +334,16 @@ export const runSelfImproveCampaign = async ({
     };
   }
 
-  const auth = assertAgentAuth();
+  const auth = authCheck();
   if (!auth.ok) {
     const blockerPath = path.join(devEvalsRoot, "cli-auth-blocker.json");
     writeFileSync(
       blockerPath,
-      `${JSON.stringify({ at: new Date().toISOString(), reason: auth.reason }, null, 2)}\n`
+      `${JSON.stringify(
+        { at: new Date().toISOString(), reason: auth.reason },
+        null,
+        2
+      )}\n`
     );
     return {
       blocker: auth.reason,
