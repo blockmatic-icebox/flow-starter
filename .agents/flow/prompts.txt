@@ -36,3 +36,42 @@ Commits:
 
 Record:
 - .agents/flow/records/factory-simplification.md
+---
+Timestamp: 2026-10-25T16:30:00Z
+Work: factory-corrective-pass
+Stage: Build
+Prompt: Flow Factory post-simplification corrective pass (plan phases P0–P2).
+
+Summary:
+- Restored Factory tests/CI; product-owned tooling at repo root; trial meta out of subject worktrees.
+- Live S01 eval turn 1 with Task subagent; dogfood Explore on disposable checkout.
+
+Documentation:
+- DESIGN.md [unchanged] in dogfood checkout only (disposable temp)
+- PRODUCT.md [unchanged] in dogfood checkout only
+- ARCHITECTURE.md [unchanged]
+
+Factory docs:
+- RUN.md, records/corrective-pass-2026-10-25.md, initiatives command fixes [updated]
+
+Decisions:
+- Official eval compare remains blocked (ADR 0015).
+
+Features:
+- knip.factory.json, ci:factory:local, root setup:gitleaks
+
+Subagents:
+- S01 eval subject (composer-2.5): DESIGN.md explore in isolated worktree
+- Dogfood Explore (composer-2.5): DESIGN.md + PRODUCT.md in disposable install
+
+Verification:
+- pnpm --dir .agents check — exit 0
+- pnpm --dir .agents test — exit 0 (240 tests)
+- pnpm knip — exit 0
+- eval prepare/next/record S01 — turn 1 exit 0; finalize exit 1 (incomplete session)
+
+Commits:
+- 2264e4b, a45447f, 24c191d, 945001a, aa26c68 (and final corrective docs commit pending)
+
+Record:
+- .agents/flow/records/corrective-pass-2026-10-25.md

@@ -3,7 +3,8 @@
 **Objective:** Radically simplify Flow Factory while preserving product development, dogfooding, evaluation validity, and native Cursor subagent coordination.
 
 **Starting revision:** `603ed51e963cdde5d5e5579e273a144d914f87f9`  
-**Final revision:** `b415e15` (see stage log for intermediate SHAs)  
+**Simplification end (prior):** `70d4708`  
+**Corrective pass:** `70d4708` → see [corrective-pass-2026-10-25.md](corrective-pass-2026-10-25.md) for ending SHA and evidence  
 **Branch:** `main`
 
 ## Stage log
@@ -35,7 +36,7 @@
 
 - Product workspace: `apps/*`, `packages/*` only
 - Factory: `.agents/` (+ `.agents/pnpm-lock.yaml` for eval harness deps)
-- Host adapters: `AGENTS.md`, `.cursor/commands/flow-eval.md`, git hooks calling `.agents` checks
+- Host adapters: `AGENTS.md`, `.cursor/commands/flow-eval.md`, git hooks calling root `tooling/` (Factory via `.agents` forwarders)
 
 ### D. Methodology
 
@@ -60,15 +61,16 @@
 - Documented worker return contract in flow-eval skill
 - `worktrees run` warns to prefer Task subagents; check/prepare/integrate retained
 
-### H. Tests (executed)
+### H. Tests (evidence tiers)
 
-| Command | Exit |
-| --- | --- |
-| `pnpm qa` | 0 |
-| `pnpm --dir .agents check` | 0 |
-| `pnpm --dir .agents test` | 0 |
-| `pnpm --dir .agents flow-eval:check` | 0 |
-| Product copy without `.agents/` + `pnpm qa` | knip requires trimming root knip `.agents` entries (documented normalization) |
+| Command | Tier | Notes |
+| --- | --- | --- |
+| `pnpm --dir .agents check` | Statically tested | Corrective pass, exit 0 |
+| `pnpm --dir .agents test` | Statically tested | 240 tests, exit 0 |
+| `pnpm knip` | Statically tested | Product config; exit 0 |
+| Product without `.agents/` + `pnpm qa` | Manually verified | Disposable install; run `pnpm lint:fix` if adopt formats differ |
+| `/flow-eval` S01 live | Manually verified | Turn 1 only; `finalize` incomplete (turn cap) |
+| Official compare | Blocked | ADR 0015 |
 
 ### I. Simplification metrics
 
@@ -87,18 +89,19 @@
 | P2 | Further trim `flow.md` body into operations guides |
 | P2 | Remove unused eval CLI handlers (`experiment`, `self-improve`, …) after consumer audit |
 | P2 | Optional `knip` workspace split purely under `.agents` for cleaner product-only copies |
-| P1 | Run live `/flow-eval end-to-end` campaign when host isolation improves |
+| P1 | Complete multi-turn S01 session or bounded turn-cap smoke policy |
+| P1 | Run live `/flow-eval` campaign when host isolation improves |
 
 ## §13 acceptance checklist
 
 | # | Theme | Status | Evidence |
 | --- | --- | --- | --- |
-| 1 | Visual reference in Explore | partial | DESIGN template + skill; manual scenario not run |
+| 1 | Visual reference in Explore | manually verified | Dogfood disposable checkout (see corrective-pass record) |
 | 2 | Evolving requirements | partial | S04 in default suite; journal format |
 | 3 | Flow improves Flow | pass | dogfooding-eval.md + flow-improve path |
 | 4 | Parallel work | pass | AGENTS.md + worktrees.md + run warning |
 | 5 | `/flow-eval` reporting | pass | flow-eval SKILL end-to-end template |
-| 6 | Product without `.agents/` | partial | install+qa works after knip normalization |
+| 6 | Product without `.agents/` | manually verified | `knip.json` product-only + disposable `pnpm qa` |
 | 7 | Missing worker evidence | pass | ADR 0015 + existing gate tests |
-| 8 | Prompt log history | pass | journal.md + tests |
+| 8 | Prompt log history | statically tested | Nonempty journal allowed; append tests use temp fixtures |
 | 9 | Historical records / ADR 0015 | pass | preserve exit 0; ADR untouched |
