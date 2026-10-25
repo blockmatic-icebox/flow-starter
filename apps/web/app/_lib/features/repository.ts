@@ -28,6 +28,7 @@ export const readStore = async ({
 } = {}): Promise<FeatureStore> => {
   const filePath = resolveStorePath({ env });
   try {
+    // turbopackIgnore: true — dynamic path under apps/web/.data only
     const raw = await readFile(filePath, "utf-8");
     return JSON.parse(raw) as FeatureStore;
   } catch (error) {

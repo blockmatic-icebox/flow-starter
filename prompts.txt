@@ -5,3 +5,7 @@
 2026-10-24T23:20:00Z | USER | Shared assessment Google Doc URL.
 2026-10-24T23:20:30Z | AGENT | Fetched assessment text export; aligned CLAUDE.md Project Rules with prompt-logging requirement; updated this log.
 2026-10-24T23:28:00Z | AGENT | Fixed Playwright journeys (button role, revalidatePath); lint clean; browser tests 4/4; preparing commits and push.
+2026-10-25T00:11:00Z | USER | Asked how many iterations and commits were made.
+2026-10-25T00:11:30Z | AGENT | Answered from git history f260e73..HEAD (2 commits; ~4 implementation iterations).
+2026-10-25T00:11:36Z | USER | Re-run stress test with fixes and Flow self-improvement.
+2026-10-25T00:13:00Z | AGENT | Fixed ES2023 lib for toSorted typecheck; triage route test; Playwright isolated store; staged web check-types gate.

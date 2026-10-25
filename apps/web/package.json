@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start",
     "check-types": "tsc-ts --noEmit",
-    "test": "node --import tsx --test app/_lib/**/*.test.ts",
+    "test": "node --import tsx --test app/**/*.test.ts",
     "test:browser": "playwright test",
     "test:browser:ui": "playwright test --ui"
   },

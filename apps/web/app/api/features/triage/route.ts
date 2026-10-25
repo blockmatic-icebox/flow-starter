@@ -16,7 +16,13 @@ const triageSchema = z.object({
 
 const publicFailure = "Triage could not be completed.";
 
-export const POST = async (request: Request) => {
+export const handleTriagePost = async ({
+  env = process.env,
+  request,
+}: {
+  env?: NodeJS.ProcessEnv;
+  request: Request;
+}) => {
   let body: { id?: string };
   try {
     body = (await request.json()) as { id?: string };
@@ -28,12 +34,12 @@ export const POST = async (request: Request) => {
   if (!id)
     return Response.json({ message: "Missing request id." }, { status: 400 });
 
-  const feature = await getRequest({ id });
+  const feature = await getRequest({ env, id });
   if (!feature)
     return Response.json({ message: "Request not found." }, { status: 404 });
 
-  const catalog = await listRequests();
-  const apiKey = process.env.AI_GATEWAY_API_KEY?.trim();
+  const catalog = await listRequests({ env });
+  const apiKey = env.AI_GATEWAY_API_KEY?.trim();
 
   if (!apiKey) {
     const suggestion = fixtureTriage({ request: feature, requests: catalog });
@@ -41,8 +47,8 @@ export const POST = async (request: Request) => {
   }
 
   const model =
-    process.env.FEATURE_TRIAGE_MODEL?.trim() ||
-    process.env.GENUI_MODEL?.trim() ||
+    env.FEATURE_TRIAGE_MODEL?.trim() ||
+    env.GENUI_MODEL?.trim() ||
     "anthropic/claude-sonnet-4";
 
   const catalogSummary = catalog
@@ -77,3 +83,5 @@ Return JSON with suggestedTheme (short slug), priority, relatedIds from the cata
     return Response.json({ message: publicFailure }, { status: 500 });
   }
 };
+
+export const POST = (request: Request) => handleTriagePost({ request });
