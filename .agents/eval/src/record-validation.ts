@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 
+import { duplicateEventIdReason } from "./event-id-validation.ts";
 import type { EvalEvent, Origin } from "./types.ts";
 
 const allowedSubjectOrigins = new Set<Origin>(["agent-reported"]);
@@ -44,7 +45,8 @@ export const validateSubjectRecordEvents = ({
   turn: number;
 }) => {
   if (!runId) return { ok: false as const, reason: "missing runId" };
-  const seenIds = new Set<string>();
+  const duplicateId = duplicateEventIdReason({ events });
+  if (duplicateId) return { ok: false as const, reason: duplicateId };
   const seenSeq = new Map<number, string>();
 
   for (const event of events) {
@@ -79,9 +81,6 @@ export const validateSubjectRecordEvents = ({
       return { ok: false as const, reason: "scenarioId mismatch" };
     if (event.turn !== undefined && event.turn !== turn)
       return { ok: false as const, reason: "turn mismatch" };
-    if (seenIds.has(event.id))
-      return { ok: false as const, reason: "duplicate event id" };
-    seenIds.add(event.id);
     if (event.seq !== undefined) {
       const prior = seenSeq.get(event.seq);
       if (prior && prior !== event.id)

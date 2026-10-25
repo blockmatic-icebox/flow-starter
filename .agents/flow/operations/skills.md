@@ -12,25 +12,17 @@ The **coordinator** loads methodology skills from this page automatically; the u
 
 ## Phase-aware selection
 
-Select skills using the actual task and uncertainty, not keyword matching alone.
+Select skills from the **Preferred skills** table using the actual task, lifecycle activity, and uncertainty—not keyword matching alone. For a mixed request, pick the governing phase first; add skills only for distinct subtasks.
 
-- A raw idea with unclear value or audience favors `idea-refine`.
-- A defined customer problem with uncertain demand or evidence favors `problem-validation`.
-- A substantial product brief with missing requirements may use those skills sequentially, but should not load both automatically.
-- Once scope and decisions are sufficiently established, use `prd-writing` for product requirements.
-- Use `spec-driven-development` when a capability requires detailed behavioral or technical contracts.
-- Use `planning-and-task-breakdown` after the intended outcome and meaningful requirements are established.
-- Use `experiment-design` only when an actual validation experiment is justified.
-- Use `domain-modeling` only when domain terms or boundaries need clarification.
-- Use `writing-for-agents` and `documentation-and-adrs` for changes to agent documentation or consequential decision records.
+Read each chosen `SKILL.md` before applying it. Preserve Flow's canonical file locations even when a skill suggests different filenames.
 
-For a mixed request, select the current governing phase first. Use additional skills only for distinct necessary subtasks.
+Never assert that routing succeeded merely because a skill appears in `skills-lock.json`. Installed availability and observed execution are separate facts. When several methodology skills could apply, load the one that matches **current uncertainty and stage**, not the full chain.
 
-Read the installed skill instructions before applying them. Preserve Flow's canonical file locations even when a skill suggests different filenames.
+### Plan versus Build (stack skills)
 
-Never assert that automatic routing succeeded merely because a skill appears in `skills-lock.json`. Installed availability and observed execution are separate facts.
-
-When several methodology skills could apply (`idea-refine`, `problem-validation`, `prd-writing`, `spec-driven-development`, `planning-and-task-breakdown`, `incremental-implementation`, `test-driven-development`, `code-review-and-quality`, `experiment-design`, `writing-for-agents`, `documentation-and-adrs`), load the one that matches **current uncertainty and stage**, not the full chain.
+- **Plan:** Load methodology skills first—usually `planning-and-task-breakdown` alone. Read `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`, relevant `docs/`, and the code paths you will touch. Do not preload React, Next.js, database, or UI skills “for completeness.”
+- **Build:** Add `incremental-implementation` (and `test-driven-development` when behavior changes), then the smallest stack skill set the slice needs (`nextjs`, `shadcn`, `playwright`, `agent-browser`, `neon-postgres`, `ai-sdk`, and so on).
+- **Exception during Plan:** Load one stack skill only when the plan would be wrong without platform-specific constraints (caching model, auth session shape, workflow durability). Prefer loading stack skills on a **researcher** subagent for contrarian or architecture waves instead of bloating the coordinator context.
 
 | Task | Preferred skills |
 | --- | --- |
@@ -38,6 +30,9 @@ When several methodology skills could apply (`idea-refine`, `problem-validation`
 | Product exploration | `idea-refine`, `problem-validation` |
 | Product requirements | `prd-writing`, `spec-driven-development` |
 | Planning | `planning-and-task-breakdown` |
+| Domain terms or boundaries | `domain-modeling` |
+| Customer validation experiment | `experiment-design` |
+| Review quality | `code-review-and-quality` |
 | Build (multi-file or planned slice) | `incremental-implementation`; add `test-driven-development` when behavior changes. Slice commits on task branches are included in implementation authorization; they do not authorize push. |
 | Parallel waves (initiative + `pnpm --dir .agents worktrees run`) | `planning-and-task-breakdown`, `incremental-implementation`; contrarian Explore: `idea-refine`, `problem-validation` |
 | React and Next.js | `nextjs`, `next-dev-loop`, `vercel-react-best-practices` |

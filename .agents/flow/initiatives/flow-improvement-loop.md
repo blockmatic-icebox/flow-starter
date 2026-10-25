@@ -2,7 +2,9 @@ Date: 2026-10-24
 
 # Initiative — Flow improvement loop
 
-**Status:** In progress
+**Status:** Maintained record (manual evidence loop; L2 auto-merge inactive per ADR 0013 Proposed)
+
+**Canonical status:** [guides/improvement.md](../guides/improvement.md), [records/factory-simplification.md](../records/factory-simplification.md).
 
 ## Outcome
 

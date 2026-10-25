@@ -11,6 +11,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
+import { repoRoot as repositoryRoot } from "../lib/repo-paths.mjs";
 import { validateFlowDocs } from "./check-flow-docs.mjs";
 
 function defaultMarkdownContent(relative) {
@@ -436,6 +437,16 @@ test("flags adopted readme missing product identity", (t) => {
     ),
     readmeErrors.join("\n")
   );
+});
+
+test("flow.md retains progressive disclosure anchors", () => {
+  const flowMd = readFileSync(
+    path.join(repositoryRoot, ".agents/flow/flow.md"),
+    "utf-8"
+  );
+  assert.match(flowMd, /## Where detail lives/u);
+  assert.match(flowMd, /## Documentation ownership/u);
+  assert.match(flowMd, /### Contract edit gate/u);
 });
 
 test("flags obsolete apps/web security paths in authoritative docs", (t) => {

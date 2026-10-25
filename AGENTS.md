@@ -8,13 +8,15 @@ This repository is **Flow Factory**—an agentic product-development environment
 
 For repository work other than setup-only install, env, or tooling, read and apply [.agents/skills/flow/SKILL.md](.agents/skills/flow/SKILL.md) before acting. The operational contract is [.agents/flow/flow.md](.agents/flow/flow.md).
 
-**Authorized Build:** After explicit implementation authorization, prefer **Cursor Task subagents** with bounded read/write scopes and structured return payloads; you integrate and verify. Use `pnpm --dir .agents worktrees check|prepare` for initiative validation and briefs; use `worktrees run` only when a host worker command is explicitly required. Do not push or open PRs unless separately authorized.
+**Authorized Build:** After explicit implementation authorization, prefer **delegated workers** (for example Cursor Task subagents when available) with bounded read/write scopes and structured return payloads; you integrate and verify. Use `pnpm --dir .agents worktrees check|prepare` for initiative validation and briefs; use `worktrees run` only when a host worker command is explicitly required. Do not push or open PRs unless separately authorized.
 
 **New-product initiation:** A substantial product brief starts in **Explore** unless the user authorized a later stage. Treat supplied requirements as evidence, not resolved decisions. Stop before **Build** until implementation is explicitly authorized. "Skip the process," "build it now," and "update everything" are not that authorization. Planning language and approval of a proposed plan are not implementation authorization.
 
 **Setup-only requests** (install, env, tooling) are not automatic product discovery and do not require the Flow skill.
 
 **Decisions:** Conflicts with an accepted ADR/PDR or root contract need human approval. Factory decisions live under `.agents/flow/decisions/`; product decisions live under `docs/adr/` and `docs/pdr/` (independent numbering). A request to replace the database, authentication, or monorepo stack conflicts with [Factory ADR 0001](.agents/flow/decisions/adr/0001-agentic-architecture.md) until a human accepts a **product** ADR documenting the divergence (or a new Factory ADR when changing the reusable baseline). Read that Factory ADR before editing `packages/db`, `docker-compose.yml`, or an accepted ADR status. Do not implement the replacement in the same turn as the request; present the conflict, alternatives, and the ADR path, then wait for approval and explicit **Build** authorization.
+
+**Contract edit gate:** Before any write to protected contracts (`PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`, `GLOSSARY.md`, `docs/adr/`, `docs/pdr/`, `docs/specs/`, `docs/initiatives/`, `docs/plans/`, Factory `.agents/flow/decisions/` and `.agents/flow/specs/`, or material edits to [.agents/flow/flow.md](.agents/flow/flow.md)), stop if the change would break accepted direction (see [Contract edit gate](.agents/flow/flow.md#contract-edit-gate)). Do not edit until the user explicitly approves **this contract change**; plan or **Build** approval is not enough. Supersede accepted ADR/PDR decisions with a new record—do not rewrite **Decision** in place.
 
 To improve Flow itself, read [.agents/skills/flow-improve/SKILL.md](.agents/skills/flow-improve/SKILL.md) when the user asks or when a workflow failure is clearly methodology-related.
 

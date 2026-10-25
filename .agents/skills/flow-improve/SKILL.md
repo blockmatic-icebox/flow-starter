@@ -6,9 +6,7 @@ disable-model-invocation: true
 
 # Flow improve
 
-Not a second methodology. Use Explore → Specify → Plan → Build → Review → Ship. Product work continues in parallel.
-
-ADR 0013 remains **Proposed**—do not implement the observer, hooks, L0 event log, or L2 auto-merge from this skill.
+Not a second methodology. Use Explore → Specify → Plan → Build → Review → Ship. Product work continues in parallel. Process, autonomy levels, and promotion rules: [improvement.md](../../flow/guides/improvement.md).
 
 ## Steps
 

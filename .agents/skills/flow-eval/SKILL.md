@@ -21,7 +21,7 @@ Do not spawn the Cursor CLI `agent` command or pass a model.
 | Argument | Meaning |
 | --- | --- |
 | _(none)_ or `end-to-end` | Bounded diagnostic suite (default scenario list), arm `flow`, repetition `1` |
-| `preserve`, `grade`, `compare`, `integrity`, `mutations`, `readiness`, `stress`, `benchmark` | Deterministic CLI only (see [RUN.md](../../eval/RUN.md)) |
+| `preserve`, `grade`, `compare`, `integrity`, `mutations`, `readiness`, `stress`, `benchmark` | Supported deterministic CLI (see [RUN.md](../../eval/RUN.md#deterministic-commands-supported)) |
 | `--scenarios S01,S02` | Limit the suite (still bounded; avoid large campaigns) |
 | `--arm flow` \| `flow-without-skills` \| `control` | Worktree arm |
 
@@ -67,7 +67,7 @@ After the evaluation-specific sections above, close the runner session with the 
 
 ## Deterministic-only modes
 
-Run the CLI directly: `pnpm --dir .agents eval <cmd>` for `integrity`, `preserve`, `freeze-pilot`, `grade`, `compare`, `mutations`, `readiness`, `stress`, `benchmark`, and `run --dry-run`.
+Run the CLI directly: `pnpm --dir .agents eval <cmd>` for `integrity`, `preserve`, `freeze-pilot`, `grade`, `compare`, `mutations`, `readiness`, `stress`, `benchmark`, and `run --dry-run`. Campaign commands (`experiment`, `self-improve`, `pilot-loop`) are experimental and unmaintained—see [RUN.md](../../eval/RUN.md#experimental--unmaintained).
 
 ## Completion
 

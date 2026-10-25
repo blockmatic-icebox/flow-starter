@@ -105,3 +105,33 @@
 | 7 | Missing worker evidence | pass | ADR 0015 + existing gate tests |
 | 8 | Prompt log history | statically tested | Nonempty journal allowed; append tests use temp fixtures |
 | 9 | Historical records / ADR 0015 | pass | preserve exit 0; ADR untouched |
+
+## Pass 2 — Factory simplification (2026-10-25)
+
+**Scope:** `.agents/` only; conservative `flow.md` dedup; demote eval campaign CLIs (keep code).
+
+### Before metrics (start of pass)
+
+| Metric                      | Value                                  |
+| --------------------------- | -------------------------------------- |
+| `flow.md` lines             | 485                                    |
+| `skills.md` lines           | 99                                     |
+| `cli.ts` lines              | 980                                    |
+| `check-flow-docs.mjs` lines | 905                                    |
+| `pnpm --dir .agents check`  | exit 0                                 |
+| `pnpm --dir .agents test`   | 271 tests (172 eval + tooling), exit 0 |
+
+### P0 / P1 / P2 (this pass)
+
+| Pri | Item | Action |
+| --- | --- | --- |
+| P1 | Campaign CLI noise in `/flow-eval` help | Demote in `cli.ts` usage, RUN.md, flow-eval skill |
+| P1 | Methodology skill triple-list in `skills.md` | Collapse to table + short phase paragraph |
+| P2 | `flow.md` vs guides overlap | Link to `working-with-flow.md` for proportional examples |
+| P2 | Initiative status clutter | Mark evaluation + improvement loop as maintained records |
+| P2 | `check-flow-docs.mjs` size | Deferred extract (behavior unchanged) |
+| P2 | `knip.factory.json` eval entries | OUT OF SCOPE (root config) |
+
+### After metrics
+
+_(Updated at pass closeout.)_

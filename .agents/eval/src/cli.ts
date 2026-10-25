@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { formatEvalUsage } from "./cli-usage.ts";
 import { compareRuns } from "./compare.ts";
 import { runExperiment } from "./generation/experiment.ts";
 import { stratifiedMethodologySample } from "./generation/methodology-sample.ts";
@@ -38,25 +39,12 @@ import {
 } from "./scenarios.ts";
 import type { EvalArm, EvalEvent, EvalHost } from "./types.ts";
 
-const usage = () => {
-  console.log(`flow-eval CLI (Factory: pnpm --dir .agents eval <cmd>)
-
-Public:
-  integrity              preserve + mutation checks (static layer A)
-  preserve               frozen baseline checksum
-  prepare                host run setup [--arm flow] [--suite | --scenarios IDs] [--repetition N]
-  next | record | observe | finalize   host-session protocol (runner only)
-  headless-run           preflight Cursor agent CLI + prepare (optional --auto)
-  prepare flags: --host cursor|claude|other  finalize: --accept-diagnostic --model-id <id>
-  grade --run <id> --scenario <id>
-  compare --baseline <id> --current <id> [--remediation]   fail-closed eligibility
-  run --scenarios IDs [--arm flow] [--dry-run]
-  mutations | readiness | stress | benchmark   product fixture checks
-
-Default diagnostic suite IDs: ${listDefaultDiagnosticScenarioIds().join(",")}
-
-Live /flow-eval end-to-end uses host-session (diagnostic; official compare blocked per ADR 0015).
-`);
+const usage = ({
+  showExperimental = false,
+}: {
+  showExperimental?: boolean;
+}) => {
+  console.log(formatEvalUsage({ showExperimental }));
 };
 
 const parseArgs = (argv: string[]) => {
@@ -963,7 +951,7 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
     await handler();
     return;
   }
-  usage();
+  usage({ showExperimental: false });
   process.exit(1);
 };
 
@@ -971,7 +959,9 @@ const main = async () => {
   const flags = parseArgs(process.argv.slice(2));
   const command = flags.command as string;
   if (!command || command === "help") {
-    usage();
+    usage({
+      showExperimental: process.env.FLOW_EVAL_SHOW_EXPERIMENTAL === "1",
+    });
     return;
   }
   await dispatchCli(command, flags);

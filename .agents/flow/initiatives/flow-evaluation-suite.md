@@ -2,7 +2,9 @@ Date: 2026-10-24
 
 # Initiative — Flow evaluation suite
 
-**Status:** In progress
+**Status:** Maintained record (protocol v2 and Layer A/B gates active; campaign automation out of scope)
+
+**Canonical pass evidence:** [records/eval-infrastructure-fix-2026-10-25.md](../records/eval-infrastructure-fix-2026-10-25.md), [records/corrective-pass-2026-10-25.md](../records/corrective-pass-2026-10-25.md), [records/factory-simplification.md](../records/factory-simplification.md) (Pass 2).
 
 ## Outcome
 

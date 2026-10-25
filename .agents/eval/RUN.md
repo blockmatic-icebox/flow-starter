@@ -26,22 +26,17 @@ pnpm --dir .agents eval finalize --run <runId> --model-id <id> --accept-diagnost
 
 `eval run`, `eval pilot`, and related commands **prepare** a host-session run and print `awaiting-host` JSON unless `--dry-run` is set.
 
-## Deterministic commands
+## Deterministic commands (supported)
+
+These commands are part of Layer A/B gates, grading, or `/flow-eval` diagnostics.
 
 ```bash
 pnpm --dir .agents eval integrity
 pnpm --dir .agents eval preserve
 pnpm --dir .agents eval freeze-pilot --seed s09-s13-pilot-2026-10-25
 pnpm --dir .agents eval grade --run <runId> --scenario S01
-pnpm --dir .agents eval:experiment
-pnpm --dir .agents eval:experiment --seed example-seed
-pnpm --dir .agents eval:self-improve
-pnpm --dir .agents eval:self-improve --iterations 3 --seed example-campaign --dry-run
-pnpm --dir .agents eval:experiment --profile full-product --count 1
-pnpm --dir .agents eval:experiment -- --profile technical-ai-assessment
 pnpm --dir .agents eval run --scenarios S01,S02,S05,S09,S13 --arm flow --dry-run
 pnpm --dir .agents eval compare --baseline run-a --current run-b
-pnpm --dir .agents eval pilot-loop --dry-run
 pnpm --dir .agents eval run --scenarios S13,S16 --repetition 2
 pnpm --dir .agents eval compare --baseline run-a --current run-b --remediation
 
@@ -55,6 +50,22 @@ pnpm --dir .agents eval:benchmark:checkout
 
 Product evidence: `.agents/eval/evidence/product-evals/<runId>/` (legacy: `__dev/product-evals/<runId>/`).
 
+## Experimental — unmaintained
+
+**Not** part of `eval integrity`, `flow-eval:check`, or `/flow-eval` end-to-end. Campaign automation is deferred ([flow-evaluation-suite](../flow/initiatives/flow-evaluation-suite.md)); commands remain for local experiments only.
+
+```bash
+pnpm --dir .agents eval:experiment
+pnpm --dir .agents eval:experiment --seed example-seed
+pnpm --dir .agents eval:self-improve
+pnpm --dir .agents eval:self-improve --iterations 3 --seed example-campaign --dry-run
+pnpm --dir .agents eval:experiment --profile full-product --count 1
+pnpm --dir .agents eval experiment --profile technical-ai-assessment
+pnpm --dir .agents eval pilot-loop --dry-run
+```
+
+`FLOW_EVAL_SHOW_EXPERIMENTAL=1 pnpm --dir .agents eval help` lists these in CLI help.
+
 `eval experiment --profile technical-ai-assessment` prepares one directory per arm under `__dev/product-evals/<arm>-<runId>/`. Exit 0 means the session is initialized. `productEvaluated` stays false and `releaseVerdict` stays `INCONCLUSIVE` until product checks cover `acceptance.json`. The build target is arm `assessment-a`.
 
 Blind subjective scores: `__dev/flow-evals/<runId>/blind-reviews/<scenarioId>.json` (see `src/blind-review.ts`). Not copied into executor worktrees.
@@ -63,7 +74,11 @@ Unit tests may inject mocks when calling harness functions directly. The CLI and
 
 Scenario worktrees run the same **product adoption** transform as [`install.sh`](../tooling/setup/install.sh) (shared [`product-adoption.mjs`](../tooling/setup/product-adoption.mjs)): slugged `package.json` name, Portless `name`, and `https://<slug>.localhost` in `apps/web`. Eval uses neutral workspace slugs (`product-<hash>`) that do not disclose scenario or arm. Partial benchmark/mutation fixtures are unchanged.
 
-Runner-only trial metadata (arm, scenario id, Portless host, run id, database lifecycle when provisioned) is written under `.agents/eval/evidence/flow-evals/<runId>/trials/.../trial-meta.json`, not in the subject worktree. Remaining isolation limits: shared host skills/MCP, flow-arm skills symlink, inert `.agents/eval` stub package, fixture files, and same-machine worktrees (see [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md)).
+Runner-only trial metadata (arm, scenario id, Portless host, run id, database lifecycle when provisioned) is written under `.agents/eval/evidence/flow-evals/<runId>/trials/.../trial-meta.json`, not in the subject worktree.
+
+### Host isolation limits (diagnostic runs)
+
+Official flow-vs-control comparison stays blocked on Cursor worktree hosts ([ADR 0017](../flow/decisions/adr/0017-official-compare-fail-closed.md)). Even for diagnostics, subjects may share: host MCP and global skills, flow-arm skills symlink, inert `.agents/eval` stub package, copied scenario fixtures, and same-machine worktrees. Protocol separation: [ADR 0015](../flow/decisions/adr/0015-evaluation-subject-separation.md).
 
 ## Database isolation (Neon Local)
 
