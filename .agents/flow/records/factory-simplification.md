@@ -3,7 +3,7 @@
 **Objective:** Radically simplify Flow Factory while preserving product development, dogfooding, evaluation validity, and native Cursor subagent coordination.
 
 **Starting revision:** `603ed51e963cdde5d5e5579e273a144d914f87f9`  
-**Final revision:** `e02d8e4` (see stage log for intermediate SHAs)  
+**Final revision:** `b415e15` (see stage log for intermediate SHAs)  
 **Branch:** `main`
 
 ## Stage log
@@ -14,6 +14,7 @@
 | 1 | `6381d71` | Eval out of root workspace; `.agents` install; skills-lock move; ownership |
 | 2 | `5ade9db` | Journal under `.agents/flow`; Explore-time DESIGN |
 | 3–6 | `e02d8e4` | Flow doc map; subagent-first delegation; eval `integrity` + bounded suite; `/flow-eval end-to-end` skill |
+| 7–8 | `b415e15` | Final report, RUN integrity, knip boundary, journal entry |
 
 ## §16 consolidated report
 
