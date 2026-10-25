@@ -14,6 +14,7 @@ const rules = [
   ["docs/ideas", slugFilePattern, "ideas"],
   ["docs/initiatives", slugFilePattern, "initiatives"],
   ["docs/plans", slugFilePattern, "plans"],
+  ["docs/tasks", slugFilePattern, "tasks"],
   ["docs/specs", slugFilePattern, "specs"],
   ["docs/research", researchFilePattern, "research"],
   ["docs/adr", decisionFilePattern, "product-adr"],
@@ -446,6 +447,77 @@ const designParityTokens = [
 const placeholderMarkerPattern =
   /\b(?:not initialized|lorem ipsum)\b|\bTBD\b/iu;
 
+const embeddedProductTaskIdPattern = /\| \*\*T-\d+-\d+\*\*/u;
+
+const initiativeTasksHeadingPattern = /^## Tasks\b/mu;
+
+function initiativeSlugFromRelative(relative) {
+  const base = path.basename(relative, ".md");
+  return slugFilePattern.test(`${base}.md`) ? base : null;
+}
+
+function tasksLinkPatternForSlug(taskSlug) {
+  return new RegExp(
+    `(?:docs/tasks/${taskSlug}\\.md|\\.\\./tasks/${taskSlug}\\.md|tasks/${taskSlug}\\.md)`,
+    "u"
+  );
+}
+
+export function validateSeparatedProductTasks(root) {
+  const errors = [];
+  const initiativesDir = path.join(root, "docs/initiatives");
+
+  if (!existsSync(initiativesDir)) {
+    return errors;
+  }
+
+  for (const filename of markdownFiles(initiativesDir)) {
+    const relative = relativePath(root, filename);
+    const content = readFileSync(filename, "utf-8");
+    const initiativeSlug = initiativeSlugFromRelative(relative);
+
+    if (embeddedProductTaskIdPattern.test(content)) {
+      errors.push(
+        `${relative}: embeds T-*-* task table; move checklist to docs/tasks/${initiativeSlug ?? "<slug>"}.md`
+      );
+    }
+
+    if (!initiativeTasksHeadingPattern.test(content)) {
+      continue;
+    }
+
+    if (!initiativeSlug) {
+      continue;
+    }
+
+    if (!tasksLinkPatternForSlug(initiativeSlug).test(content)) {
+      errors.push(
+        `${relative}: has ## Tasks but no link to docs/tasks/${initiativeSlug}.md`
+      );
+    }
+
+    const tasksPath = path.join(root, "docs/tasks", `${initiativeSlug}.md`);
+    if (!existsSync(tasksPath)) {
+      errors.push(
+        `${relative}: links or requires docs/tasks/${initiativeSlug}.md but file is missing`
+      );
+    }
+  }
+
+  for (const filename of markdownFiles(path.join(root, "docs/specs"))) {
+    const relative = relativePath(root, filename);
+    const content = readFileSync(filename, "utf-8");
+
+    if (embeddedProductTaskIdPattern.test(content)) {
+      errors.push(
+        `${relative}: embeds T-*-* task table; use docs/tasks/<slug>.md for Build checklists`
+      );
+    }
+  }
+
+  return errors;
+}
+
 const INSTALL_SCRIPT_REL = ".agents/tooling/setup/install.sh";
 
 function isFactoryCheckout(root) {
@@ -680,6 +752,14 @@ const flowCoordinatorContractChecks = [
   {
     label: "AskQuestion structured UI",
     pattern: /AskQuestion/iu,
+  },
+  {
+    label: "separated product tasks",
+    pattern: /docs\/tasks\/<slug>\.md/iu,
+  },
+  {
+    label: "tasks-documents operations",
+    pattern: /tasks-documents\.md/iu,
   },
 ];
 
@@ -927,7 +1007,8 @@ export function validateFlowDocs(root = repositoryRoot) {
     ...validateDesignTokenParity(root),
     ...validateDesignImplementationRefs(root),
     ...validateAdoptedAgentsScripts(root),
-    ...validateRepositoryOwnership(root)
+    ...validateRepositoryOwnership(root),
+    ...validateSeparatedProductTasks(root)
   );
 
   if (path.resolve(root) === path.resolve(repositoryRoot)) {

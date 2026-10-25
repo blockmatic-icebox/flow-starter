@@ -15,6 +15,7 @@ import { repoRoot as repositoryRoot } from "../lib/repo-paths.mjs";
 import {
   validateFlowCoordinatorContract,
   validateFlowDocs,
+  validateSeparatedProductTasks,
 } from "./check-flow-docs.mjs";
 
 function defaultMarkdownContent(relative) {
@@ -459,6 +460,53 @@ test("flow.md retains progressive disclosure anchors", () => {
   assert.match(flowMd, /## Where detail lives/u);
   assert.match(flowMd, /## Documentation ownership/u);
   assert.match(flowMd, /### Proportionality and continuation/u);
+});
+
+test("requires separated docs/tasks checklist for initiatives with ## Tasks", (t) => {
+  const root = fixture(
+    t,
+    ["docs/initiatives/demo.md", "docs/tasks/demo.md", "docs/specs/demo.md"],
+    {
+      "docs/initiatives/demo.md": `# Demo
+
+## Tasks (execution)
+
+See [tasks](../tasks/demo.md).
+`,
+      "docs/specs/demo.md":
+        "# Spec\n\n**Last reviewed:** 2026-10-24\n**Status:** Current\n",
+      "docs/tasks/demo.md": "# Tasks\n\n- [ ] T-0-1\n",
+    },
+    { omitRequired: true }
+  );
+  assert.equal(validateSeparatedProductTasks(root).length, 0);
+});
+
+test("flags embedded T-*-* tables in initiatives and specs", (t) => {
+  const root = fixture(
+    t,
+    ["docs/initiatives/bad.md", "docs/specs/bad.md"],
+    {
+      "docs/initiatives/bad.md": `# Bad
+
+## Tasks
+
+| **T-0-1** | migrate |
+`,
+      "docs/specs/bad.md":
+        "# Spec\n\n**Last reviewed:** 2026-10-24\n**Status:** Current\n\n| **T-1-1** | x |\n",
+    },
+    { omitRequired: true }
+  );
+  const errors = validateSeparatedProductTasks(root);
+  assert.ok(
+    errors.some((e) => e.includes("docs/initiatives/bad.md")),
+    errors.join("\n")
+  );
+  assert.ok(
+    errors.some((e) => e.includes("docs/specs/bad.md")),
+    errors.join("\n")
+  );
 });
 
 test("flags obsolete apps/web security paths in authoritative docs", (t) => {

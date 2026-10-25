@@ -212,7 +212,7 @@ Plan only as deeply as the work requires:
 - Documentation impact.
 - Explicit acceptance checks.
 
-For a small task, a concise plan in the conversation is sufficient. For sustained initiative work, keep the plan and task progress in its initiative document. A standalone plan is exceptional, not the default. Add `docs/plans/<slug>.md` only when the initiative cannot hold that plan or the user asks for a separate plan document.
+For a small task, a concise plan in the conversation is sufficient. For sustained initiative work, keep **scope and waves** in the initiative and the **checkbox backlog** in `docs/tasks/<slug>.md` (same slug as the initiative). Do not embed `T-*-*` task tables or large checklists in initiatives or specs. Link only from the initiative (`## Tasks (execution)`). See [tasks-documents.md](operations/tasks-documents.md). A standalone `docs/plans/<slug>.md` is exceptional—narrative plan when the initiative is insufficient, not a duplicate tasks file.
 
 **Exit condition:** The first implementation slice is unambiguous and verifiable.
 
@@ -316,7 +316,8 @@ Flow Factory's mission, goals, and inherited foundation are explained in [factor
 | `ARCHITECTURE.md` | Current **product** technical structure, boundaries, and deviations from Factory defaults |
 | `GLOSSARY.md` | Terms with project-specific meanings and consequential distinctions |
 | `docs/ideas/<slug>.md` | Worthwhile possibilities that are not yet implementation commitments |
-| `docs/initiatives/<slug>.md` | Product bounded work: outcome, scope, assumptions, tasks, progress, validation, and findings |
+| `docs/initiatives/<slug>.md` | Product bounded work: outcome, scope, assumptions, progress, validation, and findings (link to tasks doc; no embedded checklist tables) |
+| `docs/tasks/<slug>.md` | Product **Build execution checklist** (dependencies, gates, checkboxes)—paired with same-slug initiative; not a spec ([tasks-documents.md](operations/tasks-documents.md)) |
 | `.agents/flow/initiatives/<slug>.md` | Factory engineering and methodology bounded work |
 | `docs/research/YYYYMMDD-<slug>.md` | Product research and evidence |
 | `.agents/flow/research/YYYYMMDD-<slug>.md` | Factory technical and methodology research |
