@@ -13,14 +13,14 @@
 
 ## Verification (2026-10-25)
 
-| Command | Result |
-| --- | --- |
-| `pnpm --dir .agents check` | exit 0 |
-| `pnpm --dir .agents test` | 164 pass |
-| `pnpm --dir .agents eval integrity` | exit 0 |
-| `pnpm --dir .agents eval:mutations` | exit 0 |
-| `pnpm --dir .agents eval:benchmark` | exit 0 |
-| `pnpm test` | exit 0 |
+| Command                             | Result   |
+| ----------------------------------- | -------- |
+| `pnpm --dir .agents check`          | exit 0   |
+| `pnpm --dir .agents test`           | 164 pass |
+| `pnpm --dir .agents eval integrity` | exit 0   |
+| `pnpm --dir .agents eval:mutations` | exit 0   |
+| `pnpm --dir .agents eval:benchmark` | exit 0   |
+| `pnpm test`                         | exit 0   |
 
 Live LLM/agent pilot (S01): not run in this pass (explicit BLOCKED without credentials/budget).
 
