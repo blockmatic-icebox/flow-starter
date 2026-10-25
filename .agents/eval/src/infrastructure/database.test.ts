@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import { isOwnedEvalDatabaseName } from "../subject-identity.ts";
 import {
   cleanupOrphanedDatabasesForRun,
+  cleanupTerminalJobDatabasesForRun,
   createDatabaseIfNotExists,
   dropOwnedDatabase,
 } from "./database.ts";
@@ -44,5 +45,18 @@ describe("database lifecycle guards", () => {
     });
     assert.equal(result.dropped, 0);
     assert.equal(result.results.length, 0);
+  });
+
+  it("resume-safe re-prepare skips pending job databases", async () => {
+    const runId = `resume-cleanup-${Date.now()}`;
+    const result = await cleanupTerminalJobDatabasesForRun({
+      jobs: [
+        { databaseName: "flow_eval_a1b2c3d4", status: "complete" },
+        { databaseName: "flow_eval_b2c3d4e5", status: "pending" },
+      ],
+      runId,
+    });
+    assert.equal(result.results.length, 0);
+    assert.equal(result.dropped, 0);
   });
 });

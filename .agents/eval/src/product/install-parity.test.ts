@@ -78,6 +78,21 @@ describe(
         identity.productName.replace(/^product-/u, "product-")
       );
       assert.equal(installedPkg.name, slug);
+      const installedWeb = JSON.parse(
+        readFileSync(path.join(installedRoot, "apps/web/package.json"), "utf-8")
+      );
+      assert.equal(installedWeb.portless.name, slug);
+      assert.match(
+        readFileSync(
+          path.join(installedRoot, "apps/web/next.config.ts"),
+          "utf-8"
+        ),
+        new RegExp(`${slug}\\.localhost`, "u")
+      );
+      assert.match(
+        readFileSync(path.join(installedRoot, "README.md"), "utf-8"),
+        new RegExp(`^# ${projectName}\\n`, "u")
+      );
       assert.ok(existsSync(path.join(evalPrepared.worktreePath, "README.md")));
       assert.ok(
         !existsSync(
