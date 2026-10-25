@@ -13,3 +13,5 @@
 2026-10-25T00:22:00Z | AGENT | Fixed flow-app AI SDK tool typing (asSchema); full check-types pass; pushing.
 2026-10-25T00:36:00Z | USER | Requested full test run; provided API keys [REDACTED] for gitignored .env files.
 2026-10-25T00:40:00Z | AGENT | Fixed live triage (generateText+Output.object, claude-sonnet-4.6); live web triage pass; keys only in .env.local (not committed).
+2026-10-25T00:41:00Z | USER | git commit push everything to main.
+2026-10-25T00:42:00Z | AGENT | No new commits needed; reverted accidental oxfmt drift on research doc; main already at 523b43d and pushed.
