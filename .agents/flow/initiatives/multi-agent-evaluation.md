@@ -13,7 +13,7 @@
 ## Non-goals
 
 - L0 observer, L2 autopromotion, background reflection, second product lifecycle.
-- Permanent benchmark products in the starter template. Feature Intelligence follows [Product ADR 0002](../../../docs/adr/0002-feature-intelligence-product.md).
+- Permanent benchmark products in the starter template. Historical Feature Intelligence stress tests are recorded in [flow-evaluation-suite.md](flow-evaluation-suite.md); generated products define their own ADRs.
 
 ## Waves
 
@@ -21,7 +21,7 @@
 | ---- | ------------------------------------------------------------ |
 | 0    | Starter cleanup, knip, baseline, this initiative             |
 | 1    | flow-eval correctness + worktree runner (parallel ownership) |
-| 2    | `packages/flow-eval/src/product/` readiness                  |
+| 2    | `.agents/eval/src/product/` readiness                        |
 | 3    | `eval stress` on `pnpm worktrees`                            |
 | 4    | Mutations + benchmarks A/B + clean-checkout adoption         |
 | 5    | Verification and bounded remediation                         |

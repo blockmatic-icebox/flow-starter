@@ -28,6 +28,23 @@ test("rejects factory eval under packages and flow app", () => {
   rmSync(root, { force: true, recursive: true });
 });
 
+test("allows app/features route and colocated components", () => {
+  const root = mkdtempSync(join(tmpdir(), "ownership-features-"));
+  mkdirSync(join(root, "apps/web/app/features/_components"), {
+    recursive: true,
+  });
+  writeFileSync(
+    join(root, "apps/web/app/features/page.tsx"),
+    'import { Card } from "./_components/card";\nexport default function Page() { return <Card />; }'
+  );
+  writeFileSync(
+    join(root, "apps/web/app/features/_components/card.tsx"),
+    "export function Card() { return <div />; }"
+  );
+  assert.deepEqual(validateRepositoryOwnership(root), []);
+  rmSync(root, { force: true, recursive: true });
+});
+
 test("rejects product imports from Factory", () => {
   const root = mkdtempSync(join(tmpdir(), "ownership-import-"));
   mkdirSync(join(root, "apps/web/app"), { recursive: true });

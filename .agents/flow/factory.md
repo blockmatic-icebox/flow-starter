@@ -33,7 +33,7 @@ Accelerate delivery, build agent-first capabilities with host-enforced boundarie
 
 ## Implemented foundation
 
-- `apps/web` (product starter) and `apps/flow` (GenUI, Flow Agent, read-only MCP).
+- `apps/web` (product starter) — the only product application ([ADR 0014](decisions/adr/0014-web-only-product-application.md)).
 - `@repo/genui`, `@repo/db` (Drizzle baseline; GenUI demo does not require a database), `@repo/ui`.
 - Bounded HTTP inputs, fail-closed production rate limits, host-owned action policies.
 - Flow workflow, skills manifest, `flow:check`, and React architecture checks.
@@ -69,7 +69,8 @@ Read in this order to understand **why** the starter looks the way it does. Pres
 | **Plan** | [ADR 0009](decisions/adr/0009-react-nextjs-fractal-architecture.md) | Accepted | React and Next.js |
 | **Plan** | [ADR 0003](decisions/adr/0003-genui-openui-foundation.md) | Accepted | GenUI representation |
 | **Plan** | [ADR 0002](decisions/adr/0002-vercel-ai-sdk-for-tier-3.md) | Accepted | Tier-3 model surface |
-| **Plan** | [ADR 0012](decisions/adr/0012-flow-and-web-applications.md) | Accepted | `apps/flow` / `apps/web` split |
+| **Plan** | [ADR 0012](decisions/adr/0012-flow-and-web-applications.md) | Superseded by ADR 0014 | Historical two-app split |
+| **Plan** | [ADR 0014](decisions/adr/0014-web-only-product-application.md) | Accepted | Web-only product application |
 | **Plan** | [ADR 0010](decisions/adr/0010-site-consultant-chat-and-mcp.md) | Accepted | Flow Agent chat and MCP |
 | **Plan** | [ADR 0011](decisions/adr/0011-api-and-agent-security-boundaries.md) | Accepted | Public API and agent boundaries |
 | **Plan** | [ADR 0004](decisions/adr/0004-voice-delegates-to-eve.md) | Accepted, not implemented | Voice direction |
@@ -107,13 +108,13 @@ Bootstrap from `main`:
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-starter/main/.agents/tooling/setup/install.sh)"
 ```
 
-The installer removes itself before the initial commit. It does not run `pnpm install`.
+The installer removes itself and evaluator-only assessment fixtures before the initial commit. It does not run `pnpm install`.
 
 When creating a product from this repository:
 
 1. Replace the root README with your product identity.
 2. Define product and experience in PRODUCT.md and DESIGN.md.
-3. Replace fictional data and optional Flow demonstrations as needed.
+3. Replace fictional data and starter homepage copy as needed.
 4. Configure required integrations; preserve relevant ADRs and PDRs.
 5. Extend `apps/web` using existing React and capability boundaries.
 6. Verify before delivery (`pnpm qa`, [verification.md](operations/verification.md) for UI).
@@ -138,14 +139,13 @@ pnpm flow:check
 
 `pnpm mcp:next` connects Next.js development diagnostics while the dev server is running.
 
-UI verification: [verification.md](operations/verification.md) — `https://web.localhost` (`pnpm dev`) or `https://flow.localhost` (`pnpm dev:flow`).
+UI verification: [verification.md](operations/verification.md) — `https://web.localhost` by default (`pnpm dev`), or `https://<portless-name>.localhost` after bootstrap.
 
 ## Examples
 
-- GenUI and Flow Agent: `pnpm dev:flow` → `apps/flow` at `/`.
 - Product starter: `pnpm dev` → `apps/web`.
-- Environment templates: `apps/web/.env.example`. Production MCP and rate limits when implemented: [security model](security/security-model.md).
-- `pnpm mcp:next` (dev diagnostics) vs `/api/mcp` (application MCP) are distinct. See [ADR 0010](decisions/adr/0010-site-consultant-chat-and-mcp.md).
+- Environment templates: `apps/web/.env.example`. When you add compose, chat, or MCP routes, follow [security model](security/security-model.md) and [ADR 0011](decisions/adr/0011-api-and-agent-security-boundaries.md).
+- `pnpm mcp:next` is Next.js dev diagnostics only, not a product MCP endpoint.
 
 ## Agent skills
 

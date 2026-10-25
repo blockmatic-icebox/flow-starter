@@ -1,31 +1,28 @@
 # Architecture
 
-> Product technical contract. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) own behavior and presentation. Product decisions: [docs/adr/](docs/adr/).
+> Product technical contract for this starter. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are adopter-owned templates. Product decisions: [docs/adr/](docs/adr/).
 
 This product **inherits [Flow Factory](.agents/flow/factory.md)**—methodology, skills, evaluation, and default security and GenUI boundaries. Factory-wide rationale lives under [.agents/flow/](.agents/flow/); see [.agents/flow/architecture.md](.agents/flow/architecture.md) for the full inherited technical architecture.
 
-**Adoption:** [Product ADR 0001 — Use Flow Factory](docs/adr/0001-use-flow-factory.md). **Product:** [Product ADR 0002 — Feature Intelligence](docs/adr/0002-feature-intelligence-product.md).
+**Adoption:** [Product ADR 0001 — Use Flow Factory](docs/adr/0001-use-flow-factory.md).
 
 ## Application
 
 | Path | Role |
 | --- | --- |
-| `apps/web` | **Feature Intelligence** — product home is running; request workflow is specified in the [initiative](docs/initiatives/feature-intelligence.md) |
+| `apps/web` | **Product starter** — minimal homepage and the default place to build your product |
 
 Shared workspace packages (`@repo/genui`, `@repo/db`, `@repo/ui`, `@repo/ts`) are available when the product needs them.
 
 ## What the product owns
 
-Running application:
+Document here:
 
-- Product home at `apps/web/app/page.tsx`
+- Product-specific routes, APIs, and data models as you add them.
+- Deviations from inherited Factory defaults (each consequential deviation needs an accepted product ADR referencing the relevant Factory ADR).
+- Product authentication, authorization, and domain capabilities once implemented.
 
-Specified for the first implementation slice in the [feature-intelligence initiative](docs/initiatives/feature-intelligence.md):
-
-- Request intake, discovery, support, and a human-confirmed strategic recommendation under `apps/web/app/requests/`
-- Persistence through `@repo/db`
-
-Inherited stack stays in place. [Product ADR 0002](docs/adr/0002-feature-intelligence-product.md) records the product choice and keeps Factory ADR 0001 for the database.
+Do not duplicate the Factory stack-selection narrative or the full GenUI specification; link instead.
 
 ## Inherited boundaries (summary)
 

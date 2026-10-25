@@ -27,7 +27,7 @@ Flow does **not** guarantee faster delivery, quality, autonomous shipping, or pr
 | You define | Your product in `PRODUCT.md` and `DESIGN.md` | Which application you build (`apps/web`, etc.) |
 | Authority for workflow | [flow.md](flow.md) | Same; [factory.md](factory.md) explains the foundation |
 
-The **Flow app** (`apps/flow`) is not the methodology; it demonstrates GenUI and a read-only Flow Agent ([Factory ADR 0012](decisions/adr/0012-flow-and-web-applications.md)).
+Flow is the methodology, not a separate demo application. The template ships one product app (`apps/web`); integrate GenUI from `@repo/genui` when needed ([Factory ADR 0014](decisions/adr/0014-web-only-product-application.md)).
 
 ## Kinds of work
 

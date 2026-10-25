@@ -19,10 +19,9 @@
         ".agents/tooling/worktrees/**/*.mjs",
         ".agents/tooling/**/*.{mjs,ts}",
         ".agents/tooling/**/*.test.mjs",
-        "packages/db/scripts/*.mjs",
         "oxlint.config.ts"
       ],
-      "project": [".agents/tooling/**/*.{mjs,ts}", "packages/db/scripts/*.mjs"]
+      "project": [".agents/tooling/**/*.{mjs,ts}"]
     },
     "apps/web": {
       "entry": [
@@ -45,8 +44,8 @@
       "project": ["src/**/*.ts", "drizzle.config.ts", "scripts/**/*.mjs"]
     },
     "packages/ts": {
-      "entry": [],
-      "project": []
+      "entry": ["base.json", "nextjs.json", "react-library.json"],
+      "project": ["*.json"]
     },
     ".agents/eval": {
       "entry": ["src/cli.ts", "src/**/*.test.ts", "src/product/**/*.test.ts"],

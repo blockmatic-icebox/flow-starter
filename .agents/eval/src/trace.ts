@@ -1,5 +1,4 @@
 import type {
-  AgentTurnResult,
   Completeness,
   EvalEvent,
   HarnessKind,
@@ -494,49 +493,3 @@ export const turnCompleteness = ({
   if (expectsCommands && commandCount === 0) return "partial";
   return "complete";
 };
-
-export const terminationFromSpawn = ({
-  status,
-  signal,
-  error,
-}: {
-  status: number | null;
-  signal: NodeJS.Signals | null;
-  error?: Error;
-}) => {
-  if (error && (error as NodeJS.ErrnoException).code === "ETIMEDOUT")
-    return "timeout" as const;
-  if (error?.message?.includes("maxBuffer")) return "truncated" as const;
-  if (status === 0) return "completed" as const;
-  if (signal === "SIGTERM" || signal === "SIGINT") return "exited" as const;
-  return "exited" as const;
-};
-
-export const mergeTurnResult = ({
-  termination,
-  exitCode,
-  sessionId,
-  toolCount,
-  completeness,
-  events,
-  protocolVerified,
-  usage,
-}: {
-  termination: TurnTermination;
-  exitCode: number;
-  sessionId?: string;
-  toolCount: number;
-  completeness: Completeness;
-  events: EvalEvent[];
-  protocolVerified: boolean;
-  usage?: TokenUsage;
-}): AgentTurnResult => ({
-  completeness,
-  events,
-  exitCode,
-  protocolVerified,
-  sessionId,
-  termination,
-  toolCount,
-  usage,
-});

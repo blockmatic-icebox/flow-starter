@@ -11,7 +11,7 @@
     "architecture:test": "node --test tooling/checks/check-react-architecture.test.mjs",
     "ownership:check": "node tooling/checks/check-repository-ownership.mjs",
     "ownership:test": "node --test tooling/checks/check-repository-ownership.test.mjs",
-    "test:tooling": "node --test tooling/worktrees/*.test.mjs tooling/security/*.test.mjs tooling/checks/check-staged.test.mjs",
+    "test:tooling": "node --test tooling/worktrees/*.test.mjs tooling/security/*.test.mjs tooling/checks/check-staged.test.mjs tooling/setup/install.test.mjs",
     "worktrees": "node tooling/worktrees/worktrees.mjs",
     "flow-eval:check": "pnpm --filter @repo/flow-eval check-types && pnpm --filter @repo/flow-eval test && pnpm --filter @repo/flow-eval eval preserve",
     "eval:experiment": "pnpm --filter @repo/flow-eval eval experiment",

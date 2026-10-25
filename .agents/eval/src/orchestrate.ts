@@ -140,7 +140,7 @@ const prepareScenarioWorktree = ({
   }
 };
 
-export const runScenarioSession = async ({
+const runScenarioSession = async ({
   runId,
   scenarioId,
   arm,

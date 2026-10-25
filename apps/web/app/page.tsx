@@ -1,19 +1,21 @@
 export default function Page() {
   return (
-    <div className="flex min-h-svh p-6">
+    <main className="flex min-h-svh p-6">
       <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
         <div>
-          <h1 className="font-medium">Feature Intelligence</h1>
+          <h1 className="font-medium">Product starter</h1>
           <p>
-            The product contract is in place. Request intake, support, and a
-            human-confirmed strategic recommendation are specified as the first
-            slice in the feature-intelligence initiative.
+            Replace PRODUCT.md and DESIGN.md, then add routes under{" "}
+            <code className="font-mono text-xs">app/</code> with route-first
+            colocation. Optional GenUI lives in{" "}
+            <code className="font-mono text-xs">@repo/genui</code> when your
+            product needs it.
           </p>
         </div>
         <p className="text-muted-foreground font-mono text-xs">
           Press <kbd>d</kbd> to toggle dark mode.
         </p>
       </div>
-    </div>
+    </main>
   );
 }

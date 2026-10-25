@@ -71,12 +71,6 @@ export function validateRepositoryOwnership(root = repoRoot) {
     }
   }
 
-  const mandatoryFeatures = ["apps/web/app/features", "apps/web/features"];
-  for (const relative of mandatoryFeatures) {
-    if (existsSync(path.join(root, relative)))
-      errors.push(`forbidden mandatory features/ layout: ${relative}`);
-  }
-
   return errors;
 }
 

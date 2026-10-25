@@ -98,7 +98,7 @@ Orchestration **policies** for methodology testing are separate from eval arms:
 | `max-safe` | Fan out every safe independent part             |
 | `adaptive` | Max-safe unless coordination overhead dominates |
 
-Scenarios `D01`–`D15` live in `packages/flow-eval/scenarios/delegation/`. The oracle is `classifyDelegation` in `src/delegation.ts`. Run:
+Scenarios `D01`–`D15` live in `.agents/eval/scenarios/delegation/`. The oracle is `classifyDelegation` in `.agents/eval/src/delegation.ts`. Run:
 
 ```bash
 pnpm --filter @repo/flow-eval test

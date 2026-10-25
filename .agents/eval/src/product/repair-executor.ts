@@ -20,7 +20,7 @@ export const pathsWithinWriteRoot = ({
   return files.every((f) => f.startsWith(root) || f === writeRoot);
 };
 
-export const writeHostRepairPacket = ({
+const writeHostRepairPacket = ({
   cycle,
   findings,
   runId,

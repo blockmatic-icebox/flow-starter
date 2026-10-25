@@ -2,14 +2,15 @@
 # Flow Starter — bootstrap a new project from the latest main branch.
 #
 # One-liner (copy/paste):
-#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-starter/main/scripts/install.sh)"
+#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/gaboesquivel/flow-starter/main/.agents/tooling/setup/install.sh)"
 #
-# Requires: git, bash 3.2+
+# Requires: git, bash 3.2+, perl
 
 set -euo pipefail
 
-REPO_URL="https://github.com/gaboesquivel/flow-starter.git"
-INSTALL_SCRIPT_REL="scripts/install.sh"
+REPO_URL="${FLOW_STARTER_SOURCE:-https://github.com/gaboesquivel/flow-starter.git}"
+INSTALL_SCRIPT_REL=".agents/tooling/setup/install.sh"
+ASSESSMENT_HANDOFF=".agents/flow/operations/assessment-adoption.md"
 
 PORTLESS_RESERVED=(
   run get alias hosts list doctor trust clean prune proxy service
@@ -51,33 +52,45 @@ replace_in_file() {
   if [[ ! -f "$file" ]]; then
     die "expected file missing after clone: $file"
   fi
-  if ! command -v perl >/dev/null 2>&1; then
-    die "perl is required for safe text replacement"
-  fi
   FROM="$from" TO="$to" perl -i -pe 's/\Q$ENV{FROM}\E/$ENV{TO}/g' "$file"
 }
 
-main() {
-  require_command git
-  require_command sed
+set_json_string_field() {
+  local file="$1"
+  local key="$2"
+  local value="$3"
+  if [[ ! -f "$file" ]]; then
+    die "expected file missing after clone: $file"
+  fi
+  KEY="$key" VALUE="$value" perl -i -pe '
+    if (/^\s*"$ENV{KEY}":\s*"/) {
+      $_ = qq{  "$ENV{KEY}": "$ENV{VALUE}",\n};
+    }
+  ' "$file"
+}
 
-  printf 'Flow Starter install\n\n'
-  printf 'Project name (used for the folder and https://<name>.localhost): '
-  local project_name
-  read -r project_name
+set_portless_name() {
+  local file="$1"
+  local name="$2"
+  if [[ ! -f "$file" ]]; then
+    die "expected file missing after clone: $file"
+  fi
+  NAME="$name" perl -i -0777 -pe '
+    s/("portless":\s*\{[^}]*"name":\s*")[^"]+(")/$1.$ENV{NAME}.$2/s
+  ' "$file"
+}
+
+run_install() {
+  local project_name="$1"
+  local slug
+  slug="$(slugify "$project_name")"
 
   if [[ -z "${project_name// }" ]]; then
     die "project name cannot be empty"
   fi
 
-  local slug
-  slug="$(slugify "$project_name")"
   if [[ -z "$slug" ]]; then
     die "project name must contain at least one letter or digit"
-  fi
-
-  if [[ "$slug" == "flow" ]]; then
-    die 'slug "flow" is reserved (conflicts with the Flow agent app at flow.localhost)'
   fi
 
   if is_reserved_portless_name "$slug"; then
@@ -94,31 +107,38 @@ main() {
   local root="$slug"
   cd "$root"
 
+  rm -rf .agents/eval/fixtures/assessments
+  rm -f "$ASSESSMENT_HANDOFF"
   rm -f "$INSTALL_SCRIPT_REL"
+  rm -f CLAUDE.md prompts.txt
+  rm -f docs/adr/0002-feature-intelligence-product.md
+  rm -f docs/initiatives/feature-intelligence.md
 
   local host_from="web.localhost"
   local host_to="${slug}.localhost"
 
   replace_in_file "apps/web/next.config.ts" "$host_from" "$host_to"
   replace_in_file "apps/web/AGENTS.md" "$host_from" "$host_to"
-  replace_in_file ".agents/flow/operations/verification.md" "$host_from" "$host_to"
-  replace_in_file ".agents/flow/factory.md" "$host_from" "$host_to"
-  replace_in_file "apps/flow/app/_lib/flow-agent/knowledge-snapshot.ts" "$host_from" "$host_to"
 
   if [[ "$(uname -s)" == "Darwin" ]]; then
     sed -i '' "s/^# Project Name$/# ${project_name}/" README.md
-    sed -i '' 's/^  "name": "flow",$/  "name": "'"${slug}"'",/' package.json
-    sed -i '' '/"portless": {/,/}/ s/"name": "web"/"name": "'"${slug}"'"/' apps/web/package.json
   else
     sed -i "s/^# Project Name$/# ${project_name}/" README.md
-    sed -i 's/^  "name": "flow",$/  "name": "'"${slug}"'",/' package.json
-    sed -i '/"portless": {/,/}/ s/"name": "web"/"name": "'"${slug}"'"/' apps/web/package.json
   fi
 
+  set_json_string_field "package.json" "name" "$slug"
+  set_portless_name "apps/web/package.json" "$slug"
+
   rm -rf .git
-  git init -b main
-  git add -A
-  git commit -m "Initial commit"
+  if ! git init -b main >/dev/null 2>&1; then
+    die "git init failed; configure user.name and user.email for git commits"
+  fi
+  if ! git add -A >/dev/null 2>&1; then
+    die "git add failed"
+  fi
+  if ! git commit -m "Initial commit" >/dev/null 2>&1; then
+    die "git commit failed; configure user.name and user.email for git commits"
+  fi
 
   printf '\nDone. New project at ./%s\n\n' "$slug"
   printf 'Next steps:\n'
@@ -126,7 +146,20 @@ main() {
   printf '  pnpm setup        # install deps and env templates\n'
   printf '  pnpm setup:portless   # optional: HTTPS local URLs\n'
   printf '  pnpm dev          # https://%s\n' "$host_to"
-  printf '  pnpm dev:flow     # https://flow.localhost (Flow agent app)\n'
+}
+
+main() {
+  require_command git
+  require_command perl
+
+  local project_name="${FLOW_STARTER_PROJECT_NAME:-}"
+  if [[ -z "$project_name" ]]; then
+    printf 'Flow Starter install\n\n'
+    printf 'Project name (used for the folder and https://<name>.localhost): '
+    read -r project_name
+  fi
+
+  run_install "$project_name"
 }
 
 main "$@"

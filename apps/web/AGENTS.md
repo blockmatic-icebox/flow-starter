@@ -1,9 +1,9 @@
 # Product application (`apps/web`)
 
-Feature Intelligence. The running page is the product home. The first request slice belongs under `app/requests/`, as specified in the root feature-intelligence initiative.
+Minimal Next.js starter for a new product. No Flow Agent, GenUI demo, or demo APIs.
 
 - Colocate route code under `app/<route>/` (see ADR 0009).
-- Shared UI from `@repo/ui`. Request persistence through `@repo/db`.
+- Shared UI from `@repo/ui`; optional database via `@repo/db`.
 - Local hostname: `web.localhost` (Portless).
 
 Root `AGENTS.md` and `ARCHITECTURE.md` own monorepo-wide rules.

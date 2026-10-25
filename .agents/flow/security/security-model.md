@@ -6,22 +6,26 @@ This document is the security boundary for the starter. [ARCHITECTURE.md](../../
 
 References: [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/), [OWASP LLM / agentic guidance](https://genai.owasp.org/), and the [MCP Streamable HTTP transport](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http).
 
+The web-only template ([ADR 0014](../decisions/adr/0014-web-only-product-application.md)) does not ship compose, chat, or MCP routes. The patterns below apply when the product adds those surfaces using `@repo/genui` and host-owned registries.
+
 ## Boundaries
 
 | Boundary | Status | Where |
 | --- | --- | --- |
-| Untrusted user input | Implemented and tested | JSON schemas for compose and chat. System instructions are server-owned. |
+| Untrusted user input | Pattern in `@repo/genui`; product implements | JSON schemas for compose and chat. System instructions are server-owned. |
 | HTTP request validation | Pattern documented; product implements | Bounded JSON readers at compose/chat routes (typical caps: compose 16 KiB, chat 128 KiB). |
-| Rate limiting and cost controls | Implemented and tested | Memory in development. Upstash Redis in production, fail closed. Chat output bound to 800 tokens and 5 steps. |
-| Authentication | Selected, not implemented for product users | MCP bearer or explicit public read-only mode is implemented. Better Auth is planned. |
-| Authorization and resource ownership | Selected, not implemented | Host-owned action policy is implemented. Tenant and resource checks are the adopter's job. |
-| MCP transport and tool permissions | Implemented and tested | Origin and host checks. Development-only unauthenticated access. Four read-only MCP tools (`describe_architecture`, `describe_technologies`, `describe_capabilities`, `describe_workflow`). In-app chat adds bundled knowledge tools; they are not MCP-exposed. |
-| Model-generated text and GenUI | Implemented and tested | Compile and validate before emit. Browser revalidates NDJSON. Renderer refuses invalid envelopes. |
+| Rate limiting and cost controls | Pattern in package; product wires store | Memory in development. Upstash Redis in production, fail closed. Chat output bound to 800 tokens and 5 steps when chat is added. |
+| Authentication | Selected, not implemented for product users | Better Auth is planned. MCP bearer patterns are documented for products that expose MCP. |
+| Authorization and resource ownership | Selected, not implemented | Host-owned action policy in `@repo/genui`. Tenant and resource checks are the adopter's job. |
+| MCP transport and tool permissions | Pattern documented; historical demo removed | Origin and host checks, read-only tool allowlists — see [ADR 0010](../decisions/adr/0010-site-consultant-chat-and-mcp.md) (historical `apps/flow` implementation). |
+| Model-generated text and GenUI | Implemented and tested in `@repo/genui` | Compile and validate before emit. Browser revalidates NDJSON. Renderer refuses invalid envelopes. |
 | Host-owned actions | Implemented and tested | `ActionSecurityPolicy` on the registration. Invocations cannot clear auth or approval. |
 | Database and credential access | Partially implemented | TLS verification stays on in production. No product tables or credential logging. Tenant isolation is not implemented. |
 | Logging and observability | Adopter responsibility | Routes return generic public errors. Do not log bearer tokens, Redis tokens, or database URLs. |
 
 ## Production configuration
+
+When the product adds compose, chat, or MCP, configure:
 
 | Variable | Role |
 | --- | --- |
@@ -33,15 +37,15 @@ References: [OWASP ASVS](https://owasp.org/www-project-application-security-veri
 | `RATE_LIMIT_TRUSTED_IP_HEADER` | Required in production when rate limits are enforced. Name a header the ingress overwrites so each caller gets an isolated daily quota. Without it, compose and chat return 503 (fail closed). |
 | `DATABASE_TLS_INSECURE_LOCAL` | `1` only outside production, and only for a loopback proxy. |
 
-`NODE_ENV=development` may call MCP without a bearer token from loopback or `flow.localhost`. The request hostname is not proof of that environment.
+Development-only unauthenticated MCP on loopback was part of the removed Flow demo app; do not treat the request hostname as proof of environment in production.
 
 ## Threats
 
 | Threat | Control | Limit |
 | --- | --- | --- |
 | Prompt injection | Injection-shaped queries route to a safe Answer. Executable OpenUI is rejected. | A model can still be persuaded inside its text budget. |
-| Unauthorized tool execution | MCP registers four read-only tools. Unknown and mutating names do not run. | Host-only UI actions stay outside the MCP registry. |
-| Auth bypass | Production MCP does not treat localhost, a forged Host, or a matching Origin as authentication. | Product login is not built. |
+| Unauthorized tool execution | MCP tool allowlists when MCP is exposed. Unknown and mutating names do not run. | Host-only UI actions stay outside the MCP registry. |
+| Auth bypass | Production MCP must not treat localhost, a forged Host, or a matching Origin as authentication. | Product login is not built in the starter. |
 | DNS rebinding | A present Origin must be allowlisted or the response is 403. | Requests without Origin are accepted only after host and auth checks, for native clients. |
 | Untrusted forwarded headers | Quota ignores `x-forwarded-for` unless the adopter names a trusted header. | Production without a trusted header fails closed instead of sharing one bucket. |
 | Cross-tenant data access | No product tenant model. | Adopters must scope queries by tenant before storing customer data. |
@@ -52,4 +56,4 @@ References: [OWASP ASVS](https://owasp.org/www-project-application-security-veri
 
 ## Not in this baseline
 
-Better Auth, Eve, MCP Apps, a `/dev` workspace, and a production approval workflow are selected directions. They are not implemented here. The GenUI demo and consultant remain unauthenticated examples.
+Better Auth, Eve, MCP Apps, a `/dev` workspace, and a production approval workflow are selected directions. They are not implemented in the starter homepage. Add routes and policies in `apps/web` when the product requires them.

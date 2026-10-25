@@ -37,7 +37,7 @@ import type {
   RunManifest,
 } from "./types.ts";
 
-export const detectEvalHost = (): EvalHost => {
+const detectEvalHost = (): EvalHost => {
   if (process.env.CLAUDE_CODE === "1" || process.env.CLAUDECODE === "1")
     return "claude";
   if (process.env.CURSOR_TRACE_ID || process.env.CURSOR_SESSION_ID)
@@ -673,29 +673,6 @@ export const hostSessionFinalize = ({
   writeRunSummary({ grades, manifest, runDir });
 
   return { grades, manifest, ok: true as const };
-};
-
-export const hostSessionRecordModel = ({
-  modelId,
-  runId,
-}: {
-  modelId: string;
-  runId: string;
-}) => {
-  const state = loadHostSessionState({ runId });
-  if (!state)
-    return { ok: false as const, reason: "host session state missing" };
-  state.modelId = modelId;
-  saveState(state);
-  const manifestPath = path.join(devEvalsRoot, runId, "manifest.json");
-  if (existsSync(manifestPath)) {
-    const manifest = JSON.parse(
-      readFileSync(manifestPath, "utf-8")
-    ) as RunManifest;
-    manifest.modelId = modelId;
-    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
-  }
-  return { ok: true as const };
 };
 
 export const scenarioWorkerBrief = ({

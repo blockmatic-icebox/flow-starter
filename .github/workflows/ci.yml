@@ -41,7 +41,7 @@ jobs:
       - run: pnpm check-types
       - run: pnpm test
       - run: pnpm --filter @repo/db db:check
-      - run: pnpm test:scripts
+      - run: pnpm --dir .agents test
       - run: pnpm eval:genui:offline
 
       - name: Install Playwright Chromium

@@ -1,72 +1,84 @@
-# Feature Intelligence
+# Design template
 
-Functional requirements live in [PRODUCT.md](PRODUCT.md). Technical boundaries live in [ARCHITECTURE.md](ARCHITECTURE.md). The first slice is [the feature-intelligence initiative](docs/initiatives/feature-intelligence.md).
+> Replace this file with the product's approved visual and interaction contract. Functional requirements belong in [PRODUCT.md](PRODUCT.md). Technical architecture belongs in [ARCHITECTURE.md](ARCHITECTURE.md). Follow the [Flow workflow](.agents/flow/flow.md).
 
 ## Experience vision
 
-A product manager can tell, on one request, how much support it has and what the model thinks it is worth strategically, then record their own decision. The screen stays understandable when the model produces nothing.
+_Describe how the product should feel to its users and what makes the experience useful, clear, and distinctive._
 
 ## Experience principles
 
-- Popularity and strategic value are separate facts.
-- The human decision is the priority that gets stored.
-- A missing recommendation is a visible state.
-- Use the inherited `@repo/ui` components and tokens.
+_Define a small set of decisions that should guide interaction, layout, information hierarchy, and accessibility._
 
 ## Users and contexts
 
-Primary context: a PM at a desk, desktop width, reviewing a short list of requests during triage. Keyboard access to submit, support, confirm, and override. Mobile can stack the same fields. The first slice targets WCAG 2.2 AA for those controls.
+_Identify the primary user contexts, devices, accessibility needs, and relevant constraints._
 
 ## Information architecture
 
-- `/` — product home.
-- `/requests` — list of requests with support count and recorded decision when one exists.
-- `/requests/new` — title and description.
-- `/requests/[id]` — request, support action, popularity, strategic recommendation, confirm, and override.
+_Describe the main destinations, navigation model, content hierarchy, and primary user journeys._
 
-Share the request id in the path. Filter or search state can use the URL when the list needs it.
+_Do not invent routes before the product's navigation requirements are established._
 
 ## Core experiences
 
 | Experience | User goal | Expected interaction | Important states |
 | --- | --- | --- | --- |
-| Submit | Capture a request | Form with title and description | Validation error, saved |
-| Discover | Find a request | List, then the detail path | Empty list, match, missing id |
-| Support | Show demand | One support action | Count updates |
-| Decide | Record a priority | Read both signals, confirm or override | Recommendation present, recommendation empty, saved decision |
+| _To be defined_ | _User outcome_ | _Primary interaction_ | _Loading, empty, error, success_ |
 
 ## Visual direction
 
-Use `@repo/ui` as the visual system. Hierarchy is the request title, then the two signals, then the human action. Add product components only where the shared set has no equivalent.
+_Describe the visual language, design references, brand personality, and hierarchy._
+
+Use the inherited `@repo/ui` design system as the baseline. Extend it deliberately rather than introducing competing component conventions.
 
 ## Brand and design tokens
 
-Map color, type, spacing, and radius to the shared tokens. The recommendation and the human decision need distinct labels so a count never reads as the priority.
+_Document approved typography, color, spacing, radius, and component treatments._
+
+Map visual decisions to the established shared design tokens and Tailwind conventions.
+
+Do not introduce arbitrary hardcoded values across application components.
 
 ## Layout and responsiveness
 
-Desktop: list and detail keep a single reading column with the two signals side by side when width allows. Narrow widths stack popularity, recommendation, and the decision actions in that order.
+_Describe desktop, mobile, and intermediate viewport behavior for the approved product experiences._
+
+Prefer responsive layouts that preserve hierarchy and functionality.
 
 ## Interaction and state
 
-Submit stays disabled until title and description are present, and the error names the missing field. Support updates the count on the detail view. Confirm stores the recommendation as the decision. Override stores the PM's choice and shows it as the recorded decision after refresh.
+_Define meaningful interaction patterns, feedback, navigation state, forms, keyboard behavior, and error handling._
+
+Use the established React and Next.js architecture. Use URL-addressable state when sharing and navigation benefit from it.
 
 ## Agentic and generative experiences
 
-The model recommends. It does not write the stored priority. The PM sees the recommendation text, the strategic judgment, and any related or conflicting requests. Confirm and override are explicit buttons.
+_Complete this section only if the product actually requires conversational agents, agent actions, or generative interfaces._
 
-Empty, loading, and failure states:
+When applicable, define:
 
-- Loading: the request is visible and the recommendation area says it is working.
-- Empty recommendation: the model key is missing, the call failed, or the request text attempted to steer the outcome. The copy says no recommendation was produced.
-- Saved decision: the human choice remains after refresh.
+- Human and agent entry points.
+- What the user can inspect, request, and approve.
+- The relationship between deterministic UI and generative presentation.
+- Authorized actions and confirmation boundaries.
+- Empty, loading, streaming, failure, and recovery states.
+- How results remain understandable and trustworthy.
 
-Request text is quoted to the model as data.
+Do not assume every adopted product requires a chat sidebar or GenUI interface.
 
 ## Accessibility
 
-Label the form fields. Name the support, confirm, and override buttons. Keep focus on the form when validation fails. Announce the recommendation result and the saved decision. Honor reduced motion from the shared theme.
+Target WCAG 2.2 AA where applicable.
+
+Define keyboard interaction, focus treatment, contrast, reduced motion, announcements, and other product-specific accessibility requirements.
 
 ## Verification
 
-Browser check for the first slice: submit a valid request, reject a missing title, find the request, add support, see a recommendation or the empty state, confirm or override, and reload the detail page onto the same decision. Cover the retired `/features` URLs as absent.
+_Describe the important visual and interaction acceptance checks._
+
+Verify relevant changes in a real browser using the repository's established tooling.
+
+## Open design decisions
+
+_List only unresolved choices that materially affect the experience._
