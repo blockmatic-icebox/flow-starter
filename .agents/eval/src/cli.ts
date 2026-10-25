@@ -20,7 +20,10 @@ import {
   prepareHostRun,
   scenarioWorkerBrief,
 } from "./host-session.ts";
-import { cleanupOrphanedDatabasesForRun } from "./infrastructure/database.ts";
+import {
+  cleanupOrphanedDatabasesForRun,
+  reconcileDatabaseRegistry,
+} from "./infrastructure/database.ts";
 import { runBatch } from "./orchestrate.ts";
 import { baselineRunId, runEvalDir } from "./paths.ts";
 import { freezePilot } from "./pilot-freeze.ts";
@@ -909,9 +912,25 @@ const dispatchCli = async (command: string, flags: Record<string, unknown>) => {
         console.error("recover-databases requires --run <runId>");
         process.exit(3);
       }
-      const result = await cleanupOrphanedDatabasesForRun({
-        runId: String(flags.run),
-      });
+      const runId = String(flags.run);
+      if (flags.reconcile) {
+        const state = loadHostSessionState({ runId });
+        const reconcile = await reconcileDatabaseRegistry({ runId });
+        console.log(
+          JSON.stringify(
+            {
+              hostJobs: state?.jobs?.length ?? 0,
+              orphanDatabaseNames: reconcile.orphanDatabaseNames,
+              reconciled: reconcile.reconciled,
+              status: "reconcile-only",
+            },
+            null,
+            2
+          )
+        );
+        return;
+      }
+      const result = await cleanupOrphanedDatabasesForRun({ runId });
       console.log(JSON.stringify(result, null, 2));
       if (result.results.some((r) => r.cleanup === "failed")) process.exit(1);
     },

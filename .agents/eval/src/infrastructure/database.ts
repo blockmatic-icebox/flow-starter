@@ -104,6 +104,27 @@ export const dropOwnedDatabase = async ({
   markDatabaseDropped({ databaseName, runId });
 };
 
+const emergencyDropUnregisteredDatabase = async ({
+  adminUrl,
+  databaseName,
+}: {
+  adminUrl: string;
+  databaseName: string;
+}) => {
+  if (!isOwnedEvalDatabaseName(databaseName)) return;
+  const sql = connectPostgres({ url: adminUrl });
+  try {
+    await sql`
+      select pg_terminate_backend(pid)
+      from pg_stat_activity
+      where datname = ${databaseName} and pid <> pg_backend_pid()
+    `.catch(() => undefined);
+    await sql.unsafe(`drop database if exists ${quoteIdent(databaseName)}`);
+  } finally {
+    await sql.end({ timeout: 10 });
+  }
+};
+
 export const provisionSubjectDatabase = async ({
   adminUrl = defaultAdminDatabaseUrl(),
   identity,
@@ -120,11 +141,19 @@ export const provisionSubjectDatabase = async ({
     adminUrl,
     databaseName: identity.databaseName,
   });
-  registerSubjectDatabase({
-    databaseName: identity.databaseName,
-    runId,
-    subjectKey: identity.subjectKey,
-  });
+  try {
+    await registerSubjectDatabase({
+      databaseName: identity.databaseName,
+      runId,
+      subjectKey: identity.subjectKey,
+    });
+  } catch (error) {
+    await emergencyDropUnregisteredDatabase({
+      adminUrl,
+      databaseName: identity.databaseName,
+    });
+    throw error;
+  }
 
   const databaseUrl = buildSubjectDatabaseUrl({
     databaseName: identity.databaseName,
@@ -233,25 +262,38 @@ export const reconcileDatabaseRegistry = async ({
   runId: string;
 }) => {
   const active = activeDatabasesForRun({ runId });
-  if (active.length === 0) return { reconciled: 0 };
   const sql = connectPostgres({ url: adminUrl });
   let reconciled = 0;
+  const orphanDatabaseNames: string[] = [];
   try {
-    await Promise.all(
-      active.map(async (entry) => {
-        const rows = await sql`
-          select 1 from pg_database where datname = ${entry.databaseName}
-        `;
-        if (rows.length === 0) {
-          markDatabaseDropped({ databaseName: entry.databaseName, runId });
-          reconciled += 1;
-        }
-      })
+    if (active.length > 0) {
+      await Promise.all(
+        active.map(async (entry) => {
+          const rows = await sql`
+            select 1 from pg_database where datname = ${entry.databaseName}
+          `;
+          if (rows.length === 0) {
+            markDatabaseDropped({ databaseName: entry.databaseName, runId });
+            reconciled += 1;
+          }
+        })
+      );
+    }
+    const registeredActive = new Set(
+      activeDatabasesForRun({ runId }).map((e) => e.databaseName)
     );
+    const ownedRows = await sql`
+      select datname from pg_database where datname like 'flow_eval_%'
+    `;
+    for (const row of ownedRows) {
+      const name = String(row.datname ?? "");
+      if (!isOwnedEvalDatabaseName(name)) continue;
+      if (!registeredActive.has(name)) orphanDatabaseNames.push(name);
+    }
   } finally {
     await sql.end({ timeout: 10 });
   }
-  return { reconciled };
+  return { orphanDatabaseNames, reconciled };
 };
 
 /** @deprecated use reconcileDatabaseRegistry */
@@ -279,6 +321,64 @@ export const cleanupOrphanedDatabasesForRun = async ({
       };
     })
   );
+  return {
+    dropped: results.filter((r) => r.cleanup === "passed").length,
+    results,
+    skipped: results.filter((r) => r.cleanup === "skipped").length,
+  };
+};
+
+export type HostJobDatabaseRef = {
+  databaseName?: string;
+  status: string;
+};
+
+const terminalStatuses = new Set([
+  "complete",
+  "failed",
+  "blocked",
+  "timed-out",
+  "cancelled",
+]);
+
+export const cleanupTerminalJobDatabasesForRun = async ({
+  adminUrl = defaultAdminDatabaseUrl(),
+  jobs,
+  runId,
+}: {
+  adminUrl?: string;
+  jobs: HostJobDatabaseRef[];
+  runId: string;
+}) => {
+  const retain = new Set(
+    jobs
+      .filter((j) => j.databaseName && !terminalStatuses.has(j.status))
+      .map((j) => j.databaseName as string)
+  );
+  const terminalNames = new Set(
+    jobs
+      .filter((j) => j.databaseName && terminalStatuses.has(j.status))
+      .map((j) => j.databaseName as string)
+  );
+  const active = activeDatabasesForRun({ runId });
+  const results = [];
+  for (const entry of active) {
+    if (retain.has(entry.databaseName)) continue;
+    const referenced = jobs.some((j) => j.databaseName === entry.databaseName);
+    if (!referenced || terminalNames.has(entry.databaseName)) {
+      // eslint-disable-next-line no-await-in-loop -- sequential drops avoid Neon connection storms
+      const outcome = await cleanupSubjectDatabase({
+        adminUrl,
+        databaseName: entry.databaseName,
+        runId,
+      });
+      results.push({
+        cleanup: outcome.cleanup,
+        databaseName: entry.databaseName,
+        reason: "reason" in outcome ? outcome.reason : undefined,
+      });
+    }
+  }
   return {
     dropped: results.filter((r) => r.cleanup === "passed").length,
     results,

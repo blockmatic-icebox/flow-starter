@@ -93,12 +93,14 @@ ${criterionLines.join("\n")}
 };
 
 export const writeRunSummary = ({
+  databaseCleanup,
   runDir,
   manifest,
   grades,
   hostJobs,
   partial = false,
 }: {
+  databaseCleanup?: RunManifest["databaseCleanup"];
   runDir: string;
   manifest: RunManifest;
   grades: GradeResult[];
@@ -161,6 +163,20 @@ export const writeRunSummary = ({
       `Timed out: ${timedOut}`,
       `Partial finalization: ${partial ? "yes" : "no"}`,
       `Official comparative eligibility: blocked unless isolation and runner capture are demonstrated (see ADR 0015).`
+    );
+  }
+
+  if (databaseCleanup) {
+    lines.push(
+      "",
+      "## Database cleanup",
+      "",
+      `Attempted: ${databaseCleanup.attempted}`,
+      `Passed: ${databaseCleanup.passed}`,
+      `Failed: ${databaseCleanup.failed}`,
+      `Skipped: ${databaseCleanup.skipped}`,
+      `Retained for resume: ${databaseCleanup.retainedForResume}`,
+      `Run cleanup complete: ${databaseCleanup.complete ? "yes" : "no"}`
     );
   }
 

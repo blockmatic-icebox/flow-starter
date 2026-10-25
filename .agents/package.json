@@ -19,6 +19,7 @@
     "flow-eval:check": "pnpm eval:check-types && pnpm eval:test && pnpm eval preserve",
     "eval:experiment": "pnpm eval experiment",
     "eval:self-improve": "pnpm eval self-improve",
+    "eval:integration-gate": "node eval/scripts/integration-gate.mjs",
     "eval:readiness": "pnpm eval readiness",
     "eval:stress": "pnpm eval stress",
     "eval:mutations": "pnpm eval mutations",

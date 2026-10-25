@@ -22,6 +22,8 @@ export type CaseEvidence = {
   evaluatedSha: string;
   environment: string;
   executionMethod: string;
+  executionCwd?: string;
+  runnerOwned?: boolean;
   expected: string;
   actual: string;
   exitCode: number | null;

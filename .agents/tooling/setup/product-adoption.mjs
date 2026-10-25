@@ -255,7 +255,8 @@ const parseArgs = (argv) => {
     } else if (token === "--project-name") {
       i += 1;
       args.projectName = argv[i];
-    } else if (token === "apply" || token === "slugify") args.command = token;
+    } else if (token === "apply" || token === "slugify" || token === "validate")
+      args.command = token;
   }
   return args;
 };
@@ -266,9 +267,25 @@ const main = () => {
     process.stdout.write(`${slugify(args.projectName ?? "")}\n`);
     return;
   }
+  if (args.command === "validate") {
+    if (!args.projectName) {
+      console.error(
+        "usage: product-adoption.mjs validate --project-name <name>"
+      );
+      process.exit(1);
+    }
+    try {
+      const { slug, trimmed } = validateProjectName(args.projectName);
+      process.stdout.write(`${JSON.stringify({ slug, trimmed })}\n`);
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
+    return;
+  }
   if (args.command !== "apply" || !args.root || !args.projectName) {
     console.error(
-      "usage: product-adoption.mjs apply --root <path> --project-name <name>"
+      "usage: product-adoption.mjs apply --root <path> --project-name <name> | validate --project-name <name>"
     );
     process.exit(1);
   }

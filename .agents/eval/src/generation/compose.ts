@@ -68,6 +68,7 @@ export const composeScenario = ({
     codeExecution: template.codeExecution,
     id,
     openingPrompt: publicBrief,
+    ...(template.acceptanceFamily ? { persistence: "required" as const } : {}),
     relevantStages: template.relevantStages,
     requiresBuildAuth: template.requiresBuildAuth,
     title: `${template.titleBase} (${template.domain})`,

@@ -13,8 +13,8 @@ import {
 } from "./host-protocol.ts";
 import type { DatabaseLifecycleStatus } from "./infrastructure/database.ts";
 import {
-  cleanupOrphanedDatabasesForRun,
   cleanupSubjectDatabase,
+  cleanupTerminalJobDatabasesForRun,
   prepareSubjectDatabase,
 } from "./infrastructure/database.ts";
 import { captureAgentDiff } from "./isolate.ts";
@@ -58,6 +58,7 @@ import type {
   PreparedSourceIdentity,
   RunManifest,
   TrustedEvaluatorRevision,
+  DatabaseCleanupSummary,
 } from "./types.ts";
 
 export const detectEvalHost = (): EvalHost => {
@@ -114,6 +115,9 @@ const terminalJobStatuses = new Set<HostJobStatus>([
   "timed-out",
   "cancelled",
 ]);
+
+export const jobsEligibleForDatabaseCleanup = (jobs: HostJob[]) =>
+  jobs.filter((job) => job.databaseName && terminalJobStatuses.has(job.status));
 
 const normalizeHostJob = (job: HostJob): HostJob => ({
   ...job,
@@ -278,6 +282,7 @@ const buildHostManifest = ({
   runId,
   scenarioIds,
   worktreePaths,
+  databaseCleanup,
 }: {
   arm: EvalArm;
   grades: GradeResult[];
@@ -285,6 +290,7 @@ const buildHostManifest = ({
   isolationAssessment?: ReturnType<typeof assessIsolationFromTrial>;
   modelId?: string;
   runnerCaptureComplete?: boolean;
+  databaseCleanup?: DatabaseCleanupSummary;
   state: HostSessionState;
   repetition: number;
   runId: string;
@@ -314,6 +320,7 @@ const buildHostManifest = ({
     agentCliVersion: agentCliVersion(),
     arm,
     completeness: allComplete ? "complete" : "partial",
+    databaseCleanup,
     controlResiduals:
       arm === "control" && controlCheck.blocking.length
         ? controlCheck.blocking
@@ -348,6 +355,32 @@ const buildHostManifest = ({
   };
 };
 
+const summarizeDatabaseCleanup = ({
+  allJobs,
+  outcomes,
+}: {
+  allJobs: HostJob[];
+  outcomes: { cleanup: "failed" | "passed" | "skipped" }[];
+}): DatabaseCleanupSummary => {
+  const eligible = jobsEligibleForDatabaseCleanup(allJobs);
+  const passed = outcomes.filter((o) => o.cleanup === "passed").length;
+  const failed = outcomes.filter((o) => o.cleanup === "failed").length;
+  const skipped = outcomes.filter((o) => o.cleanup === "skipped").length;
+  const retainedForResume = allJobs.filter(
+    (job) => job.databaseName && !terminalJobStatuses.has(job.status)
+  ).length;
+  const attempted = eligible.length;
+  return {
+    attempted,
+    complete:
+      failed === 0 && retainedForResume === 0 && passed + skipped === attempted,
+    failed,
+    passed,
+    retainedForResume,
+    skipped,
+  };
+};
+
 const cleanupJobsDatabases = async ({
   jobs,
   runId,
@@ -355,11 +388,11 @@ const cleanupJobsDatabases = async ({
   jobs: HostJob[];
   runId: string;
 }) => {
-  await Promise.all(
-    jobs.map(async (job) => {
-      if (!job.databaseName) return;
+  const eligible = jobsEligibleForDatabaseCleanup(jobs);
+  const outcomes = await Promise.all(
+    eligible.map(async (job) => {
       const result = await cleanupSubjectDatabase({
-        databaseName: job.databaseName,
+        databaseName: job.databaseName as string,
         runId,
       });
       if (job.databaseLifecycle)
@@ -369,10 +402,13 @@ const cleanupJobsDatabases = async ({
             : result.cleanup === "skipped"
               ? "skipped"
               : "failed";
+      return { cleanup: result.cleanup };
     })
   );
+  return summarizeDatabaseCleanup({ allJobs: jobs, outcomes });
 };
 
+/* eslint-disable complexity -- sequential per-job host preparation */
 export const prepareHostRun = async ({
   arm,
   copySkills = true,
@@ -393,7 +429,13 @@ export const prepareHostRun = async ({
   scenarioIds: string[];
 }) => {
   const runId = runIdInput ?? `run-${Date.now()}`;
-  if (runIdInput) await cleanupOrphanedDatabasesForRun({ runId });
+  if (runIdInput) {
+    const existing = loadHostSessionState({ runId });
+    await cleanupTerminalJobDatabasesForRun({
+      jobs: existing?.jobs ?? [],
+      runId,
+    });
+  }
   const flowSha = currentFlowSha();
   const commonSource = recordCommonSource();
   const trustedEvaluatorRevision: TrustedEvaluatorRevision = {
@@ -447,7 +489,14 @@ export const prepareHostRun = async ({
       worktreePath = prepared.worktreePath;
       trialRunnerMeta = prepared.trialRunnerMeta as Record<string, unknown>;
       prep = prepared.prep;
-      if (requiresDatabase({ command: "host-prepare", scenarioId })) {
+      const generated = generatedById.get(scenarioId);
+      if (
+        requiresDatabase({
+          command: "host-prepare",
+          scenarioCard: generated?.publicCard,
+          scenarioId: generated ? undefined : scenarioId,
+        })
+      ) {
         // eslint-disable-next-line no-await-in-loop -- sequential database provisioning per host job
         const dbRecord = await prepareSubjectDatabase({
           identity: prepared.identity,
@@ -571,6 +620,7 @@ export const prepareHostRun = async ({
 
   return { host, jobs, ok: true as const, runId };
 };
+/* eslint-enable complexity */
 
 export const hostSessionNext = ({
   repetition,
@@ -1040,11 +1090,15 @@ export const hostSessionFinalize = async ({
   }
 
   if (modelId) state.modelId = modelId;
-  await cleanupJobsDatabases({ jobs: state.jobs, runId });
+  const databaseCleanup = await cleanupJobsDatabases({
+    jobs: state.jobs,
+    runId,
+  });
   saveState(state);
 
   const manifest = buildHostManifest({
     arm: state.arm,
+    databaseCleanup,
     grades,
     host: state.host,
     isolationAssessment,
@@ -1062,6 +1116,7 @@ export const hostSessionFinalize = async ({
     `${JSON.stringify(manifest, null, 2)}\n`
   );
   writeRunSummary({
+    databaseCleanup,
     grades,
     hostJobs: state.jobs,
     manifest,
@@ -1070,6 +1125,7 @@ export const hostSessionFinalize = async ({
   });
 
   return {
+    databaseCleanup,
     grades,
     incompleteJobs: incomplete.map(
       (j) => `${j.scenarioId}/r${j.repetition}:${j.status}`

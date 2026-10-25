@@ -1,17 +1,20 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import { repoRoot } from "../paths.ts";
 import { runMutationIntegrity, runOfflineBenchmark } from "./mutations.ts";
 import { evaluateReadiness } from "./readiness.ts";
 
 describe("product readiness", () => {
-  it("evaluates engineering evidence from allowlisted commands", () => {
+  it("factory unit case runs from runner when explicitly requested", () => {
     const readiness = evaluateReadiness({
       caseIds: ["flow-eval-unit"],
       runId: "readiness-test",
     });
     assert.equal(readiness.engineering, "PASS");
     assert.ok(readiness.evidence.length >= 1);
+    assert.equal(readiness.evidence[0]?.runnerOwned, true);
+    assert.equal(readiness.evidence[0]?.executionCwd, repoRoot);
   });
 });
 

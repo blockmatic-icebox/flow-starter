@@ -8,6 +8,7 @@ import {
   familyRequirements,
   runFamilyCase,
 } from "./families/registry.ts";
+import type { AllowlistedCase } from "./registry.ts";
 import { allowlistedCases, starterRequirements } from "./registry.ts";
 import type {
   DimensionVerdict,
@@ -59,14 +60,16 @@ const summarizeEvidence = ({
 };
 
 const dimensionFromKinds = ({
+  caseCatalog,
   evidence,
   kinds,
 }: {
+  caseCatalog: AllowlistedCase[];
   evidence: ReturnType<typeof runAllowlistedCase>[];
   kinds: Set<string>;
 }) => {
   const rows = evidence.filter((e) =>
-    allowlistedCases().some((c) => c.caseId === e.caseId && kinds.has(c.kind))
+    caseCatalog.some((c) => c.caseId === e.caseId && kinds.has(c.kind))
   );
   if (rows.length === 0) return "INCONCLUSIVE" as DimensionVerdict;
   if (rows.some((r) => r.status === "failed")) return "FAIL";
@@ -173,9 +176,10 @@ export const evaluateReadiness = ({
     });
 
   const requirements = starterRequirements();
-  const selected = allowlistedCases().filter((c) =>
-    caseIds?.length ? caseIds.includes(c.caseId) : true
-  );
+  const selected = allowlistedCases().filter((c) => {
+    if (caseIds?.length) return caseIds.includes(c.caseId);
+    return c.scope === "product";
+  });
   const evidence = selected.map((caseDef) =>
     runAllowlistedCase({
       caseDef,
@@ -187,6 +191,7 @@ export const evaluateReadiness = ({
 
   const counts = summarizeEvidence({ evidence, requirements });
   const engineering = dimensionFromKinds({
+    caseCatalog: selected,
     evidence,
     kinds: new Set(["unit", "integration", "security"]),
   });
@@ -197,6 +202,7 @@ export const evaluateReadiness = ({
         ? ("INCONCLUSIVE" as DimensionVerdict)
         : ("PASS" as DimensionVerdict);
   const usability = dimensionFromKinds({
+    caseCatalog: selected,
     evidence,
     kinds: new Set(["browser"]),
   });

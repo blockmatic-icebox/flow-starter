@@ -17,8 +17,8 @@ describe("database-registry", () => {
     if (existsSync(dir)) rmSync(dir, { force: true, recursive: true });
   });
 
-  it("registers and marks dropped", () => {
-    registerSubjectDatabase({
+  it("registers and marks dropped", async () => {
+    await registerSubjectDatabase({
       databaseName: "flow_eval_a1b2c3d4",
       runId,
       subjectKey: "flow:S01:1",

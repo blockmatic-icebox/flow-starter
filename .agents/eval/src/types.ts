@@ -121,7 +121,17 @@ export interface RunManifest {
   hypothesis?: string;
   controlResiduals?: string[];
   acceptedControlResiduals?: string[];
+  databaseCleanup?: DatabaseCleanupSummary;
 }
+
+export type DatabaseCleanupSummary = {
+  attempted: number;
+  complete: boolean;
+  failed: number;
+  passed: number;
+  retainedForResume: number;
+  skipped: number;
+};
 
 export type EvalEventKind =
   | "user"

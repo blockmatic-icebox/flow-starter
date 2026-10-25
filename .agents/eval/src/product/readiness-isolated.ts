@@ -5,6 +5,7 @@ import {
 } from "../infrastructure/database.ts";
 import { prepareInstalledSubject } from "./prepare-installed-product.ts";
 import { evaluateReadiness } from "./readiness.ts";
+import { productReleaseCaseIds } from "./registry.ts";
 
 export const evaluateReadinessWithDatabase = async ({
   caseIds,
@@ -33,11 +34,7 @@ export const evaluateReadinessWithDatabase = async ({
 
   try {
     return evaluateReadiness({
-      caseIds: caseIds ?? [
-        "db-starter-persist",
-        "web-starter-unit",
-        "web-starter-browser",
-      ],
+      caseIds: caseIds ?? productReleaseCaseIds(),
       runId,
       worktreePath: prepared.worktreePath,
     });

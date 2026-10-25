@@ -34,8 +34,14 @@ const copyAdoptionFixture = (root) => {
 
 test("slugify and portless reserved names", () => {
   assert.equal(slugify("Acme Widgets"), "acme-widgets");
+  assert.equal(slugify("  Foo--Bar!!  "), "foo--bar");
   assert.equal(isReservedPortlessName("run"), true);
+  assert.equal(isReservedPortlessName("proxy"), true);
   assert.equal(isReservedPortlessName("eval-s13"), false);
+});
+
+test("validateProjectName rejects reserved portless slugs", () => {
+  assert.throws(() => validateProjectName("run"), /reserved by portless/u);
 });
 
 test("validateProjectName rejects control characters", () => {
