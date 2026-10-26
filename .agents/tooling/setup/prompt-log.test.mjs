@@ -39,17 +39,27 @@ const appendPromptEntry = ({ filePath, prompt, summary, timestamp }) => {
   writeFileSync(filePath, `${prior}${block}`, "utf-8");
 };
 
-test("factory prompt log is never tracked in git", () => {
+test("factory prompt log path is never tracked in git", () => {
   const { stdout: tracked } = runGit({
-    args: ["ls-files", "--", promptLogRel, "prompts.txt"],
+    args: ["ls-files", "--", promptLogRel],
     cwd: repoRoot,
   });
   assert.equal(tracked.trim(), "");
   const gitignore = readFileSync(join(repoRoot, ".gitignore"), "utf-8");
   assert.match(gitignore, /\.agents\/flow\/prompts\.txt/u);
-  assert.ok(
-    gitignore.split("\n").some((line) => line.trim() === "prompts.txt")
-  );
+});
+
+test("root prompts.txt may be tracked when employer brief requires it", () => {
+  const { stdout: trackedRoot } = runGit({
+    args: ["ls-files", "--", "prompts.txt"],
+    cwd: repoRoot,
+  });
+  const gitignore = readFileSync(join(repoRoot, ".gitignore"), "utf-8");
+  const tracksRoot = trackedRoot.trim() === "prompts.txt";
+  const ignoresRoot = gitignore
+    .split("\n")
+    .some((line) => line.trim() === "prompts.txt");
+  assert.ok(tracksRoot || ignoresRoot);
 });
 
 test("prompt log append preserves prior entries and redacts secrets", () => {

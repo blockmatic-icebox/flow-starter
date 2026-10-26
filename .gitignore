@@ -37,7 +37,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Flow / assessment local prompt logs (never commit)
+# Flow / assessment local prompt logs (never commit .agents/flow/prompts.txt; root prompts.txt gitignored by default)
 .agents/flow/prompts.txt
 .agents/flow/local/
 prompts.txt
@@ -74,6 +74,7 @@ __dev
 !.cursor/agents/**
 !.cursor/commands/
 !.cursor/commands/**
+!.cursor/hooks.json
 
 # Neon Local metadata
 .neon_local/

@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [
+      {
+        "command": "node .agents/tooling/prompt-log/append-on-stop.mjs submit"
+      }
+    ],
+    "stop": [
+      {
+        "command": "node .agents/tooling/prompt-log/append-on-stop.mjs stop"
+      }
+    ]
+  }
+}

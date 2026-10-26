@@ -12,6 +12,7 @@ Coordinator reconciliation and worker returns: [delegation.md](delegation.md). *
 | --- | --- |
 | Task report (this page) | User-visible closeout after every repository task |
 | `.agents/flow/prompts.txt` | Optional **local** prompt log (gitignored; never commit) |
+| `prompts.txt` (repo root) | Prompt log default path; gitignored unless a brief requires tracking on a product branch |
 | `.agents/flow/records/*.md` | Initiative retrospectives and evidence index |
 | `PRODUCT.md` / `DESIGN.md` / `ARCHITECTURE.md` | Current product contracts |
 | ADRs / PDRs | Consequential decisions (product and Factory namespaces) |
@@ -38,7 +39,7 @@ Display in the main Cursor conversation after every repository task (Explore, Sp
 
 **Core principle:** concise, evidence-based, truthful. Never invent verification, commits, or documentation changes.
 
-**Human-readable closeout:** **Outcome**, **Next**, and delegation summaries describe work in plain language. Gate ids (**G***), task ids (**T-*-*), and dependency formulas belong in `docs/tasks/` and similar artifacts—not as the primary explanation in chat. Link to the tasks file when ids help traceability; see [human-readable-surfaces.md § Chat prose](human-readable-surfaces.md#chat-prose-coordinator).
+**Human-readable closeout:** **Outcome**, **Next**, and delegation summaries describe work in plain language. Gate ids (**G***), task ids (**T-_-_), and dependency formulas belong in `docs/tasks/` and similar artifacts—not as the primary explanation in chat. Link to the tasks file when ids help traceability; see [human-readable-surfaces.md § Chat prose](human-readable-surfaces.md#chat-prose-coordinator).
 
 ### Required sections
 
@@ -110,9 +111,9 @@ Compared three search approaches and recommended URL-based state. No implementat
 
 ## Prompt log entry (coordinator only)
 
-Prompt logs are **local-only** (listed in `.gitignore`). Do **not** commit `.agents/flow/prompts.txt` or root `prompts.txt`.
+Do **not** commit `.agents/flow/prompts.txt`. Root `prompts.txt` is gitignored by default; employer briefs may require a **tracked** log on a product branch (see [prompt-log.md](prompt-log.md)).
 
-Preference, opt-in on first post-install task, and paths: [prompt-log.md](prompt-log.md).
+Preference, hooks, opt-in on first post-install task, and paths: [prompt-log.md](prompt-log.md).
 
 When logging is **enabled** in `AGENTS.md` (or required by an employer brief), the coordinator appends **one** block per handled request. Otherwise use the Task report only. Workers and subagents must never append.
 

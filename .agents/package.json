@@ -11,7 +11,7 @@
     "architecture:test": "node --test tooling/checks/check-react-architecture.test.mjs",
     "ownership:check": "node tooling/checks/check-repository-ownership.mjs",
     "ownership:test": "node --test tooling/checks/check-repository-ownership.test.mjs",
-    "test:tooling": "node --test tooling/worktrees/*.test.mjs ../tooling/security/*.test.mjs ../tooling/checks/check-staged.test.mjs tooling/checks/conventional-commit.test.mjs tooling/setup/prompt-log.test.mjs && node --test --test-concurrency=1 tooling/setup/product-adoption.test.mjs tooling/setup/clean-adoption.test.mjs && node tooling/setup/run-install-tests-if-present.mjs",
+    "test:tooling": "node --test tooling/worktrees/*.test.mjs ../tooling/security/*.test.mjs ../tooling/checks/check-staged.test.mjs tooling/checks/conventional-commit.test.mjs tooling/setup/prompt-log.test.mjs tooling/prompt-log/*.test.mjs && node --test --test-concurrency=1 tooling/setup/product-adoption.test.mjs tooling/setup/clean-adoption.test.mjs && node tooling/setup/run-install-tests-if-present.mjs",
     "worktrees": "node tooling/worktrees/worktrees.mjs",
     "eval": "node --import tsx eval/src/cli.ts",
     "eval:check-types": "node ./node_modules/tsc-ts/bin/tsc-ts.js --noEmit -p eval/tsconfig.json",

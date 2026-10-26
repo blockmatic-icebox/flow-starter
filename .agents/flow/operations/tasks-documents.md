@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Keep **execution checklists** separate from **requirements** and **initiative scope** so agents and humans can tick progress without rewriting specs (Addy Osmani *specs + tasks* pattern).
+Keep **execution checklists** separate from **requirements** and **initiative scope** so agents and humans can tick progress without rewriting specs (Addy Osmani _specs + tasks_ pattern).
 
 | Document | Owns | Does not own |
 | --- | --- | --- |
