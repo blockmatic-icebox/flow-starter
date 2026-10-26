@@ -46,7 +46,7 @@
     "db:ping": "pnpm --filter @repo/db exec node --import tsx scripts/db-ping.mjs",
     "deepsec": "pnpm --dir=.deepsec exec deepsec",
     "mcp:next": "next-devtools-mcp",
-    "agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-localhost:3000}"
+    "agentic:check": "sh -c 'if [ -z \"${AGENTIC_CHECK_URL:-}\" ]; then echo \"agentic:check requires AGENTIC_CHECK_URL (public host without scheme, e.g. vercel.com)\"; exit 1; fi; case \"$AGENTIC_CHECK_URL\" in http://*|https://*) echo \"agentic:check: omit https:// from AGENTIC_CHECK_URL\"; exit 1;; esac; exec is-agentic \"$AGENTIC_CHECK_URL\"'"
   },
   "dependencies": {
     "@ai-sdk/gateway": "4.0.125",
