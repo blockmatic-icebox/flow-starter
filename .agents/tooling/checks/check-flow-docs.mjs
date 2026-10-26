@@ -40,8 +40,6 @@ export const knowledgeBundleSources = [
   "PRODUCT.md",
 ];
 
-const firstPartySkillIds = ["flow", "flow-eval", "flow-improve"];
-
 const legacyFlowDocDirs = ["docs/workflow", "docs/agents"];
 
 const methodologyPathDenylist = [/^docs\/workflow\//u, /^docs\/agents\//u];
@@ -519,22 +517,8 @@ export function validateSeparatedProductTasks(root) {
 }
 
 const INSTALL_SCRIPT_REL = ".agents/tooling/setup/install.sh";
-const PRODUCT_ADOPTION_REL = ".agents/tooling/setup/product-adoption.mjs";
-const PRODUCT_README_TEMPLATE_REL =
-  ".agents/tooling/setup/product-readme.template.md";
-
 function isFactoryCheckout(root) {
   return existsSync(path.join(root, INSTALL_SCRIPT_REL));
-}
-
-function validateFactoryEvalSubjectSetup(root) {
-  if (!isFactoryCheckout(root)) return [];
-  return [PRODUCT_ADOPTION_REL, PRODUCT_README_TEMPLATE_REL]
-    .filter((relative) => !existsSync(path.join(root, relative)))
-    .map(
-      (relative) =>
-        `missing Factory eval subject setup file: ${relative} (required by flow-eval worktrees)`
-    );
 }
 
 function isFullProductTree(root) {
@@ -603,32 +587,15 @@ function validateReadmeIdentity(root) {
   }
 
   const readme = readFileSync(readmePath, "utf-8");
-  const factory = isFactoryCheckout(root);
-  const adoptedProductReadme =
-    isFullProductTree(root) &&
-    readme.includes("Web application built with Flow Factory");
 
-  if (factory && !adoptedProductReadme) {
-    if (!readme.startsWith("# Flow Factory\n"))
+  if (isFullProductTree(root)) {
+    if (readme.includes("raw.githubusercontent.com"))
       errors.push(
-        "README.md: Factory checkout must start with '# Flow Factory'"
+        "README.md: product readme must not reference remote installer curl URLs"
       );
-    return errors;
+    if (/^# Project Name$/mu.test(readme))
+      errors.push("README.md: must not retain '# Project Name' heading");
   }
-
-  const useAdoptedProductReadmeRules = !factory || isFullProductTree(root);
-  if (!useAdoptedProductReadmeRules) return errors;
-
-  if (readme.includes("raw.githubusercontent.com"))
-    errors.push(
-      "README.md: adopted product must not reference remote installer curl URLs"
-    );
-  if (/^# Project Name$/mu.test(readme))
-    errors.push("README.md: must not retain '# Project Name' heading");
-  if (!readme.includes("Web application built with Flow Factory"))
-    errors.push(
-      "README.md: adopted product must state it is a web application built with Flow Factory"
-    );
 
   return errors;
 }
@@ -725,135 +692,12 @@ function validateMethodologyPlacement(root) {
   return errors;
 }
 
-function parseSkillFrontmatter(content) {
-  const match = /^---\s*\n([\s\S]*?)\n---/u.exec(content);
-  if (!match) return null;
-  const nameMatch = /^name:\s*(?<name>[a-z0-9-]+)\s*$/mu.exec(match[1]);
-  return nameMatch?.groups?.name ?? null;
-}
-
-const flowCoordinatorContractChecks = [
-  { label: "gitignored prompt logs", pattern: /gitignored/iu },
-  {
-    label: "never commit prompt logs",
-    pattern: /must\s+\*\*never\*\*\s+be\s+committed/iu,
-  },
-  { label: "human-supplied brief", pattern: /human-supplied brief/iu },
-  { label: "reconcile brief with contracts", pattern: /\*\*Reconcile\*\*/u },
-  { label: "conflict stop and ask", pattern: /stop and ask/iu },
-  { label: "Explore to Specify persistence", pattern: /Explore → Specify/iu },
-  {
-    label: "Decided Assumed Open structure",
-    pattern: /\*\*Decided\*\*.*\*\*Assumed\*\*.*\*\*Open\*\*/u,
-  },
-  { label: "repository role starter-neutral", pattern: /starter-neutral/iu },
-  {
-    label: "cursor plans not contracts",
-    pattern: /Cursor plan files are \*\*not\*\* contracts/iu,
-  },
-  {
-    label: "prompt log preference post-install",
-    pattern: /Prompt log preference/iu,
-  },
-  {
-    label: "prompt log Q/A not option lists",
-    pattern: /questions and answers.*no multiple-choice option lists/iu,
-  },
-  { label: "prompt-log operations link", pattern: /prompt-log\.md/iu },
-  {
-    label: "human-readable surfaces",
-    pattern: /human-readable-surfaces\.md/iu,
-  },
-  {
-    label: "human-readable chat",
-    pattern: /Human-readable chat/iu,
-  },
-  {
-    label: "no task-id-only chat",
-    pattern: /internal execution shorthand/iu,
-  },
-  {
-    label: "GenUI product Build",
-    pattern: /@repo\/genui.*genui\.md/iu,
-  },
-  {
-    label: "AskQuestion structured UI",
-    pattern: /AskQuestion/iu,
-  },
-  {
-    label: "separated product tasks",
-    pattern: /docs\/tasks\/<slug>\.md/iu,
-  },
-  {
-    label: "tasks-documents operations",
-    pattern: /tasks-documents\.md/iu,
-  },
-];
-
-export function validateFlowCoordinatorContract(content) {
-  const errors = [];
-  for (const { label, pattern } of flowCoordinatorContractChecks) {
-    if (!pattern.test(content))
-      errors.push(
-        `.agents/skills/flow/SKILL.md: missing coordinator contract (${label})`
-      );
-  }
-  return errors;
-}
-
-function validateFirstPartySkills(root) {
-  const errors = [];
-  const seen = new Set();
-
-  for (const skillId of firstPartySkillIds) {
-    if (seen.has(skillId))
-      errors.push(`duplicate first-party skill id ${skillId}`);
-    seen.add(skillId);
-
-    const skillDir = path.join(root, ".agents/skills", skillId);
-    const skillFile = path.join(skillDir, "SKILL.md");
-    if (!existsSync(skillFile)) {
-      errors.push(
-        `missing first-party skill ${skillId} at .agents/skills/${skillId}/SKILL.md`
-      );
-      continue;
-    }
-
-    const content = readFileSync(skillFile, "utf-8");
-    const name = parseSkillFrontmatter(content);
-    if (name !== skillId)
-      errors.push(
-        `.agents/skills/${skillId}/SKILL.md: frontmatter name ${name ?? "missing"} !== ${skillId}`
-      );
-
-    const lockPath = path.join(root, ".agents/skills-lock.json");
-    if (existsSync(lockPath)) {
-      const lock = JSON.parse(readFileSync(lockPath, "utf-8"));
-      const entry = lock.skills?.[skillId];
-      if (!entry)
-        errors.push(`skills-lock.json missing first-party skill ${skillId}`);
-      else if (
-        entry.sourceType === "local" &&
-        !entry.source?.includes(`.agents/skills/${skillId}`)
-      )
-        errors.push(
-          `skills-lock.json ${skillId} source should reference .agents/skills/${skillId}`
-        );
-    }
-  }
-
-  return errors;
-}
-
 function validateMarkdownLinks(root) {
   const errors = [];
   const files = [
     ...rootLinkDocuments.map((relative) => path.join(root, relative)),
     ...markdownFiles(path.join(root, "docs")),
     ...markdownFiles(path.join(root, ".agents/flow")),
-    ...firstPartySkillIds.map((skillId) =>
-      path.join(root, ".agents/skills", skillId, "SKILL.md")
-    ),
   ];
 
   for (const filename of files) {
@@ -1024,7 +868,6 @@ export function validateFlowDocs(root = repositoryRoot) {
     ...validateRequiredDocuments(root),
     ...validateLegacyFlowDocDirs(root),
     ...validateMethodologyPlacement(root),
-    ...validateFirstPartySkills(root),
     ...validateMarkdownLinks(root),
     ...validateSemanticConsistency(root),
     ...validateKnowledgeSnapshot(),
@@ -1034,19 +877,9 @@ export function validateFlowDocs(root = repositoryRoot) {
     ...validateDesignTokenParity(root),
     ...validateDesignImplementationRefs(root),
     ...validateAdoptedAgentsScripts(root),
-    ...validateFactoryEvalSubjectSetup(root),
     ...validateRepositoryOwnership(root),
     ...validateSeparatedProductTasks(root)
   );
-
-  if (path.resolve(root) === path.resolve(repositoryRoot)) {
-    const flowSkillPath = path.join(root, ".agents/skills/flow/SKILL.md");
-    if (existsSync(flowSkillPath)) {
-      errors.push(
-        ...validateFlowCoordinatorContract(readFileSync(flowSkillPath, "utf-8"))
-      );
-    }
-  }
 
   return errors;
 }

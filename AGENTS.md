@@ -26,6 +26,4 @@ Factory stack ADRs live under `.agents/flow/decisions/` when touching inherited 
 
 Run checks that match the change; report commands and exit codes. UI changes: browser smoke via `pnpm test:browser` when routes change.
 
-## Coordinator closeout
-
-After a repository task, end with a **Task report** per [.agents/flow/operations/journal.md](.agents/flow/operations/journal.md). The last section must be **Skills loaded**.
+Optional Factory parity (Flow docs, eval harness, agents tooling): `pnpm ci:factory:local` or `pnpm --dir .agents check:factory`.

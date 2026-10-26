@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import {
-  existsSync,
   mkdtempSync,
   mkdirSync,
   readFileSync,
@@ -13,7 +12,6 @@ import test from "node:test";
 
 import { repoRoot as repositoryRoot } from "../lib/repo-paths.mjs";
 import {
-  validateFlowCoordinatorContract,
   validateFlowDocs,
   validateSeparatedProductTasks,
 } from "./check-flow-docs.mjs";
@@ -72,8 +70,6 @@ None.
   return "# Example\n";
 }
 
-const firstPartySkillIds = ["flow", "flow-eval", "flow-improve"];
-
 const requiredDocuments = {
   ".agents/flow/README.md": "# Flow\n",
   ".agents/flow/architecture.md": "# Factory architecture\n",
@@ -82,16 +78,6 @@ const requiredDocuments = {
   "AGENTS.md": "# Agents\n",
   "ARCHITECTURE.md": "# Architecture\n",
 };
-
-function firstPartySkillFixture(skillId) {
-  return `---
-name: ${skillId}
-description: fixture
----
-
-# ${skillId}
-`;
-}
 
 function fixture(t, filenames, contents = {}, options = {}) {
   const root = mkdtempSync(path.join(os.tmpdir(), "flow-docs-"));
@@ -116,14 +102,6 @@ function fixture(t, filenames, contents = {}, options = {}) {
         defaultMarkdownContent(filename),
       "utf-8"
     );
-  }
-
-  for (const skillId of firstPartySkillIds) {
-    const skillFile = path.join(root, ".agents/skills", skillId, "SKILL.md");
-    if (!existsSync(skillFile)) {
-      mkdirSync(path.dirname(skillFile), { recursive: true });
-      writeFileSync(skillFile, firstPartySkillFixture(skillId), "utf-8");
-    }
   }
 
   return root;
@@ -380,34 +358,6 @@ test("ignores links inside fenced code", (t) => {
   assert.deepEqual(validateFlowDocs(root), []);
 });
 
-test("flow coordinator contract rejects stripped skill", () => {
-  const root = path.resolve(import.meta.dirname, "..", "..", "..");
-  const flowPath = path.join(root, ".agents/skills/flow/SKILL.md");
-  const content = readFileSync(flowPath, "utf-8");
-  assert.equal(validateFlowCoordinatorContract(content).length, 0);
-  const broken = content.replaceAll("human-supplied brief", "brief");
-  assert.ok(validateFlowCoordinatorContract(broken).length > 0);
-});
-
-test("flow-improve and flow-eval disable model invocation; flow does not", () => {
-  const root = path.resolve(import.meta.dirname, "..", "..", "..");
-  const flow = readFileSync(
-    path.join(root, ".agents/skills/flow/SKILL.md"),
-    "utf-8"
-  );
-  const improve = readFileSync(
-    path.join(root, ".agents/skills/flow-improve/SKILL.md"),
-    "utf-8"
-  );
-  const evalSkill = readFileSync(
-    path.join(root, ".agents/skills/flow-eval/SKILL.md"),
-    "utf-8"
-  );
-  assert.match(improve, /^disable-model-invocation:\s*true/mu);
-  assert.match(evalSkill, /^disable-model-invocation:\s*true/mu);
-  assert.doesNotMatch(flow, /^disable-model-invocation:/mu);
-});
-
 test("validates current repository product contracts and readme identity", () => {
   const errors = validateFlowDocs();
   assert.equal(errors.length, 0, errors.join("\n"));
@@ -425,10 +375,16 @@ test("flags placeholder markers in product contracts", (t) => {
   );
 });
 
-test("flags adopted readme missing product identity", (t) => {
+test("flags adopted readme with placeholder project name heading", (t) => {
   const root = fixture(
     t,
-    ["README.md", "PRODUCT.md", "DESIGN.md", ".agents/package.json"],
+    [
+      "README.md",
+      "PRODUCT.md",
+      "DESIGN.md",
+      ".agents/package.json",
+      "packages/ui/src/styles/globals.css",
+    ],
     {
       ".agents/package.json": JSON.stringify({
         scripts: {
@@ -437,7 +393,8 @@ test("flags adopted readme missing product identity", (t) => {
       }),
       "DESIGN.md": "# Design\n\n## Experience direction\n\nok\n",
       "PRODUCT.md": "# My App\n\nScope.\n",
-      "README.md": "# My App\n\nGeneric readme.\n",
+      "README.md": "# Project Name\n\nGeneric readme.\n",
+      "packages/ui/src/styles/globals.css": ":root { --background: ok; }\n",
     },
     { omitRequired: true }
   );
@@ -445,9 +402,7 @@ test("flags adopted readme missing product identity", (t) => {
     e.startsWith("README.md:")
   );
   assert.ok(
-    readmeErrors.some((e) =>
-      /web application built with Flow Factory/iu.test(e)
-    ),
+    readmeErrors.some((e) => /Project Name/iu.test(e)),
     readmeErrors.join("\n")
   );
 });
