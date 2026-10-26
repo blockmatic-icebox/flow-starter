@@ -6,11 +6,13 @@ import {
   getDb,
   getRequest,
   recordPmReviewStarted,
+  retryTriage,
   searchRequests,
+  DispositionError,
   setDisposition,
   supportRequest,
 } from "@repo/fi";
-import type { FeatureRequestSource } from "@repo/fi";
+import type { FeatureRequestSource, SearchRequestsSort } from "@repo/fi";
 import { cookies } from "next/headers";
 
 const db = () => getDb();
@@ -37,7 +39,13 @@ export async function actionSetDisposition(input: {
   dispositionRationale: string;
   mergeTargetId?: string | null;
 }) {
-  return await setDisposition({ db: db(), ...input });
+  try {
+    return await setDisposition({ db: db(), ...input });
+  } catch (error) {
+    if (error instanceof DispositionError)
+      throw new Error(error.message, { cause: error });
+    throw error;
+  }
 }
 
 export async function actionRecordPmReview(input: { requestId: string }) {
@@ -58,8 +66,17 @@ export async function actionGetRequest(input: { requestId: string }) {
 export async function actionSearchRequests(input: {
   query?: string;
   themeKey?: string;
+  sort?: SearchRequestsSort;
+  page?: number;
+  pageSize?: number;
 }) {
-  return await searchRequests({ db: db(), limit: 50, ...input });
+  return await searchRequests({ db: db(), pageSize: 25, ...input });
+}
+
+export async function actionRetryTriage(input: {
+  requestId: string;
+}): ReturnType<typeof retryTriage> {
+  return await retryTriage({ db: db(), ...input });
 }
 
 export async function actionSupportWithCookie(input: { requestId: string }) {

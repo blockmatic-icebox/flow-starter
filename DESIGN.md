@@ -30,10 +30,10 @@ Spec: [docs/specs/feature-intelligence.md](docs/specs/feature-intelligence.md). 
 | Route | Screen | Layout / behavior |
 | --- | --- | --- |
 | `/` | Home (persona router) | Four intent cards + Browse secondary; not a flat feature list |
-| `/requests` | Discover | List + **theme filter chips** (`theme_key` query); cards show problem one-liner, theme label, source, support |
-| `/requests/new` | Submit | Step 1 form → step 2 triage preview (editable problem, duplicate link default, confirm) |
-| `/requests/[id]` | Detail | Main: problem, description, brief; sidebar: support, disposition audit, transparency |
-| `/triage` | PM queue | Card list sorted by **support**; subtitle shows count; inline disposition panel |
+| `/requests` | Discover | **Search**, **sort** (support / recent / title), **pagination** (~25/page), theme chips; cards show **support count**, disposition badge when set ([remediation RC-5](docs/specs/feature-intelligence-remediation.md)) |
+| `/requests/new` | Submit | Step 1 form → step 2 triage preview; on AI failure/degraded: honest partial UI, **Submit anyway**, **Retry AI review** ([RC-2](docs/specs/feature-intelligence-remediation.md)) |
+| `/requests/[id]` | Detail | Main: problem, description, brief; sidebar: support, **Decision** (outcome, rationale, time, simulated PM, merge link), transparency (“How this was evaluated”) |
+| `/triage` | PM queue | Card list with **sort** (support default); inline panel — disposition, **merge target picker** when Merge, rationale; badge when item needs AI/manual review |
 | `/insights` | Metrics | 2×3 metric grid (incl. PM triage median); **range** selector (`7d`–`all`, default `90d`); horizontal bar panels for weekly submissions, dispositions, queue depth; theme list + judgment table; proxy footnote when `pmTriageN < 2` |
 | `/chat` | Ask-only help | `max-w-2xl` thread; **no** tool UI; secondary nav item |
 

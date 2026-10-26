@@ -3,6 +3,7 @@
 **Last reviewed:** 2026-10-25  
 **Status:** Current  
 **Initiative:** [feature-intelligence.md](../initiatives/feature-intelligence.md)  
+**Implementation fidelity:** [feature-intelligence-remediation.md](./feature-intelligence-remediation.md) (RC-1–RC-10)  
 **Ubiquitous language:** [GLOSSARY.md](../../GLOSSARY.md)  
 **User journeys (UX):** [feature-intelligence-journeys.md](./feature-intelligence-journeys.md) (v1.3)
 
@@ -19,7 +20,10 @@
 | [feature-intelligence-testing.md](./feature-intelligence-testing.md) | TDD order, W-* manual, eve evals |
 | [docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md) | MVP build checklist (complete) |
 | [docs/tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) | Demo depth checklist (complete) |
+| [feature-intelligence-remediation.md](./feature-intelligence-remediation.md) | Workflow gap closure (RC-1–RC-10) |
+| [docs/tasks/feature-intelligence-remediation.md](../tasks/feature-intelligence-remediation.md) | Remediation execution checklist (Plan) |
 | [ADR 0003](../adr/0003-feature-intelligence-model-providers.md) | Gateway (Jev/triage) vs Anthropic (`/chat`) |
+| [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md) | Merge, validation, seed safety, eval bar |
 
 ## Problem
 

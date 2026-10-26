@@ -8,17 +8,20 @@ export default defineTool({
   description:
     "Search published feature requests by text and optional theme key.",
   async execute({ query, themeKey, limit }) {
-    const rows = await searchRequests({
+    const result = await searchRequests({
       db: agentDb(),
-      limit,
+      pageSize: limit ?? 25,
       query,
       themeKey,
     });
+    const rows = result.items;
     return {
       count: rows.length,
+      page: result.page,
       requests: rows.map((r) => ({
         id: r.id,
         source: r.source,
+        supportCount: r.supportCount,
         themeKey: r.themeKey,
         title: r.title,
       })),

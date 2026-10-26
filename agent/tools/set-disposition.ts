@@ -1,4 +1,4 @@
-import { setDisposition } from "@repo/fi";
+import { DispositionError, setDisposition } from "@repo/fi";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 
@@ -12,14 +12,20 @@ export default defineTool({
     dispositionRationale,
     mergeTargetId,
   }) {
-    const row = await setDisposition({
-      db: agentDb(),
-      disposition,
-      dispositionRationale,
-      mergeTargetId,
-      requestId,
-    });
-    return { request: row };
+    try {
+      const result = await setDisposition({
+        db: agentDb(),
+        disposition,
+        dispositionRationale,
+        mergeTargetId,
+        requestId,
+      });
+      return result;
+    } catch (error) {
+      if (error instanceof DispositionError)
+        throw new Error(`${error.code}: ${error.message}`, { cause: error });
+      throw error;
+    }
   },
   inputSchema: z.object({
     disposition: z.enum(["merge", "monitor", "decline", "needs_discussion"]),

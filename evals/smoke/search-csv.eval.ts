@@ -7,9 +7,9 @@ export default defineEval({
   tags: ["smoke"],
   async test(t) {
     loadRootEnv();
-    const rows = await searchRequests({
+    const { items: rows } = await searchRequests({
       db: getDb(),
-      limit: 10,
+      pageSize: 10,
       query: "CSV",
     });
     if (rows.length < 1) throw new Error("expected CSV-related seed rows");

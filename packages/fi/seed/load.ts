@@ -6,11 +6,13 @@ import {
 } from "@repo/db";
 
 import { loadRootEnv } from "../src/db/get-db";
+import { assertSeedAllowed } from "./assert-seed-allowed";
 import { generateSeed } from "./generate-seed";
 import { labelForThemeKey } from "./theme-label";
 import { validateGeneratedSeed } from "./validate-manifest";
 
 loadRootEnv();
+assertSeedAllowed();
 const url = process.env.DATABASE_URL?.trim();
 if (!url) {
   console.error("DATABASE_URL is required to seed");

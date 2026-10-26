@@ -13,6 +13,12 @@
 - Enough volume for duplicate retrieval, lexical search, PM queue, and **90-day** analytics demos.
 - Coherent narrative: duplicates, related-but-separate items, emerging themes, ambiguous copy, **high support / low strategic** dispositions, imperfect timing.
 
+## Safety (remediation — [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md))
+
+- Seed **wipes** FI tables — unacceptable on production without explicit opt-in.
+- **Required behavior (RC-8):** abort when `NODE_ENV=production` unless `FI_SEED_ALLOW_DESTRUCTIVE=1`.
+- Eve evals should prefer `EVE_EVAL_DATABASE_URL` when set (isolated branch); document in [testing spec](./feature-intelligence-testing.md).
+
 ## Volume and manifest (canonical)
 
 All counts are **exact** after seed; tests import from `packages/fi/seed/manifest.ts`.

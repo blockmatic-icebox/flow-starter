@@ -51,6 +51,21 @@ Run after `pnpm dev`, `pnpm --filter @repo/fi seed`, and env for AI triage.
 
 **CI:** `pnpm test:browser` remains starter-level; FI coverage is not a merge gate for this initiative.
 
+### Remediation manual (W-R)
+
+After [remediation Build](../tasks/feature-intelligence-remediation.md):
+
+| # | Flow | Pass |
+| --- | --- | --- |
+| W-R1 | Merge in triage requires target; save updates target support count |  |
+| W-R2 | Submit with AI degraded/failed → Submit anyway publishes; Retry re-runs harness |  |
+| W-R3 | Detail Decision sidebar shows rationale, time, actor, merge link |  |
+| W-R4 | Empty disposition rationale blocked |  |
+| W-R5 | Discover search + sort + page 2 at 500 rows; support on cards |  |
+| W-R6 | Triage sort control; insights seed footnote when applicable |  |
+
+**Eval policy:** No smoke eval that only greps `agent/` source; assert `t.succeeded()` and persisted fields ([RC-9](./feature-intelligence-remediation.md#rc-9--verification-eve-and-domain)).
+
 ---
 
 ## eve — eval layout (Build)

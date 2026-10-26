@@ -1,20 +1,22 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-
+import { createDraftAndTriage, getDb, loadRootEnv } from "@repo/fi";
 import { defineEval } from "eve/evals";
-import { equals, includes } from "eve/evals/expect";
+import { equals } from "eve/evals/expect";
 
 export default defineEval({
   description:
-    "submit_request tool does not call confirmRequest in the same module (AG-7).",
+    "submit path leaves request in pending_confirm until explicit confirm (AG-7).",
   tags: ["smoke"],
   async test(t) {
-    const source = await readFile(
-      path.join(process.cwd(), "agent/tools/submit-request.ts"),
-      "utf-8"
-    );
-    t.check(source, includes("pending_confirm"));
-    await t.require(source.includes("confirmRequest("), equals(false));
+    loadRootEnv();
+    const db = getDb();
+    const title = `Eval draft ${crypto.randomUUID().slice(0, 8)}`;
+    const { request } = await createDraftAndTriage({
+      db,
+      description: "Eval-only description for AG-7 behavioral check.",
+      source: "internal",
+      title,
+    });
+    await t.require(request?.status ?? "", equals("pending_confirm"));
     t.succeeded();
   },
 });

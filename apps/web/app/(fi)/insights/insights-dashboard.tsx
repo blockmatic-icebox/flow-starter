@@ -237,6 +237,11 @@ export const InsightsDashboard = ({
           </Card>
         </div>
       ) : null}
+      <p className="text-muted-foreground text-xs">
+        Trend charts use timestamps from the demo seed (synthetic history
+        anchored to SEED_REFERENCE_ISO). Live PM dispositions update capture
+        rate and triage metrics with real disposition times.
+      </p>
     </div>
   );
 };

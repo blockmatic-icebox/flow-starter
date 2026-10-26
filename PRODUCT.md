@@ -35,16 +35,14 @@ Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence
 
 | Area | Status |
 | --- | --- |
-| **Specification** | Complete — [tasks](docs/tasks/feature-intelligence.md) + [initiative](docs/initiatives/feature-intelligence.md) |
-| **Database** | **Live** with `DATABASE_URL` — migrate; demo seed **500** rows (`pnpm seed:fi`, dev/CI only) |
-| **Domain (`@repo/fi`)** | **Live** — full T0–T3 harness orchestration; **degraded** when `AI_GATEWAY_API_KEY` absent |
-| **eve (`agent/`)** | **Live** — MVP tools, `evals/` smoke (AG-7), `pnpm exec eve eval smoke` |
-| **Human UI (`apps/web`)** | **Live** — `app/(fi)/` routes, insights trends UI, ask-only `/chat`; [browser verification](docs/research/20261025-fi-browser-verification.md) (demo depth: triage **50**, insights **90d** at localhost 2026-10-26) |
-| **Deployment (demo)** | **Live** — Vercel project `meta-cto`, branch `meta-cto`, production https://meta-cto-gaboesquivel.vercel.app (Vercel Authentication may require sign-in or share link; env: `DATABASE_URL`, `AI_GATEWAY_API_KEY`, `ANTHROPIC_API_KEY` on Production) |
+| **Specification** | **MVP + demo depth specified**; **[workflow remediation](docs/specs/feature-intelligence-remediation.md) accepted** (Specify 2026-10-25) — [initiative](docs/initiatives/feature-intelligence.md) |
+| **Database** | **Live** — migrate + seed on Vercel build (`apps/web/scripts/vercel-build.mjs`); local seed guarded ([RC-8](docs/specs/feature-intelligence-remediation.md)) |
+| **Domain (`@repo/fi`)** | **Live** — disposition validation, merge rollup, discovery pagination, degraded triage flags ([remediation](docs/specs/feature-intelligence-remediation.md)) |
+| **eve (`agent/`)** | **Live** — behavioral smoke evals (AG-7 + disposition monitor); `pnpm exec eve eval smoke` |
+| **Human UI (`apps/web`)** | **Live** — merge picker, discover search/sort/page, AI failure UX, decision sidebar; manual W-R pass on deploy |
+| **Deployment (demo)** | **Live** — Vercel `meta-cto`, https://meta-cto-gaboesquivel.vercel.app (`DATABASE_URL`, gateway/Anthropic keys on Production) |
 
-**Build checklist:** [assessment MVP](docs/tasks/feature-intelligence.md) complete; [demo depth](docs/tasks/feature-intelligence-demo-depth.md) (500 seed + analytics) complete. Analytics spec: [feature-intelligence-analytics.md](docs/specs/feature-intelligence-analytics.md).
-
-**Spec compliance:** MVP acceptance criteria AC-1–AC-8 are met for assessment scope; W-3 near-duplicate live submit is **partial** in manual pass (lexical harness still surfaces seeded candidates when text overlaps). See [spec verification](docs/specs/feature-intelligence.md#verification-mvp) and browser log.
+**Build:** [Remediation tasks](docs/tasks/feature-intelligence-remediation.md) implemented on `meta-cto` (2026-10-26). Adversarial reconciliation: [research](docs/research/20261025-fi-adversarial-review.md). W-3 near-duplicate **partial** (lexical by design).
 
 ## Success metrics
 
@@ -68,6 +66,7 @@ Use [GLOSSARY.md](GLOSSARY.md) for domain terms (feature request, disposition, i
 - [Architecture](ARCHITECTURE.md)
 - [Initiative](docs/initiatives/feature-intelligence.md)
 - [Tasks — demo depth](docs/tasks/feature-intelligence-demo-depth.md)
+- [Remediation spec](docs/specs/feature-intelligence-remediation.md) · [ADR 0004](docs/adr/0004-fi-workflow-integrity-and-safety.md) · [Adversarial research](docs/research/20261025-fi-adversarial-review.md)
 - [ADR 0001 — Use Flow Factory](docs/adr/0001-use-flow-factory.md)
 - [ADR 0002 — Feature Intelligence architecture](docs/adr/0002-feature-intelligence-architecture.md)
 - [ADR 0003 — Model providers (gateway vs Anthropic)](docs/adr/0003-feature-intelligence-model-providers.md)

@@ -8,20 +8,75 @@ import { actionSearchRequests } from "../actions";
 export default async function RequestsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ theme?: string }>;
+  searchParams: Promise<{
+    theme?: string;
+    q?: string;
+    sort?: string;
+    page?: string;
+  }>;
 }) {
-  const { theme } = await searchParams;
-  const themeKey = theme && theme in themeRegistry ? theme : undefined;
+  const params = await searchParams;
+  const themeKey =
+    params.theme && params.theme in themeRegistry ? params.theme : undefined;
+  const sort =
+    params.sort === "published_at" ||
+    params.sort === "title" ||
+    params.sort === "support"
+      ? params.sort
+      : "support";
+  const page = Math.max(1, Math.trunc(Number(params.page ?? "1")) || 1);
+  const q = params.q?.trim() || undefined;
 
-  const rows = await actionSearchRequests({
+  const result = await actionSearchRequests({
+    page,
+    query: q,
+    sort,
     themeKey,
   });
 
   const themes = Object.entries(themeRegistry);
+  const totalPages = Math.max(1, Math.ceil(result.total / result.pageSize));
+
+  const buildHref = (nextPage: number) => {
+    const sp = new URLSearchParams();
+    if (themeKey) sp.set("theme", themeKey);
+    if (q) sp.set("q", q);
+    if (sort !== "support") sp.set("sort", sort);
+    if (nextPage > 1) sp.set("page", String(nextPage));
+    const qs = sp.toString();
+    return qs ? `/requests?${qs}` : "/requests";
+  };
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <h1 className="font-heading text-2xl font-semibold">Discover requests</h1>
+      <form action="/requests" className="flex flex-wrap gap-2" method="get">
+        {themeKey ? (
+          <input name="theme" type="hidden" value={themeKey} />
+        ) : null}
+        <input
+          className="border-input min-w-[12rem] flex-1 rounded-md border px-3 py-2 text-sm"
+          name="q"
+          placeholder="Search requests"
+          type="search"
+          value={q ?? ""}
+        />
+        <select
+          className="border-input rounded-md border px-3 py-2 text-sm"
+          defaultValue={sort}
+          name="sort"
+        >
+          <option value="support">Sort: support</option>
+          <option value="published_at">Sort: recent</option>
+          <option value="title">Sort: title</option>
+        </select>
+        <button
+          className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm"
+          type="submit"
+        >
+          Search
+        </button>
+      </form>
       <div className="flex flex-wrap gap-2">
         <Link
           className={`rounded-full border px-3 py-1 text-sm ${themeKey ? "hover:bg-muted" : "bg-primary text-primary-foreground"}`}
@@ -39,8 +94,11 @@ export default async function RequestsPage({
           </Link>
         ))}
       </div>
+      <p className="text-muted-foreground text-sm">
+        {result.total} published · page {result.page} of {totalPages}
+      </p>
       <ul className="space-y-3">
-        {rows.map((row) => (
+        {result.items.map((row) => (
           <li key={row.id}>
             <Card>
               <CardHeader className="gap-2">
@@ -58,12 +116,33 @@ export default async function RequestsPage({
                     <Badge variant="outline">{row.themeLabel}</Badge>
                   ) : null}
                   <Badge variant="secondary">{row.source}</Badge>
+                  <Badge variant="outline">
+                    {row.supportCount} supporter
+                    {row.supportCount === 1 ? "" : "s"}
+                  </Badge>
+                  {row.disposition ? (
+                    <Badge>{row.disposition.replace("_", " ")}</Badge>
+                  ) : null}
                 </div>
               </CardHeader>
             </Card>
           </li>
         ))}
       </ul>
+      <div className="flex justify-between gap-4 text-sm">
+        {page > 1 ? (
+          <Link className="text-primary underline" href={buildHref(page - 1)}>
+            Previous
+          </Link>
+        ) : (
+          <span />
+        )}
+        {page < totalPages ? (
+          <Link className="text-primary underline" href={buildHref(page + 1)}>
+            Next
+          </Link>
+        ) : null}
+      </div>
     </div>
   );
 }

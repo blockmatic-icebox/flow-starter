@@ -1,4 +1,4 @@
 {
-  "installCommand": "pnpm install --frozen-lockfile --filter web...",
-  "buildCommand": "pnpm --filter web build"
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "node scripts/vercel-build.mjs"
 }

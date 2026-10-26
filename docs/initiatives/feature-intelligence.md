@@ -1,7 +1,7 @@
 # Initiative: Feature Intelligence (Meta CTO assessment)
 
-**Status:** Specified (complete) · **MVP + demo depth built**  
-**Stage:** Review (external demo recording optional)  
+**Status:** Specified · **MVP + demo depth built** · **Workflow remediation specified** (not built)  
+**Stage:** Specify complete for remediation → **Plan** next (Build not authorized)  
 **Time box:** ~2–3 hours implementation + ~5 min demo
 
 ## Outcome
@@ -32,6 +32,7 @@ Help a product team turn **unstructured feature requests** from customers, prosp
 - **Publish flow:** Require submitter **confirm/edit** after triage before catalog publish.
 - **Duplicate retrieval:** **Lexical top-10** for assessment (no pgvector).
 - **Testing:** [eve eval smoke + seed](../../docs/specs/feature-intelligence-testing.md); **web FI manual only** (no new Playwright for MVP).
+- **Remediation (2026-10-25):** Merge with **supporter rollup**; AI failure non-blocking UX; discovery search/sort/pagination; domain validation; decision transparency (outcome + audit on detail); seed production guard; **behavioral** Eve evals — [remediation spec](../specs/feature-intelligence-remediation.md), [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md).
 - **Agents:** Single eve root agent (no subagents in v1).
 - **Triage:** [Jev harness](../../docs/specs/feature-intelligence-triage-harness.md) via **AI Gateway** (`AI_GATEWAY_API_KEY`, `typesafe-ai/jev`); reference `@repo/genui` gateway wiring.
 - **Ask-only chat:** **Direct Anthropic** (`ANTHROPIC_API_KEY`); port Flow demo `streamText` pattern ([ADR 0010](../../.agents/flow/decisions/adr/0010-site-consultant-chat-and-mcp.md)) — [ADR 0003](../adr/0003-feature-intelligence-model-providers.md).
@@ -86,7 +87,9 @@ Detail: [MVP cut line](#mvp-cut-line-assessment); specs index in [feature-intell
 
 **Build checklist is a separate file** (specs/initiative stay stable; checkboxes update in tasks only):
 
-→ **[docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md)** — waves, dependencies, gates G1–G4, ids `T-*-*`.
+→ **[docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md)** — MVP (complete).  
+→ **[docs/tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md)** — demo depth (complete).  
+→ **[docs/tasks/feature-intelligence-remediation.md](../tasks/feature-intelligence-remediation.md)** — workflow remediation (**Plan ready**; gates G-R1–G-R5).
 
 ## Non-goals
 
@@ -150,10 +153,13 @@ See [docs/specs/feature-intelligence.md](../specs/feature-intelligence.md).
 | [feature-intelligence-seed.md](../specs/feature-intelligence-seed.md) | 500-row seed + FR-001–FR-011 anchors |
 | [feature-intelligence-analytics.md](../specs/feature-intelligence-analytics.md) | Insights trends, range, charts |
 | [feature-intelligence-testing.md](../specs/feature-intelligence-testing.md) | TDD + W-* + evals |
+| [feature-intelligence-remediation.md](../specs/feature-intelligence-remediation.md) | Workflow gap closure (RC-1–RC-10) |
 | [tasks/feature-intelligence.md](../tasks/feature-intelligence.md) | MVP execution checklist |
 | [tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) | 500 seed + analytics (complete) |
+| [tasks/feature-intelligence-remediation.md](../tasks/feature-intelligence-remediation.md) | Remediation execution (draft) |
 
-Contracts: [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [ARCHITECTURE.md](../../ARCHITECTURE.md), [GLOSSARY.md](../../GLOSSARY.md), [ADR 0002](../adr/0002-feature-intelligence-architecture.md), [ADR 0003](../adr/0003-feature-intelligence-model-providers.md).
+Contracts: [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [ARCHITECTURE.md](../../ARCHITECTURE.md), [GLOSSARY.md](../../GLOSSARY.md), [ADR 0002](../adr/0002-feature-intelligence-architecture.md), [ADR 0003](../adr/0003-feature-intelligence-model-providers.md), [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md).  
+Research: [20261025-fi-adversarial-review.md](../research/20261025-fi-adversarial-review.md).
 
 ## Demo depth (post-MVP)
 
@@ -172,4 +178,8 @@ Contracts: [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [ARCHIT
 - [x] **Specify (demo depth)** — 500 seed + analytics specs + tasks
 - [x] **Build (MVP)** — [feature-intelligence.md](../tasks/feature-intelligence.md)
 - [x] **Build (demo depth)** — [feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md)
-- [ ] Review / external demo recording (no in-app recorder)
+- [x] **Explore (adversarial)** — [research](../research/20261025-fi-adversarial-review.md)
+- [x] **Specify (remediation)** — [remediation spec](../specs/feature-intelligence-remediation.md) + ADR 0004
+- [x] **Plan (remediation)** — [tasks](../tasks/feature-intelligence-remediation.md) (dependencies + gates)
+- [ ] **Build (remediation)** — not authorized
+- [ ] Review / Ship — after remediation Build

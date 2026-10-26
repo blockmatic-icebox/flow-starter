@@ -10,6 +10,7 @@ export interface TriageStepsPayload {
   degraded?: boolean;
   duration_ms: number;
   model: string;
+  needs_ai_review?: boolean;
   steps: TriageStepRecord[];
   version: number;
 }

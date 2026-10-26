@@ -24,14 +24,18 @@ export default defineEvalConfig({
   setup() {
     const root = new URL("..", import.meta.url).pathname;
     loadRootEnv(root);
+    const evalUrl = process.env.EVE_EVAL_DATABASE_URL?.trim();
+    const env = evalUrl
+      ? { ...process.env, DATABASE_URL: evalUrl }
+      : process.env;
     execSync("pnpm db:migrate", {
       cwd: root,
-      env: process.env,
+      env,
       stdio: "inherit",
     });
     execSync("pnpm seed:fi", {
       cwd: root,
-      env: process.env,
+      env,
       stdio: "inherit",
     });
     return { root };

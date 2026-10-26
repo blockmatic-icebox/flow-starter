@@ -1064,3 +1064,260 @@ Human: is everything pushed to meta-cto ? update agents.md so we dont push to an
 Agent: Confirmed origin/meta-cto sync after pushing pending log; added Assessment Git (meta-cto only) rule to AGENTS.md.
 
 ---
+---
+Timestamp: 2026-10-26T01:58:00.000Z
+Work: feature-intelligence
+Stage: Explore
+
+Human: Meta CTO adversarial review and Flow remediation — explore findings, interview, no skip to Build.
+
+Agent: Reconciled 11 findings vs code on meta-cto; confirmed merge UI/validation gaps, discovery limits, shallow evals, seed safety; opened Explore with first merge-supporter question.
+
+---
+---
+Timestamp: 2026-10-26T01:55:56.068Z
+Work: feature-intelligence
+Stage: Build
+Generation: 09ba54e9-a58a-4c70-9852-8710bc272980
+
+Human: is everything pushed to meta-cto ?  update agents.md so we dont push to any other branch at this stage
+
+Agent: ---
+
+---
+---
+Timestamp: 2026-10-26T02:01:25.894Z
+Work: feature-intelligence
+Stage: Build
+Generation: f0cd2e51-67be-4c8a-bd4e-00857ee5f04b
+
+Human: # Meta CTO — Adversarial Review and Flow Remediation
+
+Continue work on the `meta-cto` branch of `gaboesquivel/flow-factory`.
+
+Use the **Flow skills, conventions, and standards** throughout this work. Start by exploring the current implementation and the adversarial review below.
+
+Act as an agentic product engineer working with me to deliver the Meta CTO technical assessment. Challenge assumptions, clarify requirements, document decisions, and build a working product.
+
+## Context
+
+An independent adversarial review identified that our implementation is architecturally promising but has gaps between documented requirements and actual product behavior.
+
+The primary concern is that Feature Intelligence currently behaves more like an AI-assisted intake and disposition system than a complete workflow for understanding, consolidating, and prioritizing customer needs.
+
+Review the latest code, original assessment requirements, existing Flow documentation, specifications, decisions, and previous implementation evidence. Do not trust completion checklists without verifying the implementation.
+
+## Adversarial findings
+
+Investigate and address these findings:
+
+1. **Merge functionality:** PMs can select Merge without choosing a valid target. Canonical relationships and supporter consolidation are incomplete.
+2. **AI resilience:** Synthesis errors can leave requests stuck in triage without an understandable failure state, recovery path, or manual fallback.
+3. **Decision transparency:** Dispositions and rationales are persisted but aren't sufficiently visible to stakeholders. Decision history and traceability are incomplete.
+4. **Domain integrity:** Invalid lifecycle transitions, empty rationales, inconsistent merge references, and unvalidated relationships can be persisted.
+5. **Discovery:** The application has hundreds of seeded requests but lacks practical search, sorting, pagination, and visible support counts.
+6. **Prioritization:** Sorting by popularity alone doesn't adequately support product decisions. Explore impact, strategic alignment, urgency, and evidence-based recommendations without overengineering.
+7. **Duplicate intelligence:** Lexical matching is weak for semantically equivalent requests, and match-confidence labels are not reliably calibrated.
+8. **Analytics:** Some metrics rely on synthetic timestamps, mutable data, or misleading denominators. Historical trends and all-time bucketing need scrutiny.
+9. **Database safety:** Destructive seeding and evaluation setup can accidentally affect shared or production data.
+10. **Verification:** Existing tests and evals sometimes verify implementation details rather than real agent behavior and successful business outcomes.
+11. **Specification drift:** Several capabilities described as complete in product specs are missing or only partially implemented.
+
+Evaluate each finding independently. Distinguish genuine defects from acceptable assessment shortcuts.
+
+## Decisions already made
+
+These decisions are approved and should not be reopened without a compelling reason:
+
+- **Authentication and authorization are out of scope.** This is a functional assessment demo. Use simulated users, names, and persona-based workflows where useful. Document the limitation rather than introducing an authentication system.
+- **Real merge functionality is required**, including target selection, domain validation, canonical relationships, and sensible supporter handling.
+- **AI failure recovery is required.** A model failure must never leave the user with an unusable workflow.
+- **Decision transparency is required**, including rationale, status, timestamps, and simulated actor identity where appropriate.
+- **Domain validation and lifecycle integrity are required.**
+- **Complete discovery functionality is required:** search, filtering, sorting, pagination, and support counts.
+- **Eve agent development is test-driven.** Evals must verify real agent behavior, tool selection, confirmation rules, recovery, and actual outcomes.
+- **MCP/API contracts and integrations should also be test-driven.** Verify real calls, validation, persistence, and error handling. First determine which MCP surfaces actually exist and clarify any proposed expansion.
+- **UI automated testing is intentionally deferred.** Do not introduce Playwright or browser E2E suites during this assessment. Manual UI verification is acceptable.
+
+Prioritize evidence that Eve and the exposed API/MCP capabilities perform correctly.
+
+## Follow the Flow workflow
+
+### Explore
+
+Load the Flow skills and all relevant project context.
+
+Review the codebase, product requirements, existing research, specifications, task documents, and architectural decisions.
+
+Interview me to clarify unresolved requirements and product tradeoffs. Ask focused questions **one at a time**, recommend sensible defaults, and explain important tradeoffs.
+
+Use the existing decisions above to avoid asking questions we've already answered.
+
+Identify what is Decided, Assumed, Open, or Deferred.
+
+Separate assessment requirements from optional production-hardening work.
+
+Record findings and relevant research using Flow conventions.
+
+### Specify
+
+Refine the product requirements through our conversation.
+
+Create or update the appropriate Flow PRDs, initiative documents, feature specifications, user journeys, and acceptance criteria.
+
+Keep `PRODUCT.md` synchronized with the detailed requirements and actual implementation status.
+
+Update `DESIGN.md` when interaction behavior, workflows, or user experience decisions change.
+
+Document architectural decisions and their rationale in `docs/adr/`, following the existing conventions. Update `ARCHITECTURE.md` to reflect accepted technical decisions.
+
+Use research documents for investigation and evidence, not undocumented assumptions.
+
+Avoid duplicating entire specifications across documents. Preserve traceability between decisions, requirements, and implementation.
+
+Request my approval of material requirements and architecture decisions.
+
+### Plan
+
+Produce a prioritized implementation plan using Flow standards.
+
+Break the work into cohesive tasks with dependencies, acceptance criteria, verification methods, and clear boundaries for parallel subagents.
+
+Favor delivering the complete core product workflow over adding peripheral functionality.
+
+Identify which changes can be executed independently and which require sequential integration.
+
+Present the plan for approval before implementation.
+
+### Build
+
+Once the plan is approved, implement it using Flow's agent delegation and execution practices.
+
+Use specialized subagents where meaningful. Maintain clear ownership, bounded tasks, and integration checkpoints.
+
+Follow test-driven development for Eve evals and MCP/API integration tests.
+
+Verify observable outcomes and persisted state, not merely that functions exist or tools were invoked.
+
+Keep product documentation and architectural decisions synchronized as implementation progresses.
+
+### Review
+
+Perform a fresh adversarial review against the original assessment and approved specifications.
+
+Challenge the product from the perspectives of a PM, a submitter, an AI engineer, and a Meta CTO evaluator.
+
+Verify that the application provides a convincing end-to-end product workflow, even though UI automation is deferred.
+
+Report passed, failed, partial, and unverified acceptance criteria with supporting evidence.
+
+Do not mark tasks complete solely because code exists or tests pass superficially.
+
+### Ship
+
+Prepare a concise assessment-ready README and verification summary.
+
+Report what was built, what changed, what was tested, what remains deferred, and which requirements are satisfied.
+
+Include the relevant PRDs/specifications, ADRs, research documents, task records, and commit references.
+
+Preserve Flow's prompt and decision history conventions.
+
+## Flow self-improvement
+
+When you discover a failure caused by Flow's methodology rather than this product, record it separately as actionable Factory feedback.
+
+Do not silently change the Flow methodology while implementing the assessment. Propose those improvements for my approval.
+
+## Start now
+
+Begin with **Flow Explore**.
+
+First inspect the latest `meta-cto` branch and reconcile the adversarial findings against the actual code and existing documentation.
+
+Summarize what is confirmed, what is already resolved, and what requires a product or architectural decision.
+
+Then **interview me one question at a time**, following Flow's normal human-in-the-loop workflow.
+
+Don't skip directly to implementation.
+
+The objective is not merely to resolve review comments. It's to use Flow to deliver a coherent, demonstrably functional product that fulfills the Meta CTO assessment.
+
+Agent: ---
+
+---
+---
+Timestamp: 2026-10-26T02:01:31.014Z
+Work: feature-intelligence
+Stage: Build
+Generation: f1a72f61-183a-40ef-a9cd-a265984280d8
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: ---
+
+---
+---
+Timestamp: 2026-10-26T02:02:20.948Z
+Work: feature-intelligence
+Stage: Build
+Generation: 71dc98ca-7182-4d60-b8fa-d4207054147e
+
+Human: is there anything you would add improve in retrospect?
+
+Agent: Retrospective: domain truth before demo polish; behavioral evals; seed guards; honesty in PRODUCT status.
+
+---
+---
+Timestamp: 2026-10-26T02:08:00.000Z
+Work: feature-intelligence
+Stage: Specify
+
+Human: agree, update docs and continue to spec
+
+Agent: Published adversarial research, remediation spec (RC-1–RC-10), ADR 0004, draft remediation tasks; synced PRODUCT, DESIGN, ARCHITECTURE, initiative, core spec index, testing W-R*, seed safety note.
+
+---
+---
+Timestamp: 2026-10-26T02:10:00.000Z
+Work: feature-intelligence
+Stage: Plan
+
+Human: now create tasks for dev with dependencies
+
+Agent: Expanded docs/tasks/feature-intelligence-remediation.md with gates G-R1–G-R5, dependency matrix, per-task depends/verify/write-set, worker map; initiative Plan marked ready.
+
+---
+---
+Timestamp: 2026-10-26T02:04:11.732Z
+Work: feature-intelligence
+Stage: Build
+Generation: 456b012a-cf8a-4b87-a225-0740292c8723
+
+Human: agree, update docs and continue to spec
+
+Agent: ---
+
+---
+---
+Timestamp: 2026-10-26T02:05:04.956Z
+Work: feature-intelligence
+Stage: Build
+Generation: 7ec9a63c-32f0-4a25-98a0-07150fa2ec18
+
+Human: now create tasks for dev with dependencies
+
+Agent: ---
+
+---
+---
+Timestamp: 2026-10-26T02:06:33.477Z
+Work: feature-intelligence
+Stage: Build
+Generation: 83b816f5-192c-43cd-b55b-c27d0a1b79e5
+
+Human: run tasks in parallel subagents all ff merging back to meta-cto branch until we complete all task, you act as orchestrator and review, apply fixes and re-span agents when needed
+
+Agent: Noting `setDisposition` is a thin update with no validation; schema already has `mergeTargetId`, `canonicalRequestId`, and `archived` status. Planning wave-based parallel builders with serial integration to avoid file conflicts.
+
+---

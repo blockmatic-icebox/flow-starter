@@ -1,9 +1,23 @@
 import { featureRequest, featureRequestSupport } from "@repo/db";
 import type { AppDatabase } from "@repo/db";
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 
-export const listTriageQueue = ({ db }: { db: AppDatabase }) =>
-  db
+export type TriageQueueSort = "support" | "newest" | "oldest";
+
+export const listTriageQueue = ({
+  db,
+  sort = "support",
+}: {
+  db: AppDatabase;
+  sort?: TriageQueueSort;
+}) => {
+  const supportCount = sql<number>`count(${featureRequestSupport.supporterKey})::int`;
+
+  let order = [desc(supportCount), desc(featureRequest.publishedAt)];
+  if (sort === "newest") order = [desc(featureRequest.publishedAt)];
+  else if (sort === "oldest") order = [asc(featureRequest.publishedAt)];
+
+  return db
     .select({
       canonicalRequestId: featureRequest.canonicalRequestId,
       decisionBrief: featureRequest.decisionBrief,
@@ -20,6 +34,7 @@ export const listTriageQueue = ({ db }: { db: AppDatabase }) =>
       source: featureRequest.source,
       status: featureRequest.status,
       submittedAt: featureRequest.submittedAt,
+      supportCount,
       themeKey: featureRequest.themeKey,
       themeLabel: featureRequest.themeLabel,
       themeRationale: featureRequest.themeRationale,
@@ -40,7 +55,5 @@ export const listTriageQueue = ({ db }: { db: AppDatabase }) =>
       )
     )
     .groupBy(featureRequest.id)
-    .orderBy(
-      desc(sql<number>`count(${featureRequestSupport.supporterKey})::int`),
-      desc(featureRequest.publishedAt)
-    );
+    .orderBy(...order);
+};

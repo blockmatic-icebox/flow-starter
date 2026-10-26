@@ -15,9 +15,9 @@ const run = async () => {
     return;
   }
   if (command === "csv") {
-    const rows = await searchRequests({
+    const { items: rows } = await searchRequests({
       db,
-      limit: 10,
+      pageSize: 10,
       query: "CSV export",
     });
     console.log(

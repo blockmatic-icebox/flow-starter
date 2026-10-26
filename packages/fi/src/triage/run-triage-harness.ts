@@ -110,6 +110,7 @@ export const runTriageHarness = async ({
       degraded,
       duration_ms: Date.now() - started,
       model: triageModelLabel(degraded),
+      needs_ai_review: degraded,
       steps,
       version: 1,
     },

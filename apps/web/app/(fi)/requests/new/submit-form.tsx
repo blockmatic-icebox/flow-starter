@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import {
   actionConfirmRequest,
   actionCreateDraftAndTriage,
+  actionRetryTriage,
 } from "../../actions";
 
 const TRIAGE_STAGES = [
@@ -29,7 +30,7 @@ const TRIAGE_STAGES = [
 ];
 
 const matchLabel = (score: number) =>
-  score > 0.35 ? "Strong match" : "Possible match";
+  score > 0.35 ? "Strong match (similar wording)" : "Possible match (lexical)";
 
 const DuplicateLinkSection = ({
   duplicates,
@@ -118,6 +119,7 @@ export const SubmitForm = ({
   const [loading, setLoading] = useState(false);
   const [stageIndex, setStageIndex] = useState(0);
   const [thankYou, setThankYou] = useState(false);
+  const [degraded, setDegraded] = useState(false);
 
   const source = isExternal ? "customer" : "internal";
 
@@ -142,7 +144,10 @@ export const SubmitForm = ({
       return;
     }
     setRequestId(request.id);
-    setProblemStatement(harness.problemStatement);
+    setDegraded(harness.degraded);
+    setProblemStatement(
+      harness.problemStatement.trim() || description.trim().slice(0, 500)
+    );
     setDecisionBrief(harness.decisionBrief);
     setDuplicates(harness.duplicateCandidates);
     setLinkId(harness.recommendedIntakeLinkId);
@@ -231,8 +236,41 @@ export const SubmitForm = ({
   if (loading) confirmLabel = "Publishing…";
   else if (isExternal) confirmLabel = "Submit feedback";
 
+  const retryAi = async () => {
+    if (!requestId) return;
+    setLoading(true);
+    const { harness } = await actionRetryTriage({ requestId });
+    setDegraded(harness.degraded);
+    setProblemStatement(
+      harness.problemStatement.trim() || description.trim().slice(0, 500)
+    );
+    setDecisionBrief(harness.decisionBrief);
+    setDuplicates(harness.duplicateCandidates);
+    setLinkId(harness.recommendedIntakeLinkId);
+    setLoading(false);
+  };
+
   return (
     <div className="mx-auto max-w-xl space-y-4">
+      {degraded ? (
+        <output className="border-border bg-muted/50 block space-y-2 rounded-lg border p-4 text-sm">
+          <p className="font-medium">AI review was limited</p>
+          <p className="text-muted-foreground">
+            We saved your title and description. You can edit the summary below,
+            submit anyway, or retry AI review.
+          </p>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button
+              disabled={loading}
+              onClick={() => retryAi().catch(console.error)}
+              type="button"
+              variant="outline"
+            >
+              Retry AI review
+            </Button>
+          </div>
+        </output>
+      ) : null}
       <DuplicateLinkSection
         duplicates={duplicates}
         isExternal={isExternal}

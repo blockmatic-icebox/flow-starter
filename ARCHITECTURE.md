@@ -5,7 +5,7 @@
 Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundaries, security). Factory detail: [.agents/flow/architecture.md](.agents/flow/architecture.md).
 
 **Adoption:** [ADR 0001 — Use Flow Factory](docs/adr/0001-use-flow-factory.md)  
-**Feature Intelligence:** [ADR 0002](docs/adr/0002-feature-intelligence-architecture.md) · [spec](docs/specs/feature-intelligence.md)
+**Feature Intelligence:** [ADR 0002](docs/adr/0002-feature-intelligence-architecture.md) · [ADR 0004](docs/adr/0004-fi-workflow-integrity-and-safety.md) · [spec](docs/specs/feature-intelligence.md) · [remediation](docs/specs/feature-intelligence-remediation.md)
 
 ## System overview (assessment)
 
@@ -34,11 +34,11 @@ Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundar
 
 | Path | Role | Implementation status |
 | --- | --- | --- |
-| `packages/fi` | Metrics (`getInsights` + trends), queue/CRUD, T0–T3 harness, `seed/` generator (500 rows), offline triage-matrix test | **Live** — degrades without gateway key |
+| `packages/fi` | Metrics, queue/CRUD, **disposition gate** (remediation), T0–T3 harness, `seed/` (500 rows + safety guard) | **Partial** — disposition/discovery gaps per RC-* |
 | `packages/db` | Drizzle schema; `fi-schema.ts`; migrations through `0002_feature_intelligence` | **Live** — `pnpm db:migrate`, remote SSL in client |
 | `agent/` | eve root agent; `instructions.md` + 8 tools → `@repo/fi` | **Live** — smoke evals in `evals/` |
-| `apps/web` | Next.js + `eve/next`; FI routes under `app/(fi)/` | **Live** — browse, submit, triage, insights, `/chat` |
-| `evals/` | eve smoke (`pnpm exec eve eval smoke`) | **Live** — migrate + seed in `evals.config.ts` |
+| `apps/web` | Next.js + `eve/next`; FI routes under `app/(fi)/` — **`force-dynamic`** on FI layout (counts from DB, not static prerender) | **Partial** — UI gaps per remediation spec |
+| `evals/` | eve smoke (`pnpm exec eve eval smoke`) | **Partial** — outcome-based evals in progress (RC-9) |
 
 Also available: `@repo/ui`, `@repo/genui` (not used for FI triage UI), `@repo/ts`.
 
@@ -50,7 +50,7 @@ Owned tables (see [spec](docs/specs/feature-intelligence.md)):
 - `feature_request_duplicate_candidate`
 - `feature_request_support`
 
-Seed: `pnpm seed:fi` → `@repo/fi/seed/load.ts` (manifest-driven **500** rows: anchors FR-001–FR-011 + generated bulk; **never on production**). See [seed spec](docs/specs/feature-intelligence-seed.md).
+Seed: `pnpm seed:fi` → `@repo/fi/seed/load.ts` (manifest **500** rows). **Policy ([ADR 0004](docs/adr/0004-fi-workflow-integrity-and-safety.md)):** refuse `NODE_ENV=production` unless `FI_SEED_ALLOW_DESTRUCTIVE=1`; optional `EVE_EVAL_DATABASE_URL` for eval isolation. See [seed spec](docs/specs/feature-intelligence-seed.md).
 
 PM triage queue: `listTriageQueue` orders by **support count** desc, then `published_at` desc.
 
