@@ -1,11 +1,9 @@
-import { listTriageQueue } from "@repo/fi";
+import { getDb, listTriageQueue } from "@repo/fi";
 import { Badge } from "@repo/ui/components/badge";
 import Link from "next/link";
 
-import { fiDb } from "../../../lib/fi-db";
-
 export const FiShell = async ({ children }: { children: React.ReactNode }) => {
-  const queue = await listTriageQueue({ db: fiDb() });
+  const queue = await listTriageQueue({ db: getDb() });
   const openCount = queue.length;
 
   return (

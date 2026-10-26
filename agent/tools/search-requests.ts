@@ -1,13 +1,15 @@
-import { getDb, searchRequests } from "@repo/fi";
+import { searchRequests } from "@repo/fi";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
+
+import { agentDb } from "../lib/db";
 
 export default defineTool({
   description:
     "Search published feature requests by text and optional theme key.",
   async execute({ query, themeKey, limit }) {
     const rows = await searchRequests({
-      db: getDb(),
+      db: agentDb(),
       limit,
       query,
       themeKey,

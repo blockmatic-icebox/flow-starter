@@ -1,12 +1,14 @@
-import { getDb, supportRequest } from "@repo/fi";
+import { supportRequest } from "@repo/fi";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
+
+import { agentDb } from "../lib/db";
 
 export default defineTool({
   description: "Add support for a published feature request.",
   async execute({ requestId, supporterKey }) {
     const result = await supportRequest({
-      db: getDb(),
+      db: agentDb(),
       requestId,
       supporterKey,
     });

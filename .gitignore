@@ -41,10 +41,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Flow / assessment local prompt logs (never commit .agents/flow/prompts.txt; root prompts.txt gitignored by default)
+# Flow local prompt logs (.agents/flow/prompts.txt never commit; root prompts.txt tracked on meta-cto)
 .agents/flow/prompts.txt
 .agents/flow/local/
-prompts.txt
 
 # Misc
 .DS_Store

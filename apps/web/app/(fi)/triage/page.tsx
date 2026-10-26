@@ -1,4 +1,4 @@
-import { listTriageQueue } from "@repo/fi";
+import { getDb, listTriageQueue } from "@repo/fi";
 import { Card, CardHeader, CardTitle } from "@repo/ui/components/card";
 import {
   Empty,
@@ -8,11 +8,10 @@ import {
 } from "@repo/ui/components/empty";
 import Link from "next/link";
 
-import { fiDb } from "../../../lib/fi-db";
 import { TriagePanel } from "./triage-panel";
 
 export default async function TriagePage() {
-  const queue = await listTriageQueue({ db: fiDb() });
+  const queue = await listTriageQueue({ db: getDb() });
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">

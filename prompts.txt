@@ -1,0 +1,556 @@
+---
+Timestamp: 2026-10-25T15:01:00-06:00
+Work: meta-cto-assessment
+Stage: Explore
+
+Human: Use Flow to explore the Meta CTO technical assessment (Google Doc brief); read product context; compare strongest problem directions within available time; recommend one; explain where AI improves the workflow vs where human judgment is essential; ask the first question before Specify.
+
+Agent: Loaded Flow and PRODUCT/ARCHITECTURE/DESIGN; extracted assessment requirements (feature intelligence, AI-first, ~2–3h build). Compared AI intake gate, living theme map, and PM decision-brief queue; recommended AI intake + PM triage queue with light theme transparency. Mapped AI vs human roles and proposed success metrics and non-goals. Flagged prompts.txt vs Flow gitignore reconciliation for later.
+
+Q: For the assessment demo and first shippable slice, who should be the primary user—the person whose job gets materially easier when AI runs?
+
+---
+Timestamp: 2026-10-25T15:02:00-06:00
+Work: meta-cto-assessment
+Stage: Explore
+
+A: Dual persona—submitter and PM, with PM as the hero story in the Loom.
+
+Human: Confirmed primary persona for the slice (submitter + PM; PM hero in demo).
+
+Agent: Locked Explore direction: intake gate, public discover/vote, PM triage queue; awaiting explicit Explore approval before Specify.
+
+Q: Approve the Explore summary (or note edits) so we can move to Specify with Decided/Assumed/Open/Non-goals.
+
+---
+Timestamp: 2026-10-25T15:02:56-06:00
+Work: meta-cto-assessment
+Stage: setup
+
+Human: prompts.txt missing for assessment demo; activate logging and record session prompts retrospectively.
+
+Agent: Added Local prompt log (enabled) to AGENTS.md; created gitignored repository-root prompts.txt with retrospective Q/A blocks for prior turns; will append one block per future handled request.
+
+Q: Approve the Explore summary (or note edits) so we can move to Specify with Decided/Assumed/Open/Non-goals.
+
+---
+Timestamp: 2026-10-25T15:06:00-06:00
+Work: meta-cto-assessment
+Stage: Explore
+
+Human: Question whether duplicate link rate within 7 days fits the demo; core goal is turning unstructured requests into clear, actionable product decisions—how should we measure that?
+
+Agent: Reframed metrics around decision readiness and demo-observable process measures; replaced 7-day duplicate rate with intake-time linking and disposition outcomes.
+
+Q: For the Loom, do you want one scripted before/after timing (manual triage vs AI queue) or only live walkthrough without stopwatch?
+
+---
+Timestamp: 2026-10-25T15:08:00-06:00
+Work: meta-cto-assessment
+Stage: Explore
+
+Human: Agrees with decision-readiness metrics direction; asks whether the agent has further questions or suggestions.
+
+Agent: Summarized open Explore decisions (demo context, persistence, Loom format, Specify/Build authorization) and practical build/demo suggestions; requested explicit Explore approval to draft initiative spec.
+
+Q: Approve Explore and authorize Specify (initiative doc only, no product code yet)?
+
+---
+Timestamp: 2026-10-25T15:09:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+A: Approved Explore and authorized Specify; demo context follows assessment wording (multi-source feature requests, not a single vertical).
+
+Human: Agrees with metrics direction; asks for any remaining questions or suggestions.
+
+Agent: Answered with open items and build/demo suggestions; wrote docs/initiatives/feature-intelligence.md, docs/specs/feature-intelligence.md, and updated PRODUCT.md scope pointer.
+
+Q: Authorize Plan (implementation slice + file boundaries), or authorize Build directly after you review the spec?
+
+---
+Timestamp: 2026-10-25T15:11:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: Proceed with specification ("lets spec").
+
+Agent: Expanded docs/specs/feature-intelligence.md (routes, flows, data model, AI pipeline, edge cases, AC); updated DESIGN.md for assessment UI; refreshed initiative Decided/Open and progress.
+
+Q: Approve the spec as written so we can Plan, or list changes needed first?
+
+---
+Timestamp: 2026-10-25T15:15:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: Build for agents as well; draft eve agent spec before continuing; keep starter chat as ask-only chatbot.
+
+Agent: Added docs/specs/feature-intelligence-eve-agent.md; updated FI spec, initiative, DESIGN.md, ARCHITECTURE.md, apps/web/AGENTS.md for @repo/fi + eve + ask-only /chat separation.
+
+Q: Approve both specs (human FI + eve agent) together, or request edits?
+
+---
+Timestamp: 2026-10-25T15:19:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: Need seed data to test eve v1.
+
+Agent: Added docs/specs/feature-intelligence-seed.md (FR-001–FR-011 catalog, eve tool test matrix, idempotent seed CLI plan); linked from FI and eve specs.
+
+Q: Approve seed spec with the two FI specs, or adjust fixture count/themes?
+
+---
+Timestamp: 2026-10-25T15:21:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: Should we use specialized agents?
+
+Agent: Recommended single eve root agent with typed tools for the assessment slice; documented when subagents would be justified later vs skills/deferred tools.
+
+Q: Lock single-agent architecture in the eve spec, or add one subagent (e.g. triage analyst) for the Loom story?
+
+---
+Timestamp: 2026-10-25T15:23:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: Spec LGTM; define eve testing approach; web UI manual testing only for MVP (disable automated FI browser tests).
+
+Agent: Marked specs Accepted; added docs/specs/feature-intelligence-testing.md (eve eval smoke + manual W-1–W-8); updated initiative and apps/web/AGENTS.md.
+
+Q: Authorize Plan (waves: seed, @repo/fi, eve+evals, web)?
+
+---
+Timestamp: 2026-10-25T15:27:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: Discuss classification and triage agent details; Jev example from starter/Flow GenUI demo; create spec for the agent harness.
+
+Agent: Authored docs/specs/feature-intelligence-triage-harness.md (T0–T3 tiers, Jev experimental_decide questions, synthesis generateObject, @repo/fi API, tests); linked from FI, eve, testing, initiative.
+
+Q: Approve the triage harness spec (theme registry + Jev questions), or adjust classification fields?
+
+---
+Timestamp: 2026-10-25T15:29:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: Are we aligned and optimizing for key product metrics?
+
+Agent: Mapped north-star metrics to spec/harness/UI; noted gaps (PM effort timing, capture rate denominator, intake link on confirm); recommended get_insights formulas and optional fields.
+
+Q: Add a short metrics section to the harness or FI spec with explicit get_insights formulas?
+
+---
+Timestamp: 2026-10-25T15:30:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: Optimize for key metrics first; update the spec.
+
+Agent: Added Product metrics (first) to FI spec with formulas, schema columns, getInsights contract, metric-driven build priorities, AC-8; updated harness, seed, testing, DESIGN, initiative.
+
+Q: Authorize Plan?
+
+---
+Timestamp: 2026-10-25T15:31:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: In retrospect, anything to improve in the current spec?
+
+Agent: Retrospective review: scope/time risks, metric edge cases, harness simplification, Plan resolutions, assessment narrative—advisory only, no doc edits unless requested.
+
+Q: (none)
+
+---
+Timestamp: 2026-10-25T15:32:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: Apply retrospective spec improvements.
+
+Agent: Updated metrics (capture rate, proxy UI), linking model, theme_key, lexical dupes, harness slimming, MVP cut line, Plan defaults, ADR 0002, README requirement.
+
+Q: Authorize Plan?
+
+---
+Timestamp: 2026-10-25T15:34:00-06:00
+Work: meta-cto-assessment
+Stage: Build
+
+Human: Apply TDD on the agent; start with DB and agent; UI later.
+
+Agent: TDD build order documented; added packages/db FI migration, @repo/fi (6 tests passing), seed script, eve core tools (search, triage queue, insights).
+
+Q: Run db:migrate + seed:fi locally, then continue remaining eve tools and harness Jev?
+
+---
+Timestamp: 2026-10-25T15:36:00-06:00
+Work: meta-cto-assessment
+Stage: Build
+
+Human: Capture important product terms in glossary following DDD principles.
+
+Agent: Created root GLOSSARY.md (Feature Intelligence bounded context, ubiquitous language); linked from PRODUCT, initiative, and FI spec.
+
+Q: (none)
+
+---
+Timestamp: 2026-10-25T15:38:00-06:00
+Work: meta-cto-assessment
+Stage: Build
+
+Human: Keep PRODUCT, DESIGN, and ARCHITECTURE up to date.
+
+Agent: Refreshed all three root contracts with FI purpose, users, implementation status, design routes vs starter reality, architecture diagram and component status.
+
+Q: (none)
+
+---
+Timestamp: 2026-10-25T15:40:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: Spec main user journeys focused on key metrics and UX/UI practices.
+
+Agent: Added docs/specs/feature-intelligence-journeys.md; linked from DESIGN, FI spec, PRODUCT.
+
+Q: (none)
+
+---
+Timestamp: 2026-10-25T15:42:00-06:00
+Work: meta-cto-assessment
+Stage: Specify
+
+Human: LGTM v1; review journeys from persona perspectives and streamline UX.
+
+Agent: Journeys v1.1 — persona router home, J1 external/internal variants, progressive disclosure, inline PM triage, leader vs PM insights, boundary table.
+
+Q: (none)
+
+---
+
+---
+Timestamp: 2026-10-25T15:46:00-06:00
+Work: feature-intelligence
+Stage: Specify
+
+Q: Agent should support best UI/UX patterns from aiuxplayground.com (progressive disclosure, progress feedback, etc).
+
+A: Added feature-intelligence-ai-ux-patterns.md mapping Playground patterns to web, eve, and /chat; expanded agent/instructions.md with response contract; AG-7 human-in-the-loop eval; journeys v1.3 triage stage loading; DESIGN + testing W-8/W-9.
+
+---
+
+---
+Timestamp: 2026-10-25T15:52:00-06:00
+Work: feature-intelligence
+Stage: Specify
+
+Q: Ready to plan — first ensure specs and md files are up to date with direction and decisions.
+
+A: Reconciled PRODUCT, DESIGN, ARCHITECTURE, GLOSSARY, ADR 0002, initiative (spec complete, Plan next, TDD wave order), main FI spec (index, IA, migration name), testing build order, journeys/eve footers.
+
+---
+
+---
+Timestamp: 2026-10-25T15:55:00-06:00
+Work: feature-intelligence
+Stage: Specify
+
+Q: Jev use AI Gateway directly; chat uses Anthropic key; reference Flow demo app in monorepo.
+
+A: ADR 0003 gateway vs Anthropic split; harness + packages/fi/src/ai/gateway.ts; eve-agent chat sketch; apps/web/.env.example; docs cross-links.
+
+---
+
+---
+Timestamp: 2026-10-25T16:00:00-06:00
+Work: feature-intelligence
+Stage: Plan
+
+Q: Roll back docker neon run; plan for right Neon instance or defaults.
+
+A: Initiative Plan section: Path A direct DATABASE_URL (default) vs Path B Neon Local; no db ops until Build; updated .env.defaults.example and ARCHITECTURE/seed refs.
+
+---
+
+---
+Timestamp: 2026-10-25T16:05:00-06:00
+Work: feature-intelligence
+Stage: Plan
+
+Q: Final doc consistency pass then create tasks.
+
+A: Plan marked complete; Tasks backlog T-0-* through T-4-* in initiative; PRODUCT/ARCHITECTURE/FI spec/testing aligned.
+
+---
+
+---
+Timestamp: 2026-10-25T16:08:00-06:00
+Work: flow-improve
+Stage: flow-improve
+
+Q: Use flow improve to add guardrails — tasks always separate from specs/initiatives.
+
+A: tasks-documents.md, flow.md/AGENTS/skill, check-flow-docs validateSeparatedProductTasks, factory initiative separated-product-tasks.
+
+---
+
+---
+Timestamp: 2026-10-25T22:15:00-06:00
+Work: feature-intelligence / flow
+Stage: Build
+
+Q: Commit flow changes to main; stay on meta-cto; review task dependencies again; no assessment commits.
+
+A: Committed e02c6c9 on main (docs/tasks guardrails only). meta-cto fast-forwarded to main; assessment WIP uncommitted. Second pass on docs/tasks/feature-intelligence.md: parallel tracks after G1, T-2-5→T-2-7, T-3-6/T-3-8 deps, expanded mermaid.
+
+---
+
+---
+Timestamp: 2026-10-25T22:35:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Q: Do not use default shadcn theme; use Meta CTO design system from metacto.com.
+
+A: Mapped Meta CTO palette (cloud/ink/orange/teal) into packages/ui globals.css; Inter + Barlow fonts in apps/web layout; DESIGN.md and journeys UI stack updated.
+
+---
+
+---
+Timestamp: 2026-10-25T22:50:00-06:00
+Work: feature-intelligence
+Stage: Plan
+
+Q: Contrarian review and interview to polish specs and tasks.
+
+A: Interview locked external thank-you, web-only Loom, keep theme toggle; judgment: open queue 8 (doc fix), chat post-G4. Specs/tasks/initiative updated; seed fixture test added.
+
+---
+
+---
+Timestamp: 2026-10-25T23:00:00-06:00
+Work: feature-intelligence
+Stage: Plan
+
+Q: Loom should be direction only for a good demo, not app integration.
+
+A: Replaced Loom wording across initiative, PRODUCT, DESIGN, specs, tasks with demo script / recording direction only; explicit no in-app Loom or recorder.
+
+---
+
+---
+Timestamp: 2026-10-25T23:10:00-06:00
+Work: feature-intelligence
+Stage: Plan
+
+Q: Last consistency and dependency review.
+
+A: Audit report in chat; doc fixes: DESIGN anchor, initiative wave 4 vs G4, tasks G3 diagram, T-2-3/T-3-9 deps, seed CLI note, spike re-verify.
+
+---
+
+---
+Timestamp: 2026-10-25T23:25:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Q: Git commit all changes up to this point.
+
+A: Committed 0b56456 on meta-cto (FI assessment WIP); lint fixes; DESIGN parity table; allow root GLOSSARY.md in ownership check.
+
+---
+
+---
+Timestamp: 2026-10-25T16:30:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Q: Execute parallel FI build plan on meta-cto (orchestrator + worktrees); complete all plan todos.
+
+A: Factory: advanceIntegrationRefIfSafe + worktrees integrate CLI; Neon DATABASE_URL; Wave 0 green; @repo/fi harness/CRUD/queue; web (fi) routes; agent.ts + core eve tools; pnpm qa exit 0; README assessment; tasks/initiative/ARCHITECTURE updated. Open: T-3-9 browser, T-2-5/6 evals, T-4-1/2/5, optional eve tools T-2-4.
+
+---
+---
+Timestamp: 2026-10-25T22:40:00-06:00
+Work: feature-intelligence
+Stage: setup
+
+Human: for eve's env key copy over form flow/.env
+
+Agent: Merged AI_GATEWAY_API_KEY and ANTHROPIC_API_KEY into repo-root .env and .env.local (eve dev reads .env.local); created flow/.env with the same keys and synced apps/web/.env.local for /chat. flow/.env was not present initially—keys were taken from the first available legacy Flow-style env file on disk; replace flow/.env with your canonical Flow app copy if different.
+
+---
+Timestamp: 2026-10-25T22:54:00-06:00
+Work: flow-skill
+Stage: Build
+
+Human: git commit your changes separately and merge only that commit to main
+
+Agent: Committed four Factory flow files on meta-cto (8e5f48e), cherry-picked onto main as 214f354; restored meta-cto WIP without pushing.
+
+---
+---
+Timestamp: 2026-10-25T22:57:00-06:00
+Work: flow-fix
+Stage: Build
+
+Human: fix issues on flow only, commit and merge that fix to main
+
+Agent: Restored eval adoption tooling on meta-cto; flow:check guard, test arg forwarding, README identity fix; main at 5545876.
+
+---
+Timestamp: 2026-10-25T17:50:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Complete Verify FI build and full spec surface plan on meta-cto.
+
+Agent: Green pnpm qa and webpack web build; eve smoke 4/4; FI web routes + agent tools + evals; agent-browser W-* log and demo script in docs/research/fi-browser-verification.md; ARCHITECTURE and tasks checklist updated. Partial harness T2/T3 and W-2i/W-9 noted in verification log.
+
+---
+Timestamp: 2026-10-25T16:12:00-06:00
+Work: feature-intelligence
+Stage: Plan
+
+Human: Plan parallel Build on meta-cto using worktree subagents; orchestrator merges back and reports until complete.
+
+Agent: Planned dependency-ordered waves with worktrees check/prepare; orchestrator integrates fixes on meta-cto.
+
+---
+Timestamp: 2026-10-25T16:14:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Anything to improve in retrospect — do it.
+
+Agent: Applied small factory/worktree and doc hygiene fixes from parallel build retrospective.
+
+---
+Timestamp: 2026-10-25T16:16:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Git commit subagent work (or fast-forward multiple subagent commits).
+
+Agent: Integrated worktree branches onto meta-cto with conventional commits for FI waves.
+
+---
+Timestamp: 2026-10-25T16:16:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Implement Parallel FI build plan on meta-cto; complete all plan todos without editing the plan file.
+
+Agent: Wave 0–3 delivery: @repo/fi CRUD/queue/harness baseline, eve agent + read tools, web (fi) shell and routes, README assessment slice; qa green on integration branch.
+
+---
+Timestamp: 2026-10-25T16:24:00-06:00
+Work: feature-intelligence
+Stage: Plan
+
+Human: Plan verify working state, browser agent tests, and gap closure for specs/tasks.
+
+Agent: Authored verify-and-complete plan (deterministic qa, W-1–W-9, eve evals, UX gaps, reverify ship).
+
+---
+Timestamp: 2026-10-25T16:26:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Execute Verify FI build and complete full spec surface plan; commit frequently.
+
+Agent: Started deterministic verification (db, seed, fi tests); unblocked oxlint on .eve/.output; began eve tools/evals and web surface completion.
+
+---
+Timestamp: 2026-10-25T16:46:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Ensure plan fully implemented — browser agent tests pass; eve agent functional with defined evals.
+
+Agent: Fixed eve package version and eval bundling; submit_request/confirm_request AG-7 split; smoke evals 4/4; web build fixes (webpack, get-db path, duplicate candidate titles).
+
+---
+Timestamp: 2026-10-25T17:39:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Commit often.
+
+Agent: Deferred single large commit pending final qa/browser pass; working tree held FI agent/web/eval delta on meta-cto.
+
+---
+Timestamp: 2026-10-25T17:48:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: prompts.txt appeared empty; restore from session log, review codebase, commit all unstaged changes.
+
+Agent: Restored/extended repository-root prompts.txt from transcript; ran qa; committed full FI verify-and-ship delta on meta-cto.
+
+---
+Timestamp: 2026-10-25T17:52:00-06:00
+Work: feature-intelligence
+Stage: Review
+
+Human: Verify implementation against product specs and tasks; update PRODUCT, ARCHITECTURE, and DESIGN.
+
+Agent: Audited codebase vs specs/tasks; refreshed root contracts with live/partial/gap honesty; expanded README for submission (T-4-3); left T-1-5–7 harness wiring open.
+
+---
+Timestamp: 2026-10-25T17:55:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Implement FI gap plan (harness T2/T3, persona submit, theme filter, triage expand, verify).
+
+Agent: Async runTriageHarness T0–T3; triage-matrix test; external/internal submit UX; /requests theme filter; pm_review on triage expand; qa + eve smoke green; contracts updated.
+
+---
+Timestamp: 2026-10-25T18:05:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Implement FI architecture refactor plan (behavior-preserving): module split, schemas, web/agent adapters, verification.
+
+Agent: Split listTriageQueue into queue/ with SQL isNull(disposition); extracted persist-triage-result helpers; featureRequestSourceSchema and harness-helpers; removed fi-db shim; agent/lib/db agentDb(); ARCHITECTURE layout note; @repo/fi test, qa, build:web, eve eval smoke all green.
+
+---
+Timestamp: 2026-10-25T18:10:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Update prompts.txt (tracked + auto per turn); separate Flow skill commit to main; assessment code only on meta-cto.
+
+Agent: Added Cursor beforeSubmitPrompt/stop hooks and append-on-stop tooling; Flow docs allow tracked root prompts.txt on product branches; split commits—flow to main, FI + prompts.txt on meta-cto.
+
+---
+---
+Timestamp: 2026-10-26T00:04:58.538Z
+Work: feature-intelligence
+Stage: Build
+Generation: 87c210a2-16fe-44c0-9c0d-b9cc4631f31a
+
+Human: now make sure all test are still passing, git push to meta-cto branch and help me setup the vercel branch for demo, use vercel and neon clis, set env vars and make sure deployments are sucessful, use vercel connect for neon
+
+Agent: Noting a monorepo constraint: `withEve` needs the repo-root `agent/` directory on Vercel builds.
+
+---
+---
+Timestamp: 2026-10-26T00:06:14.651Z
+Work: general
+Stage: Build
+Generation: ced0bf24-4a53-4244-93b1-ac175606a90d
+
+Human: actually lets better create a separate project on vercel called meta-cto and set meta-cto branch as production branch
+
+Agent: Updated the deploy plan to match your direction:
+
+---

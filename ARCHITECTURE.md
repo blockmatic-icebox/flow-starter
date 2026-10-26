@@ -93,7 +93,7 @@ Root `pnpm test` includes `@repo/fi`.
 ```text
 apps/web/app/(fi)/  # FI routes (home, requests, triage, insights, chat)
 agent/              # eve Feature Intelligence operator
-packages/fi/        # domain + harness
+packages/fi/        # domain + harness (queue/list-triage-queue, requests/persist-triage-result, triage/harness-helpers, schemas/feature-request-source)
 packages/db/        # Drizzle + FI migration
 docs/adr/           # product ADRs
 docs/specs/         # FI specifications (see main spec index)

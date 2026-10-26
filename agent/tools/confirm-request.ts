@@ -1,13 +1,15 @@
-import { confirmRequest, getDb } from "@repo/fi";
+import { confirmRequest } from "@repo/fi";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
+
+import { agentDb } from "../lib/db";
 
 export default defineTool({
   description:
     "Publish a draft request after the user confirms or edits the problem statement.",
   async execute({ requestId, problemStatement, intakeLinkedRequestId }) {
     const published = await confirmRequest({
-      db: getDb(),
+      db: agentDb(),
       intakeLinkedRequestId,
       problemStatement,
       requestId,

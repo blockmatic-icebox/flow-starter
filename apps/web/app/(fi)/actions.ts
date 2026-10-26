@@ -3,22 +3,24 @@
 import {
   confirmRequest,
   createDraftAndTriage,
+  getDb,
   getRequest,
   recordPmReviewStarted,
   searchRequests,
   setDisposition,
   supportRequest,
 } from "@repo/fi";
+import type { FeatureRequestSource } from "@repo/fi";
 import { cookies } from "next/headers";
 
-import { fiDb } from "../../lib/fi-db";
+const db = () => getDb();
 
 export async function actionCreateDraftAndTriage(input: {
   title: string;
   description: string;
-  source: "customer" | "prospect" | "support" | "internal";
+  source: FeatureRequestSource;
 }): ReturnType<typeof createDraftAndTriage> {
-  return await createDraftAndTriage({ db: fiDb(), ...input });
+  return await createDraftAndTriage({ db: db(), ...input });
 }
 
 export async function actionConfirmRequest(input: {
@@ -26,7 +28,7 @@ export async function actionConfirmRequest(input: {
   problemStatement: string;
   intakeLinkedRequestId?: string | null;
 }) {
-  return await confirmRequest({ db: fiDb(), ...input });
+  return await confirmRequest({ db: db(), ...input });
 }
 
 export async function actionSetDisposition(input: {
@@ -35,29 +37,29 @@ export async function actionSetDisposition(input: {
   dispositionRationale: string;
   mergeTargetId?: string | null;
 }) {
-  return await setDisposition({ db: fiDb(), ...input });
+  return await setDisposition({ db: db(), ...input });
 }
 
 export async function actionRecordPmReview(input: { requestId: string }) {
-  return await recordPmReviewStarted({ db: fiDb(), ...input });
+  return await recordPmReviewStarted({ db: db(), ...input });
 }
 
 export async function actionSupportRequest(input: {
   requestId: string;
   supporterKey: string;
 }) {
-  return await supportRequest({ db: fiDb(), ...input });
+  return await supportRequest({ db: db(), ...input });
 }
 
 export async function actionGetRequest(input: { requestId: string }) {
-  return await getRequest({ db: fiDb(), ...input });
+  return await getRequest({ db: db(), ...input });
 }
 
 export async function actionSearchRequests(input: {
   query?: string;
   themeKey?: string;
 }) {
-  return await searchRequests({ db: fiDb(), limit: 50, ...input });
+  return await searchRequests({ db: db(), limit: 50, ...input });
 }
 
 export async function actionSupportWithCookie(input: { requestId: string }) {
@@ -73,7 +75,7 @@ export async function actionSupportWithCookie(input: { requestId: string }) {
     });
   }
   return await supportRequest({
-    db: fiDb(),
+    db: db(),
     requestId: input.requestId,
     supporterKey,
   });

@@ -1,14 +1,15 @@
 import { classifyThemeDeterministic } from "../theme/classify-deterministic";
 import { themeLabelForKey } from "../theme/registry";
 import { classifyDecisions } from "./classify-decisions";
+import {
+  hasGatewayKey,
+  mergeDuplicateExplanations,
+  resolveDegraded,
+  triageModelLabel,
+} from "./harness-helpers";
 import { retrieveLexicalCandidates } from "./retrieve-candidates";
 import { synthesizeArtifact } from "./synthesize-artifact";
-import type { DuplicateCandidate, TriageHarnessResult } from "./types";
-
-const decisionModelId = () =>
-  process.env.FI_DECISION_MODEL?.trim() || "typesafe-ai/jev";
-const synthesisModelId = () =>
-  process.env.FI_SYNTHESIS_MODEL?.trim() || "anthropic/claude-sonnet-4.6";
+import type { TriageHarnessResult } from "./types";
 
 export const runTriageHarness = async ({
   title,
@@ -42,8 +43,8 @@ export const runTriageHarness = async ({
     name: "classify_theme",
   });
 
-  const gatewayKey = process.env.AI_GATEWAY_API_KEY?.trim();
-  let degraded = !gatewayKey;
+  const gatewayMissing = !hasGatewayKey();
+  let degraded = gatewayMissing;
 
   const classification = await classifyDecisions({
     candidates,
@@ -53,7 +54,10 @@ export const runTriageHarness = async ({
     title,
   });
 
-  if (classification.degraded) degraded = true;
+  degraded = resolveDegraded({
+    classificationDegraded: classification.degraded,
+    gatewayMissing: degraded,
+  });
 
   steps.push({
     detail: classification.degraded
@@ -79,25 +83,17 @@ export const runTriageHarness = async ({
     title,
   });
 
-  if (!gatewayKey) degraded = true;
+  if (gatewayMissing) degraded = true;
 
   steps.push({
     detail: degraded ? "degraded synthesis" : "generateObject",
     name: "synthesize",
   });
 
-  const explanationById = new Map(
-    synthesis.duplicateExplanations.map((e) => [e.requestId, e.explanation])
+  const duplicateCandidates = mergeDuplicateExplanations(
+    candidates,
+    synthesis.duplicateExplanations
   );
-
-  const duplicateCandidates: DuplicateCandidate[] = candidates.map((c) => ({
-    ...c,
-    explanation: explanationById.get(c.id) ?? c.explanation,
-  }));
-
-  const modelLabel = degraded
-    ? "degraded"
-    : `${decisionModelId()}+${synthesisModelId()}`;
 
   return {
     decisionBrief: synthesis.decisionBrief,
@@ -113,7 +109,7 @@ export const runTriageHarness = async ({
     triageSteps: {
       degraded,
       duration_ms: Date.now() - started,
-      model: modelLabel,
+      model: triageModelLabel(degraded),
       steps,
       version: 1,
     },

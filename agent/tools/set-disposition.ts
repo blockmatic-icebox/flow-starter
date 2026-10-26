@@ -1,6 +1,8 @@
-import { setDisposition, getDb } from "@repo/fi";
+import { setDisposition } from "@repo/fi";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
+
+import { agentDb } from "../lib/db";
 
 export default defineTool({
   description: "Set PM disposition on a published feature request.",
@@ -11,7 +13,7 @@ export default defineTool({
     mergeTargetId,
   }) {
     const row = await setDisposition({
-      db: getDb(),
+      db: agentDb(),
       disposition,
       dispositionRationale,
       mergeTargetId,

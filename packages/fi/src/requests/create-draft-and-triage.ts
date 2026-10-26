@@ -1,8 +1,15 @@
-import { featureRequest, featureRequestDuplicateCandidate } from "@repo/db";
+import { featureRequest } from "@repo/db";
 import type { AppDatabase } from "@repo/db";
 import { eq } from "drizzle-orm";
 
+import type { FeatureRequestSource } from "../schemas/feature-request-source";
 import { runTriageHarness } from "../triage/run-triage-harness";
+import {
+  applyHarnessToRequest,
+  insertDraft,
+  insertDuplicateCandidates,
+  loadPublishedCatalog,
+} from "./persist-triage-result";
 
 export const createDraftAndTriage = async ({
   db,
@@ -13,30 +20,10 @@ export const createDraftAndTriage = async ({
   db: AppDatabase;
   title: string;
   description: string;
-  source: "customer" | "prospect" | "support" | "internal";
+  source: FeatureRequestSource;
 }) => {
-  const submittedAt = new Date();
-  const [draft] = await db
-    .insert(featureRequest)
-    .values({
-      description,
-      source,
-      status: "triaging",
-      submittedAt,
-      title,
-    })
-    .returning();
-
-  if (!draft) throw new Error("failed to create draft request");
-
-  const published = await db
-    .select({
-      description: featureRequest.description,
-      id: featureRequest.id,
-      title: featureRequest.title,
-    })
-    .from(featureRequest)
-    .where(eq(featureRequest.status, "published"));
+  const draft = await insertDraft({ db, description, source, title });
+  const published = await loadPublishedCatalog({ db });
 
   const harness = await runTriageHarness({
     description,
@@ -45,32 +32,8 @@ export const createDraftAndTriage = async ({
     title,
   });
 
-  const triageCompletedAt = new Date();
-
-  await db
-    .update(featureRequest)
-    .set({
-      decisionBrief: harness.decisionBrief,
-      problemStatement: harness.problemStatement,
-      status: "pending_confirm",
-      themeKey: harness.themeKey,
-      themeLabel: harness.themeLabel,
-      themeRationale: harness.themeRationale,
-      triageCompletedAt,
-      triageConfidence: harness.triageConfidence,
-      triageSteps: harness.triageSteps,
-    })
-    .where(eq(featureRequest.id, draft.id));
-
-  if (harness.duplicateCandidates.length > 0)
-    await db.insert(featureRequestDuplicateCandidate).values(
-      harness.duplicateCandidates.map((c) => ({
-        candidateRequestId: c.id,
-        explanation: c.explanation,
-        requestId: draft.id,
-        score: c.score,
-      }))
-    );
+  await applyHarnessToRequest({ db, harness, requestId: draft.id });
+  await insertDuplicateCandidates({ db, harness, requestId: draft.id });
 
   const [updated] = await db
     .select()

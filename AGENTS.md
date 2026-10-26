@@ -24,7 +24,7 @@ To improve Flow itself, read [.agents/skills/flow-improve/SKILL.md](.agents/skil
 
 ## Local prompt log (enabled)
 
-The coordinator **must** append one Q/A block per handled human request to gitignored repository-root `prompts.txt`. Format: [.agents/flow/operations/journal.md](.agents/flow/operations/journal.md#prompt-log-qa-format). Log **questions and answers** only—do not paste multiple-choice option lists into **Q:**. Never commit `prompts.txt`. Workers and subagents do not append.
+The coordinator **must** ensure repository-root `prompts.txt` receives one Q/A block per handled human request (Cursor hooks append when `.cursor/hooks.json` is present; coordinator still reconciles summaries). Format: [.agents/flow/operations/journal.md](.agents/flow/operations/journal.md#prompt-log-qa-format). Log **questions and answers** only—do not paste multiple-choice option lists into **Q:**. On this product branch the root log is **tracked in Git**; never land assessment-only product code on `main`. Workers and subagents do not append.
 
 ## When to read
 

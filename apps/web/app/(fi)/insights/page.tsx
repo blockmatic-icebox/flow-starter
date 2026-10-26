@@ -1,7 +1,5 @@
-import { getInsights } from "@repo/fi";
+import { getDb, getInsights } from "@repo/fi";
 import { Card, CardHeader, CardTitle } from "@repo/ui/components/card";
-
-import { fiDb } from "../../../lib/fi-db";
 
 const formatMs = (ms: number | null) => {
   if (ms === null) return "—";
@@ -10,7 +8,7 @@ const formatMs = (ms: number | null) => {
 };
 
 export default async function InsightsPage() {
-  const insights = await getInsights({ db: fiDb() });
+  const insights = await getInsights({ db: getDb() });
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
