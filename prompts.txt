@@ -1289,6 +1289,16 @@ Agent: Expanded docs/tasks/feature-intelligence-remediation.md with gates G-R1â€
 
 ---
 ---
+Timestamp: 2026-10-26T02:15:00.000Z
+Work: feature-intelligence
+Stage: Ship
+
+Human: git everything is done and test, deploy to vercel meta-cto, make sure vercel deployments run the drizzle mirations and seeds on startup
+
+Agent: Committed 8cf3e07b3 remediation + vercel-build.mjs; pushed meta-cto; production deploy with migrate+seed in build phase; alias meta-cto-two.vercel.app.
+
+---
+---
 Timestamp: 2026-10-26T02:04:11.732Z
 Work: feature-intelligence
 Stage: Build
