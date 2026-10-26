@@ -33,8 +33,8 @@ Spec: [docs/specs/feature-intelligence.md](docs/specs/feature-intelligence.md). 
 | `/requests` | Discover | List + **theme filter chips** (`theme_key` query); cards show problem one-liner, theme label, source, support |
 | `/requests/new` | Submit | Step 1 form → step 2 triage preview (editable problem, duplicate link default, confirm) |
 | `/requests/[id]` | Detail | Main: problem, description, brief; sidebar: support, disposition audit, transparency |
-| `/triage` | PM queue | Table or `Item` list; **inline expand panel** for disposition (not dialog-first); `pm_review_started_at` on first expand |
-| `/insights` | Metrics | Persona hero + metric cards (no charts MVP); sample `n` + proxy footnotes |
+| `/triage` | PM queue | Card list sorted by **support**; subtitle shows count; inline disposition panel |
+| `/insights` | Metrics | 2×3 metric grid (incl. PM triage median); **range** selector (`7d`–`all`, default `90d`); horizontal bar panels for weekly submissions, dispositions, queue depth; theme list + judgment table; proxy footnote when `pmTriageN < 2` |
 | `/chat` | Ask-only help | `max-w-2xl` thread; **no** tool UI; secondary nav item |
 
 ### Interaction principles

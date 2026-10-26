@@ -577,3 +577,163 @@ Human: Reconcile prompts.txt, refresh PRODUCT ARCHITECTURE DESIGN, and verify in
 Agent: Reconciled prompt log; updated contracts with deployment and spec-compliance notes; qa and smoke re-run; committed and pushed meta-cto.
 
 ---
+---
+Timestamp: 2026-10-26T00:25:41.619Z
+Work: feature-intelligence
+Stage: Build
+Generation: 398d40c3-e807-4dc1-9750-bdcb1415b2f8
+
+Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: Prompt log, product contracts, and spec verification are aligned with the assessment MVP; changes are on `meta-cto` and production is deployed.
+
+---
+Timestamp: 2026-10-25T18:45:00-06:00
+Work: feature-intelligence
+Stage: Explore
+
+Human: Explore realistic 90-day historical seed (~300 requests, 40–60 open triage) and analytics dashboard for Feature Intelligence; refine scope, challenge low-value work, then Specify and Plan without Build.
+
+Agent: Reviewed metrics, schema, seed, and insights UI; user chose dual seed commands and extending /insights with charts; proposed selective data_origin deletes to preserve manual rows, time-bucketed analytics from existing timestamps, honest limits on AI impact claims; awaiting Specify approval to write specs and tasks.
+
+---
+Timestamp: 2026-10-25T18:50:00-06:00
+Work: feature-intelligence
+Stage: Explore
+
+Human: Scope tweaks — no data_origin or simulation seed command; single seed:fi at ~500 rows with updated evals; extend insights; no simulation banner; test Neon MCP.
+
+Agent: Revised plan to one destructive 500-row generator with stable anchor IDs for smoke; Neon MCP list_projects OK on meta-cto-fi; still no Build until authorized.
+
+---
+Timestamp: 2026-10-25T18:52:00-06:00
+Work: feature-intelligence
+Stage: Specify
+
+Human: Use 500 (total seed volume).
+
+Agent: Locked TOTAL_REQUESTS=500, OPEN_QUEUE_COUNT=50; wrote seed amendment, analytics spec, and demo-depth tasks; initiative index updated; Build not started.
+
+---
+Timestamp: 2026-10-25T19:00:00-06:00
+Work: feature-intelligence
+Stage: Specify
+
+Human: Improve demo-depth specs and generate tasks from retrospective gaps.
+
+Agent: Seed v2 manifest tables, analytics north-star scoping and unified getInsights API, demo-depth tasks W1–W6 with SD/AN acceptance IDs; testing and core spec UI cross-links updated.
+
+---
+Timestamp: 2026-10-25T19:05:00-06:00
+Work: feature-intelligence
+Stage: Plan
+
+Human: Are tasks with explicit dependencies ready for execution?
+
+Agent: Upgraded demo-depth tasks with per-task Depends on, gates G-D1–G-D6, critical path, and parallel tracks; status ready pending Build authorization.
+
+---
+Timestamp: 2026-10-25T19:30:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Implement demo depth build plan (500 seed, analytics, phase commits).
+
+Agent: Shipped five commits: seed generator, queue sort/smoke, getInsights trends, insights UI, contracts/tasks; pnpm qa and eve smoke green.
+
+---
+---
+Timestamp: 2026-10-26T00:39:03.902Z
+Work: feature-intelligence
+Stage: Build
+Generation: f601a6ff-bc7b-43de-bb9c-57661e9b7ffb
+
+Human: Let’s use Flow to explore the next batch of features: realistic historical seed data and an analytics dashboard that demonstrates how a product team uses Feature Intelligence over time.
+
+I want to simulate three months of actual usage: incoming feedback, AI triage, people confirming or correcting suggestions, support for requests, and PM decisions with meaningful rationale. Keep a substantial backlog so we have plenty of opportunities to demonstrate live triage too.
+
+Start with roughly 300 requests over 90 days, with 40–60 still awaiting triage. Use the dashboard product context we already established. Include duplicates, related requests that should remain separate, emerging themes, ambiguous feedback, and cases where popularity differs from strategic value. The history should feel coherent, with realistic timing and imperfect outcomes.
+
+Anonymous usage is fine for now. Keep our existing decision types and use stable synthetic participants where needed. Clearly label simulated data, preserve the small test fixture, and make the larger seed reproducible without deleting real work.
+
+For analytics, prioritize our existing success metrics and help us understand trends, backlog health, and changing demand. Review what we actually capture today before proposing charts. Flag missing instrumentation and distinguish measured outcomes from proxies; don’t manufacture evidence that AI improved performance.
+
+Read the current implementation, product documents, and assessment brief. Help me refine this scope, challenge anything that adds work without improving the demonstration, and ask the important questions. Then work with me through Flow specification and planning so we have an agreed, prioritized implementation plan. Don’t start building yet.
+
+Agent: ## Stage: Explore (complete) → Specify (needs your approval)
+
+---
+---
+Timestamp: 2026-10-26T00:43:17.303Z
+Work: feature-intelligence
+Stage: Build
+Generation: 90a4b87e-58af-4827-a558-6b6d6435cfac
+
+Human: 1. ok 
+2. data_origin (or equivalent) — this is not necessary
+3. pnpm seed:fi  should seed 500, update eval strategy to use this seed
+4. pnpm seed:fi:simulation not required
+5. ok
+6. not needed
+7. test mpc
+
+Agent: ## Revised scope (your decisions)
+
+---
+---
+Timestamp: 2026-10-26T00:45:03.233Z
+Work: feature-intelligence
+Stage: Build
+Generation: 842b39d4-a8e3-4a4d-a9e1-0e5100052a74
+
+Human: use 500
+
+Agent: **Locked:** **500** total requests, **~90 days** of history, **50** open triage items (within your 40–60 band).
+
+---
+---
+Timestamp: 2026-10-26T00:45:38.756Z
+Work: feature-intelligence
+Stage: Build
+Generation: 59ed0073-b678-4608-802b-d3222bbe2b7e
+
+Human: in retrospect is anything you would improve in our spec ?  any gaps?
+
+Agent: Here’s an honest retrospective: the specs are directionally right for a demo, but several gaps would cause churn during Build unless you tighten them first.
+
+---
+---
+Timestamp: 2026-10-26T00:47:04.189Z
+Work: feature-intelligence
+Stage: Build
+Generation: d67ad9ca-c266-4bb6-9e97-c744ed664d6f
+
+Human: ok improve the spec and generate the tasks for them
+
+Agent: Updated the demo-depth specs and task checklist from the retrospective. Highlights:
+
+---
+---
+Timestamp: 2026-10-26T00:47:54.613Z
+Work: feature-intelligence
+Stage: Build
+Generation: ca2c5b87-d4fe-4998-a884-d5ed23117cb7
+
+Human: do we tasks with explicitly dependencies ready for execution?
+
+Agent: **Short answer:** They weren’t fully execution-ready before (only wave-level “Depends on: W1”). **They are now** — see [docs/tasks/feature-intelligence-demo-depth.md](docs/tasks/feature-intelligence-demo-depth.md).
+
+---
+---
+Timestamp: 2026-10-26T00:48:56.886Z
+Work: feature-intelligence
+Stage: Build
+Generation: c7c72107-bd41-4ace-aef1-fd9db4e8d613
+
+Human: lets build, make sure to update tasks, and root .md files when done, commit often per phase
+
+Agent: Gathering the current implementation to draft a phased build plan aligned with the task file.
+
+---

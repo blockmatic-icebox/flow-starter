@@ -102,8 +102,8 @@ After deploy, use Vercel Agent Runs trace for one eval failure or successful too
 ## Commands (reference)
 
 ```bash
-# Domain seed (required before eve eval)
-pnpm --filter @repo/fi seed
+# Domain seed (required before eve eval; 500 rows — never on production DB)
+pnpm --filter @repo/fi seed   # open triage queue: 50 after seed
 
 # Eve smoke (after eve init + agent implemented)
 npx eve eval smoke

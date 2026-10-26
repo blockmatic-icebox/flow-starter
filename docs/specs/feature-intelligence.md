@@ -14,7 +14,8 @@
 | [feature-intelligence-ai-ux-patterns.md](./feature-intelligence-ai-ux-patterns.md) | AI UX Playground mapping (web, eve, `/chat`) |
 | [feature-intelligence-eve-agent.md](./feature-intelligence-eve-agent.md) | eve operator, tools, AG-1–AG-7 |
 | [feature-intelligence-triage-harness.md](./feature-intelligence-triage-harness.md) | T0–T3 pipeline, Jev, synthesis |
-| [feature-intelligence-seed.md](./feature-intelligence-seed.md) | FR-001–FR-011 fixture |
+| [feature-intelligence-seed.md](./feature-intelligence-seed.md) | 500-row seed + anchors |
+| [feature-intelligence-analytics.md](./feature-intelligence-analytics.md) | Insights trends |
 | [feature-intelligence-testing.md](./feature-intelligence-testing.md) | TDD order, W-* manual, eve evals |
 | [docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md) | Build checklist (separate from specs) |
 | [ADR 0003](../adr/0003-feature-intelligence-model-providers.md) | Gateway (Jev/triage) vs Anthropic (`/chat`) |
@@ -317,7 +318,7 @@ Return JSON (also powers eve `get_insights`):
 }
 ```
 
-**UI:** `/insights` shows all four metrics, **`openQueueCount`**, and `sample.publishedCount`. After two PM dispositions in demo, **capture rate** and **open queue** should move noticeably.
+**UI:** `/insights` shows north-star metrics (including **PM triage median**), **`openQueueCount`**, and `sample.publishedCount`; demo depth adds time range and trends per [analytics spec](./feature-intelligence-analytics.md). **Capture rate** and **open queue** are live snapshots; after two PM dispositions in demo they should move noticeably.
 
 ### Build priorities (metric-driven)
 

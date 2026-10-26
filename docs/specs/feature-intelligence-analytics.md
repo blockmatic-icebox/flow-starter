@@ -87,7 +87,7 @@ type GetInsightsResult = {
   decisionCaptureRate: number | null;
   intakeLinkRate: number | null;
   openQueueCount: number;
-  sample: { /* unchanged keys */ };
+  sample: {/* unchanged keys */};
   computedAt: string;
   range: { preset: InsightsRangePreset; from: string; to: string } | null;
   trends: null | {

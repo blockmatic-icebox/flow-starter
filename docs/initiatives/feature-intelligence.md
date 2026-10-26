@@ -147,16 +147,28 @@ See [docs/specs/feature-intelligence.md](../specs/feature-intelligence.md).
 | [feature-intelligence-ai-ux-patterns.md](../specs/feature-intelligence-ai-ux-patterns.md) | Progressive disclosure, progress, HITL |
 | [feature-intelligence-eve-agent.md](../specs/feature-intelligence-eve-agent.md) | Tools, AG-1–AG-7 |
 | [feature-intelligence-triage-harness.md](../specs/feature-intelligence-triage-harness.md) | T0–T3 |
-| [feature-intelligence-seed.md](../specs/feature-intelligence-seed.md) | FR-001–FR-011 |
+| [feature-intelligence-seed.md](../specs/feature-intelligence-seed.md) | 500-row seed + FR-001–FR-011 anchors |
+| [feature-intelligence-analytics.md](../specs/feature-intelligence-analytics.md) | Insights trends, range, charts |
 | [feature-intelligence-testing.md](../specs/feature-intelligence-testing.md) | TDD + W-* + evals |
-| [tasks/feature-intelligence.md](../tasks/feature-intelligence.md) | Execution checklist (Addy-style; not a spec) |
+| [tasks/feature-intelligence.md](../tasks/feature-intelligence.md) | MVP execution checklist |
+| [tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) | 500 seed + analytics Build backlog |
 
 Contracts: [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [ARCHITECTURE.md](../../ARCHITECTURE.md), [GLOSSARY.md](../../GLOSSARY.md), [ADR 0002](../adr/0002-feature-intelligence-architecture.md), [ADR 0003](../adr/0003-feature-intelligence-model-providers.md).
+
+## Demo depth (post-MVP)
+
+**Specified 2026-10-25 (v2):** Manifest-driven **500**-row seed (`SEED_REFERENCE_ISO`, intake ~20%, merge/dup graph), queue **support sort**, `getInsights({ range })` + `/insights` trends. Tasks: [feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md). **Build** authorization required.
+
+## Tasks (execution)
+
+- Assessment MVP: [docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md) (complete)
+- Demo depth: [docs/tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md)
 
 ## Progress
 
 - [x] Explore — direction and metrics agreed
 - [x] Specify — initiative + full spec set + contracts updated
 - [x] **Plan** — Neon paths, waves, gates, **Tasks** backlog
-- [ ] **Build** — explicit authorization; execute [docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md)
+- [x] **Specify (demo depth)** — 500 seed + analytics specs + tasks
+- [x] **Build (demo depth)** — [feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md)
 - [ ] Review / external demo recording (no in-app recorder)

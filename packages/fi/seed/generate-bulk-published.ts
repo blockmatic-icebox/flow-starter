@@ -46,9 +46,7 @@ const buildPublishedRow = ({
   const triageDone = at(Math.max(0, daysAgo - 1));
   const dispositioned = disposition ? at(Math.max(0, daysAgo - 3)) : null;
   const title =
-    i < vagueTitles.length
-      ? vagueTitles[i]
-      : `${themeKey.replaceAll("_", " ")} request ${i}`;
+    vagueTitles[i] ?? `${themeKey.replaceAll("_", " ")} request ${i}`;
 
   const supportCount = (() => {
     let count = isOpen

@@ -13,7 +13,7 @@ This checkout is the Meta CTO technical assessment on [Flow Factory](.agents/flo
 | **External submitter** (customer, prospect) | Quick feedback; plain-language confirm; optional link to similar ideas |
 | **Internal submitter** (support, sales) | Paste tickets; duplicates-first confirm; avoid new duplicate rows |
 | **Product manager** (primary demo persona) | Inline triage queue; **dispositions** with rationale |
-| **Product leader** (secondary) | Read-only **Insights** + audit on detail |
+| **Product leader** (secondary) | **Insights** trends (90d default), backlog/queue panels, audit on detail |
 | **Automation / agents** | eve operator over `@repo/fi` — human-in-the-loop before publish/disposition |
 
 ## Capabilities (accepted scope)
@@ -35,13 +35,13 @@ Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence
 | Area | Status |
 | --- | --- |
 | **Specification** | Complete — [tasks](docs/tasks/feature-intelligence.md) + [initiative](docs/initiatives/feature-intelligence.md) |
-| **Database** | **Live** with `DATABASE_URL` — migrate, seed (`pnpm seed:fi`), Wave 0 done |
+| **Database** | **Live** with `DATABASE_URL` — migrate; demo seed **500** rows (`pnpm seed:fi`, dev/CI only) |
 | **Domain (`@repo/fi`)** | **Live** — full T0–T3 harness orchestration; **degraded** when `AI_GATEWAY_API_KEY` absent |
 | **eve (`agent/`)** | **Live** — MVP tools, `evals/` smoke (AG-7), `pnpm exec eve eval smoke` |
 | **Human UI (`apps/web`)** | **Live** — `app/(fi)/` routes, server actions, ask-only `/chat`; [browser verification](docs/research/20261025-fi-browser-verification.md) |
 | **Deployment (demo)** | **Live** — Vercel project `meta-cto`, branch `meta-cto`, production https://meta-cto-gaboesquivel.vercel.app (Vercel Authentication may require sign-in or share link; env: `DATABASE_URL`, `AI_GATEWAY_API_KEY`, `ANTHROPIC_API_KEY` on Production) |
 
-**Build checklist:** [docs/tasks/feature-intelligence.md](docs/tasks/feature-intelligence.md) — Waves 0–4 complete for assessment MVP; live gateway improves triage quality when `AI_GATEWAY_API_KEY` is set.
+**Build checklist:** [assessment MVP](docs/tasks/feature-intelligence.md) complete; [demo depth](docs/tasks/feature-intelligence-demo-depth.md) (500 seed + analytics) complete. Analytics spec: [feature-intelligence-analytics.md](docs/specs/feature-intelligence-analytics.md).
 
 **Spec compliance:** MVP acceptance criteria AC-1–AC-8 are met for assessment scope; W-3 near-duplicate live submit is **partial** in manual pass (lexical harness still surfaces seeded candidates when text overlaps). See [spec verification](docs/specs/feature-intelligence.md#verification-mvp) and browser log.
 

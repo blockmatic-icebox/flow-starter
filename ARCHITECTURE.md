@@ -50,7 +50,11 @@ Owned tables (see [spec](docs/specs/feature-intelligence.md)):
 - `feature_request_duplicate_candidate`
 - `feature_request_support`
 
-Seed: `pnpm seed:fi` → `@repo/fi/seed/load.ts` (deterministic FR-001–FR-011 per [seed spec](docs/specs/feature-intelligence-seed.md)).
+Seed: `pnpm seed:fi` → `@repo/fi/seed/load.ts` (manifest-driven **500** rows: anchors FR-001–FR-011 + generated bulk; **never on production**). See [seed spec](docs/specs/feature-intelligence-seed.md).
+
+PM triage queue: `listTriageQueue` orders by **support count** desc, then `published_at` desc.
+
+Insights: `getInsights({ db, range? })` — eve omits `range` (all-time, `trends: null`); web defaults `90d` with weekly trends per [analytics spec](docs/specs/feature-intelligence-analytics.md).
 
 ## Triage pipeline
 

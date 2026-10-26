@@ -26,35 +26,35 @@ All counts are **exact** after seed; tests import from `packages/fi/seed/manifes
 
 ### Status breakdown (500 total)
 
-| Status | Count | Notes |
-| --- | ---: | --- |
-| `published` | **462** | Includes open + dispositioned |
-| `pending_confirm` | **1** | FR-011 only |
-| `triaging` | **5** | In-flight intake demos |
-| `draft` | **12** | Abandoned / internal drafts |
-| `archived` | **20** | Retired noise |
+| Status            |   Count | Notes                         |
+| ----------------- | ------: | ----------------------------- |
+| `published`       | **462** | Includes open + dispositioned |
+| `pending_confirm` |   **1** | FR-011 only                   |
+| `triaging`        |   **5** | In-flight intake demos        |
+| `draft`           |  **12** | Abandoned / internal drafts   |
+| `archived`        |  **20** | Retired noise                 |
 
 ### Published subset (462)
 
-| Bucket | Count |
-| --- | ---: |
-| **Open queue** (no disposition) | **50** |
+| Bucket                                   |   Count |
+| ---------------------------------------- | ------: |
+| **Open queue** (no disposition)          |  **50** |
 | Dispositioned (with non-empty rationale) | **412** |
 
 **Open queue composition**
 
-| Source | Open count |
-| --- | ---: |
-| Anchors (FR-001, 002, 004–007, 009, 010) | **8** |
-| Bulk published, undecided | **42** |
+| Source                                   | Open count |
+| ---------------------------------------- | ---------: |
+| Anchors (FR-001, 002, 004–007, 009, 010) |      **8** |
+| Bulk published, undecided                |     **42** |
 
 ### Disposition mix (412 closed published)
 
-| Disposition | Count |
-| --- | ---: |
-| `merge` | **85** |
-| `monitor` | **120** |
-| `decline` | **95** |
+| Disposition        |   Count |
+| ------------------ | ------: |
+| `merge`            |  **85** |
+| `monitor`          | **120** |
+| `decline`          |  **95** |
 | `needs_discussion` | **112** |
 
 Anchors FR-003 (`monitor`) and FR-008 (`decline`) are included in these totals.
@@ -89,15 +89,15 @@ FR-006 ⊥  FR-008   (related theme; FR-008 declined with FR-006 reference)
 
 ### Themes (bulk + anchors)
 
-| `theme_key` | Min published rows (incl. anchors) |
-| --- | ---: |
-| `reporting_exports` | 80 |
-| `collaboration_sharing` | 75 |
-| `integrations_alerts` | 60 |
-| `permissions_access` | 55 |
-| `performance_scale` | 50 |
-| `mobile_experience` | 45 |
-| `data_governance` | 40 |
+| `theme_key`             | Min published rows (incl. anchors) |
+| ----------------------- | ---------------------------------: |
+| `reporting_exports`     |                                 80 |
+| `collaboration_sharing` |                                 75 |
+| `integrations_alerts`   |                                 60 |
+| `permissions_access`    |                                 55 |
+| `performance_scale`     |                                 50 |
+| `mobile_experience`     |                                 45 |
+| `data_governance`       |                                 40 |
 
 Emerging arc: `mobile_experience` and `permissions_access` **volume share** rises in the **last 30 days** of the window (generator rule: ≥ **60%** of those themes’ `submitted_at` after reference − 30d).
 
@@ -145,11 +145,11 @@ Stable keys: `persona-cs-01` … `persona-cs-08`, `persona-ae-01` … `persona-a
 
 UUID v4-shaped fixed ids (`00000000-0000-4000-8000-00000000000n`).
 
-| Id | Short ref |
-| --- | --- |
-| `…0001` | `FR-001` |
-| … | … |
-| `…000b` | `FR-011` |
+| Id      | Short ref |
+| ------- | --------- |
+| `…0001` | `FR-001`  |
+| …       | …         |
+| `…000b` | `FR-011`  |
 
 Bulk ids: deterministic from `RNG_SEED` (e.g. namespace `00000000-0000-5000-8xxx-…`).
 
@@ -232,11 +232,11 @@ Discover list keeps **most supported** sort separately (unchanged).
 
 ## Supporter keys
 
-| Key | Used for |
-| --- | --- |
-| `seed-supporter-a`, `seed-supporter-b` | Anchor support |
-| `eve-test-1` | Automated `support_request` |
-| `persona-*` | Bulk |
+| Key                                    | Used for                    |
+| -------------------------------------- | --------------------------- |
+| `seed-supporter-a`, `seed-supporter-b` | Anchor support              |
+| `eve-test-1`                           | Automated `support_request` |
+| `persona-*`                            | Bulk                        |
 
 ---
 
