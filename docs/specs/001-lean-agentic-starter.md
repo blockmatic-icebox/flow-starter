@@ -1,10 +1,11 @@
 # 001 — Lean Flow and Agentic Prototype Starter
 
 Date: 2026-10-26  
-**Status:** Draft  
+**Status:** Current  
 **Last reviewed:** 2026-10-26  
 Owner: Gabo Esquivel  
-Source branch: `meta-cto` @ `6323ad9d24ccc09d1bf09f5e7dec980336226607` (record when `kiss` was cut)
+**Delivery (this record):** Specification accepted and landed on `meta-cto` (commit `9e2f85dd4`). Requirements P1–P10 describe the future `kiss` experiment; they are **not** implemented on `meta-cto`, which remains the Feature Intelligence assessment checkout.  
+Source baseline for future `kiss`: `meta-cto` @ `6323ad9d24ccc09d1bf09f5e7dec980336226607`
 
 ## Purpose
 
@@ -183,7 +184,17 @@ Production authentication and authorization; security-hardening scope; real cust
 
 ## Evidence and status
 
-See **Completion record** (append when experiment closes).
+### Completion record — specification delivery (2026-10-26)
+
+| Item | Evidence |
+| --- | --- |
+| Spec landed on `meta-cto` | `9e2f85dd4` — `docs/specs/001-lean-agentic-starter.md` only |
+| Assessment product unchanged | FI routes, `@repo/fi`, and assessment docs remain on `meta-cto` |
+| `kiss` implementation | **Not started** — deferred; cut `kiss` from baseline above when Build is authorized |
+| Workflow trials (small-task / shared-spec) | **Not run** — applies when implementation begins |
+| Product checks P1–P10 | **Not applicable** on `meta-cto` until `kiss` Build |
+
+Repository verification before push (2026-10-26): `pnpm check-types` exit 0, `pnpm test` exit 0, `pnpm --filter @repo/db db:check` exit 0 (`pnpm qa` knip reports pre-existing unused-export noise unrelated to this spec).
 
 References:
 

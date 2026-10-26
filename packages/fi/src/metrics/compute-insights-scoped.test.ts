@@ -6,6 +6,14 @@ import { computeInsightsScoped } from "./compute-insights-scoped";
 const computedAt = new Date("2026-10-26T12:00:00.000Z");
 const fromIso = "2026-09-26T12:00:00.000Z";
 
+const triageSteps = ({ degraded }: { degraded?: boolean }) => ({
+  degraded,
+  duration_ms: 1,
+  model: "test",
+  steps: [],
+  version: 1,
+});
+
 describe("computeInsightsScoped", () => {
   it("counts decisions in range by disposition_at, not snapshot", () => {
     const result = computeInsightsScoped({
@@ -22,7 +30,7 @@ describe("computeInsightsScoped", () => {
           status: "published",
           submittedAt: new Date("2026-09-01T00:00:00Z"),
           triageCompletedAt: new Date("2026-09-01T00:01:00Z"),
-          triageSteps: { degraded: false, steps: [] },
+          triageSteps: triageSteps({ degraded: false }),
         },
         {
           disposition: "decline",
@@ -58,7 +66,7 @@ describe("computeInsightsScoped", () => {
           status: "published",
           submittedAt: new Date("2026-10-01T00:00:00Z"),
           triageCompletedAt: new Date("2026-10-01T00:05:00Z"),
-          triageSteps: { degraded: true, steps: [] },
+          triageSteps: triageSteps({ degraded: true }),
         },
         {
           disposition: null,
@@ -70,7 +78,7 @@ describe("computeInsightsScoped", () => {
           status: "published",
           submittedAt: new Date("2026-10-02T00:00:00Z"),
           triageCompletedAt: new Date("2026-10-02T00:05:00Z"),
-          triageSteps: { degraded: false, steps: [] },
+          triageSteps: triageSteps({ degraded: false }),
         },
       ],
     });

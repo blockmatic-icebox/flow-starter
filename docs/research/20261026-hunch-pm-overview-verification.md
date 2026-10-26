@@ -2,7 +2,7 @@
 
 **Research date:** 2026-10-26  
 **Last reviewed:** 2026-10-26  
-**Status:** Current  
+**Status:** Current
 
 **Branch:** `meta-cto` · **Production:** https://meta-cto-two.vercel.app
 
