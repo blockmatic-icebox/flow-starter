@@ -6,6 +6,9 @@ import {
 } from "@repo/ui/components/card";
 import Link from "next/link";
 
+import { fiHomeSummary, fiHomeTitle } from "@/lib/fi-home-content";
+import { resolveSiteOrigin } from "@/lib/site-url";
+
 const intents = [
   {
     description: "Tell us what you need in plain language.",
@@ -29,15 +32,36 @@ const intents = [
   },
 ];
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  applicationCategory: "BusinessApplication",
+  description: fiHomeSummary,
+  name: fiHomeTitle,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  url: resolveSiteOrigin(),
+};
+
 export default function HomePage() {
   return (
     <div className="space-y-8">
+      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       <div>
         <h1 className="font-heading text-3xl font-semibold tracking-tight">
-          Feature Intelligence
+          {fiHomeTitle}
         </h1>
-        <p className="text-muted-foreground mt-2">
-          Turn unstructured feedback into clear product decisions.
+        <p className="text-muted-foreground mt-2">{fiHomeSummary}</p>
+        <p className="text-muted-foreground mt-4 text-sm">
+          Remote agents connect via{" "}
+          <Link className="underline" href="/.well-known/mcp/server-card.json">
+            MCP server card
+          </Link>{" "}
+          or POST <code className="text-xs">/api/mcp</code>. Human-readable
+          agent instructions live at{" "}
+          <Link className="underline" href="/llms.txt">
+            llms.txt
+          </Link>
+          .
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

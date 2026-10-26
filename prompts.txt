@@ -1355,3 +1355,47 @@ Human: Briefly inform the user about the task result and perform any follow-up a
 Agent: The **`@repo/fi` unit test** run finished successfully: **24 tests, 13 suites, 0 failures** (exit code 0), including the new seed guard and disposition validation cases. That matches what we relied on before the remediation commit and Vercel deploy.
 
 ---
+---
+Timestamp: 2026-10-26T02:50:09.839Z
+Work: feature-intelligence
+Stage: Build
+Generation: 39c5ee1a-308b-4c5e-b522-0c01b75a9a4f
+
+Human: good, now make sure we are running db migrations and non destructive seeds if not present on vercel deploynents
+
+Agent: ---
+
+---
+---
+Timestamp: 2026-10-26T02:55:11.434Z
+Work: feature-intelligence
+Stage: Build
+Generation: 6666e6d2-d9a8-46eb-9d51-a9840909ba0e
+
+Human: now lets plan for having full agentic discoverability using npm package is-agentic, lets create an adr and spec for this if needed. make sure the mpc server is reachable from chatgpt, claude and any agent
+
+Agent: ---
+
+---
+---
+Timestamp: 2026-10-26T02:57:06.261Z
+Work: feature-intelligence
+Stage: Build
+Generation: f7e57d66-bac2-472c-b334-d55129b46a5f
+
+Human: create tasks
+
+Agent: ---
+
+---
+---
+Timestamp: 2026-10-26T03:00:07.930Z
+Work: feature-intelligence
+Stage: Build
+Generation: 3086dba9-aa0a-4f05-9943-68b980f348c2
+
+Human: run tasks in parallel using subagents act as orchestrator
+
+Agent: ---
+
+---

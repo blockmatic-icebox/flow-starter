@@ -74,7 +74,7 @@ Degraded path when `AI_GATEWAY_API_KEY` absent still sets `triage_completed_at` 
 | eve tools → `@repo/fi` | **Live** — read + `submit_request`, `confirm_request`, `support_request`, `set_disposition`, `get_request` |
 | Web server actions → `@repo/fi` | **Live** — triage, submit, confirm, support, disposition |
 | `POST /api/chat` ask-only | **Live** — Anthropic via `ANTHROPIC_API_KEY` |
-| **MCP Streamable HTTP** | **Planned** — [ADR 0005](docs/adr/0005-fi-agentic-discoverability-and-mcp.md); `/.well-known/mcp/*`, Phase A read-only FI tools |
+| **MCP Streamable HTTP** | **Live** — [ADR 0005](docs/adr/0005-fi-agentic-discoverability-and-mcp.md); `POST /api/mcp`, `/.well-known/mcp/*`, `llms.txt`, Markdown negotiation; assessment demo exposes all eight FI tools without bearer |
 | Postgres | **Live** when `DATABASE_URL` set — see initiative Neon plan |
 
 ## Security (inherited)

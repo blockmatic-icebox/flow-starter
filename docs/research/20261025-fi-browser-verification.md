@@ -87,3 +87,10 @@ MVP + demo depth tasks: [feature-intelligence.md](../tasks/feature-intelligence.
 - **Browser (2026-10-26):** Pre-fix production showed **8** open (static prerender at old build). **`export const dynamic = "force-dynamic"`** on `app/(fi)/layout.tsx` so triage badge and insights read live DB after redeploy.
 - **Access:** Deployment Protection / SSO — use Vercel share link or `vercel curl` for smoke; do not commit share tokens.
 - **Redeploy:** Push `meta-cto` for Git build; CLI `vercel deploy` must run from monorepo root (project `rootDirectory` = `apps/web`).
+
+## Agentic discoverability (T-A-31 / T-A-32 — 2026-10-26)
+
+- **Public alias for auditors:** Prefer `https://meta-cto-two.vercel.app` for Is Agentic and remote MCP clients. Deployment Protection on other aliases can block unauthenticated `curl` and MCP handshakes; use a public production alias or documented bypass — do not commit bypass tokens.
+- **Remote MCP config:** `{ "type": "http", "url": "https://meta-cto-two.vercel.app/api/mcp" }` (Streamable HTTP). Clients must send `Accept: application/json, text/event-stream` on POST.
+- **Manual smoke (post-deploy):** `tools/list` includes eight tools; `search_requests` with `query: "CSV"` returns seeded rows when DB is populated.
+- **CLI gate:** `pnpm agentic:check` (`is-agentic` against `AGENTIC_CHECK_URL`).

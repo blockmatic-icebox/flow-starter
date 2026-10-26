@@ -40,7 +40,8 @@ Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence
 | **Domain (`@repo/fi`)** | **Live** — disposition validation, merge rollup, discovery pagination, degraded triage flags ([remediation](docs/specs/feature-intelligence-remediation.md)) |
 | **eve (`agent/`)** | **Live** — behavioral smoke evals (AG-7 + disposition monitor); `pnpm exec eve eval smoke` |
 | **Human UI (`apps/web`)** | **Live** — merge picker, discover search/sort/page, AI failure UX, decision sidebar; manual W-R pass on deploy |
-| **Deployment (demo)** | **Live** — Vercel `meta-cto`, https://meta-cto-gaboesquivel.vercel.app (`DATABASE_URL`, gateway/Anthropic keys on Production) |
+| **Agentic discoverability** | **Live** — `llms.txt`, well-known MCP, Streamable HTTP `/api/mcp` (open demo tools), `pnpm agentic:check` ([spec](docs/specs/feature-intelligence-agentic-discoverability.md)) |
+| **Deployment (demo)** | **Live** — Vercel `meta-cto`, https://meta-cto-two.vercel.app (`DATABASE_URL`, gateway/Anthropic keys on Production) |
 
 **Build:** [Remediation tasks](docs/tasks/feature-intelligence-remediation.md) implemented on `meta-cto` (2026-10-26). Adversarial reconciliation: [research](docs/research/20261025-fi-adversarial-review.md). W-3 near-duplicate **partial** (lexical by design).
 

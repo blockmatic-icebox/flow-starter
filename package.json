@@ -46,7 +46,8 @@
     "db:studio": "pnpm --filter @repo/db db:studio",
     "db:ping": "pnpm --filter @repo/db exec node --import tsx scripts/db-ping.mjs",
     "deepsec": "pnpm --dir=.deepsec exec deepsec",
-    "mcp:next": "next-devtools-mcp"
+    "mcp:next": "next-devtools-mcp",
+    "agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-meta-cto-two.vercel.app}"
   },
   "dependencies": {
     "@ai-sdk/gateway": "4.0.125",
@@ -59,6 +60,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "is-agentic": "^1.0.1",
     "knip": "^6.42.1",
     "next-devtools-mcp": "0.4.0",
     "oxfmt": "^0.74.0",
