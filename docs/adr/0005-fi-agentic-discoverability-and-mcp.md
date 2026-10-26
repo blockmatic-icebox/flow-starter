@@ -2,7 +2,7 @@ Date: 2026-10-26
 
 # ADR 0005 — Feature Intelligence agentic discoverability and public MCP
 
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
@@ -22,18 +22,16 @@ Factory patterns apply: read-only external invocation ([Factory ADR 0006](../../
    - `/.well-known/mcp/server-card.json` (canonical server card: transport, endpoint, tools, auth),
    - `/.well-known/mcp.json` (registry-style manifest pointer per [verifymcp discovery guidance](https://verifymcp.io/docs/remote/discovery)),
    - optional `/.well-known/ai-catalog.json` listing the FI MCP server.
-4. **Tool policy (phased)**  
-   - **Phase A (public, read-only):** `search_requests`, `get_request`, `list_triage_queue`, `get_insights` — same semantics as Eve read tools; no mutations.  
-   - **Phase B (assessment demo, optional bearer):** `set_disposition`, `submit_request`, `confirm_request`, `support_request` only when `FI_MCP_BEARER_TOKEN` (or similar) is configured; otherwise tools are omitted from the public card.
+4. **Tool policy (assessment demo-open)** — Register **all eight** Eve-equivalent tools on public `POST /api/mcp` **without** `FI_MCP_BEARER_TOKEN`: read tools plus `set_disposition`, `submit_request`, `confirm_request`, `support_request`. Same semantics and `@repo/fi` validation as Eve; **assessment-only** — not for production customer deployments without Factory ADR 0011 hardening (OAuth, rate limits, auth).
 5. **Single domain layer** — MCP tool handlers call **`@repo/fi` only** (no duplicate business logic). Eve and MCP share validation with web server actions.
 6. **Verification** — Add `is-agentic` CLI (`npx is-agentic <host>`) as an optional CI/preview check; target **essential checks passing** and **MCP check full** (live handshake + well-known) before claiming “agent-ready.”
-7. **Assessment auth** — Remains **no end-user login**; MCP Phase A is intentionally unauthenticated read-only on the public demo URL. Production hardening (OAuth, rate limits, Redis) follows Factory ADR 0011 when moving beyond the assessment.
+7. **Assessment auth** — Remains **no end-user login**; MCP is intentionally **unauthenticated** on the public demo URL (including mutations). Production hardening (OAuth, rate limits, Redis, bearer or mTLS) follows Factory ADR 0011 when moving beyond the assessment.
 
 ## Alternatives considered
 
 - **Eve HTTP only (no MCP)** — Rejected for discoverability goal; ChatGPT/Claude native MCP hosts do not consume Eve sessions.
 - **stdio MCP only** — Rejected; not reachable from remote cloud agents without a bridge.
-- **Full mutation MCP without auth** — Rejected; conflicts with security model and assessment scope.
+- **Full mutation MCP without auth (production)** — Rejected for adopters; **accepted only** for this Meta CTO assessment demo with explicit SECURITY.md warning and no production customer data.
 - **Rely on Smithery/registry alone** — Insufficient; Is Agentic requires **live protocol handshake** on our origin.
 
 ## Consequences

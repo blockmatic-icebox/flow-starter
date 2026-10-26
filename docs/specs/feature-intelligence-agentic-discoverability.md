@@ -1,8 +1,8 @@
 # Spec: Feature Intelligence — agentic discoverability (Is Agentic + MCP)
 
 **Last reviewed:** 2026-10-26  
-**Status:** Draft  
-**ADR:** [0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) (Proposed)  
+**Status:** Current  
+**ADR:** [0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) (Accepted)  
 **Initiative:** [feature-intelligence.md](../initiatives/feature-intelligence.md)
 
 ## Problem
@@ -16,14 +16,14 @@ Any standard agent client (Claude, ChatGPT, Cursor, etc.) can:
 1. Find **instructions** (`llms.txt`, when-to-use, sitemap).
 2. Read the **homepage and errors** as Markdown when requested.
 3. Discover MCP via **well-known** documents.
-4. Complete an MCP **Streamable HTTP** handshake and invoke **read-only** FI tools against production.
+4. Complete an MCP **Streamable HTTP** handshake and invoke FI tools (read and write on the assessment demo host).
 
 ## Non-goals
 
-- End-user OAuth for the assessment demo (Phase B uses optional static bearer only).
+- End-user OAuth for the assessment demo.
 - Replacing Eve as the primary PM copilot.
 - MCP tools that bypass `@repo/fi` validation.
-- Writable MCP on the public internet without `FI_MCP_BEARER_TOKEN`.
+- Writable MCP on the public internet for production adopters without Factory ADR 0011 hardening (assessment demo is explicitly open).
 
 ---
 
@@ -49,13 +49,20 @@ Any standard agent client (Claude, ChatGPT, Cursor, etc.) can:
 | Tool | Maps to `@repo/fi` | Notes |
 | --- | --- | --- |
 | `search_requests` | `searchRequests` | Pagination + `q` documented in tool description |
-| `get_request` | `getRequest` | |
-| `list_triage_queue` | `listTriageQueue` | |
+| `get_request` | `getRequest` |  |
+| `list_triage_queue` | `listTriageQueue` |  |
 | `get_insights` | `getInsights` | Optional `range` |
 
-### Phase B — mutation (optional bearer)
+### Assessment demo — mutation tools (open)
 
-Same names as [Eve tools](./feature-intelligence-eve-agent.md); registered only when `FI_MCP_BEARER_TOKEN` is set. Requests must send `Authorization: Bearer <token>`.
+Same names as [Eve tools](./feature-intelligence-eve-agent.md); registered on public `/api/mcp` without bearer for the Meta CTO assessment (`FI_MCP_DEMO_OPEN=1` default on assessment deploy). Production forks must gate mutations behind auth per Factory ADR 0011.
+
+| Tool              | Maps to `@repo/fi`     |
+| ----------------- | ---------------------- |
+| `submit_request`  | `createDraftAndTriage` |
+| `confirm_request` | `confirmRequest`       |
+| `support_request` | `supportRequest`       |
+| `set_disposition` | `setDisposition`       |
 
 ---
 
@@ -101,13 +108,16 @@ Same names as [Eve tools](./feature-intelligence-eve-agent.md); registered only 
     "endpoint": "https://<host>/api/mcp"
   },
   "tools": [
-    { "name": "search_requests", "description": "Search published requests with pagination." }
+    {
+      "name": "search_requests",
+      "description": "Search published requests with pagination."
+    }
   ],
   "authentication": { "required": false }
 }
 ```
 
-Phase B: set `authentication.required: true` and document bearer in card when mutations are enabled.
+Assessment demo: `authentication.required: false` with all tools listed; production adopters set `required: true` when enabling bearer/OAuth.
 
 ---
 
@@ -130,14 +140,14 @@ Run from repo:
 npx is-agentic@latest <production-host> --json
 ```
 
-| Check id | Target |
-| --- | --- |
-| `mcp-server` | **pass** (live handshake + `/.well-known/mcp`) |
-| `markdown-negotiation-vary` | **pass** |
-| `agent-instruction` | **pass** |
-| `sitemap` | **pass** |
-| `agent-friendly-404` | **pass** |
-| `content-no-js` | **pass** or partial acceptable |
+| Check id                    | Target                                         |
+| --------------------------- | ---------------------------------------------- |
+| `mcp-server`                | **pass** (live handshake + `/.well-known/mcp`) |
+| `markdown-negotiation-vary` | **pass**                                       |
+| `agent-instruction`         | **pass**                                       |
+| `sitemap`                   | **pass**                                       |
+| `agent-friendly-404`        | **pass**                                       |
+| `content-no-js`             | **pass** or partial acceptable                 |
 
 Add root script: `"agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-meta-cto-two.vercel.app}"` (devDependency `is-agentic`).
 
@@ -151,6 +161,19 @@ Add root script: `"agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-meta-cto-two
 - Claude Desktop / ChatGPT: add remote MCP URL, list tools, call `search_requests` with `query: "CSV"`.
 - `curl -H 'Accept: text/markdown' https://<host>/`
 
+### Curl probes (T-A-12)
+
+Replace `<host>` with `meta-cto-two.vercel.app` or `AGENTIC_CHECK_URL`:
+
+```sh
+curl -sS "https://<host>/llms.txt" | head
+curl -sS "https://<host>/sitemap.xml" | head
+curl -sS -i -H 'Accept: text/markdown' "https://<host>/" | head -20
+curl -sS -i -H 'Accept: text/html' "https://<host>/" | head -20
+curl -sS -i -H 'Accept: text/markdown' "https://<host>/no-such-agent-path" | head -20
+curl -sS "https://<host>/.well-known/mcp/server-card.json" | head
+```
+
 ---
 
 ## Acceptance criteria
@@ -163,10 +186,10 @@ Add root script: `"agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-meta-cto-two
 | AD-4 | `llms.txt` includes when-to-use + MCP link. |
 | AD-5 | Homepage Markdown negotiation passes Is Agentic `markdown-negotiation-vary`. |
 | AD-6 | `npx is-agentic <host>` MCP check **pass** (not partial). |
-| AD-7 | Phase B mutations disabled on public deploy unless bearer configured. |
+| AD-7 | Assessment demo documents open mutation MCP risk; production adopters gate writes behind auth. |
 
 ---
 
 ## Approval
 
-**Draft** — pending human approval of [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md). **Plan:** [tasks](../tasks/feature-intelligence-agentic-discoverability.md) (gates G-A0–G-A4). **Build** requires explicit authorization after Plan + ADR acceptance.
+**Current** — [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) accepted. **Tasks:** [feature-intelligence-agentic-discoverability.md](../tasks/feature-intelligence-agentic-discoverability.md).

@@ -1,14 +1,14 @@
 # Tasks: Feature Intelligence — agentic discoverability
 
 **Last reviewed:** 2026-10-26  
-**Status:** Plan ready (Build not authorized until ADR 0005 accepted + explicit **Build**)  
+**Status:** Build complete (2026-10-26)  
 **Spec:** [feature-intelligence-agentic-discoverability.md](../specs/feature-intelligence-agentic-discoverability.md) (AD-1–AD-7)  
-**ADR:** [0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) (Proposed — accept before Wave 1)  
+**ADR:** [0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) (Accepted)  
 **Initiative:** [feature-intelligence.md](../initiatives/feature-intelligence.md)
 
 **Role:** Execution checklist — requirements live in the spec only.  
 **Rules:** Respect **Depends on**. Commit subjects: `feat(web): T-A-4 well-known mcp`.  
-**Env (Build):** `AGENTIC_CHECK_URL` (default `meta-cto-two.vercel.app`), optional `FI_MCP_BEARER_TOKEN` for Phase B.
+**Env (Build):** `AGENTIC_CHECK_URL` (default `meta-cto-two.vercel.app`); `FI_MCP_DEMO_OPEN=1` on assessment deploy (mutations without bearer).
 
 ---
 
@@ -58,49 +58,49 @@
 
 ## Wave 0 — Decision
 
-- [ ] **T-A-0** — Human accepts [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md); set **Status: Accepted**; spec **Status: Current**
+- [x] **T-A-0** — Human accepts [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md); set **Status: Accepted**; spec **Status: Current**
 
 ---
 
 ## Wave 1 — Discovery documents (parallel)
 
-- [ ] **T-A-1** — `llms.txt` (**AD-4**)  
-  - **Depends on:** T-A-0  
-  - **Do:** Product summary, routes, **When to use Feature Intelligence**, links to `/.well-known/mcp/server-card.json` and `/api/mcp`.  
+- [x] **T-A-1** — `llms.txt` (**AD-4**)
+  - **Depends on:** T-A-0
+  - **Do:** Product summary, routes, **When to use Feature Intelligence**, links to `/.well-known/mcp/server-card.json` and `/api/mcp`.
   - **Verify:** `curl -sS https://<host>/llms.txt` contains “when” + MCP URL.
 
-- [ ] **T-A-2** — Sitemap  
-  - **Depends on:** T-A-0  
-  - **Do:** Next `sitemap.ts` for `/`, `/requests`, `/triage`, `/insights`, `/requests/new`, `/chat`.  
+- [x] **T-A-2** — Sitemap
+  - **Depends on:** T-A-0
+  - **Do:** Next `sitemap.ts` for `/`, `/requests`, `/triage`, `/insights`, `/requests/new`, `/chat`.
   - **Verify:** `curl -sS https://<host>/sitemap.xml` valid XML.
 
-- [ ] **T-A-3** — Homepage agent HTML + JSON-LD  
-  - **Depends on:** T-A-0  
-  - **Do:** SSR/plain HTML ≥500 chars meaningful text, H1, `SoftwareApplication` JSON-LD.  
+- [x] **T-A-3** — Homepage agent HTML + JSON-LD
+  - **Depends on:** T-A-0
+  - **Do:** SSR/plain HTML ≥500 chars meaningful text, H1, `SoftwareApplication` JSON-LD.
   - **Verify:** `is-agentic` `content-no-js` improves; view-source on `/`.
 
-- [ ] **T-A-4** — Well-known MCP metadata (**AD-1**)  
-  - **Depends on:** T-A-0, T-A-1  
-  - **Do:** `/.well-known/mcp/server-card.json`, `/.well-known/mcp.json`, optional `/.well-known/ai-catalog.json`; `endpoint` uses `APP_ORIGIN` or request host.  
+- [x] **T-A-4** — Well-known MCP metadata (**AD-1**)
+  - **Depends on:** T-A-0, T-A-1
+  - **Do:** `/.well-known/mcp/server-card.json`, `/.well-known/mcp.json`, optional `/.well-known/ai-catalog.json`; `endpoint` uses `APP_ORIGIN` or request host.
   - **Verify:** JSON validates; endpoint URL matches deployed `/api/mcp` after T-A-20.
 
 ---
 
 ## Wave 2 — Markdown negotiation & errors
 
-- [ ] **T-A-10** — Homepage Markdown negotiation (**AD-5**)  
-  - **Depends on:** T-A-1  
-  - **Do:** For `/`, if `Accept: text/markdown` → `Content-Type: text/markdown`, body ≥500 chars; HTML for `text/html`; header `Vary: Accept`.  
+- [x] **T-A-10** — Homepage Markdown negotiation (**AD-5**)
+  - **Depends on:** T-A-1
+  - **Do:** For `/`, if `Accept: text/markdown` → `Content-Type: text/markdown`, body ≥500 chars; HTML for `text/html`; header `Vary: Accept`.
   - **Verify:** `curl -sS -i -H 'Accept: text/markdown' https://<host>/` and HTML variant per spec.
 
-- [ ] **T-A-11** — Agent-friendly 404  
-  - **Depends on:** T-A-1  
-  - **Do:** 404 status; Markdown body when `Accept: text/markdown` with link to `/llms.txt`.  
+- [x] **T-A-11** — Agent-friendly 404
+  - **Depends on:** T-A-1
+  - **Do:** 404 status; Markdown body when `Accept: text/markdown` with link to `/llms.txt`.
   - **Verify:** `curl` probe path per Is Agentic `agent-friendly-404`.
 
-- [ ] **T-A-12** — Document curl verification  
-  - **Depends on:** T-A-10, T-A-11  
-  - **Do:** Add commands to spec or research log; no code required.  
+- [x] **T-A-12** — Document curl verification
+  - **Depends on:** T-A-10, T-A-11
+  - **Do:** Add commands to spec or research log; no code required.
   - **Verify:** Peer can run commands from doc.
 
 **Gate G-A2** after T-A-10 + T-A-11.
@@ -109,29 +109,27 @@
 
 ## Wave 3 — MCP server (Streamable HTTP)
 
-- [ ] **T-A-20** — MCP route skeleton (**AD-2**)  
-  - **Depends on:** T-A-4, **G-A1**  
-  - **Do:** `POST /api/mcp` Streamable HTTP (`@modelcontextprotocol/sdk` transport); health for OPTIONS if needed; rate limit stub.  
+- [x] **T-A-20** — MCP route skeleton (**AD-2**)
+  - **Depends on:** T-A-4, **G-A1**
+  - **Do:** `POST /api/mcp` Streamable HTTP (`@modelcontextprotocol/sdk` transport); health for OPTIONS if needed; rate limit stub.
   - **Verify:** MCP Inspector or `tools/list` returns without error locally.
 
-- [ ] **T-A-21** — Phase A tools (**AD-3**)  
-  - **Depends on:** T-A-20  
-  - **Do:** Register `search_requests`, `get_request`, `list_triage_queue`, `get_insights` calling `@repo/fi` (reuse Zod from `agent/tools/*` where possible).  
+- [x] **T-A-21** — Phase A tools (**AD-3**)
+  - **Depends on:** T-A-20
+  - **Do:** Register `search_requests`, `get_request`, `list_triage_queue`, `get_insights` calling `@repo/fi` (reuse Zod from `agent/tools/*` where possible).
   - **Verify:** CSV search returns FR-001/002 rows like Eve smoke.
 
-- [ ] **T-A-22** — Phase B bearer (optional) (**AD-7**)  
-  - **Depends on:** T-A-21  
-  - **Do:** Register mutation tools only when `FI_MCP_BEARER_TOKEN` set; require `Authorization: Bearer`; omit from public card when unset.  
-  - **Verify:** Without token, `tools/list` has no `set_disposition`; with token, mutation succeeds in dev.
+- [x] **T-A-22** — Phase B bearer (**AD-7**) — **N/A (demo-open)**
+  - Assessment policy registers all mutation tools without bearer; documented in ADR 0005 and SECURITY.md.
 
-- [ ] **T-A-23** — Automated MCP smoke  
-  - **Depends on:** T-A-21  
-  - **Do:** Test initialize + list tools + one `search_requests` call (local `next dev` or route handler unit test).  
+- [x] **T-A-23** — Automated MCP smoke
+  - **Depends on:** T-A-21
+  - **Do:** Test initialize + list tools + one `search_requests` call (local `next dev` or route handler unit test).
   - **Verify:** `pnpm --filter web test` (or dedicated script) exit 0.
 
-- [ ] **T-A-24** — Sync server card with live tools  
-  - **Depends on:** T-A-21  
-  - **Do:** Regenerate or statically align tool names/descriptions in well-known JSON.  
+- [x] **T-A-24** — Sync server card with live tools
+  - **Depends on:** T-A-21
+  - **Do:** Regenerate or statically align tool names/descriptions in well-known JSON.
   - **Verify:** Card tools match `tools/list` output.
 
 **Gate G-A3** after T-A-20, T-A-21, T-A-23.
@@ -140,24 +138,24 @@
 
 ## Wave 4 — Verification, CI, contracts
 
-- [ ] **T-A-30** — `is-agentic` CLI gate (**AD-6**)  
-  - **Depends on:** **G-A3**  
-  - **Do:** `devDependency` `is-agentic`; script `agentic:check`; document `AGENTIC_CHECK_URL`.  
+- [x] **T-A-30** — `is-agentic` CLI gate (**AD-6**)
+  - **Depends on:** **G-A3**
+  - **Do:** `devDependency` `is-agentic`; script `agentic:check`; document `AGENTIC_CHECK_URL`.
   - **Verify:** `pnpm agentic:check` — target `mcp-server` **pass**, `markdown-negotiation-vary` **pass**.
 
-- [ ] **T-A-31** — Vercel Deployment Protection note  
-  - **Depends on:** T-A-20  
-  - **Do:** Research log: public alias vs protection for external auditors.  
+- [x] **T-A-31** — Vercel Deployment Protection note
+  - **Depends on:** T-A-20
+  - **Do:** Research log: public alias vs protection for external auditors.
   - **Verify:** Doc updated with date.
 
-- [ ] **T-A-32** — Manual external clients  
-  - **Depends on:** **G-A3**  
-  - **Do:** Claude Desktop / ChatGPT: remote MCP `https://<host>/api/mcp`; call `search_requests`.  
+- [x] **T-A-32** — Manual external clients
+  - **Depends on:** **G-A3**
+  - **Do:** Claude Desktop / ChatGPT: remote MCP `https://<host>/api/mcp`; call `search_requests`.
   - **Verify:** Screenshot or log in research doc.
 
-- [ ] **T-A-33** — Contract sync  
-  - **Depends on:** T-A-30, T-A-32  
-  - **Do:** `PRODUCT.md` MCP row **Live**; initiative progress; check all **AD-1–AD-7**.  
+- [x] **T-A-33** — Contract sync
+  - **Depends on:** T-A-30, T-A-32
+  - **Do:** `PRODUCT.md` MCP row **Live**; initiative progress; check all **AD-1–AD-7**.
   - **Verify:** `pnpm --dir .agents flow:check` OK.
 
 **Gate G-A4** = shippable agentic slice.
