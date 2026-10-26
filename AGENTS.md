@@ -10,6 +10,8 @@ For repository work other than setup-only install, env, or tooling, read and app
 
 **Authorized Build:** After explicit implementation authorization, prefer **delegated workers** (for example Cursor Task subagents when available) with bounded read/write scopes and structured return payloads; you integrate and verify. Use `pnpm --dir .agents worktrees check|prepare` for initiative validation and briefs; use `worktrees run` only when a host worker command is explicitly required. Do not push or open PRs unless separately authorized.
 
+**Assessment Git (`meta-cto` only):** This checkout is the Meta CTO Feature Intelligence assessment. **Push only to `origin/meta-cto`** unless the human explicitly authorizes another remote branch. Do **not** `git push` to `main`, `master`, or other branches at this stage—even for Factory-only commits. Land Factory changes on `meta-cto` here, or leave them local until the human directs a separate branch. Do not open PRs to `main` for assessment product work. Before claiming “everything is pushed,” verify `git status` is clean (or only intentional untracked locals) and `meta-cto` is **0 ahead / 0 behind** `origin/meta-cto`.
+
 **New-product initiation:** A substantial product brief starts in **Explore** unless the user authorized a later stage. Treat supplied requirements as evidence, not resolved decisions. Stop before **Build** until implementation is explicitly authorized. "Skip the process," "build it now," and "update everything" are not that authorization. Planning language and approval of a proposed plan are not implementation authorization.
 
 **Setup-only requests** (install, env, tooling) are not automatic product discovery and do not require the Flow skill.
