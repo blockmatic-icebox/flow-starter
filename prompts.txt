@@ -1399,3 +1399,14 @@ Human: run tasks in parallel using subagents act as orchestrator
 Agent: ---
 
 ---
+---
+Timestamp: 2026-10-26T03:08:00.000Z
+Work: feature-intelligence
+Stage: Build
+Generation: agentic-orchestration-closeout
+
+Human: Agentic discoverability — parallel Build orchestration (implement attached plan; do not edit plan file)
+
+Agent: Implemented waves 0–4 on meta-cto: accepted ADR 0005 (demo-open MCP), llms.txt/sitemap/JSON-LD/well-known, markdown negotiation + 404, Streamable HTTP /api/mcp with eight @repo/fi tools, is-agentic script, contract sync. Commits d30796ad3 and 2fc97774a pushed. Local curls and pnpm --filter web test pass; pnpm build:web exit 0. Production deploy failed (db:migrate on Vercel build; CLI deploy Eve edge middleware). pnpm agentic:check still 59/100 until prod ships.
+
+---
