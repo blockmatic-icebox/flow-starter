@@ -8,13 +8,7 @@ export const dynamic = "force-dynamic";
 const knownPath = (pathname: string) => {
   if (pathname === "/" || pathname === "/favicon.ico") return true;
   const prefixes = [
-    "/requests",
-    "/triage",
-    "/insights",
-    "/chat",
-    "/about",
-    "/contact",
-    "/privacy",
+    "/dev",
     "/developers",
     "/api",
     "/llms.txt",
@@ -23,6 +17,7 @@ const knownPath = (pathname: string) => {
     "/sitemap.xml",
     "/markdown",
     "/eve",
+    "/mcp",
   ];
   return prefixes.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
@@ -32,7 +27,7 @@ const knownPath = (pathname: string) => {
 const notFoundMarkdown = (pathname: string, origin: string) =>
   `# Not found
 
-The path \`${pathname}\` is not part of Feature Intelligence.
+The path \`${pathname}\` is not part of this app.
 
 - Agent instructions: ${origin}/llms.txt
 - Sitemap: ${origin}/sitemap.xml

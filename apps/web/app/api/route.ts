@@ -7,14 +7,14 @@ export const GET = (request: Request) => {
   const origin = resolveSiteOrigin(request);
   return Response.json(
     {
-      description: "Feature Intelligence HTTP APIs",
-      documentation: `${origin}/developers`,
+      description: "Starter HTTP APIs for chat, GenUI compose, and MCP",
+      documentation: `${origin}/dev`,
       links: {
         chat: `${origin}/api/chat`,
         mcp: `${origin}/api/mcp`,
         openapi: `${origin}/openapi.json`,
       },
-      title: "Feature Intelligence API",
+      title: "Flow Starter API",
     },
     {
       headers: discoveryRateLimitHeaders(),

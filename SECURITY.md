@@ -27,7 +27,7 @@ These checks are described in [the security model](.agents/flow/security/securit
 - Tenant isolation and product data.
 - Production secrets, ingress trust, and deployment configuration.
 - Enabling MCP public access or a bearer token deliberately.
-- **Meta CTO assessment:** public Streamable HTTP MCP at `/api/mcp` exposes **read and write** FI tools without authentication on the demo host only; do not reuse that configuration for real customer data.
+- **MCP exposure:** Streamable HTTP at `/api/mcp` is off by default until you enable it and configure authentication or read-only tools for production.
 - Reviewing dependencies and responding to advisories after they fork.
 
 ## Disclaimer
