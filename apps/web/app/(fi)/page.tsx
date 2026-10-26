@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 
+import { fiProductTagline } from "@/lib/fi-agent-surfaces-content";
 import { fiHomeSummary, fiHomeTitle } from "@/lib/fi-home-content";
 import { resolveSiteOriginFromHeaderList } from "@/lib/site-url";
 
@@ -18,13 +19,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     alternates: { canonical: url },
+    description: fiProductTagline,
     openGraph: {
       description: fiHomeSummary,
-      title: fiHomeTitle,
+      images: [{ alt: fiHomeTitle, url: `${origin}/opengraph-image` }],
+      title: `${fiHomeTitle} — product feature request triage`,
       type: "website",
       url,
     },
-    title: fiHomeTitle,
+    title: `${fiHomeTitle} — product feature request triage`,
   };
 }
 
@@ -56,12 +59,34 @@ export default async function HomePage() {
   const origin = resolveSiteOriginFromHeaderList(headerList);
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    applicationCategory: "BusinessApplication",
-    description: fiHomeSummary,
-    name: fiHomeTitle,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    url: origin,
+    "@graph": [
+      {
+        "@type": "Organization",
+        address: {
+          "@type": "PostalAddress",
+          addressCountry: "US",
+          addressLocality: "Austin",
+          postalCode: "78701",
+          streetAddress: "Meta CTO assessment demo",
+        },
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "technical support",
+          email: "contact@gaboesquivel.com",
+          telephone: "+1-512-555-0199",
+        },
+        name: fiHomeTitle,
+        url: origin,
+      },
+      {
+        "@type": "SoftwareApplication",
+        applicationCategory: "BusinessApplication",
+        description: fiHomeSummary,
+        name: fiHomeTitle,
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        url: origin,
+      },
+    ],
   };
 
   return (
@@ -71,18 +96,24 @@ export default async function HomePage() {
         <h1 className="font-heading text-3xl font-semibold tracking-tight">
           {fiHomeTitle}
         </h1>
+        <p className="text-muted-foreground mt-1 text-lg">{fiProductTagline}</p>
         <p className="text-muted-foreground mt-2">{fiHomeSummary}</p>
         <p className="text-muted-foreground mt-4 text-sm">
-          Remote agents connect via{" "}
+          <Link className="underline" href="/developers">
+            Developer portal
+          </Link>{" "}
+          ·{" "}
+          <Link className="underline" href="/openapi.json">
+            OpenAPI
+          </Link>{" "}
+          ·{" "}
           <Link className="underline" href="/.well-known/mcp/server-card.json">
             MCP server card
           </Link>{" "}
-          or POST <code className="text-xs">/api/mcp</code>. Human-readable
-          agent instructions live at{" "}
+          · POST <code className="text-xs">/api/mcp</code> ·{" "}
           <Link className="underline" href="/llms.txt">
             llms.txt
           </Link>
-          .
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

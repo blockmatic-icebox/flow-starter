@@ -21,10 +21,13 @@ Use this product when you need to capture customer or internal feature requests,
 
 ## Agent interoperability
 
+- Developer portal: ${origin}/developers
+- OpenAPI 3.1: ${origin}/openapi.json
 - MCP server card: ${origin}/.well-known/mcp/server-card.json
 - MCP registry: ${origin}/.well-known/mcp.json
 - Streamable HTTP MCP: ${origin}/api/mcp
 - Sitemap: ${origin}/sitemap.xml
+- Trust pages: ${origin}/about, ${origin}/contact, ${origin}/privacy
 
 ## Tools (MCP)
 

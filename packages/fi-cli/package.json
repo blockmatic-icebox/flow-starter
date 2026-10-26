@@ -1,0 +1,14 @@
+{
+  "name": "@repo/fi-cli",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Feature Intelligence CLI — discover OpenAPI and MCP endpoints for agents",
+  "bin": {
+    "fi": "./bin/fi.mjs"
+  },
+  "files": [
+    "bin",
+    "README.md"
+  ],
+  "type": "module"
+}

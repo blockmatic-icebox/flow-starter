@@ -26,6 +26,9 @@ export const FiShell = async ({ children }: { children: React.ReactNode }) => {
             <Link className="text-muted-foreground" href="/chat">
               Ask
             </Link>
+            <Link className="text-muted-foreground" href="/developers">
+              Developers
+            </Link>
           </nav>
         </div>
       </header>

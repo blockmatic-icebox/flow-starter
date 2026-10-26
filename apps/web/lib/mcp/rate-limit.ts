@@ -1,3 +1,5 @@
+import { jsonError } from "@/lib/api/json-error";
+
 const windowMs = 60_000;
 const maxPerWindow = 120;
 
@@ -18,6 +20,11 @@ export const checkMcpRateLimit = (request: Request) => {
   }
   current.count += 1;
   if (current.count > maxPerWindow)
-    return Response.json({ error: "rate_limited" }, { status: 429 });
+    return jsonError({
+      code: "rate_limited",
+      message: "Too many MCP requests from this client.",
+      resolution: "Wait one minute and retry.",
+      status: 429,
+    });
   return null;
 };

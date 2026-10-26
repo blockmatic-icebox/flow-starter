@@ -4,6 +4,10 @@ export const dynamic = "force-dynamic";
 
 const publicRoutes = [
   "/",
+  "/about",
+  "/contact",
+  "/privacy",
+  "/developers",
   "/requests",
   "/requests/new",
   "/triage",

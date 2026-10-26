@@ -1,5 +1,6 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 
+import { jsonError } from "@/lib/api/json-error";
 import { createFiMcpServer } from "@/lib/mcp/create-mcp-server";
 import { checkMcpRateLimit } from "@/lib/mcp/rate-limit";
 
@@ -19,6 +20,14 @@ const handleMcp = async (request: Request) => {
   await server.connect(transport);
   try {
     return await transport.handleRequest(request);
+  } catch (error) {
+    return jsonError({
+      code: "mcp_handler_error",
+      message: error instanceof Error ? error.message : "MCP request failed",
+      resolution:
+        "Verify JSON-RPC body and Accept headers for Streamable HTTP.",
+      status: 500,
+    });
   } finally {
     await transport.close();
     await server.close();

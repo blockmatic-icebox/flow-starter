@@ -9,7 +9,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "check-types": "tsc-ts --noEmit",
-    "test": "node --import tsx --test tests/starter.contract.test.ts tests/site-url.test.ts tests/mcp/smoke.test.ts",
+    "test": "node --import tsx --test tests/starter.contract.test.ts tests/site-url.test.ts tests/mcp/smoke.test.ts tests/agent-surfaces.test.ts",
     "test:browser": "playwright test",
     "test:browser:ui": "playwright test --ui"
   },
