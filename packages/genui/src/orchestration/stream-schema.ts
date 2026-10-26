@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { validateCompositionEnvelope } from "../contract/compiler";
 import { GENUI_LIBRARY_VERSION } from "../core/envelope";
+import { groundedRecordSchema } from "../core/grounded-record-schema";
 import { GENUI_MAX_DOCUMENT_BYTES } from "../core/limits";
 import type { ComposeStreamEvent } from "./stream";
 
@@ -12,57 +13,11 @@ export const NDJSON_MAX_EVENTS = 32;
 const requestId = z.string().min(1).max(128);
 const sequence = z.number().int().nonnegative();
 
-const recordId = z.string().min(1).max(200);
-
-const entityRecord = z.strictObject({
-  id: recordId,
-  kind: z.literal("entity"),
-  summary: z.string().max(2000).optional(),
-  tags: z.array(z.string().max(80)).max(32).optional(),
-  title: z.string().min(1).max(500),
-  url: z.string().min(1).max(2000),
-});
-
-const documentRecord = z.strictObject({
-  excerpt: z.string().min(1).max(4000),
-  id: recordId,
-  kind: z.literal("document"),
-  revisedAt: z.string().max(40).optional(),
-  title: z.string().min(1).max(500),
-  url: z.string().min(1).max(2000),
-});
-
-const metricRecord = z.strictObject({
-  id: recordId,
-  kind: z.literal("metric"),
-  label: z.string().min(1).max(500),
-  trend: z.enum(["up", "down", "flat"]).optional(),
-  unit: z.string().max(40).optional(),
-  value: z.string().min(1).max(200),
-});
-
-const mediaRecord = z.strictObject({
-  id: recordId,
-  kind: z.literal("media"),
-  mimeType: z.string().min(1).max(200),
-  title: z.string().min(1).max(500),
-  url: z.string().min(1).max(2000),
-});
-
 const envelopeSchema = z.strictObject({
   fallbackText: z.string().max(8000),
   libraryVersion: z.literal(GENUI_LIBRARY_VERSION),
   openuiText: z.string().min(1).max(GENUI_MAX_DOCUMENT_BYTES),
-  records: z
-    .array(
-      z.discriminatedUnion("kind", [
-        entityRecord,
-        documentRecord,
-        metricRecord,
-        mediaRecord,
-      ])
-    )
-    .max(64),
+  records: z.array(groundedRecordSchema).max(64),
   requestId,
 });
 
@@ -78,12 +33,15 @@ const composeStreamEventSchema = z.discriminatedUnion("type", [
     envelope: envelopeSchema,
     metadata: z
       .strictObject({
+        classifier: z.enum(["jev", "regex"]).optional(),
         component: z.string().optional(),
         composite: z.string().nullable().optional(),
         failureCode: z
           .enum([
+            "classification_failed",
             "generation_invalid",
             "missing_credentials",
+            "unsupported_request",
             "validation_failed",
           ])
           .optional(),

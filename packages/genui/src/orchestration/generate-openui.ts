@@ -4,6 +4,7 @@ import { z } from "zod";
 import { validateCompositionEnvelope } from "../contract/compiler";
 import type { CompositionEnvelope, GroundedRecord } from "../core/envelope";
 import { GENUI_LIBRARY_VERSION } from "../core/envelope";
+import { groundedRecordSchema } from "../core/grounded-record-schema";
 import { acmeCatalogRecords } from "../fixtures/acme-catalog";
 import { supportDashboardRecords } from "../fixtures/synthetic-support";
 import { componentNames } from "../registry/components";
@@ -15,40 +16,6 @@ export interface ComposeTurn {
 }
 
 const DEFAULT_GENUI_MODEL = "anthropic/claude-sonnet-4.6";
-
-const groundedRecordSchema = z.discriminatedUnion("kind", [
-  z.object({
-    id: z.string(),
-    kind: z.literal("entity"),
-    summary: z.string().optional(),
-    tags: z.array(z.string()).optional(),
-    title: z.string(),
-    url: z.string(),
-  }),
-  z.object({
-    excerpt: z.string(),
-    id: z.string(),
-    kind: z.literal("document"),
-    revisedAt: z.string().optional(),
-    title: z.string(),
-    url: z.string(),
-  }),
-  z.object({
-    id: z.string(),
-    kind: z.literal("metric"),
-    label: z.string(),
-    trend: z.enum(["up", "down", "flat"]).optional(),
-    unit: z.string().optional(),
-    value: z.string(),
-  }),
-  z.object({
-    id: z.string(),
-    kind: z.literal("media"),
-    mimeType: z.string(),
-    title: z.string(),
-    url: z.string(),
-  }),
-]);
 
 const generationSchema = z.object({
   fallbackText: z.string().min(1).max(400),

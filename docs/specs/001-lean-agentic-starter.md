@@ -6,7 +6,7 @@ Date: 2026-10-26
 Owner: Gabo Esquivel  
 **Delivery:** Implemented on branch **`simple`**.  
 Source baseline: `meta-cto` @ `9afd416fa0093d49cdef114ea6837a50e8010b26`  
-**Visual system:** default shadcn/ui (not Porcelain).
+**Visual system:** Porcelain ([DESIGN.md](../../DESIGN.md)).
 
 ## Purpose
 
@@ -186,9 +186,10 @@ Production authentication and authorization; security-hardening scope; real cust
 | --- | --- |
 | Spec landed on `meta-cto` | `9e2f85dd4` — `docs/specs/001-lean-agentic-starter.md` only |
 | Assessment product unchanged | FI routes, `@repo/fi`, and assessment docs remain on `meta-cto` |
-| `simple` implementation | **Delivered** — GenUI studio, shared compose across web/MCP/Eve, neutral shadcn theme, assessment copy removed (commits after `11b5f1f8`) |
-| Workflow trials (small-task / shared-spec) | **Partial** — Matt skills in lockfile; GitHub tracker setup via `setup-matt-pocock-skills` not automated in CI |
-| Product checks P1–P10 | **Mostly verified** on `simple` — P3 Jev intentionally deferred (regex tier routing); P5 MCP App host rendering unverified without live host |
+| `simple` implementation | **Delivered** — GenUI studio, shared compose across web/MCP/Eve, Porcelain theme, assessment copy removed |
+| Workflow trials (small-task / shared-spec) | **Partial** — Matt skills in lockfile; ADR 0002 documents Matt workflow; GitHub tracker setup via `setup-matt-pocock-skills` not automated in CI |
+| Product checks P1–P10 | **Mostly verified** on `simple` — P3 Jev wired for ambiguous routes with regex fallback; P5 MCP App host rendering unverified without live host; P8 unsupported requests fail honestly |
+| Closeout evidence (2026-10-26) | `pnpm --filter @repo/genui test` and `pnpm eval:genui:offline` 102/102 pass; studio create vs refine; Eve `compose-ui` execute test in `apps/web/tests/agent/`; Vercel root `apps/web` documented in ARCHITECTURE |
 
 Repository verification before push (2026-10-26): `pnpm check-types` exit 0, `pnpm test` exit 0, `pnpm --filter @repo/db db:check` exit 0 (`pnpm qa` knip reports pre-existing unused-export noise unrelated to this spec).
 

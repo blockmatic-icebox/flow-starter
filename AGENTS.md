@@ -7,9 +7,10 @@ Short pointers for coding agents on branch **`simple`**.
 | Document | Use |
 | --- | --- |
 | [PRODUCT.md](PRODUCT.md) | Agentic MCP/API-first starter scope |
-| [DESIGN.md](DESIGN.md) | Default shadcn studio layout |
+| [DESIGN.md](DESIGN.md) | Porcelain studio layout |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Packages, commands, env, MCP/GenUI boundaries |
 | [docs/adr/0001-use-flow-factory.md](docs/adr/0001-use-flow-factory.md) | Factory adoption |
+| [docs/adr/0002-matt-workflow-on-simple.md](docs/adr/0002-matt-workflow-on-simple.md) | Matt workflow on `simple` |
 | [docs/specs/001-lean-agentic-starter.md](docs/specs/001-lean-agentic-starter.md) | Starter requirements |
 
 **Tracked work:** GitHub Issues (see [docs/simplified-flow-prd.md](docs/simplified-flow-prd.md)). No mandatory Flow phase router or custom Flow skill load for ordinary edits.

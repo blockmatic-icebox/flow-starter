@@ -53,13 +53,14 @@ pnpm --filter @repo/db db:check
 
 ## Environment
 
-| Variable             | Purpose                               |
-| -------------------- | ------------------------------------- |
+| Variable | Purpose |
+| --- | --- |
 | `AI_GATEWAY_API_KEY` | Open-ended OpenUI generation (tier 3) |
-| `ANTHROPIC_API_KEY`  | Optional `/api/chat`                  |
-| `DATABASE_URL`       | Optional Postgres for future features |
-| `GENUI_MODEL`        | Override gateway model for compose    |
-| `AGENTIC_CHECK_URL`  | Host passed to `pnpm agentic:check`   |
+| `TYPESAFE_API_KEY` | Jev classification for ambiguous routes (optional; regex fallback when unset) |
+| `ANTHROPIC_API_KEY` | Optional `/api/chat` |
+| `DATABASE_URL` | Optional Postgres for future features |
+| `GENUI_MODEL` | Override gateway model for compose |
+| `AGENTIC_CHECK_URL` | Host passed to `pnpm agentic:check` (no `https://` prefix) |
 
 ## Commands
 
@@ -76,8 +77,12 @@ pnpm test:browser
 
 ## GenUI routing
 
-`@repo/genui` uses deterministic regex intents for tier-1 templates (support dashboard, plan comparison, onboarding form), declarative tier-2 stacks, and AI Gateway tier-3 open composition or refinement. **Jev is not wired on `simple`** — tier selection uses `tierFromSignals` in `packages/genui/src/core/tiers.ts` until ambiguous routing justifies a classifier.
+`@repo/genui` uses deterministic regex intents for tier-1 templates (support dashboard, plan comparison, onboarding form), declarative tier-2 stacks, and AI Gateway tier-3 open composition or refinement. When regex does not match, optional **Jev** (`@typesafe-ai/sdk`, `TYPESAFE_API_KEY`) classifies ambiguous prompts; without a key, `tierFromSignals` in `packages/genui/src/core/tiers.ts` applies with `classifier: "regex"`. Unsupported catalog requests return `outcome: "failed"` with `unsupported_request`.
 
 ## Eve
 
-Repo root `agent/` with `withEve` in [`apps/web/next.config.ts`](apps/web/next.config.ts). Smoke eval: [`evals/smoke/compose-support-dashboard.eval.ts`](evals/smoke/compose-support-dashboard.eval.ts).
+Repo root `agent/` with `withEve` in [`apps/web/next.config.ts`](apps/web/next.config.ts). Smoke eval: [`evals/smoke/compose-support-dashboard.eval.ts`](evals/smoke/compose-support-dashboard.eval.ts) (calls `compose-ui` tool `execute`).
+
+## Vercel (`flow-starter` project)
+
+Set **Root Directory** to `apps/web` and **Framework** to Next.js so [`apps/web/vercel.json`](apps/web/vercel.json) install/build commands apply. The assessment **`meta-cto`** project should ignore branch `simple` (Ignored Build Step) so preview deploys do not run Eve against the lean starter. `apps/web` lists `@openuidev/lang-core` so Eve authored-module builds resolve GenUI imports.

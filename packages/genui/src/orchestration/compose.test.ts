@@ -159,6 +159,23 @@ describe("composeQuery", () => {
     }
   });
 
+  it("reports unsupported catalog requests as failed outcomes", async () => {
+    const result = await composeQuery({
+      input: {
+        clientRequestId: "unsupported",
+        query: "This request is unsupported",
+        version: 1,
+      },
+    });
+
+    const complete = result.events.find((event) => event.type === "complete");
+
+    assert.ok(complete && complete.type === "complete");
+    assert.equal(result.metadata.outcome, "failed");
+    assert.equal(result.metadata.failureCode, "unsupported_request");
+    assert.match(complete.envelope.openuiText, /StatusMessage/u);
+  });
+
   it("routes onboarding form prompts to tier 1 InteractiveForm stack", async () => {
     const result = await composeQuery({
       input: {

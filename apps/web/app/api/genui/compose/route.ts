@@ -1,6 +1,7 @@
 import {
   composeQuery,
   GENUI_LIBRARY_VERSION,
+  groundedRecordSchema,
   MAX_QUERY_CODE_POINTS,
 } from "@repo/genui";
 import type { ComposeInput } from "@repo/genui";
@@ -9,40 +10,6 @@ import { z } from "zod";
 import { loadRootEnv } from "@/lib/env";
 
 loadRootEnv();
-
-const groundedRecordSchema = z.discriminatedUnion("kind", [
-  z.object({
-    id: z.string(),
-    kind: z.literal("entity"),
-    summary: z.string().optional(),
-    tags: z.array(z.string()).optional(),
-    title: z.string(),
-    url: z.string(),
-  }),
-  z.object({
-    excerpt: z.string(),
-    id: z.string(),
-    kind: z.literal("document"),
-    revisedAt: z.string().optional(),
-    title: z.string(),
-    url: z.string(),
-  }),
-  z.object({
-    id: z.string(),
-    kind: z.literal("metric"),
-    label: z.string(),
-    trend: z.enum(["up", "down", "flat"]).optional(),
-    unit: z.string().optional(),
-    value: z.string(),
-  }),
-  z.object({
-    id: z.string(),
-    kind: z.literal("media"),
-    mimeType: z.string(),
-    title: z.string(),
-    url: z.string(),
-  }),
-]);
 
 const priorEnvelopeSchema = z.object({
   fallbackText: z.string(),

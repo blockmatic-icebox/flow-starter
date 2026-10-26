@@ -1,9 +1,22 @@
 "use client";
 
-import { Button } from "@repo/ui/components/button";
+import { Button, buttonVariants } from "@repo/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@repo/ui/components/card";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@repo/ui/components/chart";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 import type { GroundedRecord } from "../core/envelope";
 import { getFormSchema } from "../fixtures/form-schemas";
@@ -97,6 +110,79 @@ export const CollectionGridView = ({
   </section>
 );
 
+const ComparisonPlanCard = ({
+  entity,
+  id,
+  records,
+}: {
+  entity: Extract<GroundedRecord, { kind: "entity" }> | null;
+  id: string;
+  records: GroundedRecord[];
+}) => {
+  const title = recordTitle(records, id);
+  const summary = entity?.summary ?? null;
+  const price = entity?.price ?? null;
+  const interval = entity?.interval ?? null;
+  const features = entity?.features ?? [];
+  const cta = entity?.cta ?? "Choose plan";
+  const href = entity?.url ?? null;
+
+  return (
+    <Card>
+      <CardHeader className="gap-1">
+        <CardTitle className="text-lg">{title}</CardTitle>
+        {price ? (
+          <p className="text-foreground text-2xl font-semibold tabular-nums">
+            {price}
+            {interval ? (
+              <span className="text-muted-foreground text-sm font-normal">
+                {" "}
+                {interval}
+              </span>
+            ) : null}
+          </p>
+        ) : null}
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {summary ? (
+          <p className="text-muted-foreground text-sm">{summary}</p>
+        ) : null}
+        {features.length > 0 ? (
+          <ul className="space-y-1.5 text-sm">
+            {features.map((feature) => (
+              <li className="flex gap-2" key={feature}>
+                <span aria-hidden className="text-primary">
+                  •
+                </span>
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </CardContent>
+      <CardFooter>
+        {href ? (
+          <a
+            className={buttonVariants({
+              className: "w-full",
+              variant: "default",
+            })}
+            href={href}
+            rel="noreferrer"
+            target="_blank"
+          >
+            {cta}
+          </a>
+        ) : (
+          <Button className="w-full" type="button">
+            {cta}
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
+  );
+};
+
 export const ComparisonViewUi = ({
   entityIds,
   records,
@@ -104,32 +190,17 @@ export const ComparisonViewUi = ({
   entityIds: string[];
   records: GroundedRecord[];
 }) => (
-  <div className="grid gap-3 md:grid-cols-2">
+  <div className="grid gap-4 md:grid-cols-2">
     {entityIds.map((id) => {
       const record = records.find((r) => r.id === id);
-      const href =
-        record?.kind === "entity" && record.url.startsWith("/")
-          ? record.url
-          : null;
-      const title = recordTitle(records, id);
-      const summary =
-        record?.kind === "entity" && record.summary ? record.summary : null;
+      const entity = record?.kind === "entity" ? record : null;
       return (
-        <div className="border-border rounded-lg border p-4" key={id}>
-          {href ? (
-            <a
-              className="text-primary font-semibold hover:underline"
-              href={href}
-            >
-              {title}
-            </a>
-          ) : (
-            <h3 className="font-semibold">{title}</h3>
-          )}
-          {summary ? (
-            <p className="text-muted-foreground mt-2 text-sm">{summary}</p>
-          ) : null}
-        </div>
+        <ComparisonPlanCard
+          entity={entity}
+          id={id}
+          key={id}
+          records={records}
+        />
       );
     })}
   </div>
@@ -141,23 +212,71 @@ export const DataExplorerView = ({
 }: {
   metricIds: string[];
   records: GroundedRecord[];
-}) => (
-  <dl className="grid gap-3 sm:grid-cols-3">
-    {metricIds.map((id) => {
-      const metric = records.find((record) => record.id === id);
-      if (!metric || metric.kind !== "metric") return null;
-      return (
-        <div className="border-border rounded-lg border p-3" key={id}>
-          <dt className="text-muted-foreground text-xs">{metric.label}</dt>
-          <dd className="text-lg font-semibold">
-            {metric.value}
-            {metric.unit ? ` ${metric.unit}` : ""}
-          </dd>
+}) => {
+  const metrics = useMemo(
+    () =>
+      metricIds
+        .map((id) => records.find((record) => record.id === id))
+        .filter((record): record is GroundedRecord & { kind: "metric" } =>
+          Boolean(record && record.kind === "metric")
+        ),
+    [metricIds, records]
+  );
+  const [activeId, setActiveId] = useState(metrics[0]?.id ?? "");
+  const active =
+    metrics.find((metric) => metric.id === activeId) ?? metrics[0] ?? null;
+  const chartData =
+    active?.series?.map((value, index) => ({
+      index: String(index + 1),
+      value,
+    })) ?? [];
+
+  return (
+    <section className="space-y-4">
+      <dl className="grid gap-3 sm:grid-cols-3">
+        {metrics.map((metric) => (
+          <div className="border-border rounded-lg border p-3" key={metric.id}>
+            <dt className="text-muted-foreground text-xs">{metric.label}</dt>
+            <dd className="text-lg font-semibold tabular-nums">
+              {metric.value}
+              {metric.unit ? ` ${metric.unit}` : ""}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      {metrics.length > 1 ? (
+        <div className="flex flex-wrap gap-2">
+          {metrics.map((metric) => (
+            <Button
+              key={metric.id}
+              onClick={() => setActiveId(metric.id)}
+              size="sm"
+              type="button"
+              variant={metric.id === active?.id ? "default" : "secondary"}
+            >
+              {metric.label}
+            </Button>
+          ))}
         </div>
-      );
-    })}
-  </dl>
-);
+      ) : null}
+      {active && chartData.length > 0 ? (
+        <ChartContainer
+          className="aspect-auto h-[200px] w-full"
+          config={{
+            value: { color: "var(--chart-1)", label: active.label },
+          }}
+        >
+          <BarChart data={chartData}>
+            <XAxis dataKey="index" hide />
+            <YAxis hide />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Bar dataKey="value" fill="var(--color-value)" radius={4} />
+          </BarChart>
+        </ChartContainer>
+      ) : null}
+    </section>
+  );
+};
 
 export const TimelineViewUi = ({
   orderedIds,

@@ -38,8 +38,17 @@ export const StudioClient = () => {
   const latestRequestIdRef = useRef<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
+  const resetComposition = useCallback(async () => {
+    abortRef.current?.abort();
+    setEnvelope(null);
+    setMessages([]);
+    setError(null);
+    setInput("");
+    await setQueryParam(null);
+  }, [setQueryParam]);
+
   const runCompose = useCallback(
-    async (text: string) => {
+    async (text: string, mode: "create" | "refine" = "create") => {
       const query = text.trim();
       if (!query) return;
       abortRef.current?.abort();
@@ -48,8 +57,8 @@ export const StudioClient = () => {
       generationRef.current += 1;
       const clientRequestId = `studio-${generationRef.current}`;
       latestRequestIdRef.current = clientRequestId;
-      const priorEnvelope = envelope;
-      const priorMessages = messages;
+      const priorEnvelope = mode === "refine" ? envelope : null;
+      const priorMessages = mode === "refine" ? messages : [];
       setError(null);
       setLoading(true);
       setMessages((prev) => [...prev, { content: query, role: "user" }]);
@@ -64,7 +73,7 @@ export const StudioClient = () => {
         const response = await fetch("/api/genui/compose", {
           body: JSON.stringify({
             clientRequestId,
-            mode: priorEnvelope ? "refine" : "create",
+            mode,
             priorEnvelope: priorEnvelope ?? undefined,
             query,
             turns: [...priorMessages, { content: query, role: "user" as const }]
@@ -123,12 +132,12 @@ export const StudioClient = () => {
     [envelope, messages]
   );
 
-  const submit = async (text: string) => {
+  const submit = async (text: string, mode: "create" | "refine" = "create") => {
     const query = text.trim();
     if (!query) return;
     setInput("");
     await setQueryParam(query);
-    await runCompose(query);
+    await runCompose(query, mode);
   };
 
   const showLanding = !envelope && !loading && messages.length === 0;
@@ -166,7 +175,7 @@ export const StudioClient = () => {
           className="flex gap-2 border-t p-4"
           onSubmit={(event) => {
             event.preventDefault();
-            void submit(input);
+            void submit(input, "refine");
           }}
         >
           <Textarea
@@ -187,15 +196,29 @@ export const StudioClient = () => {
           <div>
             <h1 className="text-lg font-semibold tracking-tight">Studio</h1>
             <p className="text-muted-foreground text-sm">
-              Agentic UI generation with OpenUI Lang and shadcn.
+              Agentic UI generation with OpenUI Lang and the Porcelain theme.
             </p>
           </div>
-          <Link
-            className="text-primary text-sm underline-offset-4 hover:underline"
-            href="/dev"
-          >
-            MCP &amp; API
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            {envelope || messages.length > 0 ? (
+              <Button
+                onClick={() => {
+                  void resetComposition();
+                }}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                New composition
+              </Button>
+            ) : null}
+            <Link
+              className="text-primary text-sm underline-offset-4 hover:underline"
+              href="/dev"
+            >
+              MCP &amp; API
+            </Link>
+          </div>
         </header>
 
         {showLanding ? (

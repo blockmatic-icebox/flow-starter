@@ -14,7 +14,9 @@ This starter repository ships as a product template on top of Flow Factory. The 
 
 Adopt Flow Factory as the engineering foundation for this product.
 
-The product inherits Flow's workflow, relevant skills, technical architecture, quality practices, and documentation conventions. Factory-owned rationale and decisions remain canonical under `.agents/flow/`. Product-specific decisions remain under `docs/` and root contracts (`PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`).
+The product inherits Flow's technical architecture, quality practices, and documentation conventions. Factory-owned rationale and decisions remain canonical under `.agents/flow/`. Product-specific decisions remain under `docs/` and root contracts (`PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`).
+
+On branch **`simple`**, day-to-day workflow is defined by [ADR 0002](0002-matt-workflow-on-simple.md), not the Factory phase router.
 
 The product may intentionally diverge from an inherited architectural choice through an explicit, accepted product ADR that references the relevant Factory ADR. Such a decision applies to this product and does not rewrite Factory history.
 

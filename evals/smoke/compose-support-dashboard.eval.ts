@@ -1,19 +1,27 @@
-import { execSync } from "node:child_process";
-import path from "node:path";
+import assert from "node:assert/strict";
 
 import { defineEval } from "eve/evals";
+import type { ToolContext } from "eve/tools";
 
-const repoRoot = path.join(import.meta.dirname, "..", "..");
+import composeUi from "../../agent/tools/compose-ui.ts";
 
 export default defineEval({
-  description:
-    "GenUI compose package tests pass (includes support-dashboard routing).",
+  description: "compose-ui tool returns validated support dashboard envelope",
   tags: ["smoke"],
-  test(t) {
-    execSync("pnpm --filter @repo/genui test", {
-      cwd: repoRoot,
-      stdio: "inherit",
-    });
+  async test(t) {
+    const result = await composeUi.execute(
+      {
+        mode: "create",
+        query: "Generate a customer support dashboard",
+      },
+      {} as ToolContext
+    );
+
+    assert.ok("envelope" in result);
+    assert.equal(result.metadata.outcome, "success");
+    assert.match(result.envelope.openuiText, /SectionStack/u);
+    assert.match(result.envelope.openuiText, /metrics-dashboard/u);
+
     t.succeeded();
   },
 });

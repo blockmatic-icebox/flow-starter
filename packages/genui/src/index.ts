@@ -3,6 +3,7 @@ export {
   type CompositionEnvelope,
   type GroundedRecord,
 } from "./core/envelope";
+export { groundedRecordSchema } from "./core/grounded-record-schema";
 export type {
   CompileErrorCode,
   CompiledComposition,
@@ -38,6 +39,7 @@ export {
 } from "./orchestration/compose";
 export { composeQueryToEnvelope } from "./orchestration/compose-query-to-envelope";
 export { routeQuery } from "./orchestration/routing";
+export type { ComposeClassifier } from "./orchestration/classify";
 export {
   answerDocument,
   collectionDocument,

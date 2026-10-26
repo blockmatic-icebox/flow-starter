@@ -77,3 +77,4 @@ __dev
 
 # Neon Local metadata
 .neon_local/
+.neon
