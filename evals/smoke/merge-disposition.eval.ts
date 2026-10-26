@@ -19,9 +19,10 @@ export default defineEval({
     const suffix = crypto.randomUUID().slice(0, 8);
     const { request: canonicalDraft } = await createDraftAndTriage({
       db,
-      description: "Eval canonical target for merge disposition smoke.",
+      description:
+        "Manager approved Marco and Jen's Saturday swap but both schedules still show the original shift.",
       source: "internal",
-      title: `Eval merge target ${suffix}`,
+      title: `Canonical Harbor Bites swap still wrong (${suffix})`,
     });
     const canonicalId = canonicalDraft?.id;
     if (!canonicalId) throw new Error("missing canonical draft id");
@@ -29,9 +30,10 @@ export default defineEval({
 
     const { request: sourceDraft } = await createDraftAndTriage({
       db,
-      description: "Eval source row for merge disposition smoke.",
+      description:
+        "Guest ticket: approved swap in app but timeclock still had the old shift — same story as Marco.",
       source: "internal",
-      title: `Eval merge source ${suffix}`,
+      title: `Duplicate swap complaint from support (${suffix})`,
     });
     const sourceId = sourceDraft?.id;
     if (!sourceId) throw new Error("missing source draft id");
@@ -40,7 +42,8 @@ export default defineEval({
     await setDisposition({
       db,
       disposition: "merge",
-      dispositionRationale: "Eval merge into canonical signal",
+      dispositionRationale:
+        "Same swap-sync failure; track on canonical Harbor Bites signal.",
       mergeTargetId: canonicalId,
       requestId: sourceId,
     });

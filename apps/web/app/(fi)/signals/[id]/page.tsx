@@ -1,5 +1,10 @@
 import type { TriageStepsPayload } from "@repo/fi";
-import { FI_SIMULATED_PM_ACTOR, getDb, searchRequests } from "@repo/fi";
+import {
+  FI_SIMULATED_PM_ACTOR,
+  getCrewdayDemoContextByRequestId,
+  getDb,
+  searchRequests,
+} from "@repo/fi";
 import { Button } from "@repo/ui/components/button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -36,6 +41,8 @@ export default async function SignalDetailPage({
         themeKey: req.themeKey,
       })
     : { items: [] };
+
+  const crewdayContext = getCrewdayDemoContextByRequestId().get(id);
 
   return (
     <div className="space-y-6">
@@ -133,6 +140,19 @@ export default async function SignalDetailPage({
         </div>
 
         <aside className="border-border space-y-4 border-t pt-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6">
+          {crewdayContext ? (
+            <div>
+              <p className="text-muted-foreground text-xs tracking-wide uppercase">
+                Crewday customer
+              </p>
+              <p className="mt-1 text-sm font-medium">
+                {crewdayContext.accountLabel}
+              </p>
+              <p className="text-muted-foreground text-xs">
+                {crewdayContext.submitterRole}
+              </p>
+            </div>
+          ) : null}
           <div>
             <p className="text-muted-foreground text-xs tracking-wide uppercase">
               Supporting accounts

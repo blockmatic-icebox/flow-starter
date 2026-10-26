@@ -4,7 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { hunchNav } from "@/lib/hunch-content";
+import {
+  crewdayDemoNote,
+  hunchNav,
+  hunchWorkspaceLabel,
+} from "@/lib/hunch-content";
 
 import {
   HunchBottomMobileNav,
@@ -53,8 +57,9 @@ export const HunchAppFrame = ({
           >
             {hunchNav.ask.label}
           </Link>
-          <p className="text-muted-foreground px-3 pt-2 text-xs">
-            Demo workspace
+          <p className="text-muted-foreground px-3 pt-2 text-xs leading-snug">
+            {hunchWorkspaceLabel}
+            <span className="mt-1 block opacity-80">{crewdayDemoNote}</span>
           </p>
         </div>
       </aside>

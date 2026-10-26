@@ -48,7 +48,8 @@ Links:
   MCP          ${origin}/api/mcp
   llms.txt     ${origin}/llms.txt
 
-Install: pnpm --filter @repo/fi-cli exec fi
+Install: npx feature-intelligence-cli
+       pnpm --filter feature-intelligence-cli exec fi
 `);
 };
 

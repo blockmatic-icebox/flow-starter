@@ -30,7 +30,7 @@ export const registerFiMcpTools = (server: McpServer) => {
     "search_requests",
     {
       description:
-        "Search published feature requests by text and optional theme key.",
+        "Search published Crewday feedback by text and optional theme key (e.g. shift_swaps, scheduling_coverage).",
       inputSchema: z.object({
         limit: z.number().int().min(1).max(50).optional(),
         query: z.string().optional(),
@@ -64,7 +64,7 @@ export const registerFiMcpTools = (server: McpServer) => {
     "get_request",
     {
       description:
-        "Get a feature request by id with duplicates and support count.",
+        "Get a Crewday feature request by id with duplicates and support count.",
       inputSchema: z.object({ requestId: z.string().uuid() }),
       ...explorerToolMeta,
     },
@@ -83,7 +83,8 @@ export const registerFiMcpTools = (server: McpServer) => {
     server,
     "list_triage_queue",
     {
-      description: "List published requests awaiting PM disposition.",
+      description:
+        "List published Crewday requests awaiting PM disposition (shift swaps, coverage, notifications).",
       inputSchema: z.object({}),
       ...explorerToolMeta,
     },
@@ -105,7 +106,8 @@ export const registerFiMcpTools = (server: McpServer) => {
     server,
     "get_insights",
     {
-      description: "North-star product metrics for feature intelligence.",
+      description:
+        "North-star metrics for the Crewday demo workspace (queue depth, capture rate, themes).",
       inputSchema: z.object({
         range: z.enum(["7d", "30d", "90d", "all"]).optional(),
       }),

@@ -51,6 +51,10 @@ const nextConfig: NextConfig = {
     return {
       beforeFiles: [
         {
+          destination: "/api/:path*",
+          source: "/v1/api/:path*",
+        },
+        {
           destination: "/markdown/home",
           source: "/index.md",
         },

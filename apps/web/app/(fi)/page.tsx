@@ -7,7 +7,14 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { hunchNav, hunchPageSubtitles } from "@/lib/hunch-content";
+import {
+  crewdayDemoNote,
+  fiSeoOverviewSubtitle,
+  fiSeoOverviewTitle,
+  hunchNav,
+  hunchPageSubtitles,
+  hunchWorkspaceLabel,
+} from "@/lib/hunch-content";
 
 import {
   formatCaptureRate,
@@ -21,7 +28,7 @@ import {
 } from "./_components/signal-status";
 
 export const metadata: Metadata = {
-  title: hunchNav.overview.label,
+  title: fiSeoOverviewTitle,
 };
 
 const rationaleExcerpt = (text: string | null, max = 120) => {
@@ -63,8 +70,12 @@ export default async function OverviewPage() {
         <h1 className="text-lg font-semibold tracking-tight">
           {hunchNav.overview.label}
         </h1>
+        <p className="text-muted-foreground text-sm">{fiSeoOverviewSubtitle}</p>
         <p className="text-muted-foreground text-sm">
           {hunchPageSubtitles.overview}
+        </p>
+        <p className="text-muted-foreground text-xs">
+          {hunchWorkspaceLabel} · {crewdayDemoNote}
         </p>
       </header>
 

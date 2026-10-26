@@ -1,5 +1,10 @@
 import type { AppDatabase } from "@repo/db";
-import { getInsights, listRecentDecisions, searchRequests } from "@repo/fi";
+import {
+  getInsights,
+  listAttentionItems,
+  listRecentDecisions,
+  searchRequests,
+} from "@repo/fi";
 import {
   answerDocument,
   collectionDocument,
@@ -34,8 +39,19 @@ type ListRecentDecisionsInput = Omit<
   "db"
 >;
 
+const themeCountDelta = (t: { count: number; priorCount: number | null }) =>
+  t.priorCount === null ? 0 : t.count - t.priorCount;
+
+type ListAttentionItemsInput = Omit<
+  Parameters<typeof listAttentionItems>[0],
+  "db"
+>;
+
 export interface ComposeFiDeps {
   getInsights: (args: GetInsightsInput) => ReturnType<typeof getInsights>;
+  listAttentionItems: (
+    args: ListAttentionItemsInput
+  ) => ReturnType<typeof listAttentionItems>;
   listRecentDecisions: (
     args: ListRecentDecisionsInput
   ) => ReturnType<typeof listRecentDecisions>;
@@ -46,6 +62,7 @@ export interface ComposeFiDeps {
 
 const defaultDeps = (db: AppDatabase): ComposeFiDeps => ({
   getInsights: (args) => getInsights({ ...args, db }),
+  listAttentionItems: (args) => listAttentionItems({ ...args, db }),
   listRecentDecisions: (args) => listRecentDecisions({ ...args, db }),
   searchRequests: (args) => searchRequests({ ...args, db }),
 });
@@ -53,7 +70,7 @@ const defaultDeps = (db: AppDatabase): ComposeFiDeps => ({
 const duplicateSearchQuery = (text: string) =>
   text
     .replaceAll(
-      /\b(?:are|these|those|requests?|duplicate|duplicates|same)\b/giu,
+      /\b(?:are|customers?|reporting|these|those|requests?|duplicate|duplicates|same|shift-?swap|issue|different|ways)\b/giu,
       " "
     )
     .replaceAll(/\s+/gu, " ")
@@ -126,42 +143,70 @@ export const composeFiQuery = async ({
     return items;
   };
 
-  const intent = matchFiComposeIntent(query);
-  let envelope;
-
-  if (intent === "integration-failure") {
-    const rows = await loadTheme({ query: "integration" });
-    const sourceIds = rows.slice(0, 6).map((r) => signalEntityId(r.id));
-    for (const row of rows.slice(0, 6))
+  const rankedListEnvelope = (
+    rows: {
+      description: string;
+      id: string;
+      supportCount: number;
+      themeLabel: string | null;
+      title: string;
+    }[],
+    answer: string
+  ) => {
+    const ids = rows.slice(0, 6).map((r) => {
       pushSignal({
-        description: row.description,
-        id: row.id,
-        supportCount: row.supportCount,
-        themeLabel: row.themeLabel,
-        title: row.title,
+        description: r.description,
+        id: r.id,
+        supportCount: r.supportCount,
+        themeLabel: r.themeLabel,
+        title: r.title,
       });
-    envelope = sectionStackDocument({
+      return signalEntityId(r.id);
+    });
+    if (ids.length === 0)
+      return statusDocument({
+        message:
+          "No matching signals in the catalog. Try Add feedback or broaden the theme.",
+        records: [],
+        requestId,
+        variant: "empty",
+      });
+    return sectionStackDocument({
       childExpressions: [
-        `StatusMessage(${openUiStringLiteral(
-          "Automated summarization is unavailable. Source signals are listed below for manual review."
-        )}, ${openUiStringLiteral("warning")})`,
-        `CollectionGrid(${openUiStringLiteral("grid-cards")}, ${openUiStringList(sourceIds)})`,
+        `Answer(${openUiStringLiteral(answer)}, ${openUiStringList(ids)})`,
+        `RankedSignalList(${openUiStringList(ids)}, ${openUiStringLiteral("/review")})`,
       ],
       records,
       requestId,
     });
-  } else if (intent === "duplicates") {
+  };
+
+  const intent = matchFiComposeIntent(query);
+  let envelope;
+
+  if (intent === "prioritize-scheduling") {
+    let rows = await loadTheme({
+      query: "scheduling coverage",
+      themeKey: "scheduling_coverage",
+    });
+    if (rows.length === 0) rows = await loadTheme({ query: "scheduling" });
+    envelope = rankedListEnvelope(
+      rows,
+      "Ranked by supporter count from published Crewday scheduling feedback. Delivery effort is unknown unless noted in decision rationale — open Triage to record a decision."
+    );
+  } else if (intent === "duplicate-swap") {
     const stripped = duplicateSearchQuery(query);
     const ranked = await fi.searchRequests({
       pageSize: 2,
-      query: stripped.length > 1 ? stripped : undefined,
+      query: stripped.length > 1 ? stripped : "shift swap",
       sort: "support",
+      themeKey: "shift_swaps",
     });
     const pair = ranked.items.slice(0, 2);
     if (pair.length < 2) {
       envelope = statusDocument({
         message:
-          "Not enough published signals to compare. Add more feedback or broaden your question.",
+          "Not enough published shift-swap signals to compare. Add more feedback or broaden your question.",
         records: [],
         requestId,
         variant: "empty",
@@ -179,22 +224,22 @@ export const composeFiQuery = async ({
       envelope = sectionStackDocument({
         childExpressions: [
           `Answer(${openUiStringLiteral(
-            "These signals describe a shared need with different wording. Review before merging — effort and scope are not inferred from similarity alone."
+            "These Crewday signals describe a shared shift-swap need with different wording. Review before merging — effort and scope are not inferred from similarity alone."
           )}, ${openUiStringList(ids)})`,
-          `ComparisonView(${openUiStringLiteral("side-by-side")}, ${openUiStringLiteral("Shared need")}, ${openUiStringList(ids)})`,
+          `ComparisonView(${openUiStringLiteral("side-by-side")}, ${openUiStringLiteral("Shared shift-swap need")}, ${openUiStringList(ids)})`,
         ],
         records,
         requestId,
       });
     }
-  } else if (intent === "public-links") {
-    const { items: linkRows } = await fi.searchRequests({
+  } else if (intent === "approval-conflict") {
+    const { items: rows } = await fi.searchRequests({
       pageSize: 4,
-      query: "link",
+      query: "approval manager employee",
       sort: "support",
     });
     const docIds: string[] = [];
-    for (const row of linkRows) {
+    for (const row of rows) {
       pushSignal({
         description: row.description,
         id: row.id,
@@ -211,17 +256,37 @@ export const composeFiQuery = async ({
       );
       docIds.push(evidenceDocId(row.id));
     }
-    envelope = sectionStackDocument({
-      childExpressions: [
-        `Answer(${openUiStringLiteral(
-          "Segmented evidence below. Facts come from customer quotes; hypotheses are not recorded decisions."
-        )}, ${openUiStringList(docIds)})`,
-        ...docIds.map((id) => `EvidenceQuote(${openUiStringLiteral(id)})`),
-      ],
-      records,
-      requestId,
+    envelope =
+      docIds.length === 0
+        ? statusDocument({
+            message:
+              "No published signals mention approval conflicts. Try searching Feedback or add new evidence.",
+            records: [],
+            requestId,
+            variant: "empty",
+          })
+        : sectionStackDocument({
+            childExpressions: [
+              `Answer(${openUiStringLiteral(
+                "Managers and employees describe shift approvals differently in the quotes below. Facts come from customer evidence; hypotheses are not recorded decisions."
+              )}, ${openUiStringList(docIds)})`,
+              ...docIds.map(
+                (id) => `EvidenceQuote(${openUiStringLiteral(id)})`
+              ),
+            ],
+            records,
+            requestId,
+          });
+  } else if (intent === "strongest-evidence") {
+    const { items: rows } = await fi.searchRequests({
+      pageSize: 6,
+      sort: "support",
     });
-  } else if (intent === "monthly-change") {
+    envelope = rankedListEnvelope(
+      rows,
+      "Highest supporter counts among published Crewday signals — strong demand, not proof of feasibility or priority without PM judgment."
+    );
+  } else if (intent === "emerging-month") {
     const [insights, prior] = await Promise.all([
       fi.getInsights({ range: "30d" }),
       fi.getInsights({ range: "90d" }),
@@ -243,7 +308,11 @@ export const composeFiQuery = async ({
         value: String(insights.openQueueCount),
       })
     );
-    const top = prior.trends?.themes.at(0);
+    const emerging = (prior.trends?.themes ?? [])
+      .filter((t) => themeCountDelta(t) > 0)
+      .toSorted((a, b) => themeCountDelta(b) - themeCountDelta(a))
+      .slice(0, 3);
+    const top = emerging.at(0) ?? prior.trends?.themes.at(0);
     envelope = sectionStackDocument({
       childExpressions: [
         `DataExplorer(${openUiStringLiteral("metrics-dashboard")}, ${openUiStringList(
@@ -251,19 +320,32 @@ export const composeFiQuery = async ({
         )})`,
         `Answer(${openUiStringLiteral(
           top
-            ? `Largest theme in the baseline window: ${top.label} (${top.count} signals). Use linked signals for drill-down.`
+            ? `Theme with notable volume in the baseline window: ${top.label} (${top.count} signals). Compare period-over-period in Insights for emerging Crewday themes.`
             : "No theme baseline available for this range."
         )}, [])`,
       ],
       records,
       requestId,
     });
-  } else if (intent === "recent-decisions") {
-    const decided = await fi.listRecentDecisions({ limit: 8 });
-    const timelineIds = decided.map((r) => {
+  } else if (intent === "popular-decline") {
+    const { items } = await fi.searchRequests({
+      pageSize: 12,
+      sort: "support",
+    });
+    const declined = items
+      .filter((r) => r.disposition === "decline")
+      .slice(0, 6);
+    const timelineIds = declined.map((r) => {
+      pushSignal({
+        description: r.description,
+        id: r.id,
+        supportCount: r.supportCount,
+        themeLabel: r.themeLabel,
+        title: r.title,
+      });
       records.push(
         evidenceRecord({
-          excerpt: `${r.disposition?.replaceAll("_", " ")} — ${r.dispositionRationale ?? ""}`,
+          excerpt: r.dispositionRationale ?? r.description.slice(0, 280),
           id: r.id,
           title: r.title,
         })
@@ -274,7 +356,7 @@ export const composeFiQuery = async ({
       timelineIds.length === 0
         ? statusDocument({
             message:
-              "No recorded decisions with rationale in the latest published signals.",
+              "No declined signals with recorded rationale match this view. Open Feedback or Triage for disposition history.",
             records: [],
             requestId,
             variant: "empty",
@@ -282,34 +364,29 @@ export const composeFiQuery = async ({
         : sectionStackDocument({
             childExpressions: [
               `Answer(${openUiStringLiteral(
-                "Recorded decisions below include rationale. Reviewing feedback does not mean a feature shipped."
+                "Popular demand can still be declined when rationale documents tradeoffs (for example manager approval or compliance). Rationale excerpts are below."
               )}, ${openUiStringList(timelineIds)})`,
               `TimelineView(${openUiStringLiteral("timeline-vertical")}, ${openUiStringList(timelineIds)})`,
             ],
             records,
             requestId,
           });
-  } else if (intent === "prioritize-reporting") {
-    const rows = await loadTheme({
-      query: "report export",
-      themeKey: "reporting",
-    });
-    const ranked = rows;
-    const ids = ranked.slice(0, 6).map((r) => {
-      pushSignal({
-        description: r.description,
-        id: r.id,
-        supportCount: r.supportCount,
-        themeLabel: r.themeLabel,
-        title: r.title,
-      });
-      return signalEntityId(r.id);
+  } else if (intent === "open-queue-attention") {
+    const attention = await fi.listAttentionItems({ limit: 8 });
+    const ids = attention.items.map((item) => {
+      records.push(
+        evidenceRecord({
+          excerpt: item.detail,
+          id: item.requestId,
+          title: item.title,
+        })
+      );
+      return evidenceDocId(item.requestId);
     });
     envelope =
       ids.length === 0
         ? statusDocument({
-            message:
-              "No matching signals in the catalog. Try Add feedback or broaden the theme.",
+            message: "Nothing in the queue needs PM attention right now.",
             records: [],
             requestId,
             variant: "empty",
@@ -317,9 +394,53 @@ export const composeFiQuery = async ({
         : sectionStackDocument({
             childExpressions: [
               `Answer(${openUiStringLiteral(
-                "Ranked by supporter count from published signals. Delivery effort is unknown unless noted in decision rationale — open Review to record a decision."
+                "Open Crewday requests flagged for review, degraded triage, or unresolved duplicates. Use Triage to record a decision."
               )}, ${openUiStringList(ids)})`,
-              `RankedSignalList(${openUiStringList(ids)}, ${openUiStringLiteral("/review")})`,
+              `TimelineView(${openUiStringLiteral("timeline-vertical")}, ${openUiStringList(ids)})`,
+            ],
+            records,
+            requestId,
+          });
+  } else if (intent === "notification-evidence") {
+    const rows = await loadTheme({
+      query: "shift change notification",
+      themeKey: "notifications",
+    });
+    const docIds: string[] = [];
+    for (const row of rows) {
+      pushSignal({
+        description: row.description,
+        id: row.id,
+        supportCount: row.supportCount,
+        themeLabel: row.themeLabel,
+        title: row.title,
+      });
+      records.push(
+        evidenceRecord({
+          excerpt: row.description.slice(0, 280),
+          id: row.id,
+          title: row.title,
+        })
+      );
+      docIds.push(evidenceDocId(row.id));
+    }
+    envelope =
+      docIds.length === 0
+        ? statusDocument({
+            message:
+              "No notification-theme signals found. Try Feedback search or add new evidence.",
+            records: [],
+            requestId,
+            variant: "empty",
+          })
+        : sectionStackDocument({
+            childExpressions: [
+              `Answer(${openUiStringLiteral(
+                "Customer quotes about shift-change and schedule notifications. Improving alerts is not a recorded decision until Triage captures one."
+              )}, ${openUiStringList(docIds)})`,
+              ...docIds.map(
+                (id) => `EvidenceQuote(${openUiStringLiteral(id)})`
+              ),
             ],
             records,
             requestId,
@@ -327,7 +448,7 @@ export const composeFiQuery = async ({
   } else if (intent === "insufficient-evidence") {
     envelope = statusDocument({
       message:
-        "Not enough grounded evidence for a confident view. Try a narrower theme, open Signals, or add feedback.",
+        "Not enough grounded evidence for a confident view. Try a narrower theme, open Feedback, or add new Crewday evidence.",
       records: [],
       requestId,
       variant: "warning",

@@ -17,11 +17,12 @@
     "ci:local": "pnpm qa && pnpm eval:genui:offline && pnpm test:browser && pnpm security:check && pnpm build",
     "ci:factory:local": "pnpm ci:local && pnpm --dir .agents commits:check --all && pnpm --dir .agents check && pnpm --dir .agents test",
     "eval:genui:offline": "pnpm --filter @repo/genui eval:offline",
-    "hooks:pre-commit": "pnpm security:block-files && pnpm security:secrets && node tooling/checks/check-staged.mjs",
+    "hooks:ci-tests": "pnpm test && pnpm --filter @repo/db db:check && pnpm --dir .agents test",
+    "hooks:pre-commit": "pnpm security:block-files && pnpm security:secrets && node tooling/checks/check-staged.mjs && pnpm run hooks:ci-tests",
     "hooks:commit-msg": "node tooling/checks/check-commit-message.mjs",
     "prepare": "simple-git-hooks",
     "qa": "pnpm lint && pnpm knip && pnpm sherif && pnpm check-types && pnpm test && pnpm --filter @repo/db db:check",
-    "test": "pnpm --filter @repo/genui test && pnpm --filter @repo/fi test && pnpm --filter web test && pnpm --filter @repo/db test",
+    "test": "pnpm --filter @repo/genui test && pnpm --filter @repo/fi test && pnpm --filter feature-intelligence-cli test && pnpm --filter web test && pnpm --filter @repo/db test",
     "seed:fi": "pnpm --filter @repo/fi seed",
     "seed:fi:if-empty": "FI_SEED_IF_EMPTY=1 pnpm seed:fi",
     "test:browser": "pnpm test:browser:web",
@@ -47,7 +48,8 @@
     "db:ping": "pnpm --filter @repo/db exec node --import tsx scripts/db-ping.mjs",
     "deepsec": "pnpm --dir=.deepsec exec deepsec",
     "mcp:next": "next-devtools-mcp",
-    "agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-meta-cto-two.vercel.app}"
+    "agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-meta-cto-two.vercel.app}",
+    "fi": "pnpm --filter feature-intelligence-cli exec fi"
   },
   "dependencies": {
     "@ai-sdk/gateway": "4.0.125",

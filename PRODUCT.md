@@ -10,6 +10,8 @@ This checkout is the Meta CTO technical assessment on [Flow Factory](.agents/flo
 
 **MCP App:** [initiative](docs/initiatives/hunch-mcp-app.md) · [spec](docs/specs/hunch-mcp-app.md) · [tasks](docs/tasks/hunch-mcp-app.md).
 
+**Crewday demo:** [initiative](docs/initiatives/crewday-demo-fidelity.md) · [spec](docs/specs/crewday-demo-fidelity.md) · [tasks](docs/tasks/crewday-demo-fidelity.md). Hunch presents Feature Intelligence for **Crewday** — a fictional workforce-scheduling product — using curated synthetic feedback (~**75–85** records), not a second application.
+
 ## Users and jobs
 
 | User | Job |
@@ -28,24 +30,24 @@ This checkout is the Meta CTO technical assessment on [Flow Factory](.agents/flo
 | **Discover & support** | Browse published requests; express support |
 | **PM triage** | Queue, disposition, merge/link semantics per [glossary](GLOSSARY.md) |
 | **Metrics** | North-star insights + **90d trends** (submissions, queue depth, themes) from persisted timestamps |
-| **Demo history** | Deterministic **500-row** seed for leader/PM narrative ([seed spec](docs/specs/feature-intelligence-seed.md)) |
+| **Demo history** | Deterministic **~75–85** Crewday-authored seed for leader/PM narrative ([crewday demo fidelity spec](docs/specs/crewday-demo-fidelity.md); historical [500-row spec](docs/specs/feature-intelligence-seed.md)) |
 | **Agent access** | eve operator with typed tools (no duplicate business logic in prompts) |
 | **Ask-only chat** | Secondary `/chat` Q&A—no FI mutations (MVP cut line) |
 | **Persona UX** | Home router, progressive disclosure, AI UX patterns ([journeys](docs/specs/feature-intelligence-journeys.md), [AI UX](docs/specs/feature-intelligence-ai-ux-patterns.md)) |
 
-Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence.md) (spec index) — eve, harness, [seed](docs/specs/feature-intelligence-seed.md), [analytics](docs/specs/feature-intelligence-analytics.md), testing, journeys, AI UX patterns.
+Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence.md) (spec index) — eve, harness, [Crewday seed](docs/specs/crewday-demo-fidelity.md), [analytics](docs/specs/feature-intelligence-analytics.md), testing, journeys, AI UX patterns.
 
 ## Implementation status
 
 | Area | Status |
 | --- | --- |
 | **Specification** | **MVP + demo depth specified**; **[workflow remediation](docs/specs/feature-intelligence-remediation.md) accepted** (Specify 2026-10-25) — [initiative](docs/initiatives/feature-intelligence.md) |
-| **Database** | **Live** — Vercel build: `db:migrate` + **if-empty** seed (`FI_SEED_IF_EMPTY`); local full reseed via `pnpm seed:fi` ([seed spec](docs/specs/feature-intelligence-seed.md)) |
+| **Database** | **Live** — Vercel build: `db:migrate` + **if-empty** seed (`FI_SEED_IF_EMPTY`); local full reseed via `pnpm seed:fi` ([Crewday seed spec](docs/specs/crewday-demo-fidelity.md)) |
 | **Domain (`@repo/fi`)** | **Live** — disposition validation, merge rollup, discovery pagination, degraded triage flags ([remediation](docs/specs/feature-intelligence-remediation.md)) |
 | **eve (`agent/`)** | **Live** — behavioral smoke evals (AG-7, owned confirm/monitor/merge); `pnpm exec eve eval smoke` |
 | **Human UI (`apps/web`)** | **Live** — **Hunch** shell (Overview, Feedback, Triage, Insights, Ask Hunch, `/dev`); PM Overview dashboard, trustworthy period metrics; legacy URL redirects |
 | **Agentic discoverability** | **Live** — `llms.txt`, well-known MCP, Streamable HTTP `/api/mcp` (open demo tools), `pnpm agentic:check` ([spec](docs/specs/feature-intelligence-agentic-discoverability.md)) |
-| **MCP App (Hunch Explorer)** | **Planned** — interactive `ui://hunch/explorer` for Apps-capable hosts; non-UI fallback required ([initiative](docs/initiatives/hunch-mcp-app.md), [spec](docs/specs/hunch-mcp-app.md)) |
+| **MCP App (Hunch Explorer)** | **Live** — interactive `ui://hunch/explorer` for Apps-capable hosts (`apps/web/mcp-app/`); non-UI fallback on all eight tools ([initiative](docs/initiatives/hunch-mcp-app.md), [spec](docs/specs/hunch-mcp-app.md)) |
 | **Deployment (demo)** | **Live** — Vercel `meta-cto`, https://meta-cto-two.vercel.app (`DATABASE_URL`, gateway/Anthropic keys on Production) |
 
 **Build:** [Remediation tasks](docs/tasks/feature-intelligence-remediation.md) implemented on `meta-cto` (2026-10-26). Adversarial reconciliation: [research](docs/research/20261025-fi-adversarial-review.md). W-3 near-duplicate **partial** (lexical by design).

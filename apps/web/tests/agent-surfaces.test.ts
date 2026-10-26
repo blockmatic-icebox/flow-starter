@@ -6,6 +6,7 @@ import { GET as getChat } from "../app/api/chat/route";
 import { GET as getOpenApi } from "../app/openapi.json/route";
 import { buildOpenApiDocument } from "../lib/openapi/build-openapi-document";
 
+// oxlint-disable-next-line eslint/complexity -- single contract test for OpenAPI surface
 test("openapi.json route returns OpenAPI 3.1 with MCP and tool paths", async () => {
   const response = getOpenApi(
     new Request("https://meta-cto-two.vercel.app/openapi.json")
@@ -24,11 +25,26 @@ test("openapi.json route returns OpenAPI 3.1 with MCP and tool paths", async () 
     operationId?: string;
   };
   assert.equal(searchSchema?.["x-mcp-tool"], "search_requests");
+  assert.ok(doc.components?.schemas?.ApiError);
+  assert.ok(doc.paths["/v1/api/mcp"]?.post);
+  assert.match(doc.info?.description ?? "", /X-API-Version/u);
+  const rateLimitedRef = doc.paths["/api/mcp"]?.post?.responses?.["429"] as {
+    $ref?: string;
+  };
+  assert.match(rateLimitedRef?.$ref ?? "", /RateLimited/u);
+  const rateLimitedResponse = doc.components?.responses?.RateLimited as {
+    content?: { "application/json"?: { schema?: { $ref?: string } } };
+  };
+  assert.match(
+    rateLimitedResponse?.content?.["application/json"]?.schema?.$ref ?? "",
+    /ApiError/u
+  );
 });
 
 test("buildOpenApiDocument catalogs search_requests with x-mcp-tool", () => {
   const doc = buildOpenApiDocument("https://example.com");
-  const search = doc.components.schemas.McpTool_search_requests as {
+  const schemas = doc.components.schemas as Record<string, unknown>;
+  const search = schemas.McpTool_search_requests as {
     "x-mcp-tool"?: string;
     description?: string;
   };

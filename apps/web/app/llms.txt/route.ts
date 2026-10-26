@@ -2,9 +2,11 @@ import { resolveSiteOrigin } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
-const body = (origin: string) => `# hunch (Feature Intelligence)
+const body = (
+  origin: string
+) => `# Feature Intelligence — feature request triage
 
-> Turn unstructured feedback into clear product decisions for the Meta CTO assessment demo.
+> Turn unstructured feedback into clear product decisions for the Meta CTO assessment demo (human UI brand: hunch).
 
 ## When to use Feature Intelligence
 
@@ -21,6 +23,7 @@ Use this product when you need to capture customer or internal feature requests,
 
 ## Agent interoperability
 
+- CLI: npx feature-intelligence-cli (npm package feature-intelligence-cli)
 - Developer overview: ${origin}/dev
 - OpenAPI 3.1: ${origin}/openapi.json
 - MCP server card: ${origin}/.well-known/mcp/server-card.json

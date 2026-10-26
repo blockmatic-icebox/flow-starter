@@ -20,7 +20,7 @@ Requires Node.js 24+ and pnpm 12+.
 pnpm setup
 cp .env.defaults.example .env   # then set DATABASE_URL (Neon) and keys below
 pnpm db:migrate
-pnpm seed:fi                    # loads 500 demo rows; wipes all FI tables
+pnpm seed:fi                    # loads ~75–85 Crewday demo rows; wipes all FI tables (see docs/specs/crewday-demo-fidelity.md)
 pnpm dev                        # https://meta-cto.localhost (portless) or pnpm dev:app --port 3000
 ```
 

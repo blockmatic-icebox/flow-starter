@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 
-import { hunchProductName, hunchSummary } from "@/lib/hunch-content";
+import {
+  fiSeoDefaultTitle,
+  fiSeoProductName,
+  hunchSummary,
+} from "@/lib/hunch-content";
 
+import { FiJsonLd } from "./_components/fi-json-ld";
 import { FiShell } from "./_components/fi-shell";
 
 export const dynamic = "force-dynamic";
@@ -9,11 +14,16 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   description: hunchSummary,
   title: {
-    default: hunchProductName,
-    template: `%s | ${hunchProductName}`,
+    default: fiSeoDefaultTitle,
+    template: `%s | ${fiSeoProductName}`,
   },
 };
 
 export default function FiLayout({ children }: { children: React.ReactNode }) {
-  return <FiShell>{children}</FiShell>;
+  return (
+    <FiShell>
+      <FiJsonLd />
+      {children}
+    </FiShell>
+  );
 }

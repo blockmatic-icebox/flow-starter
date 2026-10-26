@@ -13,9 +13,17 @@ export interface SeedDuplicateCandidate {
   score: number;
 }
 
+export interface CrewdayDemoContext {
+  accountLabel: string;
+  organizationKey: string;
+  personaKey: string;
+  submitterRole: string;
+}
+
 export interface SeedRequestRow {
   canonicalRequestId?: string | null;
   decisionBrief?: string | null;
+  demoContext?: CrewdayDemoContext;
   description: string;
   disposition?: Disposition | null;
   dispositionAt?: Date | null;
@@ -27,12 +35,14 @@ export interface SeedRequestRow {
   pmReviewStartedAt?: Date | null;
   problemStatement: string;
   publishedAt?: Date | null;
+  scenarioTag?: string;
   source: Source;
   status: Status;
   submittedAt: Date;
   supportCount: number;
   supporterKeys?: string[];
   themeKey: string;
+  themeRationale?: string;
   title: string;
   triageCompletedAt?: Date | null;
 }

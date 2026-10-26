@@ -34,7 +34,7 @@ Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundar
 
 | Path | Role | Implementation status |
 | --- | --- | --- |
-| `packages/fi` | Metrics, queue/CRUD, **disposition gate** (remediation), T0–T3 harness, `seed/` (500 rows + safety guard) | **Live** — RC-1–RC-8 per [remediation tasks](docs/tasks/feature-intelligence-remediation.md) |
+| `packages/fi` | Metrics, queue/CRUD, **disposition gate** (remediation), T0–T3 harness, `seed/` (~**75–85** Crewday curated rows + safety guard) | **Live** — RC-1–RC-8 per [remediation tasks](docs/tasks/feature-intelligence-remediation.md) |
 | `packages/db` | Drizzle schema; `fi-schema.ts`; migrations through `0002_feature_intelligence` | **Live** — `pnpm db:migrate`, remote SSL in client |
 | `agent/` | eve root agent; `instructions.md` + 8 tools → `@repo/fi` | **Live** — smoke evals in `evals/` |
 | `apps/web` | Next.js + `eve/next`; Hunch UI under `app/(fi)/` (Overview, Feedback, Triage, Insights, `/dev`); GenUI `POST /api/genui/compose`; agentic routes (`llms.txt`, well-known MCP, `/api/mcp`) — **`force-dynamic`** on FI layout | **Live** — [hunch-pm-overview](docs/specs/hunch-pm-overview.md), [hunch-genui](docs/specs/hunch-genui.md) + [agentic discoverability](docs/specs/feature-intelligence-agentic-discoverability.md) |
@@ -50,7 +50,7 @@ Owned tables (see [spec](docs/specs/feature-intelligence.md)):
 - `feature_request_duplicate_candidate`
 - `feature_request_support`
 
-Seed: `pnpm seed:fi` → `@repo/fi/seed/load.ts` (manifest **500** rows). **Vercel:** migrate + `FI_SEED_IF_EMPTY=1` (no wipe when data exists). **Local destructive reseed:** `pnpm seed:fi` with production guard per [ADR 0004](docs/adr/0004-fi-workflow-integrity-and-safety.md). See [seed spec](docs/specs/feature-intelligence-seed.md).
+Seed: `pnpm seed:fi` → `@repo/fi/seed/load.ts` loads **`assembleCrewdaySeed()`** (~**75–85** authored records from `packages/fi/seed/fixtures/*`, canon in [`crewday-scenario.ts`](packages/fi/seed/crewday-scenario.ts)). **Vercel:** migrate + `FI_SEED_IF_EMPTY=1` (no wipe when data exists). **Local destructive reseed:** `pnpm seed:fi` with production guard per [ADR 0004](docs/adr/0004-fi-workflow-integrity-and-safety.md). See [Crewday demo fidelity spec](docs/specs/crewday-demo-fidelity.md) (historical 500-row manifest: [feature-intelligence-seed.md](docs/specs/feature-intelligence-seed.md)).
 
 PM triage queue: `listTriageQueue` orders by **support count** desc, then `published_at` desc.
 
@@ -75,7 +75,7 @@ Degraded path when `AI_GATEWAY_API_KEY` absent still sets `triage_completed_at` 
 | Web server actions → `@repo/fi` | **Live** — triage, submit, confirm, support, disposition |
 | `POST /api/chat` ask-only | **Live** — Anthropic via `ANTHROPIC_API_KEY` |
 | **MCP Streamable HTTP** | **Live** — [ADR 0005](docs/adr/0005-fi-agentic-discoverability-and-mcp.md); `POST /api/mcp`, `/.well-known/mcp/*`, `llms.txt`, Markdown negotiation; assessment demo exposes all eight FI tools without bearer |
-| **MCP App (Hunch Explorer)** | **Planned** — [hunch-mcp-app spec](docs/specs/hunch-mcp-app.md); UI resource `ui://hunch/explorer`; iframe bundle + Apps bridge; `@repo/fi` only via MCP tool handler (no DB in iframe) |
+| **MCP App (Hunch Explorer)** | **Live** — [hunch-mcp-app spec](docs/specs/hunch-mcp-app.md); UI resource `ui://hunch/explorer`; Vite bundle [`apps/web/mcp-app/`](apps/web/mcp-app/) + Apps bridge; `@repo/fi` only via MCP tool handler (no DB in iframe) |
 | Postgres | **Live** when `DATABASE_URL` set — see initiative Neon plan |
 
 ## Security (inherited)
@@ -108,7 +108,7 @@ Root `pnpm test` includes `@repo/fi`.
 
 Verify: `vercel inspect <deployment-url> -S gaboesquivel` after push. If Vercel Git **Production Branch** remains `main`, trigger production from `meta-cto` via dashboard or deployment API.
 
-## MCP App boundary (planned)
+## MCP App boundary (live)
 
 ```text
 MCP host → POST /api/mcp → register-tools ( @repo/fi )
@@ -119,8 +119,8 @@ MCP host → POST /api/mcp → register-tools ( @repo/fi )
 ```
 
 - **Domain:** All reads/writes stay in `apps/web/lib/mcp/` handlers calling `@repo/fi` — same as today’s eight tools.
-- **UI:** Dedicated build artifact (e.g. `apps/web/mcp-app/` or `packages/mcp-app/`) compiled into static HTML/JS served from `resources/read`.
-- **Build pipeline:** Extend `pnpm --filter web build` (or a prebuild step) to emit the iframe bundle; Vercel build unchanged at root (`apps/web/vercel.json`) except for added compile step and asset copy into the MCP resource provider.
+- **UI:** `apps/web/mcp-app/` → `mcp-app/dist/hunch-explorer.html` served from `resources/read` ([`hunch-explorer-resource.ts`](apps/web/lib/mcp/hunch-explorer-resource.ts)).
+- **Build pipeline:** `pnpm --filter web build` runs `build:mcp-app` (Vite) before `next build`; [`next.config.ts`](apps/web/next.config.ts) traces the HTML artifact for `/api/mcp` and `/mcp`.
 - **Fallback:** Tools return text + structured content when the host never loads the resource.
 
 ## Repository layout
@@ -128,7 +128,7 @@ MCP host → POST /api/mcp → register-tools ( @repo/fi )
 ```text
 apps/web/app/(fi)/  # FI routes (home, requests, triage, insights, chat)
 agent/              # eve Feature Intelligence operator
-packages/fi/        # domain + harness; seed/manifest.ts + generate-seed.ts; insights/bucketing.ts, compute-trends.ts
+packages/fi/        # domain + harness; seed/crewday-scenario.ts, fixtures/, assemble-seed.ts; insights/bucketing.ts, compute-trends.ts
 packages/db/        # Drizzle + FI migration
 docs/adr/           # product ADRs
 docs/specs/         # FI specifications (see main spec index)

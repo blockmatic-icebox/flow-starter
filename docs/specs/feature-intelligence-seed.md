@@ -1,7 +1,9 @@
 # Spec: Feature Intelligence — seed data (eve + demo)
 
+> **Superseded for demo volume and dataset shape.** Current Crewday demonstration seed (~75–85 curated records, scenario canon, quality bar) is defined in **[crewday-demo-fidelity.md](./crewday-demo-fidelity.md)**. This document remains **historical reference** for the prior **500-row** bulk-generated era (`fi-demo-v1`, manifest counts below).
+
 **Last reviewed:** 2026-10-25  
-**Status:** Current  
+**Status:** Historical  
 **Consumers:** `@repo/fi` seed command, web UI, **eve** tool smoke tests, `/insights` trends  
 **Related:** [feature-intelligence.md](./feature-intelligence.md) · [feature-intelligence-analytics.md](./feature-intelligence-analytics.md) · [eve agent spec](./feature-intelligence-eve-agent.md)
 

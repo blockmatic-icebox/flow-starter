@@ -17,7 +17,7 @@
 | `pnpm --filter web test` | 0 | 30 pass, 3 skipped live MCP |
 | `CI=true pnpm test:browser` | 0 | After `<main>` landmark fix |
 | `pnpm exec eve eval smoke` | 0 | 10 pass, 1 skip (degraded disclosure when gateway set) |
-| `pnpm build:web` | 0 | |
+| `pnpm build:web` | 0 |  |
 | `pnpm --filter @repo/genui test` | 0 | 129 pass (post abort-handling fix) |
 
 ## Local agent-browser matrix
@@ -70,14 +70,14 @@
 **Sessions:** `hunch-full-qa-r2` (local), `hunch-full-qa-r2-prod` (production).  
 **Git at test:** `36d79a79f` (no product code changes required).
 
-| Command | Exit |
-| --- | --- |
-| `pnpm --filter @repo/fi test` | 0 |
-| `pnpm --filter web test` | 0 |
-| `pnpm --filter @repo/genui test` | 0 |
-| `CI=true pnpm test:browser` | 0 |
-| `pnpm exec eve eval smoke` | 0 (10 pass, 1 skip) |
-| `pnpm build:web` | 0 |
+| Command                          | Exit                |
+| -------------------------------- | ------------------- |
+| `pnpm --filter @repo/fi test`    | 0                   |
+| `pnpm --filter web test`         | 0                   |
+| `pnpm --filter @repo/genui test` | 0                   |
+| `CI=true pnpm test:browser`      | 0                   |
+| `pnpm exec eve eval smoke`       | 0 (10 pass, 1 skip) |
+| `pnpm build:web`                 | 0                   |
 
 | Surface | Local | Production |
 | --- | --- | --- |

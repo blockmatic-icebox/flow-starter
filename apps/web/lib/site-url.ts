@@ -1,6 +1,6 @@
 type HeaderLike = Pick<Headers, "get">;
 
-export const requestFromHeaderList = (headerList: HeaderLike) => {
+const requestFromHeaderList = (headerList: HeaderLike) => {
   const host = headerList.get("host") ?? headerList.get("x-forwarded-host");
   const normalizedHost = host?.split(",")[0]?.trim();
   if (!normalizedHost) return;

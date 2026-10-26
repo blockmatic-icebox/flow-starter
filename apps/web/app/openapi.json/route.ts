@@ -1,3 +1,4 @@
+import { discoveryRateLimitHeaders } from "@/lib/api/rate-limit-headers";
 import { buildOpenApiDocument } from "@/lib/openapi/build-openapi-document";
 import { resolveSiteOrigin } from "@/lib/site-url";
 
@@ -9,6 +10,7 @@ export const GET = (request: Request) => {
     headers: {
       "Cache-Control": "public, max-age=3600",
       "Content-Type": "application/json; charset=utf-8",
+      ...discoveryRateLimitHeaders(),
     },
   });
 };

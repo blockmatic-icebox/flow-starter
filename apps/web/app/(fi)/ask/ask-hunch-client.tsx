@@ -9,12 +9,14 @@ import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 
 const starters = [
-  "What reporting work should we prioritize?",
-  "Are these requests duplicates?",
-  "Why do customers disagree about public links?",
-  "What changed in customer feedback this month?",
-  "What happened to last week's reviewed feedback?",
-  "Summarize integration feedback when analysis fails",
+  "What scheduling problems should Crewday prioritize next?",
+  "Are customers reporting the same shift-swap issue in different ways?",
+  "Why are managers and employees disagreeing about shift approvals?",
+  "Which customer problems have the strongest evidence?",
+  "What emerging issues have appeared in the last month?",
+  "Why did we decline a popular request?",
+  "Which open requests need product manager attention?",
+  "What evidence supports improving shift-change notifications?",
 ];
 
 export const AskHunchClient = () => {

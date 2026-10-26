@@ -6,6 +6,7 @@ import { McpServer } from "@modelcontextprotocol/server";
 
 import {
   HUNCH_EXPLORER_RESOURCE_URI,
+  hunchExplorerResourceDescription,
   readHunchExplorerHtml,
 } from "./hunch-explorer-resource";
 import { registerFiMcpTools } from "./register-tools";
@@ -21,8 +22,7 @@ export const createFiMcpServer = () => {
     "Hunch Explorer",
     HUNCH_EXPLORER_RESOURCE_URI,
     {
-      description:
-        "Compact workspace: Signals search/detail, Patterns metrics, Review queue preview.",
+      description: hunchExplorerResourceDescription,
     },
     async () => ({
       contents: [

@@ -33,9 +33,16 @@ export { isTriageDegraded } from "./triage/is-triage-degraded";
 export type { TriageQueueSort } from "./queue/list-triage-queue";
 export { runTriageHarness } from "./triage/run-triage-harness";
 export type { DuplicateCandidate, TriageStepsPayload } from "./triage/types";
+export { getCrewdayDemoContextByRequestId } from "./demo/crewday-context";
 export { classifyThemeDeterministic } from "./theme/classify-deterministic";
 export { themeRegistry, themeLabelForKey } from "./theme/registry";
 export {
   featureRequestSourceSchema,
   type FeatureRequestSource,
 } from "./schemas/feature-request-source";
+export type { CrewdayDemoContext } from "../seed/types";
+export {
+  CREWDAY_PRODUCT_NAME,
+  CREWDAY_SMOKE_ANCHOR_IDS,
+  crewdayDemoBlurb,
+} from "../seed/crewday-scenario";

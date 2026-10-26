@@ -15,6 +15,19 @@
 
 **Implemented:** `apps/web/app/(fi)/` — Overview, Feedback, Add feedback, Triage, Insights, Ask Hunch, Developer overview (`/dev`). Domain terms remain in [GLOSSARY.md](GLOSSARY.md) (signal = published feature request, disposition in API, “decision” in UI). Specs: [hunch-genui.md](docs/specs/hunch-genui.md), [hunch-pm-overview.md](docs/specs/hunch-pm-overview.md).
 
+### Crewday demonstration context (UI)
+
+Hunch is framed as Feature Intelligence for **Crewday** — a fictional multi-location scheduling product — not a generic analytics backlog. Copy and fixtures follow [crewday-demo-fidelity.md](docs/specs/crewday-demo-fidelity.md); canon lives in [`packages/fi/seed/crewday-scenario.ts`](packages/fi/seed/crewday-scenario.ts).
+
+| Surface | Presentation |
+| --- | --- |
+| **Shell / Overview** | Short Crewday blurb (product name + one-line value prop); metrics and queue remain Hunch-native |
+| **Feedback detail** | When seed provides `demoContext`, show **organization** and **submitter role** (secondary pewter line under title or in evidence column) — map via `getCrewdayDemoContextByRequestId` |
+| **Add feedback / Review** | Plain-language workforce scheduling scenarios; no “Request #N” placeholder titles |
+| **Ask Hunch / `/dev`** | Starters and MCP copy reference Crewday customers (restaurants, retail, hospitality) where grounded in persisted rows |
+
+Do not add a project switcher or second product shell; Crewday is narrative context only.
+
 ### Screens
 
 | Route | Screen |

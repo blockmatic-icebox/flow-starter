@@ -1,45 +1,50 @@
-export const RNG_SEED = "fi-demo-v1";
+export const RNG_SEED = "crewday-demo-v1";
 export const SEED_REFERENCE_ISO = "2026-10-25T12:00:00.000Z";
 export const HISTORY_DAYS = 90;
 
-export const TOTAL_REQUESTS = 500;
-export const ANCHOR_COUNT = 11;
-export const BULK_COUNT = TOTAL_REQUESTS - ANCHOR_COUNT;
+/** Curated Crewday demonstration dataset (see docs/specs/crewday-demo-fidelity.md). */
+export const TOTAL_REQUESTS = 80;
 
 export const STATUS_COUNTS = {
-  archived: 20,
-  draft: 12,
+  archived: 1,
+  draft: 4,
   pending_confirm: 1,
-  published: 462,
-  triaging: 5,
+  published: 73,
+  triaging: 1,
 } as const;
 
-export const OPEN_QUEUE_COUNT = 50;
-export const ANCHOR_OPEN_COUNT = 8;
-export const BULK_OPEN_COUNT = OPEN_QUEUE_COUNT - ANCHOR_OPEN_COUNT;
+export const OPEN_QUEUE_COUNT = 13;
 
 export const DISPOSITION_COUNTS = {
-  decline: 95,
-  merge: 85,
-  monitor: 120,
-  needs_discussion: 112,
+  decline: 10,
+  merge: 6,
+  monitor: 26,
+  needs_discussion: 18,
 } as const;
 
-export const PUBLISHED_DISPOSITIONED = 412;
-export const MIN_INTAKE_LINKS = 90;
-export const MIN_DUPLICATE_CANDIDATES = 180;
-export const MIN_PM_REVIEW_STARTED = 200;
-export const MERGE_CANONICAL_VICTIMS = 40;
+export const PUBLISHED_DISPOSITIONED = 60;
+export const INTAKE_LINKS_COUNT = 4;
+export const DUPLICATE_CANDIDATES_COUNT = 20;
+export const MIN_INTAKE_LINKS = INTAKE_LINKS_COUNT;
+export const MIN_DUPLICATE_CANDIDATES = DUPLICATE_CANDIDATES_COUNT;
+export const MIN_PM_REVIEW_STARTED = 60;
+
+export const BULK_REQUEST_ID_PREFIX = "00000000-0000-5000-8000-";
+
+export const DISPOSITION_RATIONALE_MIN_LENGTH = 24;
 
 export const THEME_MIN_PUBLISHED = {
-  collaboration_sharing: 75,
-  data_governance: 40,
-  integrations_alerts: 60,
-  mobile_experience: 45,
-  performance_scale: 50,
-  permissions_access: 55,
-  reporting_exports: 80,
+  availability_time_off: 9,
+  mobile_reliability: 9,
+  notifications: 9,
+  permissions_compliance: 9,
+  reporting_operations: 9,
+  scheduling_coverage: 10,
+  shift_swaps: 9,
+  time_tracking_payroll: 9,
 } as const;
 
-/** SHA-256 first 16 hex chars of sorted bulk ids — update if bulk generation changes */
-export const GENERATED_BULK_ID_HASH = "4369a9066558c9c2";
+export const CREWDAY_THEME_KEYS = [
+  ...Object.keys(THEME_MIN_PUBLISHED),
+  "platform_other",
+] as const;

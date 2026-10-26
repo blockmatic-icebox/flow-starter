@@ -75,7 +75,7 @@ evals/
 ├── evals.config.ts      # setup: migrate + seed; teardown optional
 ├── smoke/
 │   ├── list-triage-queue.eval.ts
-│   ├── search-csv.eval.ts
+│   ├── search-shift-swap.eval.ts
 │   └── get-dispositioned.eval.ts
 └── live/                  # optional; requires model — skip in CI default
     └── submit-near-duplicate.eval.ts
@@ -83,7 +83,7 @@ evals/
 
 ### `evals.config.ts`
 
-- **`setup`:** Ensure `DATABASE_URL`, run migrations if needed, `pnpm --filter @repo/fi seed`.
+- **`setup`:** Require trimmed `EVE_EVAL_DATABASE_URL` (isolated eval database; **no** `DATABASE_URL` fallback). Run migrations, then `FI_SEED_IF_EMPTY=1 pnpm seed:fi`.
 - **`teardown`:** Optional truncate FI tables or leave seed for local dev.
 - **No Braintrust** in assessment unless already configured; local `eve eval` artifacts only.
 
@@ -94,14 +94,14 @@ Use natural-language prompts that should invoke tools; assert with `t.calledTool
 | Eval id | User message (example) | Gates |
 | --- | --- | --- |
 | `smoke/list-triage-queue` | “What’s on the PM triage queue?” | `list_triage_queue`; count **50** |
-| `smoke/search-csv` | “Find requests about CSV export” | `search_requests`; mentions FR-001 or FR-002 |
+| `smoke/search-shift-swap` | “Find feedback about shift swaps” | `search_requests`; Crewday swap-themed titles |
 | `smoke/get-dispositioned` | “Why was FR-008 declined?” | `get_request`; includes decline rationale theme |
 | `smoke/submit-no-auto-confirm` | “Submit: Export to PDF” (after seed) | `submit_request` only; **no** `confirm_request` until follow-up “confirm” (AG-7) |
 | `smoke/confirm-after-approval` | Explicit confirm after draft | `@repo/fi` `createDraftAndTriage` → `confirmRequest`; **owned** row |
 | `smoke/set-disposition-monitor` | Monitor disposition on owned signal | Owned draft → confirm → `setDisposition` monitor (does not mutate seed queue) |
 | `smoke/merge-disposition` | Merge into canonical target | Owned published pair → `setDisposition` merge + `mergeTargetId` |
 
-**Eval DB:** `evals/evals.config.ts` migrates then runs `FI_SEED_IF_EMPTY=1 pnpm seed:fi` (skip reload when `feature_request` already has rows). Prefer `EVE_EVAL_DATABASE_URL` for an isolated branch ([remediation](./feature-intelligence-remediation.md#rc-9--verification-eve-and-domain)).
+**Eval DB:** `evals/evals.config.ts` **requires** `EVE_EVAL_DATABASE_URL` (trimmed). Setup migrates and seeds only that URL (`DATABASE_URL` is set to the eval URL for child processes). Fails closed if unset so mutating smoke evals never hit the demonstration database. Use a dedicated Neon branch or local database name ([Crewday fidelity](./crewday-demo-fidelity.md#testing-requirements), [remediation](./feature-intelligence-remediation.md#rc-9--verification-eve-and-domain)).
 
 **Model:** Use real model for evals that need tool routing, or a **fixture agent** with `mockModel` only for plumbing tests (see [eve evals docs](https://eve.dev/docs/evals.md)). Assessment minimum: **one real-model smoke** locally before demo recording; CI can run deterministic checks on `@repo/fi` if eval flakiness is a concern (document in Plan).
 
@@ -125,7 +125,8 @@ After deploy, use Vercel Agent Runs trace for one eval failure or successful too
 # Domain seed (required before eve eval; 500 rows — never on production DB)
 pnpm --filter @repo/fi seed   # open triage queue: 50 after seed
 
-# Eve smoke (after eve init + agent implemented)
+# Eve smoke (isolated DB required)
+export EVE_EVAL_DATABASE_URL='postgresql://…'  # not the demo DATABASE_URL
 npx eve eval smoke
 
 # Web manual

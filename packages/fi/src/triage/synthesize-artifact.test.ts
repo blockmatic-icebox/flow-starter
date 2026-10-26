@@ -9,7 +9,7 @@ const synthesisInput = {
   isSolutionShaped: false,
   linkDuplicateId: null,
   source: "internal",
-  themeKey: "reporting_exports" as ThemeKey,
+  themeKey: "shift_swaps" as ThemeKey,
   title: "CSV export",
 };
 

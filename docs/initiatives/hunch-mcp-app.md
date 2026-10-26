@@ -1,6 +1,6 @@
 # Initiative — Hunch MCP App (Meta CTO assessment)
 
-**Status:** Wave A complete (contracts + language); Waves B–F pending implementation
+**Status:** Wave A complete (contracts + language); **Waves B–D implemented** in `apps/web` (`lib/mcp/`, `mcp-app/`); Waves E–F partial (eve smoke + verification log)
 
 **Depends on:** [feature-intelligence-agentic-discoverability.md](../specs/feature-intelligence-agentic-discoverability.md) (Streamable HTTP + eight tools **live**)
 
@@ -20,9 +20,8 @@
 
 ## Open
 
-- Exact SDK version and build bundling for the iframe bundle (Webpack vs dedicated Vite entry).
+- External host verification (ChatGPT Apps lab, official host utilities) — local protocol tests pass; production `resources/list` verified on deploy.
 - Whether `confirm_request` / `set_disposition` get optional interactive UI or stay tool-only.
-- External host verification (ChatGPT Apps lab, official host utilities).
 
 ## Outcome
 
@@ -34,14 +33,14 @@ Agents and MCP App–capable hosts can:
 
 ## Waves
 
-| Wave | Focus                                                              |
-| ---- | ------------------------------------------------------------------ |
-| A    | Contract docs + glossary/design/architecture alignment             |
-| B    | Register resource + MIME type; `resources/list` / `resources/read` |
-| C    | Hunch Explorer React bundle + bridge wiring                        |
-| D    | Tool `_meta.ui.resourceUri` associations + structured payloads     |
-| E    | Eve eval isolation + workflow smoke (owned rows)                   |
-| F    | Protocol verification log + optional external host pass            |
+| Wave | Focus | Status |
+| --- | --- | --- |
+| A | Contract docs + glossary/design/architecture alignment | **Done** |
+| B | Register resource + MIME type; `resources/list` / `resources/read` | **Done** — `hunch-explorer-resource.ts`, tests in `apps/web/tests/mcp/` |
+| C | Hunch Explorer React bundle + bridge wiring | **Done** — `apps/web/mcp-app/` (`@modelcontextprotocol/ext-apps`) |
+| D | Tool `_meta.ui.resourceUri` associations + structured payloads | **Done** — `register-tools.ts` (`search_requests`, `get_request`, `list_triage_queue`, `get_insights`) |
+| E | Eve eval isolation + workflow smoke (owned rows) | **Partial** — owned-row evals; prefer `EVE_EVAL_DATABASE_URL` ([testing spec](../specs/feature-intelligence-testing.md)) |
+| F | Protocol verification log + optional external host pass | **Partial** — [verification template](../research/20261026-hunch-mcp-app-verification.md) |
 
 ## Execution
 

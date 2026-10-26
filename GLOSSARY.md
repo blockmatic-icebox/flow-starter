@@ -40,6 +40,18 @@ The central **aggregate** for customer and internal feedback about what to build
 
 **Not:** a Jira ticket, a chat message, or a roadmap commitment.
 
+### Crewday (demo configured product)
+
+**Crewday** is the **fictional customer product** configured for the Meta CTO demonstration: multi-location restaurants and retailers using workforce scheduling software. Hunch is the Feature Intelligence layer **about** Crewday feedback — not a separate Crewday application.
+
+| Term | Meaning |
+| --- | --- |
+| **Configured product** | Synthetic domain (orgs, personas, themes) authored in seed fixtures; no multi-tenant product switcher |
+| **demoContext** | Optional seed metadata (organization label, submitter role) for believable UI presentation |
+| **Canon** | [`packages/fi/seed/crewday-scenario.ts`](packages/fi/seed/crewday-scenario.ts) — product name, priorities, org/persona keys |
+
+Spec: [crewday-demo-fidelity.md](docs/specs/crewday-demo-fidelity.md).
+
 ---
 
 ## Submitter-facing language

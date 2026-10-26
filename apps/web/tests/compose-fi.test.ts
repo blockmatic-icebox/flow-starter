@@ -8,7 +8,7 @@ import { matchFiComposeIntent } from "../app/_lib/genui/compose-fi-routes";
 const sampleRow = {
   canonicalRequestId: null,
   decisionBrief: null,
-  description: "Customer needs weekly exports",
+  description: "Saturday dinner rush and I'm down a cook",
   disposition: "monitor" as const,
   dispositionAt: new Date(),
   dispositionRationale: "Track demand",
@@ -16,16 +16,16 @@ const sampleRow = {
   intakeLinkedRequestId: null,
   mergeTargetId: null,
   pmReviewStartedAt: null,
-  problemStatement: "Automate exports",
+  problemStatement: "Fill coverage gaps faster",
   publishedAt: new Date(),
   source: "customer" as const,
   status: "published" as const,
   submittedAt: new Date(),
   supportCount: 4,
-  themeKey: "reporting",
-  themeLabel: "Reporting",
+  themeKey: "scheduling_coverage",
+  themeLabel: "Scheduling & coverage",
   themeRationale: null,
-  title: "Schedule weekly report exports",
+  title: "Show certified cooks for Saturday rush",
   triageCompletedAt: new Date(),
   triageConfidence: null,
   triageSteps: null,
@@ -64,61 +64,97 @@ const mockInsights = (): ComposeFiDeps["getInsights"] => () =>
     trends: {
       strategicVsPopular: [],
       themes: [
-        { count: 3, label: "Reporting", priorCount: 1, themeKey: "reporting" },
+        {
+          count: 3,
+          label: "Scheduling & coverage",
+          priorCount: 1,
+          themeKey: "scheduling_coverage",
+        },
       ],
       weekly: [],
     },
   });
 
+const mockAttention = (): ComposeFiDeps["listAttentionItems"] => () =>
+  Promise.resolve({
+    items: [],
+    totalCount: 0,
+  });
+
+const baseDeps = (search: ComposeFiDeps["searchRequests"]): ComposeFiDeps => ({
+  getInsights: mockInsights(),
+  listAttentionItems: mockAttention(),
+  listRecentDecisions: () => Promise.resolve([]),
+  searchRequests: search,
+});
+
 describe("matchFiComposeIntent", () => {
-  it("maps representative prompts", () => {
+  it("maps Crewday assessment starters", () => {
     assert.equal(
-      matchFiComposeIntent("What reporting work should we prioritize?"),
-      "prioritize-reporting"
-    );
-    assert.equal(
-      matchFiComposeIntent("Are these requests duplicates?"),
-      "duplicates"
-    );
-    assert.equal(
-      matchFiComposeIntent("Why do customers disagree about public links?"),
-      "public-links"
-    );
-    assert.equal(
-      matchFiComposeIntent("What changed in customer feedback this month?"),
-      "monthly-change"
-    );
-    assert.equal(
-      matchFiComposeIntent("What happened to last week's reviewed feedback?"),
-      "recent-decisions"
+      matchFiComposeIntent(
+        "What scheduling problems should Crewday prioritize next?"
+      ),
+      "prioritize-scheduling"
     );
     assert.equal(
       matchFiComposeIntent(
-        "Summarize integration feedback when analysis fails"
+        "Are customers reporting the same shift-swap issue in different ways?"
       ),
-      "integration-failure"
+      "duplicate-swap"
+    );
+    assert.equal(
+      matchFiComposeIntent(
+        "Why are managers and employees disagreeing about shift approvals?"
+      ),
+      "approval-conflict"
+    );
+    assert.equal(
+      matchFiComposeIntent(
+        "Which customer problems have the strongest evidence?"
+      ),
+      "strongest-evidence"
+    );
+    assert.equal(
+      matchFiComposeIntent(
+        "What emerging issues have appeared in the last month?"
+      ),
+      "emerging-month"
+    );
+    assert.equal(
+      matchFiComposeIntent("Why did we decline a popular request?"),
+      "popular-decline"
+    );
+    assert.equal(
+      matchFiComposeIntent(
+        "Which open requests need product manager attention?"
+      ),
+      "open-queue-attention"
+    );
+    assert.equal(
+      matchFiComposeIntent(
+        "What evidence supports improving shift-change notifications?"
+      ),
+      "notification-evidence"
     );
   });
 });
 
 describe("composeFiQuery", () => {
-  it("validates prioritize-reporting composition", async () => {
+  it("validates prioritize-scheduling composition", async () => {
     const result = await composeFiQuery({
-      deps: {
-        getInsights: mockInsights(),
-        listRecentDecisions: () => Promise.resolve([]),
-        searchRequests: mockSearch([
+      deps: baseDeps(
+        mockSearch([
           sampleRow,
           {
             ...sampleRow,
             id: "00000000-0000-4000-8000-000000000002",
             title: "B",
           },
-        ]),
-      },
+        ])
+      ),
       input: {
         clientRequestId: "test-1",
-        query: "What reporting work should we prioritize?",
+        query: "What scheduling problems should Crewday prioritize next?",
         version: 1,
       },
     });
@@ -128,11 +164,7 @@ describe("composeFiQuery", () => {
 
   it("returns empty status for insufficient evidence", async () => {
     const result = await composeFiQuery({
-      deps: {
-        getInsights: mockInsights(),
-        listRecentDecisions: () => Promise.resolve([]),
-        searchRequests: mockSearch([]),
-      },
+      deps: baseDeps(mockSearch([])),
       input: {
         clientRequestId: "test-2",
         query: "not enough evidence here",

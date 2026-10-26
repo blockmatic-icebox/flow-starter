@@ -1,14 +1,18 @@
-import { jsonError } from "@/lib/api/json-error";
+import { jsonError, withExtraHeaders } from "@/lib/api/json-error";
+import { discoveryRateLimitHeaders } from "@/lib/api/rate-limit-headers";
 
 export const dynamic = "force-dynamic";
 
 const handler = () =>
-  jsonError({
-    code: "api_route_not_found",
-    message: "No API route matches this path.",
-    resolution: "See /openapi.json and /developers for supported endpoints.",
-    status: 404,
-  });
+  withExtraHeaders(
+    jsonError({
+      code: "api_route_not_found",
+      message: "No API route matches this path.",
+      resolution: "See /openapi.json and /developers for supported endpoints.",
+      status: 404,
+    }),
+    discoveryRateLimitHeaders()
+  );
 
 export const GET = handler;
 export const POST = handler;

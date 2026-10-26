@@ -45,6 +45,8 @@ test("POST /api/mcp initialize returns 200", async () => {
     },
   });
   assert.equal(response.status, 200);
+  assert.ok(response.headers.get("RateLimit-Limit"));
+  assert.ok(response.headers.get("RateLimit-Remaining"));
   const json = (await response.json()) as {
     result?: { serverInfo?: { name?: string } };
   };
@@ -170,7 +172,7 @@ test("POST /api/mcp tools/call search_requests returns text content", async (t) 
     jsonrpc: "2.0",
     method: "tools/call",
     params: {
-      arguments: { limit: 2, query: "CSV" },
+      arguments: { limit: 2, query: "shift swap" },
       name: "search_requests",
     },
   });
@@ -180,6 +182,7 @@ test("POST /api/mcp tools/call search_requests returns text content", async (t) 
   };
   const text = json.result?.content?.[0]?.text ?? "";
   assert.match(text, /requests/u);
+  assert.match(text, /swap|shift/iu);
 });
 
 const liveMcpHost = () =>
@@ -215,6 +218,31 @@ test("live MCP smoke when AGENTIC_LIVE_MCP=1", async (t) => {
     result?: { serverInfo?: { name?: string } };
   };
   assert.equal(json.result?.serverInfo?.name, "feature-intelligence");
+});
+
+test("POST /api/mcp returns Retry-After when rate limited", async () => {
+  const body = {
+    id: 1,
+    jsonrpc: "2.0",
+    method: "initialize",
+    params: {
+      capabilities: {},
+      clientInfo: { name: "rate-limit-test", version: "1.0.0" },
+      protocolVersion: "2025-03-26",
+    },
+  };
+  let limited: Response | null = null;
+  for (let i = 0; i < 125; i += 1) {
+    // oxlint-disable-next-line eslint/no-await-in-loop -- rate limit must be exercised sequentially
+    const response = await mcpPost(postApiMcp, body);
+    if (response.status === 429) {
+      limited = response;
+      break;
+    }
+  }
+  assert.ok(limited, "expected HTTP 429 after exceeding MCP rate limit");
+  assert.ok(limited.headers.get("Retry-After"));
+  assert.ok(limited.headers.get("RateLimit-Limit"));
 });
 
 test("live POST /mcp alias when AGENTIC_LIVE_MCP=1", async (t) => {

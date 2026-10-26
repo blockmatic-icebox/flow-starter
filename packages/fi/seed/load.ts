@@ -7,6 +7,7 @@ import {
 import { sql as drizzleSql } from "drizzle-orm";
 
 import { loadRootEnv } from "../src/db/get-db";
+import { classifyThemeDeterministic } from "../src/theme/classify-deterministic";
 import { assertSeedAllowed } from "./assert-seed-allowed";
 import { generateSeed } from "./generate-seed";
 import { isDestructiveSeedMode, isIfEmptySeedMode } from "./seed-mode";
@@ -52,6 +53,21 @@ const insertChunks = async <T>(
   await Promise.all(tasks);
 };
 
+const themeRationaleForRow = (row: {
+  description: string;
+  themeKey: string;
+  themeRationale?: string;
+  title: string;
+}) => {
+  if (row.themeRationale?.trim()) return row.themeRationale.trim();
+  classifyThemeDeterministic({
+    description: row.description,
+    title: row.title,
+  });
+  const themeLabel = labelForThemeKey(row.themeKey);
+  return `Theme ${themeLabel} from deterministic routing.`;
+};
+
 if (ifEmpty) {
   const [countRow] = await db
     .select({ count: drizzleSql<number>`count(*)::int` })
@@ -75,54 +91,6 @@ if (!validation.ok) {
   process.exit(1);
 }
 
-if (isDestructiveSeedMode()) {
-  await sql`DELETE FROM feature_request_support`;
-  await sql`DELETE FROM feature_request_duplicate_candidate`;
-  await sql`DELETE FROM feature_request`;
-}
-
-await insertChunks(requests, (slice) =>
-  db.insert(featureRequest).values(
-    slice.map((row) => ({
-      canonicalRequestId: row.canonicalRequestId ?? null,
-      decisionBrief: row.decisionBrief ?? null,
-      description: row.description,
-      disposition: row.disposition ?? null,
-      dispositionAt: row.dispositionAt ?? null,
-      dispositionRationale: row.dispositionRationale ?? null,
-      id: row.id,
-      intakeLinkedRequestId: row.intakeLinkedRequestId ?? null,
-      mergeTargetId: row.mergeTargetId ?? null,
-      pmReviewStartedAt: row.pmReviewStartedAt ?? null,
-      problemStatement: row.problemStatement,
-      publishedAt: row.publishedAt ?? null,
-      source: row.source,
-      status: row.status,
-      submittedAt: row.submittedAt,
-      themeKey: row.themeKey,
-      themeLabel: labelForThemeKey(row.themeKey),
-      themeRationale: "Seed demo",
-      title: row.title,
-      triageCompletedAt: row.triageCompletedAt ?? null,
-      triageSteps:
-        row.status === "published" || row.status === "pending_confirm"
-          ? seedSteps
-          : null,
-    }))
-  )
-);
-
-await insertChunks(duplicateCandidates, (slice) =>
-  db.insert(featureRequestDuplicateCandidate).values(
-    slice.map((d) => ({
-      candidateRequestId: d.candidateRequestId,
-      explanation: d.explanation,
-      requestId: d.requestId,
-      score: d.score,
-    }))
-  )
-);
-
 const supportRows: { requestId: string; supporterKey: string }[] = [];
 for (const row of requests) {
   const keys = row.supporterKeys ?? [];
@@ -139,9 +107,61 @@ for (const row of requests) {
   }
 }
 
-await insertChunks(supportRows, (slice) =>
-  db.insert(featureRequestSupport).values(slice)
-);
+await db.transaction(async (tx) => {
+  if (isDestructiveSeedMode()) {
+    await tx.execute(drizzleSql`DELETE FROM feature_request_support`);
+    await tx.execute(
+      drizzleSql`DELETE FROM feature_request_duplicate_candidate`
+    );
+    await tx.execute(drizzleSql`DELETE FROM feature_request`);
+  }
+
+  await insertChunks(requests, (slice) =>
+    tx.insert(featureRequest).values(
+      slice.map((row) => ({
+        canonicalRequestId: row.canonicalRequestId ?? null,
+        decisionBrief: row.decisionBrief ?? null,
+        description: row.description,
+        disposition: row.disposition ?? null,
+        dispositionAt: row.dispositionAt ?? null,
+        dispositionRationale: row.dispositionRationale ?? null,
+        id: row.id,
+        intakeLinkedRequestId: row.intakeLinkedRequestId ?? null,
+        mergeTargetId: row.mergeTargetId ?? null,
+        pmReviewStartedAt: row.pmReviewStartedAt ?? null,
+        problemStatement: row.problemStatement,
+        publishedAt: row.publishedAt ?? null,
+        source: row.source,
+        status: row.status,
+        submittedAt: row.submittedAt,
+        themeKey: row.themeKey,
+        themeLabel: labelForThemeKey(row.themeKey),
+        themeRationale: themeRationaleForRow(row),
+        title: row.title,
+        triageCompletedAt: row.triageCompletedAt ?? null,
+        triageSteps:
+          row.status === "published" || row.status === "pending_confirm"
+            ? seedSteps
+            : null,
+      }))
+    )
+  );
+
+  await insertChunks(duplicateCandidates, (slice) =>
+    tx.insert(featureRequestDuplicateCandidate).values(
+      slice.map((d) => ({
+        candidateRequestId: d.candidateRequestId,
+        explanation: d.explanation,
+        requestId: d.requestId,
+        score: d.score,
+      }))
+    )
+  );
+
+  await insertChunks(supportRows, (slice) =>
+    tx.insert(featureRequestSupport).values(slice)
+  );
+});
 
 console.log(
   `Seeded ${requests.length} feature requests (${duplicateCandidates.length} duplicate candidates, ${supportRows.length} support rows)`

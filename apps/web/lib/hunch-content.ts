@@ -1,12 +1,21 @@
-export const hunchProductName = "hunch";
+/** Public product name for SEO, JSON-LD, and agent discovery (UI brand stays hunch). */
+export const fiSeoProductName = "Feature Intelligence";
 
-export const hunchTagline =
-  "Turn customer feedback into clear product decisions.";
+export const fiSeoProductPhrase = "feature request triage";
+
+export const fiSeoDefaultTitle = `${fiSeoProductName} — ${fiSeoProductPhrase}`;
+
+export const fiSeoOverviewTitle = `Overview — ${fiSeoProductPhrase}`;
+
+export const fiSeoOverviewSubtitle = `${fiSeoProductName} · Crewday demo · ${fiSeoProductPhrase}`;
 
 export const hunchSummary =
-  "Hunch helps product teams capture feedback, check duplicates, review a prioritized queue, and record decisions with rationale. Ask Hunch generates grounded views from your feedback data—without mutating records from generated UI.";
+  "Hunch helps product teams capture feedback, check duplicates, review a prioritized queue, and record decisions with rationale. This workspace uses fictional Crewday sample data—workforce scheduling for multi-location restaurants and retail. Ask Hunch generates grounded views from that feedback without mutating records from generated UI.";
 
-export const hunchWorkspaceLabel = "Demo workspace";
+export const hunchWorkspaceLabel = "Crewday — Workforce scheduling";
+
+export const crewdayDemoNote =
+  "Sample data only · fictional Crewday customer feedback";
 
 export const hunchNav = {
   ask: { href: "/ask", label: "Ask Hunch" },
@@ -19,19 +28,20 @@ export const hunchNav = {
 
 export const hunchPageSubtitles = {
   addFeedback: "Capture customer feedback in plain language.",
-  ask: "Ask questions about your feedback data. Generated views are read-only.",
-  feedback: "Explore customer feedback, requests, and supporting evidence.",
-  insights: "Understand recurring themes and changes in demand.",
-  overview: "See what needs attention and how feedback is becoming decisions.",
+  ask: "Ask questions about Crewday feedback. Generated views are read-only.",
+  feedback:
+    "Explore Crewday customer feedback, requests, and supporting evidence.",
+  insights: "Understand recurring themes and changes in Crewday demand.",
+  overview:
+    "See what needs attention and how Crewday feedback is becoming decisions.",
   triage: "Review feedback and record what happens next.",
 } as const;
 
-export const fiHomeTitle = hunchProductName;
-export const fiHomeSummary = hunchSummary;
+const fiHomeSummary = `${fiSeoProductName} is ${fiSeoProductPhrase} for product teams. ${hunchSummary}`;
 
-export const fiHomeMarkdown = `# ${hunchProductName}
+export const fiHomeMarkdown = `# ${fiSeoProductName} — Overview ${fiSeoProductPhrase}
 
-${hunchSummary}
+${fiHomeSummary}
 
 ## Start here
 

@@ -38,6 +38,13 @@ export default function DevPage() {
       <p>{fiMcpConnectionSummary}</p>
       <CopyMcpUrl url={fiMcpCanonicalUrl} />
       <p className="text-sm">{fiMcpClientGuidance}</p>
+      <h2>CLI</h2>
+      <p>
+        Official npm package: <code>npx feature-intelligence-cli</code> — prints
+        discovery links, <code>--openapi</code> validates the spec,{" "}
+        <code>--mcp-smoke</code> runs initialize and tools/list against this
+        host.
+      </p>
       <h2>Discovery</h2>
       <ul>
         <li>

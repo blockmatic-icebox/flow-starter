@@ -41,7 +41,8 @@ const SignalsPanel = ({ data }: { data: unknown }) => {
   if (!data)
     return (
       <p className="empty">
-        Waiting for search or detail tool results from the host.
+        Run search_requests (e.g. shift swap or scheduling) to list Crewday
+        signals from the host.
       </p>
     );
 
@@ -96,7 +97,9 @@ const SignalsPanel = ({ data }: { data: unknown }) => {
 const PatternsPanel = ({ data }: { data: unknown }) => {
   if (!data)
     return (
-      <p className="empty">Run get_insights to populate pattern metrics.</p>
+      <p className="empty">
+        Run get_insights to populate Crewday theme and queue metrics.
+      </p>
     );
 
   const record = data as Record<string, unknown>;
@@ -228,7 +231,7 @@ export const HunchExplorerApp = () => {
   return (
     <div className="shell">
       <header>
-        <h1>Hunch Explorer</h1>
+        <h1>Hunch Explorer · Crewday</h1>
         <span className={`status-pill ${statusClass}`}>{statusLabel}</span>
       </header>
       <nav className="tabs" aria-label="Explorer sections">

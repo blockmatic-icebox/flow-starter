@@ -10,7 +10,7 @@ mock.module("./classify-decisions.ts", {
         degraded: false,
         isSolutionShaped: false,
         linkDuplicateId: null,
-        themeKey: "reporting_exports",
+        themeKey: "shift_swaps",
         themeSkippedJev: true,
       }),
   },

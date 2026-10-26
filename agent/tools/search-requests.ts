@@ -6,7 +6,7 @@ import { agentDb } from "../lib/db";
 
 export default defineTool({
   description:
-    "Search published feature requests by text and optional theme key.",
+    "Search published Crewday feature requests by text and optional Crewday theme key.",
   async execute({ query, themeKey, limit }) {
     const result = await searchRequests({
       db: agentDb(),

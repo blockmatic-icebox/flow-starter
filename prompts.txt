@@ -3486,3 +3486,1249 @@ Human: make sure the is clean with only lean agentic starter prd
 Agent: **`meta-cto`** is clean: working tree has no extra changes, and the only difference from **`origin/meta-cto`** is the lean agentic starter PRD.
 
 ---
+---
+Timestamp: 2026-10-26T12:32:00.000Z
+Work: feature-intelligence
+Stage: Ship
+
+Human: Full-site browser QA, fixes, and prod re-verify per approved plan.
+
+Agent: Ran automated baseline and agent-browser on all Hunch routes locally; fixed Playwright smoke (`<main>` landmark) and Ask compose false `truncated_stream` on abort; documented in docs/research/20261026-hunch-full-site-qa.md; pushed `meta-cto` (3f49da6c7, 36d79a79f) and promoted Vercel production; re-verified https://meta-cto-two.vercel.app including Ask Hunch compose.
+
+---
+---
+Timestamp: 2026-10-26T12:48:00.000Z
+Work: feature-intelligence
+Stage: Ship
+
+Human: Repeat full-site browser QA and push to prod.
+
+Agent: Pass 2 — all automated checks and agent-browser local/prod matrix passed with no code fixes; updated docs/research/20261026-hunch-full-site-qa.md; pushed e003c26f9; promoted production meta-qsx2oxuxk on meta-cto-two.vercel.app.
+
+---
+---
+Timestamp: 2026-10-26T12:42:44.425Z
+Work: feature-intelligence
+Stage: Build
+Generation: 6b0c73c8-fe3a-4b11-a1fa-c6ab27a41758
+
+Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: ## Task report — Completed · Ship
+
+---
+---
+Timestamp: 2026-10-26T12:42:49.660Z
+Work: feature-intelligence
+Stage: Build
+Generation: 887446ef-f058-4814-bc77-c83c3341c4ff
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: **Full-site browser QA is done.** Hunch routes and legacy redirects were checked locally with agent-browser; **Ask Hunch** (`/ask`, including `/chat` → `/ask`) composes correctly on production.
+
+---
+---
+Timestamp: 2026-10-26T12:50:00.248Z
+Work: feature-intelligence
+Stage: Build
+Generation: 99f98a0e-7e04-48cd-82a3-1305a400f7fb
+
+Human: do it again and push to prod
+
+Agent: **Pass 2 complete.** Automated checks (`fi`, `web`, `genui`, Playwright smoke, eve smoke, `build:web`) all passed. Local and production agent-browser runs covered Overview, Feedback, Triage, Insights, Dev, **Ask Hunch** (duplicate starter compose OK), and `/chat` → `/ask`. No code changes were needed.
+
+---
+---
+Timestamp: 2026-10-26T12:50:04.001Z
+Work: feature-intelligence
+Stage: Build
+Generation: d3eb5a62-b698-48e5-a0a3-df363f7fb032
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: **Second full-site QA is done.** Tests and agent-browser passed locally and on **https://meta-cto-two.vercel.app** (including Ask Hunch compose); nothing new to fix in code.
+
+---
+---
+Timestamp: 2026-10-26T13:51:01.652Z
+Work: feature-intelligence
+Stage: Build
+Generation: 7e6425ca-dceb-443f-916a-e20c8865215b
+
+Human: Improve how ready https://meta-cto-two.vercel.app is for agents.
+
+Current Is Agentic score: 97/100 (Is Agentic readiness model based on Ora audit evidence).
+
+Implement the following fixes in priority order:
+
+1. Brand name discoverability (Recommended, Failed)
+Evidence: meta-cto-two.vercel.app was not in the top 10 for "Overview feature request triage"
+Recommended fix: Make sure your own domain ranks in the top results when people search your brand together with your main product (for example "Acme payments API"). If it does not, your brand may be too generic, conflict with a more established term, or not yet indexed. Strengthen it by describing your main product clearly in your homepage title and headings, earning press mentions that link to your domain, and avoiding redirect chains that mask your main domain in search results.
+Current result: Failed.
+
+2. JSON-LD structured data (Recommended, Failed)
+Evidence: No JSON-LD structured data found on homepage
+Recommended fix: Add JSON-LD structured data to your homepage using the identity type that matches your site - SoftwareApplication for products, Organization or LocalBusiness for companies, Person for personal sites, Article for blogs - with name, description, url, and type-appropriate fields (offers, sameAs, author) so AI can parse your identity programmatically.
+Current result: Failed.
+
+3. REST typed error model (Recommended, Failed)
+Evidence: No typed error model found in OpenAPI spec
+Recommended fix: Document your error responses in your OpenAPI spec: give 4xx and 5xx responses a typed error schema (or use RFC 9457 application/problem+json). A consistent error object with a machine-readable code and a human-readable message lets agents handle failures without guessing.
+Current result: Failed.
+
+4. REST versioning / deprecation policy (Recommended, Failed)
+Evidence: No API versioning strategy found - add URL path versioning (/v1/, /v2/) or a versioned header parameter in your OpenAPI spec
+Recommended fix: Declare a versioning policy agents can rely on: version your API (in the URL path or a version header) and publish how you signal deprecation (a Sunset/Deprecation header or a documented timeline). Agents avoid integrating against a surface that can change without warning.
+Current result: Failed.
+
+5. CLI tool available (Recommended, Failed)
+Evidence: No CLI tool found
+Recommended fix: Publish an official CLI tool on npm, PyPI, or Homebrew. A CLI lets agents and developers script interactions with your product without building API integrations from scratch.
+Current result: Failed.
+
+6. Organization schema completeness (Recommended, Failed)
+Evidence: No JSON-LD found - Organization schema missing
+Recommended fix: Add Organization JSON-LD that includes both contactPoint (with email/phone and contactType) and address (PostalAddress). This lets AI verify your business legitimacy and answer contact queries.
+Current result: Failed.
+
+7. Rate limit response headers (Recommended, Failed)
+Evidence: No REST rate-limit headers found on probed endpoints
+Recommended fix: Return standard rate-limit headers on your API responses (the RFC RateLimit headers, plus Retry-After on a 429) so agents can self-throttle in real time, and document the conventions alongside your API.
+Current result: Failed.
+
+Requirements:
+- Inspect the existing codebase before changing files.
+- Follow each published protocol or file format exactly.
+- Preserve existing product behavior and visual design.
+- Add or update tests for every behavior you change.
+- Verify every public endpoint and machine-readable file after implementation.
+- Finish with a concise change summary, verification results, and any remaining recommendations that require product decisions or credentials.
+
+Agent: Incorporating the open demo baseline into the agent-readiness plan and creating the updated plan document.
+
+---
+
+Q: Implement agent readiness improvements (open demo baseline) per attached plan — brand SEO, JSON-LD, OpenAPI errors/versioning, rate-limit headers, npm CLI, tests and verification.
+
+A: Shipped FI SEO metadata and overview copy, SoftwareApplication + Organization JSON-LD, OpenAPI ApiError/versioning/v1 paths, RateLimit headers on API/MCP, feature-intelligence-cli on npm (1.0.1), and expanded tests. Production Is Agentic rescan still required after deploy; update fi-organization-contact.ts with real assessment contact when ready.
+
+---
+---
+Timestamp: 2026-10-26T13:53:43.192Z
+Work: feature-intelligence
+Stage: Build
+Generation: 43fc831b-2d56-40ac-9d8a-f9fdc7281e9a
+
+Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: ## Task report — Completed · Build
+
+---
+---
+Timestamp: 2026-10-26T14:32:49.537Z
+Work: feature-intelligence
+Stage: Build
+Generation: 134d90b9-7b8d-4adc-b6cc-4e1b1e18f5df
+
+Human: got [isj
+
+Agent: Your last message looks cut off — **“got [isj”** — so I’m not sure what you’re pointing at.
+
+---
+---
+Timestamp: 2026-10-26T15:28:22.357Z
+Work: feature-intelligence
+Stage: Build
+Generation: 72b7bc33-7d1c-40f0-b1cc-da52ce09c6df
+
+Human: # Cursor Composer Implementation Plan — Hunch Crewday Demo
+
+**Repository:** `gaboesquivel/flow-factory`  
+**Target branch:** `meta-cto`  
+**Reference commit inspected:** `e003c26f`  
+**Product:** Hunch — AI-first Feature Intelligence  
+**Demo customer product:** Crewday  
+**Priority:** High — Meta CTO technical assessment
+
+## Mission
+
+Transform the existing Hunch assessment demo into a credible, polished, single-product Feature Intelligence experience using realistic synthetic customer feedback about **Crewday**, a fictional workforce scheduling platform for multi-location restaurant and retail businesses.
+
+The current application is functionally sophisticated but its seeded content undermines the experience. Numbered feedback titles, generic descriptions, arbitrary duplicate relationships, repeated decision rationales, and evaluation records appearing in the live dataset make the product feel like a testing harness.
+
+Fix the underlying data, AI workflows, evaluation fixtures, suggested prompts, and user-facing context together.
+
+**Do not rebuild Hunch. Improve the existing implementation.**
+
+## 0. Operating instructions
+
+Use Flow naturally throughout this work. Load the repository's Flow skill and the relevant product, architecture, GenUI, agent, MCP, and testing guidance.
+
+Read:
+
+- `AGENTS.md`
+- `.agents/skills/flow/SKILL.md`
+- `.agents/flow/flow.md`
+- `PRODUCT.md`
+- `DESIGN.md`
+- `ARCHITECTURE.md`
+- `GLOSSARY.md`
+- Relevant Hunch product specs, ADRs, and testing documentation
+
+Start by inspecting the current checkout, branch, diff, and implementation. Do not assume the reference commit is still current.
+
+The user has accepted the following product decisions:
+
+1. Hunch remains the application and brand.
+2. Crewday becomes its single configured demonstration product.
+3. Multi-project support is explicitly out of scope.
+4. The previous 500-record synthetic dataset should be replaced with a smaller, carefully curated, realistic dataset.
+5. Distinct personas, meaningful business situations, and coherent decisions are required.
+6. Evaluation data must not pollute the demonstration dataset.
+7. Curated suggested prompts must reflect real, supported user jobs.
+8. Existing AI, Eve, MCP, GenUI, and PM workflows must be preserved.
+9. Prioritize agent, domain, and MCP tests; do not add Playwright UI E2E tests.
+
+Use the existing workflow, documentation ownership rules, and human approval boundaries. Where this direction supersedes an accepted technical or product decision, document the supersession using the repository's contract-approval procedure. Do not silently rewrite accepted ADR decisions.
+
+Keep factory-only tooling and methodology inside `.agents/`. Keep Hunch product work in the existing product directories.
+
+Use TDD for domain, agent, and MCP behavior. Delegate independent research, fixture authoring, and test review to bounded subagents when useful, but integrate their work through the main agent.
+
+Do not modify `main`, introduce unrelated refactors, push to remote, or open a PR without separate authorization.
+
+---
+
+# Phase 1 — Reconcile the product and design
+
+## 1.1 Establish the Hunch/Crewday boundary
+
+Hunch is the Feature Intelligence System being assessed.
+
+Crewday is the fictional product whose customers supply feedback.
+
+**Crewday is not a second application to build.**
+
+Crewday's fictional business:
+
+> Crewday helps multi-location restaurants and retailers manage employee schedules, shift swaps, coverage, availability, and labor coordination.
+
+Create one canonical demo-context definition containing:
+
+- Product name and concise description
+- Product capabilities and non-capabilities
+- Primary customer segments
+- Customer organizations and stakeholder roles
+- Main product problems
+- Business priorities and strategic constraints
+- Representative scenarios
+- Clearly labeled synthetic-data provenance
+
+Suggested location: `packages/fi/seed/crewday-scenario.ts`, with a lightweight shared presentation export if necessary.
+
+Use one fixed configured product context. Do not create a project switcher, project tables, project membership systems, project CRUD, or tenant authorization.
+
+## 1.2 Define Crewday's business priorities
+
+The product team should have understandable criteria for making decisions.
+
+For this demo, use:
+
+1. Shift coverage reliability
+2. Employee scheduling accuracy
+3. Reduced scheduling administration
+4. Labor and payroll correctness
+5. Compliance and appropriate manager controls
+6. Customer retention and expansion
+
+Business tradeoffs should be explicit.
+
+For example, a requested feature may have high support but be declined because it undermines manager approval or duplicates an existing capability. A less popular request might be important because it addresses legal compliance or payroll correctness.
+
+Do not invent precise ROI or revenue values without explaining that they are synthetic assumptions.
+
+## 1.3 Align documentation
+
+Create a new forward-looking spec, initiative, and execution checklist following current Flow conventions:
+
+- `docs/initiatives/crewday-demo-fidelity.md`
+- `docs/specs/crewday-demo-fidelity.md`
+- `docs/tasks/crewday-demo-fidelity.md`
+
+Record the following separately:
+
+- Confirmed decisions
+- Design assumptions
+- Domain requirements
+- Dataset quality requirements
+- Testing requirements
+- Acceptance criteria
+- Excluded scope
+
+Keep prior implemented specifications as historical records when Flow requires that. Create superseding documentation rather than rewriting immutable completed specs.
+
+Update the current state in `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`, and the README, replacing outdated claims such as 500 current seeded records.
+
+Audit the old MCP App documentation: the inspected branch already contains an MCP resource, Vite-built explorer, and tool associations, while some documents still describe that work as planned. Reconcile documentation with actual implementation.
+
+**Exit:** A single coherent product story, unchanged Hunch architecture, clear Crewday domain, and agreed acceptance criteria.
+
+---
+
+# Phase 2 — Design realistic synthetic feedback
+
+This is the most important content phase. Quality matters more than row count.
+
+## 2.1 Establish a coherent fictional customer ecosystem
+
+Create approximately six fictional customer organizations representing distinct business sizes and operational needs.
+
+Suggested examples:
+
+| Customer | Type | Relevant context |
+|---|---|---|
+| Cedar Table Group | Restaurant chain | 18 locations; coverage and sick-call problems |
+| Little Oak Café | Independent café group | 3 locations; simple scheduling |
+| Northline Retail | Retail chain | 42 stores; regional visibility |
+| Harbor Hospitality | Franchise operator | Manager permissions and turnover |
+| Mercado Kitchens | Multi-location food business | Multilingual workforce |
+| Beacon Events | Seasonal staffing business | High-volume shift changes |
+
+These are fictional demo accounts, not Hunch projects.
+
+Keep their characteristics consistent across feedback, support signals, decisions, and summaries.
+
+## 2.2 Define distinct personas
+
+Create 8–10 believable submitter personas or role archetypes:
+
+- Hourly employee
+- Shift supervisor
+- Restaurant/store manager
+- Regional operations manager
+- Franchise owner
+- Payroll administrator
+- HR/compliance director
+- Customer support specialist
+- Sales representative relaying prospect feedback
+- Internal Crewday product manager
+
+Personas must influence how feedback is written.
+
+Employees describe day-to-day frustrations. Managers explain operational consequences. Payroll teams mention correction workflows. Support agents paste summaries of complaints. Sales representatives relay deal blockers.
+
+Not every submission should read like a polished product requirement.
+
+Include variations in tone, writing quality, detail, urgency, terminology, and language.
+
+## 2.3 Author approximately 70–90 meaningful records
+
+Prefer curated scenario-driven fixtures over formulaic generated text.
+
+For each feedback record, define or derive:
+
+- Stable UUID
+- Natural-language title
+- Original feedback description
+- Source (`customer`, `prospect`, `support`, `internal`)
+- Submitter role and fictional account context
+- Underlying problem statement
+- Theme
+- Lifecycle status
+- Submitted, published, triaged, and decision dates when applicable
+- Supporters
+- Duplicate candidates where justified
+- Intake links where justified
+- PM decision and specific rationale where applicable
+- AI decision brief where appropriate
+- Expected evaluation behavior for designated fixture cases
+
+Use the existing schema fields where possible. If the UI needs independently queryable account and role data, consider a minimal optional context field or optional columns rather than new account/project tables. Document why the schema change is necessary before adding it.
+
+Original customer language should remain distinct from the normalized problem statement and AI summary.
+
+### Writing quality examples
+
+**Employee**
+
+Title: “My approved shift swap disappeared”
+
+Description: “Marco agreed to cover Saturday and our manager approved it yesterday, but both of us still see the old schedule. I don't know who's actually supposed to come in.”
+
+**Manager**
+
+Title: “Need approval before staff trade closing shifts”
+
+Description: “People keep swapping closing shifts with coworkers who aren't trained to close. I need to approve the replacement before the change becomes final.”
+
+**Payroll administrator**
+
+Title: “Approved overtime changes aren't reaching payroll”
+
+Description: “Every Monday we compare Crewday against our payroll file and manually correct shift changes that were approved after the weekly cutoff.”
+
+**Prospect**
+
+Title: “Can regional managers see coverage across locations?”
+
+Description: “We operate 28 stores. Our regional leads need to spot coverage gaps across stores without gaining access to every employee's compensation information.”
+
+**Ambiguous customer**
+
+Title: “Notifications aren't working”
+
+Description: “Didn't know my schedule changed until I got to work. This keeps happening.”
+
+**Multilingual feedback**
+
+Title: “No me llegan los cambios de turno”
+
+Description: “Mi supervisor cambió mi horario, pero no recibí aviso. Vi el cambio cuando ya era demasiado tarde.”
+
+These should be representative of authored fixtures, not a template repeated with changed nouns or numbers.
+
+## 2.4 Build connected problem scenarios
+
+Create at least eight intentionally connected clusters.
+
+### Scenario A — Shift swaps
+
+Employee wants immediate swaps; manager wants prior approval; regional leader wants visibility.
+
+Some records are duplicates. Others are related but distinct or contain conflicting requirements.
+
+### Scenario B — Missed schedule notifications
+
+Users report late, missing, or confusing shift-change notifications.
+
+Include different wording, app platforms, urgency, and one genuinely unrelated notification request.
+
+### Scenario C — Sick-call coverage
+
+Managers need to find eligible replacements quickly. Employees want available shifts offered fairly.
+
+### Scenario D — Payroll discrepancies
+
+Approved schedule changes fail to appear in payroll exports. Include multiple reports describing the same root problem.
+
+### Scenario E — Time off and availability
+
+Students, part-time staff, and supervisors have conflicting expectations about recurring availability and leave approvals.
+
+### Scenario F — Permissions and compliance
+
+Franchise managers need scoped access. HR needs enforcement of rest-period policies.
+
+Include a strategically important, low-support request.
+
+### Scenario G — Mobile/offline reliability
+
+Some employees cannot access their schedules reliably while offline or using older devices.
+
+### Scenario H — Regional workforce visibility
+
+Multi-location managers need aggregated coverage information without unnecessarily exposing employee details.
+
+For every cluster, identify:
+
+- Canonical problem
+- Distinct feedback records
+- True duplicates
+- Related but separate requests
+- Expected grouping
+- Example proposed action
+- Evidence supporting that action
+
+Avoid marking records as duplicates just because they share a theme.
+
+## 2.5 Make disposition rationales specific
+
+Retain Hunch's existing disposition types:
+
+- `merge`
+- `monitor`
+- `decline`
+- `needs_discussion`
+
+Populate meaningful examples of all four, plus pending undecided items.
+
+Each disposition should answer:
+
+- What decision was made?
+- Why?
+- What evidence informed it?
+- What happens next?
+
+For a merge, reference a genuinely matching canonical request.
+
+For monitoring, describe what additional evidence or threshold would change the decision.
+
+For a decline, explain the strategic tradeoff without dismissing the customer problem.
+
+For needs-discussion, identify the unresolved decision or stakeholder conflict.
+
+**Exit:** Every visible request has meaningful, coherent text and a defensible relationship to Crewday's product strategy.
+
+---
+
+# Phase 3 — Replace the seed implementation safely
+
+## 3.1 Refactor the existing seed pipeline
+
+Inspect and update:
+
+- `packages/fi/seed/anchors.ts`
+- `packages/fi/seed/generate-bulk-published.ts`
+- `packages/fi/seed/generate-seed.ts`
+- `packages/fi/seed/fixture.ts`
+- `packages/fi/seed/manifest.ts`
+- `packages/fi/seed/types.ts`
+- `packages/fi/seed/validate-manifest.ts`
+- `packages/fi/seed/load.ts`
+- `packages/fi/seed/seed-mode.ts`
+- `packages/fi/seed/assert-seed-allowed.ts`
+- `packages/fi/seed/prng.ts`
+
+Move to authored, typed Crewday scenario fixtures.
+
+Prefer small, maintainable fixture modules grouped by domain scenario.
+
+Remove obsolete bulk-record creation, arbitrary shuffled dispositions, artificial title numbering, meaningless descriptions, and randomly linked duplicate candidates.
+
+Do not keep the bulk generator solely for historical compatibility if no current consumer needs it.
+
+Stable IDs and deterministic fixture generation should remain.
+
+Faker, if retained, may generate incidental nonsemantic details but must not determine substantive customer problems, classifications, decisions, or duplicate relationships.
+
+## 3.2 Improve support signals
+
+Currently, the loader can create supporter keys from a request ID plus an incrementing number.
+
+Replace arbitrary-looking support distributions with internally coherent support fixtures.
+
+Use stable, distinct synthetic supporter identifiers representing actual fictional stakeholders.
+
+Ensure:
+
+- No repeated supporter is counted twice for the same request.
+- Supporting stakeholders match the stated customer segment.
+- Popularity reflects the underlying scenario.
+- Merge operations preserve the expected unique-supporter semantics.
+- Support counts are never hardcoded separately from the persisted supporting rows.
+- High support does not automatically mean high strategic priority.
+
+Do not invent aggregate company-level support if the application only stores individual supporter keys. Document any aggregation limitations.
+
+## 3.3 Create valid duplicate graphs
+
+For each duplicate candidate, require:
+
+- Existing target ID
+- Meaningful overlap
+- Explanation describing the shared underlying problem
+- Score consistent with the retrieval/similarity contract
+- No self-reference
+- No invalid merge cycle
+- Valid canonical target
+
+Create explicit related-but-not-duplicate examples.
+
+Remove generated edges that connect records solely by list position.
+
+If a fixture contains a score, do not describe it as actual model confidence unless it came from a model. Treat authored scores as fixture values.
+
+## 3.4 Restore realistic temporal history
+
+Use a deterministic reference date or explicitly injected scenario clock.
+
+Preserve chronological integrity:
+
+`submitted → triaged → published → PM review → disposition`
+
+Only populate timestamps for lifecycle transitions that actually occurred.
+
+Create realistic variation in elapsed times and event cadence. Avoid manufacturing benchmark-looking averages through uniform artificial intervals.
+
+Include older and newer feedback so monthly trends and emerging themes work.
+
+Never create future-dated feedback accidentally.
+
+Metrics derived from this scenario must be labeled as synthetic demo history, not actual operational performance measured in production.
+
+## 3.5 Validate the dataset semantically
+
+Replace count-only validation with stronger assertions:
+
+- All required titles and descriptions are meaningful.
+- No numbered placeholder titles.
+- No “bulk seeded description” or equivalent filler.
+- No generic “Closed: decline” decision briefs.
+- No dangling reference IDs.
+- No invalid timestamps.
+- No impossible status/disposition combinations.
+- All merge targets exist.
+- Support counts equal distinct persisted supporters.
+- Themes match request content.
+- Every designated scenario is represented.
+- All dispositions have sufficient rationales.
+- The expected open queue is nonempty.
+- No evaluation-only records appear in demo fixtures.
+- Two seed runs produce the same logical dataset under the same injected clock.
+
+Keep the manifest as a dataset contract, but define numbers from the final curated scenario rather than preserving arbitrary historic totals.
+
+## 3.6 Safe database replacement
+
+**Critical:** `pnpm seed:fi` currently performs a destructive replacement by default outside production and `FI_SEED_IF_EMPTY=1` skips existing databases.
+
+Do not assume deploying new seed code will update the existing Hunch database.
+
+Implement and verify a safe replacement process:
+
+1. Inspect the active database target.
+2. Confirm whether it contains user-created or evaluation records worth preserving.
+3. Do not reset the production database automatically.
+4. Prefer a new disposable demo database or an explicit verified backup and reset of a dedicated demo database.
+5. Require explicit authorization for destructive changes to any existing hosted database.
+6. Keep production destructive-seed protection.
+7. Make the intended demo reset command and if-empty mode unambiguous.
+8. Ensure partial failed inserts cannot leave an inconsistent dataset; use a transaction or appropriate equivalent.
+9. Verify repeated operations and error recovery.
+10. Document the rollback procedure.
+
+Do not change existing schema migrations to rewrite historical migrations. Add a forward migration only if new optional columns are genuinely necessary.
+
+**Exit:** Curated, deterministic, validated fixtures can populate a safe isolated database, preserving lifecycle and relational integrity.
+
+---
+
+# Phase 4 — Align AI triage and Crewday themes
+
+## 4.1 Review the theme registry
+
+Inspect:
+
+- `packages/fi/src/theme/registry.ts`
+- `packages/fi/src/theme/classify-deterministic.ts`
+- `packages/fi/src/triage/retrieve-candidates.ts`
+- `packages/fi/src/triage/run-triage-harness.ts`
+- `packages/fi/src/triage/synthesize-artifact.ts`
+- `packages/fi/src/triage/classify-decisions.ts`
+
+The current themes focus on analytics software: dashboards, reporting exports, mobile dashboards, and integrations.
+
+Those categories no longer match the sample product.
+
+Create a single Crewday-relevant taxonomy such as:
+
+| Theme | Example |
+|---|---|
+| Scheduling & coverage | Finding replacement staff |
+| Shift swaps | Approval and synchronization |
+| Availability & time off | Recurring availability conflicts |
+| Notifications | Missing schedule-change alerts |
+| Time tracking & payroll | Overtime and export discrepancies |
+| Permissions & compliance | Access scopes and rest periods |
+| Mobile & reliability | Offline schedule access |
+| Reporting & operations | Multi-location coverage visibility |
+
+Keep the underlying Hunch domain logic generic enough for a configured product, without introducing multi-project infrastructure.
+
+Update deterministic keywords and fallback behaviors.
+
+## 4.2 Keep duplicate detection honest
+
+The current deterministic candidate retrieval is lexical.
+
+Do not claim reliable semantic duplicate detection merely because carefully seeded candidates are attached to records.
+
+Test how the real submission workflow performs with:
+
+- Paraphrased duplicate
+- Nearly identical language, different problem
+- Multilingual feedback
+- Incomplete complaint
+- Related but separate feature
+- Conflicting requirements
+- No reasonable candidate
+
+Maintain the existing T0–T3 pipeline unless a focused change improves a demonstrated failure.
+
+Do not add a vector database or another retrieval system merely to make the demo appear sophisticated.
+
+Report limitations honestly.
+
+## 4.3 Improve the synthesized briefs
+
+The AI output should distinguish:
+
+- Original feedback
+- Normalized underlying problem
+- Retrieved supporting records
+- Reasoned analysis
+- Uncertainty
+- Recommended next step
+
+The recommendation must remain uncommitted until human approval.
+
+If synthesis or classification degrades, display the existing degraded state rather than pretending the model completed the workflow.
+
+Update agent instructions in:
+
+- `agent/instructions.md`
+- Relevant tool descriptions or behavior rules in `agent/`
+
+Ensure the agent understands Crewday's configured domain while Hunch remains the product operator.
+
+**Exit:** A new Crewday submission follows the real AI intake workflow with useful classifications, grounded evidence, and explicit human confirmation.
+
+---
+
+# Phase 5 — Update Hunch, GenUI, and MCP experiences
+
+## 5.1 Add visible demo context
+
+Inspect:
+
+- `apps/web/lib/hunch-content.ts`
+- `apps/web/app/(fi)/page.tsx`
+- `apps/web/app/(fi)/_components/hunch-shell.tsx`
+- `apps/web/app/(fi)/signals/page.tsx`
+- `apps/web/app/(fi)/signals/[id]/page.tsx`
+- `apps/web/app/(fi)/review/page.tsx`
+- `apps/web/app/(fi)/patterns/page.tsx`
+
+Keep the Paper + Cobalt design system.
+
+Display a concise product context, such as:
+
+**Crewday — Workforce scheduling**
+
+Supporting copy: “Explore fictional customer feedback and see how Hunch turns it into product decisions.”
+
+Clearly identify this as sample data without placing distracting disclaimer banners on every component.
+
+Keep existing page architecture and route conventions.
+
+Make sure the overview, feedback table, detail view, review queue, and insights all tell the same Crewday story.
+
+Personas and customer context should appear where they add meaning, especially on feedback detail and decision review. Do not invent author names or account data from thin air at render time.
+
+## 5.2 Replace Ask Hunch starters
+
+Inspect:
+
+- `apps/web/app/(fi)/ask/ask-hunch-client.tsx`
+- `apps/web/app/_lib/genui/compose-fi-routes.ts`
+- `apps/web/app/_lib/genui/compose-fi.ts`
+- `apps/web/app/_lib/genui/fi-records.ts`
+- `docs/specs/hunch-genui.md`
+
+Replace starters about CSV reporting, analytics integrations, and public dashboard links.
+
+Recommended curated prompts:
+
+1. “What scheduling problems should Crewday prioritize next?”
+2. “Are customers reporting the same shift-swap issue in different ways?”
+3. “Why are managers and employees disagreeing about shift approvals?”
+4. “Which customer problems have the strongest evidence?”
+5. “What emerging issues have appeared in the last month?”
+6. “Why did we decline a popular request?”
+7. “Which open requests need product manager attention?”
+8. “What evidence supports improving shift-change notifications?”
+
+Implement only starters whose answers can be generated from actual persisted records and current capabilities.
+
+Each starter must resolve to a meaningful grounded composition, not a generic fallback that merely restates the question.
+
+Rework the existing static route matchers and FI-specific composition branches where necessary. Avoid matching unrelated questions accidentally.
+
+Use the established `@repo/genui` components and renderer. Do not introduce JSON Render, a second renderer, or freeform generated HTML.
+
+Preserve the read-only boundary for generated views.
+
+## 5.3 Improve MCP descriptions and starter workflows
+
+Inspect:
+
+- `apps/web/lib/mcp/create-mcp-server.ts`
+- `apps/web/lib/mcp/register-tools.ts`
+- `apps/web/lib/mcp/tool-catalog.ts`
+- `apps/web/lib/mcp/hunch-explorer-resource.ts`
+- `apps/web/mcp-app/src/app.tsx`
+- `apps/web/app/.well-known/mcp/server-card.json/route.ts`
+
+Preserve all existing eight MCP tools and their public contracts.
+
+The MCP App is already present in the inspected branch; improve its content rather than rebuilding it.
+
+Add useful, concise example workflows to discoverable server descriptions or MCP prompt resources where supported by the installed SDK and host protocol.
+
+Investigate proper MCP `prompts/list` and `prompts/get` support for curated starter prompts if appropriate.
+
+Do not claim that registering an MCP prompt automatically replaces ChatGPT's own attachment autocomplete.
+
+The JPEG/PNG file suggestions seen when typing `@hunch` are host-controlled Files suggestions, not Hunch-provided feature intelligence workflows. Hunch cannot directly remove that list.
+
+The goal is to improve all Hunch-controlled surfaces:
+
+- Ask Hunch starter prompts
+- MCP resource description
+- MCP tool guidance
+- Optional protocol-supported prompt resources
+- Hunch Explorer copy, empty states, and readable results
+- Agent follow-up suggestions
+
+No image file references should be added as starter prompts.
+
+## 5.4 Preserve mutation boundaries
+
+Search, detail, queue, and insights remain read-only.
+
+Submitting a request creates a pending-confirmation draft.
+
+Publishing requires explicit confirmation.
+
+Setting a disposition requires user approval, a rationale, and a valid merge target when merging.
+
+Do not weaken these behaviors for demo convenience.
+
+**Exit:** A viewer immediately understands Crewday, discovers realistic feedback, and can invoke useful Hunch workflows from the web app or MCP.
+
+---
+
+# Phase 6 — Rebuild tests around believable personas
+
+Testing must prove actual behavior, not just seeded database volume.
+
+## 6.1 Unit and fixture tests
+
+Update:
+
+- `packages/fi/seed/generate-seed.test.ts`
+- `packages/fi/seed/manifest.test.ts`
+- `packages/fi/seed/fixture.test.ts`
+- `packages/fi/seed/seed-mode.test.ts`
+- Other tests referring to the old 500-record contract
+
+Add targeted scenario validation tests.
+
+Required coverage:
+
+- Deterministic fixture IDs and content
+- Valid record and support relationships
+- Meaningful duplicate mappings
+- Different persona writing styles
+- Related-but-distinct cases
+- High-support/low-priority cases
+- Low-support/high-strategic-value cases
+- Valid status transitions
+- Valid timing relationships
+- Safe repeat seeding
+- No placeholder content
+
+Avoid tests that simply assert that a fixed arbitrary number of rows exists.
+
+## 6.2 Agent evaluations
+
+Update existing evaluations in `evals/smoke/`.
+
+Examples requiring updates:
+
+- `search-csv.eval.ts`
+- `list-triage-queue.eval.ts`
+- `get-dispositioned.eval.ts`
+- `merge-disposition.eval.ts`
+- Other tests dependent on old anchors or counts
+
+Use real-feeling Crewday tasks as prompts.
+
+Include at least these evaluation cases:
+
+1. Discover feedback by product problem.
+2. Find a genuine duplicate.
+3. Reject an incorrect duplicate candidate.
+4. Normalize an ambiguous complaint.
+5. Classify multilingual feedback.
+6. Explain a strategic prioritization decision.
+7. Retrieve the correct canonical merge target.
+8. Demonstrate human approval before publication.
+9. Demonstrate human approval before disposition.
+10. Recover from degraded triage without fabricated conclusions.
+
+Each test must verify actual results, tool calls, and persisted state when applicable.
+
+Do not treat a model's final narrative as sufficient proof.
+
+## 6.3 Isolate evaluation data
+
+Inspect `evals/evals.config.ts`.
+
+The current setup allows fallback from `EVE_EVAL_DATABASE_URL` to `DATABASE_URL`, and existing evaluation scripts create records resembling “Eval merge target ...”.
+
+This is incompatible with a clean demo dataset.
+
+Require a clearly isolated test database for mutating evaluations. Fail closed instead of running writes against an unverified shared demonstration database.
+
+Use the existing local database tooling, with unique isolated database names or equivalent separation as supported by the test environment.
+
+Keep evaluation fixtures separate from demonstration seeds.
+
+If a test needs to create records, use realistic persona-based content in its isolated environment, not generic “Eval target” customer-facing content.
+
+Assert that demonstration searches, queue results, and insights exclude evaluation records by virtue of isolation.
+
+Do not rely only on name-prefix filtering to solve the problem.
+
+## 6.4 MCP integration tests
+
+Update:
+
+- `apps/web/tests/mcp/smoke.test.ts`
+- `apps/web/tests/mcp/route.test.ts`
+- `apps/web/tests/mcp/mcp-app-resource.test.ts`
+
+Add or extend protocol tests for:
+
+- MCP discovery
+- `tools/list`
+- `resources/list`
+- `resources/read`
+- Optional registered prompts, if implemented
+- Correct Crewday records returned by search
+- Correct detail retrieval
+- Correct duplicate relationships
+- Accurate queue and insights payloads
+- Text fallback for non-UI hosts
+- No unexpected mutation from read operations
+
+Retain the MCP App MIME type and resource association contracts.
+
+## 6.5 GenUI tests
+
+Update:
+
+- `apps/web/tests/compose-fi.test.ts`
+- `apps/web/tests/genui-compose.route.test.ts`
+- Relevant `packages/genui` evaluation fixtures when necessary
+
+Each visible starter should have a passing composition test.
+
+Tests must check:
+
+- Valid component envelope
+- Correct intent selection
+- Correct record references
+- Correct evidence and numbers
+- Appropriate empty or insufficient-evidence state
+- No write operation from a generated view
+
+## 6.6 Realistic adversarial tests
+
+Include messy feedback deliberately:
+
+- Short and underspecified requests
+- Misspellings
+- Spanish-language feedback
+- Duplicate meaning with very different wording
+- Similar wording but different underlying problem
+- Conflicting stakeholders
+- High-support request with poor strategic fit
+- Unsupported recommendation
+- Missing evidence
+- Gateway failure
+
+Use a small, representative evaluation matrix rather than exploding into hundreds of redundant tests.
+
+**Exit:** Domain, agent, GenUI, and MCP behavior remain correct under realistic and adversarial inputs.
+
+---
+
+# Phase 7 — Verify, review, and prepare the demo
+
+## 7.1 Run the relevant quality gates
+
+Run the project's actual scripts, including:
+
+- `pnpm --filter @repo/fi test`
+- `pnpm --filter web test`
+- `pnpm --filter @repo/db db:check` if schema changes
+- `pnpm qa`
+- `pnpm build:web`
+- `pnpm exec eve eval smoke` against the isolated evaluation DB
+- `pnpm --dir .agents flow:check` for documentation conventions
+
+Do not add new UI Playwright suites. A concise manual UI pass is enough for this assessment.
+
+Report failures, skipped checks, and environmental limitations accurately.
+
+## 7.2 Perform an adversarial review
+
+Use a reviewer with no authorship responsibility for the implementation if available.
+
+Review:
+
+- Assessment compliance
+- Data realism
+- Domain consistency
+- Duplicate correctness
+- AI grounding
+- Workflow integrity
+- Seed safety
+- Evaluation isolation
+- MCP compatibility
+- Starter-prompt usefulness
+- Remaining misleading metrics
+- Documentation accuracy
+
+Focus on what a Meta CTO reviewer would notice in the first two minutes.
+
+## 7.3 Verify complete demonstration journeys
+
+**Journey A — Discover a problem**
+
+Open Hunch, identify Crewday as the example product, find shift-swap feedback, and inspect evidence from multiple personas.
+
+**Journey B — Detect duplicates**
+
+Submit differently worded feedback about an existing problem. Verify that actual triage returns relevant candidates and distinguishes duplicates from related but distinct requests.
+
+**Journey C — Make a decision**
+
+Open the queue, inspect a realistic decision brief, approve a disposition, and verify the persisted rationale.
+
+**Journey D — Explain product strategy**
+
+Ask why a popular request was declined. Verify Hunch retrieves the real decision and evidence rather than inventing a justification.
+
+**Journey E — Explore trends**
+
+Inspect dashboard insights for the synthetic history and confirm all displayed counts, trends, and labels correspond to real persisted fixture records.
+
+**Journey F — Use MCP**
+
+Connect to the existing MCP endpoint, list tools, search Crewday requests, retrieve details, and verify the Hunch Explorer resource and text fallback.
+
+## 7.4 Deployment considerations
+
+The hosted application is associated with `meta-cto` on Vercel and the existing public Hunch endpoint.
+
+Do not assume that updating fixture files automatically replaces its current database contents.
+
+Prepare a safe deployment and database refresh procedure.
+
+Verify the actual target database, migration state, seed mode, environment variables, and production branch configuration before any hosted change.
+
+Do not reset the shared hosted database without explicit authorization.
+
+After an authorized refresh, check that old numbered requests and leaked evaluation records are no longer visible in the demo.
+
+---
+
+# Final acceptance criteria
+
+The work is complete only when:
+
+- [ ] Hunch presents Crewday as its single demonstration product.
+- [ ] No multi-project infrastructure has been added.
+- [ ] The numbered bulk dataset has been replaced.
+- [ ] Sample feedback reads like believable communication from distinct people.
+- [ ] Persona and customer-account context is consistent.
+- [ ] The demo contains genuine duplicates, related requests, conflicts, and ambiguous examples.
+- [ ] Merge targets and supporting records are logically valid.
+- [ ] Decision briefs and rationales are specific and defensible.
+- [ ] Theme classification makes sense for Crewday.
+- [ ] Hunch's AI workflow remains grounded, with human approval before mutations.
+- [ ] Web app starters are Crewday-specific and executable.
+- [ ] MCP tools, Hunch Explorer, and non-UI fallbacks remain functional.
+- [ ] Evaluation records cannot contaminate the demo database.
+- [ ] Dashboard values accurately represent synthetic persisted data and are labeled accordingly.
+- [ ] Existing domain, agent, and MCP behavior is verified by automated tests.
+- [ ] No new Playwright UI E2E suite was introduced.
+- [ ] Product, design, architecture, and related current documentation are synchronized.
+- [ ] A safe database refresh/deployment procedure is documented.
+- [ ] A reviewer can demonstrate an end-to-end AI-assisted product decision using Crewday feedback.
+
+# Implementation boundaries
+
+Do not build Crewday itself.
+
+Do not introduce authentication, organizations, project switching, multi-tenancy, a new database, new agent architecture, new GenUI renderer, new product dashboard framework, or a new retrieval system without a demonstrated requirement.
+
+Do not make unrelated Flow Factory improvements during this Hunch product task.
+
+Do not manufacture measured AI-quality or business-impact claims from seeded timestamps or invented support counts.
+
+Preserve the existing Hunch functionality and Meta CTO assessment requirements.
+
+# Final report required from Cursor
+
+At the end, provide one concise but evidence-rich report in the main Cursor session:
+
+1. **Outcome:** What changed and how the Hunch demo is now more believable.
+2. **Skills and models:** Skills loaded, agents used, and actual model identities where available.
+3. **Files:** Created, modified, or removed, grouped into domain, seed, web, MCP, agent, eval, and product documentation.
+4. **Database:** Whether the demo database was updated, which environment was used, and whether the hosted application still needs a refresh.
+5. **Verification:** Exact commands, passing/failing counts, and any unverified behavior.
+6. **Assessment fit:** How the revised demo demonstrates duplicate detection, customer understanding, prioritization, human judgment, and measurable outcomes.
+7. **Risks:** Remaining quality gaps or limitations, prioritized by impact.
+8. **Delivery:** Commit references if created, local branch status, and whether anything was pushed.
+9. **Demo:** A recommended five-minute walkthrough using actual Crewday fixture records and real tool results.
+
+The desired result is not simply cleaner seed text. It is a coherent demonstration of **AI helping a product manager move from messy customer feedback to an evidence-backed decision**.
+
+Optimize for believable product value, assessment relevance, engineering simplicity, and verified behavior—not maximum feature count.
+
+Agent: Noting the repo matches the reference commit with substantial local WIP (SEO, rate limits). Creating a phased plan that maps the brief to concrete files and decisions.
+
+---
+---
+Timestamp: 2026-10-26T15:41:05.917Z
+Work: feature-intelligence
+Stage: Build
+Generation: e9036039-55ed-429a-9ca4-e78e4ea85ee6
+
+Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: Launched **five parallel builder subagents** on top of the earlier fixture work. Current layout:
+
+---
+---
+Timestamp: 2026-10-26T15:46:23.418Z
+Work: feature-intelligence
+Stage: Build
+Generation: 3d8796bc-7716-4850-8613-a170d9fccd75
+
+Human: Perform any necessary follow-up actions in response to the subagent completion above. If no follow-up work is needed, no further action is required. If you mention an agent or subagent in your response, link it with the `[Name](id)` Don't use generic label such as `[agent]`, `[worker]`, or `[subagent]`. For cloud subagents, when the agent has edited code, link to `[Review](bc-id#changes)`, or, if you know the exact added and deleted line counts, `[Review +A −D](bc-id#changes)`, replacing A and D with those counts. Never write A or D literally. Use `[Try Live](bc-id#desktop)` only when the agent used computer use. Don't repeat the same confirmation every time.
+
+Agent: Follow-up from the [Crewday fixture author](b0855143-0e5c-4f1f-bf4c-f0b96a696aca) is integrated on the coordinator side:
+
+---
+---
+Timestamp: 2026-10-26T15:49:52.669Z
+Work: feature-intelligence
+Stage: Build
+Generation: 4d7bf01a-cebf-43eb-9adb-60fc34e50bf4
+
+Human: Perform any necessary follow-up actions in response to the subagent completion above. If no follow-up work is needed, no further action is required. If you mention an agent or subagent in your response, link it with the `[Name](id)` Don't use generic label such as `[agent]`, `[worker]`, or `[subagent]`. For cloud subagents, when the agent has edited code, link to `[Review](bc-id#changes)`, or, if you know the exact added and deleted line counts, `[Review +A −D](bc-id#changes)`, replacing A and D with those counts. Never write A or D literally. Use `[Try Live](bc-id#desktop)` only when the agent used computer use. Don't repeat the same confirmation every time.
+
+Agent: Follow-up for the [product docs](f7e4faa0-41d8-4644-9ad9-5d8367821090), [themes & agent](b0732d20-6b60-4515-a977-da86e060ff32), and [seed pipeline](609d333b-b000-40ce-b284-ada41f64cc7f) work:
+
+---
+---
+Timestamp: 2026-10-26T15:56:12.292Z
+Work: feature-intelligence
+Stage: Build
+Generation: 00376b76-88ec-4d31-9da4-fc4850c74da8
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: The compose/MCP run failed because **`genui-compose.route.test.ts` hung** for ~4.5 minutes on `response.text()` while the NDJSON stream never finished (stuck DB connection), and the runner marked it as cancelled with a pending promise.
+
+---
+---
+Timestamp: 2026-10-26T16:01:02.014Z
+Work: feature-intelligence
+Stage: Build
+Generation: 0c1cbb71-b8c7-4b26-98f5-d35bc99e7fdf
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: The full `pnpm --filter web test` run was **aborted after ~5 minutes** with no summary in the log—likely killed while `build:mcp-app` was still running or before `tail` saw output.
+
+---
+---
+Timestamp: 2026-10-26T16:01:10.361Z
+Work: feature-intelligence
+Stage: Build
+Generation: de8e7b5b-8d8e-4972-a060-95f5b0c60bbf
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: ## Crewday web demo — done
+
+---
+---
+Timestamp: 2026-10-26T16:01:14.504Z
+Work: feature-intelligence
+Stage: Build
+Generation: 9e4d09e5-c38a-4c9f-b043-78c1b91c0478
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: Crewday demo web work is **complete**: UI/MCP copy, eight Ask Hunch starters, new compose intents, and signal detail org/role via `getCrewdayDemoContextByRequestId` from `@repo/fi`.
+
+---
+---
+Timestamp: 2026-10-26T16:01:15.057Z
+Work: feature-intelligence
+Stage: Build
+Generation: 7d2831a3-c7de-4178-ba7a-88bff4c846b4
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: ## Evals and test rewrites — done
+
+---
+---
+Timestamp: 2026-10-26T16:01:23.003Z
+Work: feature-intelligence
+Stage: Build
+Generation: 27fb3b8a-bc19-4fa3-bdff-5053754d63bd
+
+Human: Perform any necessary follow-up actions in response to the subagent completion above. If no follow-up work is needed, no further action is required. If you mention an agent or subagent in your response, link it with the `[Name](id)` Don't use generic label such as `[agent]`, `[worker]`, or `[subagent]`. For cloud subagents, when the agent has edited code, link to `[Review](bc-id#changes)`, or, if you know the exact added and deleted line counts, `[Review +A −D](bc-id#changes)`, replacing A and D with those counts. Never write A or D literally. Use `[Try Live](bc-id#desktop)` only when the agent used computer use. Don't repeat the same confirmation every time.
+
+Agent: The [Crewday UI / GenUI / MCP](e5a373bb-72fd-4c98-a73c-ce4f29f5f84e) work is already integrated: `@repo/fi` exports `getCrewdayDemoContextByRequestId` (used on signal detail), and the eight Ask starters map to the new compose intents.
+
+---
+---
+Timestamp: 2026-10-26T16:02:00.000Z
+Work: setup
+Stage: setup
+
+Human: make sure ci tests are run as commit hook in package.json simple git hooks
+
+Agent: Added `pnpm hooks:ci-tests` (`pnpm test`, `@repo/db db:check`, `pnpm --dir .agents test`) and chained it into `hooks:pre-commit` for simple-git-hooks. Updated AGENTS.md and `.agents/flow/architecture.md` to document the new gate.
+
+---
+---
+Timestamp: 2026-10-26T16:01:34.783Z
+Work: feature-intelligence
+Stage: Build
+Generation: 311b53d7-58e0-4879-b96f-8786aa973266
+
+Human: make sure ci tests are run as commit hook in @package.json simple git hooks
+
+Agent: ## Task report — Completed · setup
+
+---
+---
+Timestamp: 2026-10-26T16:01:38.249Z
+Work: feature-intelligence
+Stage: Build
+Generation: 06111280-998f-4303-b1ce-ed2be0bf2d6e
+
+Human: Perform any necessary follow-up actions in response to the subagent completion above. If no follow-up work is needed, no further action is required. If you mention an agent or subagent in your response, link it with the `[Name](id)` Don't use generic label such as `[agent]`, `[worker]`, or `[subagent]`. For cloud subagents, when the agent has edited code, link to `[Review](bc-id#changes)`, or, if you know the exact added and deleted line counts, `[Review +A −D](bc-id#changes)`, replacing A and D with those counts. Never write A or D literally. Use `[Try Live](bc-id#desktop)` only when the agent used computer use. Don't repeat the same confirmation every time.
+
+Agent: The [eval isolation & smoke tests](e789942f-dd5a-43e6-bc21-bf954aa670de) work is in good shape: `EVE_EVAL_DATABASE_URL` is required, `search-shift-swap.eval.ts` replaced CSV smoke, and merge titles are Crewday-realistic.
+
+---
+---
+Timestamp: 2026-10-26T16:01:50.903Z
+Work: feature-intelligence
+Stage: Build
+Generation: dc50b71a-cf04-4579-84f1-60725af6552d
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: **Task result:** `pnpm run hooks:ci-tests` exited **1**. Product `pnpm test` and `db:check` passed; **`pnpm --dir .agents test`** failed on flow-docs validation (spec metadata didn’t match the strict `**Status:**` / `**Last reviewed:**` line format).
+
+---

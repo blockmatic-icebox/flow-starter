@@ -2,14 +2,21 @@ import { classifyThemeDeterministic } from "../src/theme/classify-deterministic"
 
 const fixtures = [
   {
-    description: "export all dashboards to csv weekly",
-    expectedTheme: "reporting_exports",
-    title: "CSV export",
+    description:
+      "Open shift coverage when a cook calls out sick — need replacement staffing.",
+    expectedTheme: "scheduling_coverage",
+    title: "Sick call coverage gap",
   },
   {
-    description: "notify slack when alert fires",
-    expectedTheme: "integrations_alerts",
-    title: "Slack alerts",
+    description:
+      "Manager approved our trade but schedules still show the old shift.",
+    expectedTheme: "shift_swaps",
+    title: "Approved swap did not update",
+  },
+  {
+    description: "Push and SMS alerts when a supervisor changes my shift.",
+    expectedTheme: "notifications",
+    title: "Shift change notifications",
   },
 ];
 

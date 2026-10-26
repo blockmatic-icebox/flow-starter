@@ -1,7 +1,8 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { streamText } from "ai";
 
-import { jsonError } from "@/lib/api/json-error";
+import { jsonError, withExtraHeaders } from "@/lib/api/json-error";
+import { discoveryRateLimitHeaders } from "@/lib/api/rate-limit-headers";
 
 const fiAskOnlySystemPrompt = `You answer questions about the Feature Intelligence product: feature requests, triage, dispositions, metrics, and workflows.
 
@@ -14,12 +15,15 @@ const anthropic = createAnthropic({
 });
 
 export const GET = () =>
-  jsonError({
-    code: "method_not_allowed",
-    message: "Use POST with a messages array.",
-    resolution: "POST /api/chat with Content-Type application/json.",
-    status: 405,
-  });
+  withExtraHeaders(
+    jsonError({
+      code: "method_not_allowed",
+      message: "Use POST with a messages array.",
+      resolution: "POST /api/chat with Content-Type application/json.",
+      status: 405,
+    }),
+    discoveryRateLimitHeaders()
+  );
 
 export async function POST(req: Request) {
   if (!process.env.ANTHROPIC_API_KEY?.trim())

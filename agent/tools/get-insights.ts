@@ -5,7 +5,8 @@ import { z } from "zod";
 import { agentDb } from "../lib/db";
 
 export default defineTool({
-  description: "North-star product metrics for feature intelligence.",
+  description:
+    "Crewday feature-intelligence trends: themes, support, and strategic vs popular requests.",
   async execute() {
     return await getInsights({ db: agentDb() });
   },

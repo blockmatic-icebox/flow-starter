@@ -25,9 +25,12 @@ export default defineEvalConfig({
     const root = new URL("..", import.meta.url).pathname;
     loadRootEnv(root);
     const evalUrl = process.env.EVE_EVAL_DATABASE_URL?.trim();
-    const env = evalUrl
-      ? { ...process.env, DATABASE_URL: evalUrl }
-      : process.env;
+    if (!evalUrl) {
+      throw new Error(
+        "EVE_EVAL_DATABASE_URL is required for eve eval setup (isolated eval database; no DATABASE_URL fallback)"
+      );
+    }
+    const env = { ...process.env, DATABASE_URL: evalUrl };
     execSync("pnpm db:migrate", {
       cwd: root,
       env,

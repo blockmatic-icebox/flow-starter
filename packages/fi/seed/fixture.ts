@@ -1,3 +1,6 @@
-/** @deprecated Use anchors + generateSeed; kept for import stability */
-export { ANCHOR_IDS, buildAnchorRows } from "./anchors";
-export { OPEN_QUEUE_COUNT } from "./manifest";
+/** Crewday demo fixtures — use generateSeed / assembleCrewdaySeed. */
+export { CREWDAY_SMOKE_ANCHOR_IDS } from "./crewday-scenario";
+export {
+  assembleCrewdaySeed,
+  getCrewdayDemoContextByRequestId,
+} from "./assemble-seed";

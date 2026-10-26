@@ -10,7 +10,7 @@
     "build:mcp-app": "vite build --config mcp-app/vite.config.ts",
     "start": "next start",
     "check-types": "tsc-ts --noEmit",
-    "test": "pnpm run build:mcp-app && node --import tsx --test tests/starter.contract.test.ts tests/site-url.test.ts tests/mcp/smoke.test.ts tests/mcp/mcp-app-resource.test.ts tests/mcp/route.test.ts tests/agent-surfaces.test.ts tests/compose-fi.test.ts tests/genui-compose.route.test.ts",
+    "test": "pnpm run build:mcp-app && node --import tsx --test tests/starter.contract.test.ts tests/site-url.test.ts tests/hunch-seo.test.ts tests/json-ld.test.ts tests/mcp/smoke.test.ts tests/mcp/mcp-app-resource.test.ts tests/mcp/route.test.ts tests/agent-surfaces.test.ts tests/compose-fi.test.ts tests/genui-compose.route.test.ts",
     "test:browser": "playwright test",
     "test:browser:ui": "playwright test --ui"
   },
@@ -18,7 +18,6 @@
     "@ai-sdk/anthropic": "^3.0.58",
     "@ai-sdk/react": "^3.0.58",
     "@modelcontextprotocol/ext-apps": "^2.0.3",
-    "@modelcontextprotocol/sdk": ">=1.32.2",
     "@modelcontextprotocol/server": "^2.4.0",
     "@repo/fi": "workspace:*",
     "@repo/genui": "workspace:*",

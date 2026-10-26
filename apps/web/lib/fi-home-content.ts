@@ -1,1 +1,1 @@
-export { fiHomeMarkdown, fiHomeSummary, fiHomeTitle } from "./hunch-content";
+export { fiHomeMarkdown } from "./hunch-content";

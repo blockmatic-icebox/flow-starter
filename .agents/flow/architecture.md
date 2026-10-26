@@ -116,7 +116,7 @@ Deploy **`web`** as a Vercel project with **Root Directory** `apps/web`, enable 
 Local gates:
 
 - `pnpm qa` — Flow docs, React architecture boundaries, lint, knip, sherif, types, unit tests, and `drizzle-kit check` for `@repo/db` (no database required). Knip reports unlisted dependencies and unresolved imports. The Next.js TypeScript plugin name in `packages/ts` is an editor plugin, not a package import, so Knip ignores the unresolved name `next` there. Generated shadcn files under `packages/ui/src/components` stay in the catalog even when a demo does not import every component.
-- `pnpm hooks:pre-commit` — staged secret-file block, staged secret scan, then checks selected from the staged diff. It does not run Playwright, the production build, or the full test suite.
+- `pnpm hooks:pre-commit` — staged secret-file block, staged secret scan, checks selected from the staged diff, then `pnpm hooks:ci-tests` (`pnpm test`, `@repo/db db:check`, `.agents test`, matching CI test jobs). It does not run Playwright, eval, security:check, knip, sherif, or the production build.
 - `pnpm security:check` — secret-scanner canary, full gitleaks scan, OSV on both lockfiles, and `pnpm audit` (requires gitleaks and osv-scanner; `pnpm setup:full` or the individual setup commands).
 - `pnpm ci:local` — `pnpm qa`, documentation and architecture tests, script tests, offline GenUI eval, browser tests, security checks, and the production build.
 

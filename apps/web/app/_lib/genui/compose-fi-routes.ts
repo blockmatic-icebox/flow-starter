@@ -1,32 +1,56 @@
 export type FiComposeIntent =
-  | "integration-failure"
-  | "duplicates"
-  | "public-links"
-  | "monthly-change"
-  | "recent-decisions"
-  | "prioritize-reporting"
+  | "prioritize-scheduling"
+  | "duplicate-swap"
+  | "approval-conflict"
+  | "strongest-evidence"
+  | "emerging-month"
+  | "popular-decline"
+  | "open-queue-attention"
+  | "notification-evidence"
   | "insufficient-evidence"
   | "search-fallback";
 
 export const fiComposeRoutes: {
-  id: FiComposeIntent;
+  id: Exclude<FiComposeIntent, "search-fallback">;
   pattern: RegExp;
 }[] = [
   {
-    id: "integration-failure",
-    pattern: /summarize integration|integration feedback/u,
-  },
-  { id: "duplicates", pattern: /duplicate|duplicates|same request/u },
-  { id: "public-links", pattern: /public link|disagree/u },
-  {
-    id: "monthly-change",
-    pattern: /changed|this month|feedback.*month/u,
+    id: "prioritize-scheduling",
+    pattern:
+      /what scheduling problems should crewday prioritize|scheduling problems.*priorit|priorit.*scheduling/u,
   },
   {
-    id: "recent-decisions",
-    pattern: /last week|reviewed feedback|what happened/u,
+    id: "duplicate-swap",
+    pattern:
+      /same shift-?swap|shift-?swap issue in different|reporting the same shift|\bduplicate|\bduplicates\b/u,
   },
-  { id: "prioritize-reporting", pattern: /priorit|reporting/u },
+  {
+    id: "approval-conflict",
+    pattern:
+      /managers? and employees? disagree|disagreeing about shift approvals|shift approvals/u,
+  },
+  {
+    id: "strongest-evidence",
+    pattern: /strongest evidence|which customer problems have the strongest/u,
+  },
+  {
+    id: "emerging-month",
+    pattern: /emerging issues|appeared in the last month|feedback this month/u,
+  },
+  {
+    id: "popular-decline",
+    pattern: /decline a popular|why did we decline|popular request/u,
+  },
+  {
+    id: "open-queue-attention",
+    pattern:
+      /open requests need product manager|need product manager attention|which open requests/u,
+  },
+  {
+    id: "notification-evidence",
+    pattern:
+      /shift-change notifications|improving shift-change|evidence supports improving.*notification/u,
+  },
   {
     id: "insufficient-evidence",
     pattern: /insufficient|not enough|no evidence/u,
@@ -38,10 +62,6 @@ export const matchFiComposeIntent = (
 ): FiComposeIntent | "search-fallback" => {
   const q = query.trim().toLowerCase();
   for (const route of fiComposeRoutes) {
-    if (route.id === "integration-failure") {
-      if (route.pattern.test(q) && /fail|error/u.test(q)) return route.id;
-      continue;
-    }
     if (route.pattern.test(q)) return route.id;
   }
   return "search-fallback";

@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import { generateSeed } from "./generate-seed.js";
 import {
-  MIN_INTAKE_LINKS,
+  INTAKE_LINKS_COUNT,
   OPEN_QUEUE_COUNT,
   STATUS_COUNTS,
   TOTAL_REQUESTS,
@@ -24,6 +24,6 @@ describe("seed manifest", () => {
     assert.equal(open.length, OPEN_QUEUE_COUNT);
 
     const intake = published.filter((r) => r.intakeLinkedRequestId);
-    assert.ok(intake.length >= MIN_INTAKE_LINKS);
+    assert.equal(intake.length, INTAKE_LINKS_COUNT);
   });
 });

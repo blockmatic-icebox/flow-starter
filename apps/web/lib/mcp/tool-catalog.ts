@@ -11,20 +11,22 @@ export interface FiMcpToolCard {
 export const fiMcpToolCatalog: FiMcpToolCard[] = [
   {
     description:
-      "Search published feature requests by text and optional theme key with pagination.",
+      "Search published Crewday feedback (scheduling, swaps, notifications) by text and optional theme key.",
     name: "search_requests",
   },
   {
     description:
-      "Get a feature request by id with duplicates and support count.",
+      "Get a Crewday feature request by id with duplicates and support count.",
     name: "get_request",
   },
   {
-    description: "List published requests awaiting PM disposition.",
+    description:
+      "List published Crewday requests awaiting PM disposition (open triage queue).",
     name: "list_triage_queue",
   },
   {
-    description: "North-star product metrics for feature intelligence.",
+    description:
+      "North-star product metrics for Crewday demo feedback and triage outcomes.",
     name: "get_insights",
   },
   {
@@ -50,13 +52,13 @@ export const fiMcpToolCatalog: FiMcpToolCard[] = [
 export const buildMcpServerCard = (origin: string) => ({
   authentication: { required: false },
   description:
-    "Search feature requests, triage queue, and product insights for Meta CTO Feature Intelligence. Assessment demo exposes read and write tools without bearer auth.",
+    "Search Crewday workforce-scheduling feedback, triage queue, and product insights for Meta CTO Feature Intelligence. Assessment demo uses fictional sample data; read and write tools run without bearer auth.",
   ...(fiMcpAppResourceUri
     ? {
         resources: [
           {
             description:
-              "Hunch Explorer MCP App (interactive signals, patterns, review)",
+              "Hunch Explorer MCP App — Crewday signals, demand patterns, and triage review",
             mimeType: "text/html;profile=mcp-app",
             uri: fiMcpAppResourceUri,
           },
@@ -92,7 +94,7 @@ export const buildAiCatalog = (origin: string) => ({
   servers: [
     {
       description:
-        "Feature Intelligence MCP — search, triage, insights, and workflow tools for the assessment demo.",
+        "Feature Intelligence MCP — Crewday demo search, triage, insights, and workflow tools.",
       name: "feature-intelligence",
       transport: {
         type: "streamable-http",
