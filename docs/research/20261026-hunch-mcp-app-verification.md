@@ -16,7 +16,7 @@ Confirm the MCP App is **discoverable**, **readable**, and **meaningful** — no
 
 | Check | Command / method | Expected | Result | Notes |
 | --- | --- | --- | --- | --- |
-| Initialize | MCP `initialize` on `POST /api/mcp` | Success | pass (prod curl 2026-10-26) | Production alias not yet on this commit |
+| Initialize | MCP `initialize` on `POST /api/mcp` | Success | pass (prod curl 2026-10-26) | Alias `meta-cto-two` → `a9ccd5f1e` |
 | Tools list | `tools/list` | Eight FI tools present | pass (local `route.test.ts`) |  |
 | Resources list | `resources/list` | Includes `ui://hunch/explorer` | pass (local) |  |
 | Resource read | `resources/read` for `ui://hunch/explorer` | HTML body | pass (local) |  |
