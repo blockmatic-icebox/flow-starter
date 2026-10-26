@@ -119,6 +119,37 @@ test("POST /api/mcp tools/call compose_ui returns envelope", async () => {
   assert.match(text, /envelope|openuiText/u);
 });
 
+test("POST /api/mcp compose_ui reports failure without credentials for open layout", async () => {
+  const prior = process.env.AI_GATEWAY_API_KEY;
+  delete process.env.AI_GATEWAY_API_KEY;
+  try {
+    const response = await mcpPost(postApiMcp, {
+      id: 4,
+      jsonrpc: "2.0",
+      method: "tools/call",
+      params: {
+        arguments: {
+          query: "Design a surprise me custom layout with novel widgets",
+        },
+        name: "compose_ui",
+      },
+    });
+    assert.equal(response.status, 200);
+    const json = (await response.json()) as {
+      result?: {
+        content?: { text?: string }[];
+        structuredContent?: { error?: string; failureCode?: string };
+      };
+    };
+    const structured = json.result?.structuredContent;
+    assert.equal(structured?.error, "composition_failed");
+    assert.equal(structured?.failureCode, "missing_credentials");
+  } finally {
+    if (prior === undefined) delete process.env.AI_GATEWAY_API_KEY;
+    else process.env.AI_GATEWAY_API_KEY = prior;
+  }
+});
+
 test("POST /mcp alias matches /api/mcp initialize", async () => {
   const body = {
     id: 1,

@@ -52,8 +52,6 @@
     "@ai-sdk/gateway": "4.0.125",
     "@repo/db": "workspace:*",
     "@repo/genui": "workspace:*",
-    "@openuidev/lang-core": "1.0.1",
-    "@openuidev/react-lang": "1.0.1",
     "ai": "^7.0.152",
     "drizzle-orm": "^0.45.4",
     "eve": "^0.83.2",

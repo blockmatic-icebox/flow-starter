@@ -17,6 +17,7 @@ const rules = [
   ["docs/tasks", slugFilePattern, "tasks"],
   ["docs/specs", slugFilePattern, "specs"],
   ["docs/research", researchFilePattern, "research"],
+  ["docs/decisions", decisionFilePattern, "product-adr"],
   ["docs/adr", decisionFilePattern, "product-adr"],
   ["docs/pdr", decisionFilePattern, "product-pdr"],
   [".agents/flow/initiatives", slugFilePattern, "flow-initiatives"],
@@ -40,7 +41,13 @@ export const knowledgeBundleSources = [
   "PRODUCT.md",
 ];
 
-const legacyFlowDocDirs = ["docs/workflow", "docs/agents"];
+const legacyFlowDocDirs = ["docs/workflow"];
+
+// Upstream skill configuration is not a second methodology tree.
+const skillConfigDocuments = new Set([
+  "docs/agents/domain.md",
+  "docs/agents/issue-tracker.md",
+]);
 
 const methodologyPathDenylist = [/^docs\/workflow\//u, /^docs\/agents\//u];
 
@@ -70,7 +77,10 @@ const obsoletePathPatterns = [
     pattern: /docs\/security\/security-model\.md/u,
   },
   { label: "docs/workflow", pattern: /docs\/workflow\//u },
-  { label: "docs/agents", pattern: /docs\/agents\//u },
+  {
+    label: "docs/agents",
+    pattern: /docs\/agents\/(?!domain\.md|issue-tracker\.md)/u,
+  },
 ];
 
 const migratedFactoryAdrBasenames = new Set([
@@ -288,7 +298,10 @@ function validateDocumentMetadata(root) {
     validateSpecMetadata({ content, errors, relative });
   }
 
-  for (const filename of markdownFiles(path.join(root, "docs/adr"))) {
+  for (const filename of [
+    ...markdownFiles(path.join(root, "docs/decisions")),
+    ...markdownFiles(path.join(root, "docs/adr")),
+  ]) {
     const relative = relativePath(root, filename);
     const content = readFileSync(filename, "utf-8");
 
@@ -675,7 +688,10 @@ function validateMethodologyPlacement(root) {
   const errors = [];
   for (const filename of markdownFiles(path.join(root, "docs"))) {
     const relative = relativePath(root, filename);
-    if (methodologyPathDenylist.some((pattern) => pattern.test(relative)))
+    if (
+      !skillConfigDocuments.has(relative) &&
+      methodologyPathDenylist.some((pattern) => pattern.test(relative))
+    )
       errors.push(
         `${relative}: Flow methodology document must live under .agents/flow/`
       );

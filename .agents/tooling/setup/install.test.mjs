@@ -86,7 +86,9 @@ const assertAdoptedProject = ({ parent, projectName, slug }) => {
   assert.equal(webPkg.portless.name, slug);
 
   assert.ok(existsSync(join(projectRoot, ".agents/flow/README.md")));
-  assert.ok(existsSync(join(projectRoot, "docs/adr/0001-use-flow-factory.md")));
+  assert.ok(
+    existsSync(join(projectRoot, "docs/decisions/0001-use-flow-factory.md"))
+  );
 
   assert.ok(!existsSync(join(projectRoot, ".agents/tooling/setup/install.sh")));
   assert.ok(

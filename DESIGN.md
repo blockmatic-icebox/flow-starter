@@ -8,15 +8,15 @@ Do not introduce a custom product brand palette in this branch. Generated compos
 
 ### Token parity (`packages/ui`)
 
-| Token | Light (`:root`) |
-| --- | --- |
-| `--background` | `oklch(1 0 0)` |
-| `--foreground` | `oklch(0.145 0 0)` |
-| `--primary` | `oklch(0.205 0 0)` |
+| Token                  | Light (`:root`)    |
+| ---------------------- | ------------------ |
+| `--background`         | `oklch(1 0 0)`     |
+| `--foreground`         | `oklch(0.145 0 0)` |
+| `--primary`            | `oklch(0.205 0 0)` |
 | `--primary-foreground` | `oklch(0.985 0 0)` |
-| `--border` | `oklch(0.922 0 0)` |
-| `--muted-foreground` | `oklch(0.556 0 0)` |
-| `--radius` | `0.625rem` |
+| `--border`             | `oklch(0.922 0 0)` |
+| `--muted-foreground`   | `oklch(0.556 0 0)` |
+| `--radius`             | `0.625rem`         |
 
 Dark mode uses the matching `.dark` neutral tokens on the document root (via `next-themes` in the studio).
 

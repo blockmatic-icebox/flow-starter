@@ -68,13 +68,6 @@ __dev
 # Agent and editor local skill installations
 .agents/skills/*
 .agents/.agents/
-# Portable first-party skills
-!.agents/skills/flow/
-!.agents/skills/flow/**
-!.agents/skills/f-extract/
-!.agents/skills/f-extract/**
-!.agents/skills/f-ship/
-!.agents/skills/f-ship/**
 .cursor/*
 !.cursor/agents/
 !.cursor/agents/**

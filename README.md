@@ -65,7 +65,7 @@ Clients without slash commands can open the matching `SKILL.md` under `.agents/s
 ### Tracker and contracts
 
 - **GitHub Issues** — canonical multi-session specs and task issues (native sub-issues and blockers where supported).
-- **Root contracts** — `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md` describe current verified behavior; link issues and [docs/adr/](docs/adr/) for consequential decisions.
+- **Root contracts** — `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md` describe current verified behavior; link issues and [docs/adr/](docs/adr/) for consequential decisions (Matt `domain-modeling` convention).
 
 Example prompts:
 
@@ -76,5 +76,5 @@ Example prompts:
 ## Docs
 
 - [PRODUCT.md](PRODUCT.md) · [DESIGN.md](DESIGN.md) · [ARCHITECTURE.md](ARCHITECTURE.md)
-- [ADR 0001 — Use Flow Factory](docs/decisions/0001-use-flow-factory.md)
+- [ADR 0001 — Use Flow Factory](docs/adr/0001-use-flow-factory.md)
 - [AGENTS.md](AGENTS.md) — short pointers for coding agents

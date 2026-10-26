@@ -15,9 +15,9 @@
     "test": "node --import tsx --test src/**/*.test.ts"
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
     "@openuidev/lang-core": "1.0.1",
     "@openuidev/react-lang": "1.0.1",
+    "@repo/ui": "workspace:*",
     "ai": "^7.0.152",
     "zod": "^4.6.7"
   },

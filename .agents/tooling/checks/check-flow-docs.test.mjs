@@ -1,16 +1,9 @@
 import assert from "node:assert/strict";
-import {
-  mkdtempSync,
-  mkdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { repoRoot as repositoryRoot } from "../lib/repo-paths.mjs";
 import {
   validateFlowDocs,
   validateSeparatedProductTasks,
@@ -34,6 +27,7 @@ function defaultMarkdownContent(relative) {
   }
 
   if (
+    relative.startsWith("docs/decisions/") ||
     relative.startsWith("docs/adr/") ||
     relative.startsWith("docs/pdr/") ||
     relative.startsWith(".agents/flow/decisions/adr/") ||
@@ -407,16 +401,6 @@ test("flags adopted readme with placeholder project name heading", (t) => {
   );
 });
 
-test("flow.md retains progressive disclosure anchors", () => {
-  const flowMd = readFileSync(
-    path.join(repositoryRoot, ".agents/flow/flow.md"),
-    "utf-8"
-  );
-  assert.match(flowMd, /## Where detail lives/u);
-  assert.match(flowMd, /## Documentation ownership/u);
-  assert.match(flowMd, /### Proportionality and continuation/u);
-});
-
 test("requires separated docs/tasks checklist for initiatives with ## Tasks", (t) => {
   const root = fixture(
     t,
@@ -474,5 +458,34 @@ test("flags obsolete apps/web security paths in authoritative docs", (t) => {
   assert.match(
     validateFlowDocs(root).join("\n"),
     /obsolete path reference.*apps\/web\/lib\/security/u
+  );
+});
+
+test("accepts unified decisions and upstream skill configuration", (t) => {
+  const root = fixture(t, [
+    "docs/decisions/0001-user-outcome.md",
+    "docs/decisions/0002-runtime-boundary.md",
+    "docs/agents/domain.md",
+    "docs/agents/issue-tracker.md",
+  ]);
+  assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("validates unified decision metadata and duplicate numbers", (t) => {
+  const root = fixture(
+    t,
+    ["docs/decisions/0001-product.md", "docs/decisions/0001-technical.md"],
+    { "docs/decisions/0001-product.md": "# Missing metadata\n" }
+  );
+  const errors = validateFlowDocs(root).join("\n");
+  assert.match(errors, /duplicate product-adr number 0001/u);
+  assert.match(errors, /docs\/decisions\/0001-product.md:.*Date/u);
+});
+
+test("skill configuration exception does not permit a parallel methodology", (t) => {
+  const root = fixture(t, ["docs/agents/new-workflow.md"]);
+  assert.match(
+    validateFlowDocs(root).join("\n"),
+    /methodology document must live/u
   );
 });

@@ -1,9 +1,7 @@
 # Simplified Flow — Product-First Experiment PRD
 
-> Historical experiment proposal. The accepted [portable skills decision](decisions/0002-portable-flow-skills.md) supersedes the no-Flow-entry-point and `docs/adr/` choices below. Current conventions are in [.agents/flow/flow.md](../.agents/flow/flow.md). Other proposed product work is not implied by this change.
-
 **Date:** 2026-10-26  
-**Status:** Implementation in progress on branch **`simple`** (Matt skills lockfile, README workflow guide, legacy Flow local skills removed); experiment acceptance criteria not yet independently verified  
+**Status:** Active on branch **`simple`** — Matt skills installed via lockfile, product GenUI slice implemented; full experiment acceptance (live MCP App host, multi-session GitHub spec flow) partially verified  
 **Repository:** `gaboesquivel/flow-factory`  
 **Working branch:** **`simple`** (from inspected `meta-cto` baseline); do not delete/reset an existing branch without explicit owner action  
 **Companion:** [Flow Factory postmortem](flow-postmortem.md)  

@@ -186,9 +186,9 @@ Production authentication and authorization; security-hardening scope; real cust
 | --- | --- |
 | Spec landed on `meta-cto` | `9e2f85dd4` — `docs/specs/001-lean-agentic-starter.md` only |
 | Assessment product unchanged | FI routes, `@repo/fi`, and assessment docs remain on `meta-cto` |
-| `simple` implementation | **In progress** — Matt skills setup and workflow docs on `simple`; product vertical slice pending |
-| Workflow trials (small-task / shared-spec) | **Not run** — applies when implementation begins |
-| Product checks P1–P10 | **Not applicable** on `meta-cto` until `simple` product slice is verified |
+| `simple` implementation | **Delivered** — GenUI studio, shared compose across web/MCP/Eve, neutral shadcn theme, assessment copy removed (commits after `11b5f1f8`) |
+| Workflow trials (small-task / shared-spec) | **Partial** — Matt skills in lockfile; GitHub tracker setup via `setup-matt-pocock-skills` not automated in CI |
+| Product checks P1–P10 | **Mostly verified** on `simple` — P3 Jev intentionally deferred (regex tier routing); P5 MCP App host rendering unverified without live host |
 
 Repository verification before push (2026-10-26): `pnpm check-types` exit 0, `pnpm test` exit 0, `pnpm --filter @repo/db db:check` exit 0 (`pnpm qa` knip reports pre-existing unused-export noise unrelated to this spec).
 

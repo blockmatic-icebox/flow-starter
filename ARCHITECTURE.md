@@ -74,6 +74,10 @@ pnpm build:web
 pnpm test:browser
 ```
 
+## GenUI routing
+
+`@repo/genui` uses deterministic regex intents for tier-1 templates (support dashboard, plan comparison, onboarding form), declarative tier-2 stacks, and AI Gateway tier-3 open composition or refinement. **Jev is not wired on `simple`** — tier selection uses `tierFromSignals` in `packages/genui/src/core/tiers.ts` until ambiguous routing justifies a classifier.
+
 ## Eve
 
 Repo root `agent/` with `withEve` in [`apps/web/next.config.ts`](apps/web/next.config.ts). Smoke eval: [`evals/smoke/compose-support-dashboard.eval.ts`](evals/smoke/compose-support-dashboard.eval.ts).

@@ -61,7 +61,7 @@ We did not sufficiently inspect how existing applications and open-source projec
 
 ### 5. We did not agree on the domain and primary user journeys
 
-Glossary/taxonomy material was generated more quickly than it was reviewed. Terms such as *request*, *task*, *triage*, *severity*, *status*, *confirmation*, and *publication* need precise meanings because they affect the data model, MCP contracts and interactions. We also insufficiently defined the main end-to-end jobs, including review/correction paths and failure states.
+Glossary/taxonomy material was generated more quickly than it was reviewed. Terms such as _request_, _task_, _triage_, _severity_, _status_, _confirmation_, and _publication_ need precise meanings because they affect the data model, MCP contracts and interactions. We also insufficiently defined the main end-to-end jobs, including review/correction paths and failure states.
 
 **Lesson:** Clarify the domain with concrete scenarios and edge cases **with the human**, then capture only resolved terms. Matt's `grill-with-docs` and `domain-modeling` can maintain a glossary and sparse ADRs as decisions emerge, but a file's existence is never proof that the owner reviewed or accepted its contents. The initial spec should explain the core jobs and boundaries without requiring the implementation of every job at once.
 
