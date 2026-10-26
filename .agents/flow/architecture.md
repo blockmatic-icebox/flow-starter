@@ -80,7 +80,7 @@ The registry is not a completed approval workflow or cross-channel authorization
 
 ## 6. Product application and GenUI integration
 
-`apps/web` is the only product application in this template ([ADR 0014](decisions/adr/0014-web-only-product-application.md)). It ships a minimal starter homepage; it does **not** include a pre-wired GenUI demo route, Flow Agent sidebar, or MCP endpoint.
+`apps/web` is the only product application in this template ([ADR 0014](decisions/adr/0014-web-only-product-application.md)). It ships a minimal starter homepage; it does **not** include a pre-wired GenUI demo route, Flow Agent sidebar, or MCP endpoint. Neutral MCP and agent discoverability for adopters is tracked in [mcp-discoverability.md](initiatives/mcp-discoverability.md) (separate from product assessment overlays).
 
 **GenUI runtime** lives in `@repo/genui` (`packages/genui`). Adopters add compose routes, action registries, and UI under `apps/web` when the product needs generative UI. Integration patterns, security boundaries, and tests are documented in [specs/genui.md](specs/genui.md).
 
@@ -101,7 +101,7 @@ These are specified for adopters building a full workspace; they are **not requi
 | Docs / retrieval | Fumadocs, bounded repo reads, revision-aware citations |
 | External clients | Read-only invocation boundary (ADR 006) |
 
-Flow Agent chat and read-only MCP were historically implemented in `apps/flow` ([ADR 0010](decisions/adr/0010-site-consultant-chat-and-mcp.md), [ADR 0012](decisions/adr/0012-flow-and-web-applications.md)). Eve workspace voice (ADR 004) and `/dev` placement (ADR 005) apply only when those features are implemented in the product app.
+Flow Agent chat and read-only MCP were historically implemented in `apps/flow` ([ADR 0010](decisions/adr/0010-site-consultant-chat-and-mcp.md), [ADR 0012](decisions/adr/0012-flow-and-web-applications.md)). Eve workspace voice (ADR 004) and `/dev` placement (ADR 005) apply only when those features are implemented in the product app. Current Factory direction for rediscoverable MCP on the starter: [mcp-discoverability.md](initiatives/mcp-discoverability.md).
 
 ### Vercel deployment
 

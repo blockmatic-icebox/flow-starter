@@ -117,7 +117,8 @@ docs/adr/           # product ADRs
 docs/specs/         # FI specifications (see main spec index)
 docs/tasks/         # execution checklists (separate from specs)
 docs/plans/         # optional standalone plans
-docs/initiatives/   # active initiative
+docs/initiatives/   # product initiatives
+.agents/flow/initiatives/  # Factory initiatives (e.g. MCP discoverability)
 PRODUCT.md          # product contract
 DESIGN.md           # experience contract
 GLOSSARY.md         # ubiquitous language

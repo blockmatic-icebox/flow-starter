@@ -4,7 +4,8 @@
 **Status:** Current  
 **Implementation:** Shipped on `meta-cto` (`meta-cto-two.vercel.app`); Is Agentic score claim pending fresh scan ([verification log](../research/20261026-fi-agentic-verification.md))  
 **ADR:** [0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) (Accepted)  
-**Initiative:** [feature-intelligence.md](../initiatives/feature-intelligence.md)
+**Initiative:** [feature-intelligence.md](../initiatives/feature-intelligence.md)  
+**Factory (separate):** Neutral starter MCP discoverability — [.agents/flow/initiatives/mcp-discoverability.md](../../.agents/flow/initiatives/mcp-discoverability.md) (does not extend this product spec)
 
 ## Problem
 

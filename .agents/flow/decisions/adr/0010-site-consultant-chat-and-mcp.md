@@ -36,4 +36,6 @@ Speech in the sidebar uses browser transcription (`SpeechInput` / Web Speech API
 
 - [ADR 0012 — Flow and web applications](0012-flow-and-web-applications.md)
 - [ADR 0011 — API and agent security boundaries](0011-api-and-agent-security-boundaries.md)
+- [MCP discoverability initiative](../../initiatives/mcp-discoverability.md) — neutral starter discoverability (Explore)
+- [verification.md](../../operations/verification.md) — optional Is Agentic deploy gate
 - [security model](../../security/security-model.md)

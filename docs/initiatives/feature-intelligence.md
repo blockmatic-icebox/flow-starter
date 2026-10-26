@@ -163,7 +163,8 @@ See [docs/specs/feature-intelligence.md](../specs/feature-intelligence.md).
 | [tasks/feature-intelligence-agentic-discoverability.md](../tasks/feature-intelligence-agentic-discoverability.md) | Agentic discoverability execution (complete) |
 
 Contracts: [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [ARCHITECTURE.md](../../ARCHITECTURE.md), [GLOSSARY.md](../../GLOSSARY.md), [ADR 0002](../adr/0002-feature-intelligence-architecture.md), [ADR 0003](../adr/0003-feature-intelligence-model-providers.md), [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md), [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md).  
-Research: [20261025-fi-adversarial-review.md](../research/20261025-fi-adversarial-review.md), [20261026-fi-agentic-verification.md](../research/20261026-fi-agentic-verification.md).
+Research: [20261025-fi-adversarial-review.md](../research/20261025-fi-adversarial-review.md), [20261026-fi-agentic-verification.md](../research/20261026-fi-agentic-verification.md).  
+**Factory (out of scope here):** [MCP discoverability for adopters](../../.agents/flow/initiatives/mcp-discoverability.md).
 
 ## Demo depth (post-MVP)
 

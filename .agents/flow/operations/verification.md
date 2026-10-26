@@ -62,6 +62,18 @@ When Playwright flakes with `net::ERR_ABORTED` against `localhost`, stop stray d
 
 When behavior is unclear (RSC boundaries, caching, server errors), use `pnpm mcp:next` with the dev server running, then confirm the fix in the browser.
 
+## Is Agentic (optional deploy gate)
+
+When a deployment exposes public agent surfaces (MCP, `llms.txt`, Markdown negotiation on `/`), run the [Is Agentic](https://is-agentic.com/docs) audit against the live host:
+
+```sh
+AGENTIC_CHECK_URL=<host-without-scheme> pnpm agentic:check
+```
+
+Factory scope and adoption patterns: [MCP discoverability initiative](../initiatives/mcp-discoverability.md). Product-specific agentic requirements (for example assessment demos) live in `docs/specs/` and `docs/adr/` separately.
+
+The root script uses the `is-agentic` devDependency on branches that include it. It returns the latest stored report; it does not force a rescan. After material deploy changes, open the host report on [is-agentic.com](https://is-agentic.com) and use **Rescan**, then rerun `pnpm agentic:check`.
+
 ## Product readiness vs methodology eval
 
 - **Flow methodology** (`pnpm --dir .agents eval run`, gates, official eligible) measures agent behavior against scenario cards. It does not by itself prove product quality.

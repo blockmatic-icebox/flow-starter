@@ -51,5 +51,6 @@ Shipped on assessment branch `meta-cto` / alias `meta-cto-two.vercel.app`: `llms
 
 - [docs/specs/feature-intelligence-agentic-discoverability.md](../specs/feature-intelligence-agentic-discoverability.md)
 - [docs/tasks/feature-intelligence-agentic-discoverability.md](../tasks/feature-intelligence-agentic-discoverability.md)
+- [Factory MCP discoverability initiative](../../.agents/flow/initiatives/mcp-discoverability.md) — neutral starter (separate from this product ADR)
 - [ADR 0004](./0004-fi-workflow-integrity-and-safety.md)
 - [SECURITY.md](../../SECURITY.md)

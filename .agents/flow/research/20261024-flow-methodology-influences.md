@@ -50,3 +50,4 @@ Examples recorded in historical reconciliation notes: mandatory `.flow/` doc roo
 - [flow-human-guide.md](../initiatives/flow-human-guide.md) — initiative tracking this guide
 - [flow-evaluation-suite.md](../initiatives/flow-evaluation-suite.md) — harness scope
 - [flow-improvement-loop.md](../initiatives/flow-improvement-loop.md) — human-reviewed remediation process
+- [mcp-discoverability.md](../initiatives/mcp-discoverability.md) — starter MCP and Is Agentic discoverability (Explore)
