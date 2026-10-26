@@ -136,7 +136,16 @@ export const routeQuery = (query: string): RoutedIntent => {
     };
   }
 
-  const decision = tierFromSignals({
+  return {
+    injection: false,
+    intent: null,
+    normalizedQuery,
+    tier: ambiguousQueryTier(normalizedQuery).tier,
+  };
+};
+
+export const ambiguousQueryTier = (normalizedQuery: string) =>
+  tierFromSignals({
     ambiguous: normalizedQuery.length < 8,
     hasControlledIntent: false,
     needsOpenComposition:
@@ -145,13 +154,5 @@ export const routeQuery = (query: string): RoutedIntent => {
       ),
     synthesisRequired: false,
   });
-
-  return {
-    injection: false,
-    intent: null,
-    normalizedQuery,
-    tier: decision.tier,
-  };
-};
 
 export const defaultEntityIds = () => acmeEntityIds;

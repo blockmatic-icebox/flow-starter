@@ -1,11 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+import { trackPageErrors } from "./track-page-errors";
+
 test("homepage renders studio shell", async ({ page }) => {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  page.on("console", (msg) => {
-    if (msg.type() === "error") errors.push(msg.text());
-  });
+  const errors = trackPageErrors(page);
 
   await page.goto("/");
   await expect(page.getByRole("main")).toBeVisible();

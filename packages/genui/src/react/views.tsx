@@ -21,10 +21,13 @@ import { Bar, BarChart, XAxis, YAxis } from "recharts";
 import type { GroundedRecord } from "../core/envelope";
 import { getFormSchema } from "../fixtures/form-schemas";
 
-const recordTitle = (records: GroundedRecord[], id: string) =>
-  records.find((record) => record.id === id)?.kind === "entity"
-    ? (records.find((record) => record.id === id) as { title: string }).title
-    : id;
+const recordTitle = (records: GroundedRecord[], id: string) => {
+  const record = records.find((item) => item.id === id);
+  if (record?.kind === "entity" || record?.kind === "document") {
+    return record.title;
+  }
+  return id;
+};
 
 export const AnswerView = ({
   body,

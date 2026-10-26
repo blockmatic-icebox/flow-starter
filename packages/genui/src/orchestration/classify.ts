@@ -1,6 +1,9 @@
+import type { TypeSafeClient } from "@typesafe-ai/sdk";
+
 import type { CompositionTier } from "../core/tiers";
-import { JEV_CONFIDENCE_THRESHOLD, tierFromSignals } from "../core/tiers";
+import { JEV_CONFIDENCE_THRESHOLD } from "../core/tiers";
 import type { ControlledIntent, RoutedIntent } from "./routing";
+import { ambiguousQueryTier } from "./routing";
 
 export type ComposeClassifier = "jev" | "regex";
 
@@ -70,11 +73,21 @@ export const classifyAmbiguousQuery = async ({
   }
 };
 
+let jevClient: TypeSafeClient | null = null;
+
+const getJevClient = async () => {
+  if (!jevClient) {
+    const { TypeSafeClient } = await import("@typesafe-ai/sdk");
+    jevClient = new TypeSafeClient({ defaultModel: "jev-latest" });
+  }
+  return jevClient;
+};
+
 const defaultJevClassifier = async (
   query: string
 ): Promise<AmbiguousClassification | null> => {
-  const { choice, TypeSafeClient } = await import("@typesafe-ai/sdk");
-  const client = new TypeSafeClient({ defaultModel: "jev-latest" });
+  const { choice } = await import("@typesafe-ai/sdk");
+  const client = await getJevClient();
   const response = await client.systemOne({
     questions: {
       intent: choice("Which starter experience best matches this UI request?", {
@@ -94,15 +107,7 @@ const defaultJevClassifier = async (
 
   const confidence = response.answers.intent.confidence ?? 0;
   if (confidence < JEV_CONFIDENCE_THRESHOLD) {
-    const decision = tierFromSignals({
-      ambiguous: query.trim().length < 8,
-      hasControlledIntent: false,
-      needsOpenComposition:
-        /custom layout|surprise me|design a|generate|pricing/u.test(
-          query.toLowerCase()
-        ),
-      synthesisRequired: false,
-    });
+    const decision = ambiguousQueryTier(query.trim().toLowerCase());
     return { classifier: "jev", intent: null, tier: decision.tier };
   }
 

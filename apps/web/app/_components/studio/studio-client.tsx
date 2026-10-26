@@ -76,12 +76,13 @@ export const StudioClient = () => {
             mode,
             priorEnvelope: priorEnvelope ?? undefined,
             query,
-            turns: [...priorMessages, { content: query, role: "user" as const }]
-              .slice(-6)
-              .map((message) => ({
-                content: message.content,
-                role: message.role,
-              })),
+            turns: [
+              ...priorMessages,
+              { content: query, role: "user" as const },
+            ].map((message) => ({
+              content: message.content,
+              role: message.role,
+            })),
             version: 1,
           }),
           headers: { "Content-Type": "application/json" },
@@ -124,8 +125,10 @@ export const StudioClient = () => {
         setLoading(false);
       } catch (error_) {
         if (latestRequestIdRef.current !== clientRequestId) return;
-        if ((error_ as Error).name !== "AbortError")
-          setError("Could not reach compose service.");
+        const aborted =
+          controller.signal.aborted ||
+          (error_ instanceof DOMException && error_.name === "AbortError");
+        if (!aborted) setError("Could not reach compose service.");
         setLoading(false);
       }
     },
@@ -253,9 +256,7 @@ export const StudioClient = () => {
                 <li key={starter}>
                   <Button
                     onClick={() => {
-                      submit(starter).catch(() =>
-                        setError("Could not compose.")
-                      );
+                      void submit(starter);
                     }}
                     size="sm"
                     type="button"

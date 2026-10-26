@@ -92,15 +92,6 @@ const controlledDocument = ({
     });
   }
 
-  if (intent === "insufficient-data") {
-    return statusDocument({
-      message: "That capability is not in the registered component catalog.",
-      records,
-      requestId,
-      variant: "warning",
-    });
-  }
-
   if (intent === "compare-plans") {
     return comparisonDocument({
       entityIds: ["entity:orbit-plan", "entity:nova-plan"],
@@ -288,7 +279,12 @@ const composeCreatePath = async ({
 
   if (intent === "insufficient-data") {
     tier = 1;
-    envelope = controlledDocument({ intent, query, requestId });
+    envelope = statusDocument({
+      message: "That capability is not in the registered component catalog.",
+      records: acmeCatalogRecords,
+      requestId,
+      variant: "warning",
+    });
     return {
       classifier,
       envelope,
