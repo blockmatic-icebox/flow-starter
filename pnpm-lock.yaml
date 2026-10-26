@@ -172,6 +172,9 @@ importers:
 
   .:
     devDependencies:
+      is-agentic:
+        specifier: ^1.0.1
+        version: 1.0.1
       knip:
         specifier: ^6.42.1
         version: 6.42.1
@@ -3204,6 +3207,11 @@ packages:
   ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
     engines: {node: '>= 0.10'}
+
+  is-agentic@1.0.1:
+    resolution: {integrity: sha512-mVzG/msZFwyj7BofwCN8MwkKhp+E1ItN08QTIjLP3s2xGDx/XL/Iy3SyXyFi3j89eu/IF1LaU4ECQw7XOD6Adw==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   is-docker@2.2.1:
     resolution: {integrity: sha512-F+i2BKsFrH66iaUFc0woD8sLy8getkwTwtOBjvs56Cx4CgJDeKQeqfz8wAYiSb8JOprWhHH5p77PbmYCvvUuXQ==}
@@ -6553,6 +6561,8 @@ snapshots:
   ip-address@10.7.4: {}
 
   ipaddr.js@1.9.1: {}
+
+  is-agentic@1.0.1: {}
 
   is-docker@2.2.1: {}
 

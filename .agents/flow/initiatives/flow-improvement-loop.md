@@ -108,6 +108,8 @@ Official pilot additionally requires `agent login` or `CURSOR_API_KEY`.
 
 Live hypotheses (e.g. extra approval after clear “implement this”) remain open until S16 pilot evidence.
 
+| F-verify-001 | No factory hook for Is Agentic deploy audits | Addressed 2026-10-25: root `pnpm agentic:check`, `verification.md` optional gate |
+
 ## Rejected proposals
 
 - Scheduled eval cron, dashboard, orchestration platform, new doc hierarchy
