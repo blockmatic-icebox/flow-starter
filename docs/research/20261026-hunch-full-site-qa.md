@@ -64,3 +64,26 @@
 | `pnpm agentic:check` | Pass | Cached report; MCP + markdown checks per prior deploy (see CLI output) |
 
 **Prod vs local:** Ask compose behavior matches local after abort-handling fix.
+
+## Pass 2 (2026-10-26, repeat)
+
+**Sessions:** `hunch-full-qa-r2` (local), `hunch-full-qa-r2-prod` (production).  
+**Git at test:** `36d79a79f` (no product code changes required).
+
+| Command | Exit |
+| --- | --- |
+| `pnpm --filter @repo/fi test` | 0 |
+| `pnpm --filter web test` | 0 |
+| `pnpm --filter @repo/genui test` | 0 |
+| `CI=true pnpm test:browser` | 0 |
+| `pnpm exec eve eval smoke` | 0 (10 pass, 1 skip) |
+| `pnpm build:web` | 0 |
+
+| Surface | Local | Production |
+| --- | --- | --- |
+| `/`, `/signals`, `/review`, `/patterns`, `/dev` | Pass | Pass |
+| `/ask` duplicate starter | Pass (shared-need Answer) | Pass |
+| `/chat` | Pass → `/ask` | Pass → `/ask` |
+| Open queue badge | **54** (eval drift) | Matches prod DB |
+
+**Deploy:** push `meta-cto` + `vercel promote` latest preview to production (same commit if doc-only).
