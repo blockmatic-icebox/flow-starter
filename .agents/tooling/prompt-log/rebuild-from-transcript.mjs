@@ -105,30 +105,30 @@ const parseTranscriptTurns = (transcriptPath) => {
 const gitPrompts = (ref) =>
   execSync(`git show ${ref}:prompts.txt`, { cwd: repoRoot, encoding: "utf-8" });
 
-const run = ({ transcriptPath, gitRef = "d02d60ace" }) => {
+const run = ({
+  transcriptPath,
+  gitRef = "origin/meta-cto",
+  sessionMarker = "Human: lets make a plan to run our task in parallel",
+}) => {
   const prior = gitPrompts(gitRef);
-  const headEndMarker =
-    "Open: T-3-9 browser, T-2-5/6 evals, T-4-1/2/5, optional eve tools T-2-4.";
-  const tailStartMarker = "---\n---\nTimestamp: 2026-10-26T00:25:41.619Z";
+  const split = prior.indexOf(sessionMarker);
+  if (split === -1)
+    throw new Error(`sessionMarker not found in ${gitRef}:prompts.txt`);
+  const head = prior.slice(0, split).trimEnd();
 
-  const headEnd = prior.indexOf(headEndMarker) + headEndMarker.length;
-  const head = prior.slice(0, headEnd).trimEnd();
-
-  const tailStart = prior.indexOf(tailStartMarker);
-  if (tailStart === -1) throw new Error("tailStartMarker not found");
-  const tail = prior.slice(tailStart).trimEnd();
+  const config = JSON.parse(
+    readFileSync(
+      path.join(repoRoot, ".agents/flow/prompt-log.config.json"),
+      "utf-8"
+    )
+  );
+  const work = config.work ?? "feature-intelligence";
+  const stage = config.stage ?? "Build";
 
   const turns = parseTranscriptTurns(transcriptPath);
-  const stopBefore = "FI prompt log, contracts, and spec verification";
-  const stopIdx = turns.findIndex((t) => t.human.startsWith(stopBefore));
-  const preTailTurns =
-    stopIdx === -1 ? turns.slice(0, 29) : turns.slice(0, stopIdx);
-
-  const work = "feature-intelligence";
-  const stage = "Build";
-  const middle = preTailTurns.map((turn) =>
+  const middle = turns.map((turn) =>
     buildBlock({
-      agent: turn.agent,
+      agent: turn.agent || "(no assistant summary in transcript)",
       human: turn.human,
       stage,
       timestamp: turn.timestampLabel ?? new Date().toISOString(),
@@ -136,39 +136,24 @@ const run = ({ transcriptPath, gitRef = "d02d60ace" }) => {
     })
   );
 
-  const postTailTurns = turns.filter(
-    (t) =>
-      t.human.includes("push all changes to meta-cto") ||
-      t.human === "ok" ||
-      t.human.includes("prompts.txt is up date") ||
-      t.human.includes("nah we fucked up")
-  );
-
-  const post = postTailTurns.map((turn) =>
-    buildBlock({
-      agent: turn.agent,
-      human: turn.human,
-      stage: turn.human === "ok" ? "Review" : stage,
-      timestamp: turn.timestampLabel ?? new Date().toISOString(),
-      work,
-    })
-  );
-
-  const out = [head, "", ...middle, "", tail, "", ...post].join("\n");
+  const out = [head, "", ...middle].join("\n").trimEnd();
   writeFileSync(path.join(repoRoot, "prompts.txt"), `${out}\n`, "utf-8");
 
   return {
-    middleBlocks: middle.length,
-    postBlocks: post.length,
-    preTailTurns: preTailTurns.length,
-    tailChars: tail.length,
+    gitRef,
+    headChars: head.length,
+    sessionTurns: turns.length,
+    totalLines: out.split("\n").length,
   };
 };
 
 const transcriptPath = process.argv[2];
+const gitRef = process.argv[3] ?? "origin/meta-cto";
 if (!transcriptPath) {
-  console.error("Usage: node rebuild-from-transcript.mjs <transcript.jsonl>");
+  console.error(
+    "Usage: node rebuild-from-transcript.mjs <transcript.jsonl> [git-ref]"
+  );
   process.exit(1);
 }
 
-console.log(JSON.stringify(run({ transcriptPath }), null, 2));
+console.log(JSON.stringify(run({ gitRef, transcriptPath }), null, 2));

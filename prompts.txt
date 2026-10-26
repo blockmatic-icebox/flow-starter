@@ -381,6 +381,11 @@ Timestamp: Sunday, Oct 25, 2026, 4:12 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
+---
+Timestamp: Sunday, Oct 25, 2026, 4:12 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
 Human: lets make a plan to run our task in parallel using subagents on worktrees all merging back to meta-cto branch. according to the dependency you will act as orchestrator, rerunning and assist with required fixes. you report back progress until everything is built
 
 Agent: Gathering context on the active initiative, worktree tooling, and the `meta-cto` branch so we can plan parallel subagent execution. Confirming one blocker before finalizing the orchestration plan: Incorporating orchestrator-led Wave 0 DB setup and Cursor Task subagents with coordinator integration.
@@ -446,7 +451,7 @@ Implement the plan as specified, it is attached for your reference. Do NOT edit 
 
 To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
-Agent: 
+Agent: (no assistant summary in transcript)
 
 ---
 
@@ -634,7 +639,7 @@ Implement the plan as specified, it is attached for your reference. Do NOT edit 
 
 To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
-Agent: 
+Agent: (no assistant summary in transcript)
 
 ---
 
@@ -725,89 +730,25 @@ Agent: Reviewing contracts, specs, and implementation status to draft an accurat
 
 ---
 
-
 ---
----
-Timestamp: 2026-10-26T00:25:41.619Z
+Timestamp: Sunday, Oct 25, 2026, 6:21 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 398d40c3-e807-4dc1-9750-bdcb1415b2f8
 
-Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+Human: FI prompt log, contracts, and spec verification
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
 
 To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
-Agent: Prompt log, product contracts, and spec verification are aligned with the assessment MVP; changes are on `meta-cto` and production is deployed.
+Agent: **Task report** — Completed · Review Prompt log, product contracts, and spec verification are aligned with the assessment MVP; changes are on `meta-cto` and production is deployed. ### 1. `prompts.txt` - Removed duplicate/thin hook blocks at the end.
 
 ---
-Timestamp: 2026-10-25T18:45:00-06:00
-Work: feature-intelligence
-Stage: Explore
-
-Human: Explore realistic 90-day historical seed (~300 requests, 40–60 open triage) and analytics dashboard for Feature Intelligence; refine scope, challenge low-value work, then Specify and Plan without Build.
-
-Agent: Reviewed metrics, schema, seed, and insights UI; user chose dual seed commands and extending /insights with charts; proposed selective data_origin deletes to preserve manual rows, time-bucketed analytics from existing timestamps, honest limits on AI impact claims; awaiting Specify approval to write specs and tasks.
 
 ---
-Timestamp: 2026-10-25T18:50:00-06:00
-Work: feature-intelligence
-Stage: Explore
-
-Human: Scope tweaks — no data_origin or simulation seed command; single seed:fi at ~500 rows with updated evals; extend insights; no simulation banner; test Neon MCP.
-
-Agent: Revised plan to one destructive 500-row generator with stable anchor IDs for smoke; Neon MCP list_projects OK on meta-cto-fi; still no Build until authorized.
-
----
-Timestamp: 2026-10-25T18:52:00-06:00
-Work: feature-intelligence
-Stage: Specify
-
-Human: Use 500 (total seed volume).
-
-Agent: Locked TOTAL_REQUESTS=500, OPEN_QUEUE_COUNT=50; wrote seed amendment, analytics spec, and demo-depth tasks; initiative index updated; Build not started.
-
----
-Timestamp: 2026-10-25T19:00:00-06:00
-Work: feature-intelligence
-Stage: Specify
-
-Human: Improve demo-depth specs and generate tasks from retrospective gaps.
-
-Agent: Seed v2 manifest tables, analytics north-star scoping and unified getInsights API, demo-depth tasks W1–W6 with SD/AN acceptance IDs; testing and core spec UI cross-links updated.
-
----
-Timestamp: 2026-10-25T19:05:00-06:00
-Work: feature-intelligence
-Stage: Plan
-
-Human: Are tasks with explicit dependencies ready for execution?
-
-Agent: Upgraded demo-depth tasks with per-task Depends on, gates G-D1–G-D6, critical path, and parallel tracks; status ready pending Build authorization.
-
----
-Timestamp: 2026-10-25T19:30:00-06:00
+Timestamp: Sunday, Oct 25, 2026, 6:37 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-
-Human: Implement demo depth build plan (500 seed, analytics, phase commits).
-
-Agent: Shipped five commits: seed generator, queue sort/smoke, getInsights trends, insights UI, contracts/tasks; pnpm qa and eve smoke green.
-
----
-Timestamp: 2026-10-25T19:45:00-06:00
-Work: feature-intelligence
-Stage: Review
-
-Human: Update root .md files; ensure tasks and specs are complete and consistent.
-
-Agent: Synced PRODUCT, DESIGN, ARCHITECTURE, GLOSSARY; fixed stale seed queue counts and approval lines across specs, initiative, testing, eve agent, and research notes.
-
----
----
-Timestamp: 2026-10-26T00:39:03.902Z
-Work: feature-intelligence
-Stage: Build
-Generation: f601a6ff-bc7b-43de-bb9c-57661e9b7ffb
 
 Human: Let’s use Flow to explore the next batch of features: realistic historical seed data and an analytics dashboard that demonstrates how a product team uses Feature Intelligence over time.
 
@@ -821,14 +762,35 @@ For analytics, prioritize our existing success metrics and help us understand tr
 
 Read the current implementation, product documents, and assessment brief. Help me refine this scope, challenge anything that adds work without improving the demonstration, and ask the important questions. Then work with me through Flow specification and planning so we have an agreed, prioritized implementation plan. Don’t start building yet.
 
-Agent: ## Stage: Explore (complete) → Specify (needs your approval)
+Agent: Exploring the codebase and contracts under Flow to ground scope, metrics, and seed design—no implementation yet.
 
 ---
+
 ---
-Timestamp: 2026-10-26T00:43:17.303Z
+Timestamp: Sunday, Oct 25, 2026, 6:37 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 90a4b87e-58af-4827-a558-6b6d6435cfac
+
+Human: Let’s use Flow to explore the next batch of features: realistic historical seed data and an analytics dashboard that demonstrates how a product team uses Feature Intelligence over time.
+
+I want to simulate three months of actual usage: incoming feedback, AI triage, people confirming or correcting suggestions, support for requests, and PM decisions with meaningful rationale. Keep a substantial backlog so we have plenty of opportunities to demonstrate live triage too.
+
+Start with roughly 300 requests over 90 days, with 40–60 still awaiting triage. Use the dashboard product context we already established. Include duplicates, related requests that should remain separate, emerging themes, ambiguous feedback, and cases where popularity differs from strategic value. The history should feel coherent, with realistic timing and imperfect outcomes.
+
+Anonymous usage is fine for now. Keep our existing decision types and use stable synthetic participants where needed. Clearly label simulated data, preserve the small test fixture, and make the larger seed reproducible without deleting real work.
+
+For analytics, prioritize our existing success metrics and help us understand trends, backlog health, and changing demand. Review what we actually capture today before proposing charts. Flag missing instrumentation and distinguish measured outcomes from proxies; don’t manufacture evidence that AI improved performance.
+
+Read the current implementation, product documents, and assessment brief. Help me refine this scope, challenge anything that adds work without improving the demonstration, and ask the important questions. Then work with me through Flow specification and planning so we have an agreed, prioritized implementation plan. Don’t start building yet.
+
+Agent: Reviewing instrumentation: we have point-in-time north-star metrics but no time series, themes-over-time, or AI-quality trends. Asking two decisions that shape the spec. Flagging a tension: dual-command seeds shouldn't wipe manual work — we'll specify selective delete by `data_origin`. Appending the prompt log. ## Stage: Explore (complete) → Specify (needs your approval) You want a **credible three-month story** for the Meta CTO dashboard-analytics product context (reporting exports, sharing, permissions, collaboration themes from the 12-row fixture), plus an **insights experience** that shows how a PM team uses FI over time—without pretending we measured AI lift. You chose **dual seed comma
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 6:42 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
 
 Human: 1. ok 
 2. data_origin (or equivalent) — this is not necessary
@@ -838,97 +800,99 @@ Human: 1. ok
 6. not needed
 7. test mpc
 
-Agent: ## Revised scope (your decisions)
+Agent: Incorporating your decisions: one 500-row `seed:fi`, no `data_origin` or simulation command, insights extension only. Checking how evals bind to the current 12-row fixture and testing Neon MCP. ## Revised scope (your decisions) | Topic | Decision | |--------|-----------|
 
 ---
+
 ---
-Timestamp: 2026-10-26T00:45:03.233Z
+Timestamp: Sunday, Oct 25, 2026, 6:44 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 842b39d4-a8e3-4a4d-a9e1-0e5100052a74
 
 Human: use 500
 
-Agent: **Locked:** **500** total requests, **~90 days** of history, **50** open triage items (within your 40–60 band).
+Agent: Locking 500 total requests (~50 open triage). Persisting Specify artifacts: updating the seed spec and adding analytics spec and tasks. **Locked:** **500** total requests, **~90 days** of history, **50** open triage items (within your 40–60 band). **Specify is written** (no code): | Artifact | Path |
 
 ---
+
 ---
-Timestamp: 2026-10-26T00:45:38.756Z
+Timestamp: Sunday, Oct 25, 2026, 6:45 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 59ed0073-b678-4608-802b-d3222bbe2b7e
 
 Human: in retrospect is anything you would improve in our spec ?  any gaps?
 
-Agent: Here’s an honest retrospective: the specs are directionally right for a demo, but several gaps would cause churn during Build unless you tighten them first.
+Agent: Reviewing the specs against implementation and your original goals. Here’s an honest retrospective: the specs are directionally right for a demo, but several gaps would cause churn during Build unless you tighten them first. ## What’s working - **Single seed + anchors** keeps eve smoke stable while scaling volume.
 
 ---
+
 ---
-Timestamp: 2026-10-26T00:47:04.189Z
+Timestamp: Sunday, Oct 25, 2026, 6:46 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: d67ad9ca-c266-4bb6-9e97-c744ed664d6f
 
 Human: ok improve the spec and generate the tasks for them
 
-Agent: Updated the demo-depth specs and task checklist from the retrospective. Highlights:
+Agent: Incorporating the retrospective into the seed and analytics specs and refreshing the demo-depth tasks. Updated the demo-depth specs and task checklist from the retrospective. Highlights: ### Seed spec ([feature-intelligence-seed.md](docs/specs/feature-intelligence-seed.md)) - **Manifest tables:** exact status/disposition/open-queue split (50 open = 8 anchors + 42 bulk), theme minimums, emerging-theme timing rule
 
 ---
+
 ---
-Timestamp: 2026-10-26T00:47:54.613Z
+Timestamp: Sunday, Oct 25, 2026, 6:47 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: ca2c5b87-d4fe-4998-a884-d5ed23117cb7
 
 Human: do we tasks with explicitly dependencies ready for execution?
 
-Agent: **Short answer:** They weren’t fully execution-ready before (only wave-level “Depends on: W1”). **They are now** — see [docs/tasks/feature-intelligence-demo-depth.md](docs/tasks/feature-intelligence-demo-depth.md).
+Agent: Wave-level dependencies aren't enough for parallel work. Upgrading the tasks doc to match the MVP pattern: per-task dependencies, gates, and a critical path. **Short answer:** They weren’t fully execution-ready before (only wave-level “Depends on: W1”). **They are now** — see [docs/tasks/feature-intelligence-demo-depth.md](docs/tasks/feature-intelligence-demo-depth.md). ### What was missing - Per-task **Depends on** (e.g. T-D1-6 waiting on T-D1-3/4/5)
 
 ---
+
 ---
-Timestamp: 2026-10-26T00:48:56.886Z
+Timestamp: Sunday, Oct 25, 2026, 6:48 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: c7c72107-bd41-4ace-aef1-fd9db4e8d613
 
 Human: lets build, make sure to update tasks, and root .md files when done, commit often per phase
 
 Agent: Gathering the current implementation to draft a phased build plan aligned with the task file.
 
 ---
+
 ---
-Timestamp: 2026-10-26T00:57:52.322Z
+Timestamp: Sunday, Oct 25, 2026, 6:51 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 018d4870-a843-4f93-a929-734b16639ad0
 
-Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+Human: Feature Intelligence demo depth — Build plan
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
 
 To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
-Agent: Demo depth build is complete on `meta-cto` in **five commits**:
+Agent: Starting Phase 1: implementing the 500-row seed generator and marking the first todo in progress. Demo depth build is complete on `meta-cto` in **five commits**: | Commit | Summary | |--------|---------|
 
 ---
+
 ---
-Timestamp: 2026-10-26T01:00:02.197Z
+Timestamp: Sunday, Oct 25, 2026, 6:59 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: a17c5796-7c0c-444b-9240-766710f03084
 
 Human: update root .md files as required, make sure there arent missing tasks or incomplete specs
 
-Agent: Synced root contracts and chased down stale spec/task references. Here is what changed and what is intentionally left as history.
+Agent: Syncing root contracts and fixing stale spec references (seed counts, approval status, insights UI). Synced root contracts and chased down stale spec/task references. Here is what changed and what is intentionally left as history. ### Root contracts | File | Updates |
 
 ---
+
 ---
-Timestamp: 2026-10-26T01:01:19.975Z
+Timestamp: Sunday, Oct 25, 2026, 7:00 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 84d8b0c8-0a80-4926-80ed-5143f207c470
 
 Human: run all tests again, make fixed, commit and push changes
 
-Agent: All checks passed; docs are committed and pushed.
+Agent: All checks passed; docs are committed and pushed. ### Tests run | Command | Result | |---------|--------|
 
 ---
 
@@ -939,7 +903,7 @@ Stage: Build
 
 Human: make sure we push all changes to meta-cto, review local branches for missing work
 
-Agent: Verified origin/meta-cto; committed prompt log (d02d60ace) and pushed; branch audit showed no missing FI demo-depth work on other branches.
+Agent: (no assistant summary in transcript)
 
 ---
 
@@ -950,146 +914,106 @@ Stage: Build
 
 Human: make sure we push all changes to meta-cto, review local branches for missing work
 
-Agent: (Duplicate Cursor submit of same prompt; no additional git changes.)
+Agent: `meta-cto` matches `origin/meta-cto`. Committing the hook-appended `prompts.txt` entry and pushing. ### `meta-cto` push status | Check | Result | |--------|--------|
 
 ---
 
 ---
 Timestamp: Sunday, Oct 25, 2026, 7:03 PM (UTC-6)
 Work: feature-intelligence
-Stage: Review
+Stage: Build
 
 Human: ok
 
-Agent: Acknowledged.
+Agent: Sounds good. **`origin/meta-cto`** is the source of truth for the assessment; say if you want **`main`** pushed or help triaging those stashes. **Task report** — Completed · Review **Outcome:** Confirmed prior push/branch audit; no new work requested. **Documentation** — No documentation changes (`prompts.txt` log entry appended locally, not committed).
 
 ---
 
 ---
 Timestamp: Sunday, Oct 25, 2026, 7:04 PM (UTC-6)
 Work: feature-intelligence
-Stage: Review
+Stage: Build
 
 Human: make sure prompts.txt is up date use this session log
 
-Agent: Prior pass incorrectly paraphrased and deleted log blocks; superseded by transcript rebuild on this turn.
+Agent: Reconciling `prompts.txt` with this session's exchanges. Reconciling the log: removing duplicate out-of-order blocks and enriching hook-thin Agent summaries from the session transcript. `prompts.txt` is reconciled against this session’s transcript and pushed on **`meta-cto`**. ### What changed in the log
 
 ---
 
 ---
 Timestamp: Sunday, Oct 25, 2026, 7:07 PM (UTC-6)
 Work: feature-intelligence
-Stage: Review
+Stage: Build
 
 Human: nah we fucked up, you seems to lost turns use your tools to get the full log, dont use compacted context, get the full session log and respect my prompt entry as they were made
 
-Agent: Rebuilt prompts.txt from full agent-transcript JSONL (46 user queries verbatim) plus git d02d60ace hook/coordinator tail; added .agents/tooling/prompt-log/rebuild-from-transcript.mjs for recovery.
+Agent: Recovering the full session from the transcript and git history—rebuilding `prompts.txt` from original entries, not summarized context. Restoring the pre-reconcile log and rebuilding the transcript session with verbatim Human lines from the JSONL. Writing a rebuild script to restore hook blocks and append verbatim transcript turns. Including missing early transcript turns and fixing hook-block preservation.
 
 ---
 
 ---
-Timestamp: 2026-10-26T01:10:03.311Z
+Timestamp: Sunday, Oct 25, 2026, 7:11 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: adf01a8f-db04-4bf8-99b3-2c87404cd79c
-
-Human: nah we fucked up, you seems to lost turns use your tools to get the full log, dont use compacted context, get the full session log and respect my prompt entry as they were made
-
-Agent: ---
-
----
----
-Timestamp: 2026-10-26T01:12:24.979Z
-Work: feature-intelligence
-Stage: Build
-Generation: 0088287f-d4fd-4bcb-8624-6664c2c0f914
 
 Human: review tasks and spec,make sure evrything is fully implemented already
 
-Agent: Documentation marks tasks complete; evidence shows stale browser verification and a few partial acceptance criteria. Creating a verification plan.
+Agent: Reviewing specs, task checklists, and the codebase to compare documented scope with what's implemented. Documentation marks tasks complete; evidence shows stale browser verification and a few partial acceptance criteria. Creating a verification plan.
 
 ---
----
-Timestamp: 2026-10-26T01:22:00.000Z
-Work: feature-intelligence
-Stage: Ship
-
-Human: when git push everything, make sure prod db has the latest migrations and seed data, test mpc calls and use browser agent to verify it all works on vercel
-
-Agent: Pushed meta-cto (604965ed0 docs, 99a9b83b3 dynamic FI layout). Synced Vercel production DATABASE_URL to Neon meta-cto-fi; migrate+seed (500/50). Neon MCP list_projects, run_sql, inspect_database OK. Promoted preview to production; agent-browser on meta-cto-gaboesquivel.vercel.app shows Triage 50 and open queue 50.
 
 ---
----
-Timestamp: 2026-10-26T01:26:23.866Z
+Timestamp: Sunday, Oct 25, 2026, 7:12 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: eb3c87a5-ca9f-42c0-9d89-c71df31007a4
 
-Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+Human: Feature Intelligence — full spec/task implementation verification
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
 
 To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
-Agent: ---
+Agent: Starting the verification plan: building the traceability matrix and running automated checks. Updating verification docs and syncing contracts. No code fixes required.
 
 ---
+
 ---
-Timestamp: 2026-10-26T01:26:29.604Z
+Timestamp: Sunday, Oct 25, 2026, 7:15 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 312952e4-caaf-4afa-bcab-7defe7bc0d11
 
-Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+Human: when git push everything, make sure prod db has the latest migrations and seed data, test mpc calls and use browser agent to verify it all works on vercel
 
-Agent: Everything from the verification and deploy pass is on **`meta-cto`** (tip **`b4e631f3c`**).
+Agent: Completing verification doc sync, then pushing, applying migrations and seed to production, and verifying via MCP and the browser on Vercel. Production shows 8 open items—Vercel likely uses a different database than the one we seeded. Syncing production env and re-seeding the correct database. ### Git push (`meta-cto`) | Commit | Summary |
 
 ---
+
 ---
-Timestamp: 2026-10-26T01:52:51.780Z
+Timestamp: Sunday, Oct 25, 2026, 7:52 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 3cf556fc-f608-4dc7-b855-ff2274ac6716
 
 Human: are you done?
 
-Agent: Yes. For this thread, the work is done.
+Agent: Yes. For this thread, the work is done. - **Spec/task verification** — automated checks green; docs and browser log updated (AC-2/W-3 still partial by design). - **Git** — pushed on **`meta-cto`** (latest **`b4e631f3c`**). - **Prod DB** — migrations current, **500 / 50 open** seed on Neon `meta-cto-fi`; Vercel production `DATABASE_URL` aligned.
 
 ---
----
-Timestamp: 2026-10-26T01:55:00.000Z
-Work: feature-intelligence
-Stage: Ship
-
-Human: is everything pushed to meta-cto ? update agents.md so we dont push to any other branch at this stage
-
-Agent: Confirmed origin/meta-cto sync after pushing pending log; added Assessment Git (meta-cto only) rule to AGENTS.md.
 
 ---
----
-Timestamp: 2026-10-26T01:58:00.000Z
-Work: feature-intelligence
-Stage: Explore
-
-Human: Meta CTO adversarial review and Flow remediation — explore findings, interview, no skip to Build.
-
-Agent: Reconciled 11 findings vs code on meta-cto; confirmed merge UI/validation gaps, discovery limits, shallow evals, seed safety; opened Explore with first merge-supporter question.
-
----
----
-Timestamp: 2026-10-26T01:55:56.068Z
+Timestamp: Sunday, Oct 25, 2026, 7:55 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 09ba54e9-a58a-4c70-9852-8710bc272980
 
 Human: is everything pushed to meta-cto ?  update agents.md so we dont push to any other branch at this stage
 
-Agent: ---
+Agent: ### Push status **Yes.** `meta-cto` matches **`origin/meta-cto`** at **`c537280f8`**, working tree clean, **0 ahead / 0 behind**. There was one unpushed hook update in `prompts.txt`; that’s included in this commit. ### `AGENTS.md`
 
 ---
+
 ---
-Timestamp: 2026-10-26T02:01:25.894Z
+Timestamp: Sunday, Oct 25, 2026, 7:58 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: f0cd2e51-67be-4c8a-bd4e-00857ee5f04b
 
 Human: # Meta CTO — Adversarial Review and Flow Remediation
 
@@ -1243,411 +1167,678 @@ Don't skip directly to implementation.
 
 The objective is not merely to resolve review comments. It's to use Flow to deliver a coherent, demonstrably functional product that fulfills the Meta CTO assessment.
 
-Agent: ---
+Agent: Starting Flow Explore: loading methodology and investigating the adversarial findings against the codebase. Reconciled the adversarial list against `meta-cto` (`c537280f8`). Explore only — no implementation.
 
 ---
+
 ---
-Timestamp: 2026-10-26T02:01:31.014Z
+Timestamp: Sunday, Oct 25, 2026, 7:58 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: f1a72f61-183a-40ef-a9cd-a265984280d8
 
-Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+Human: # Meta CTO — Adversarial Review and Flow Remediation
 
-Agent: ---
+Continue work on the `meta-cto` branch of `gaboesquivel/flow-factory`.
+
+Use the **Flow skills, conventions, and standards** throughout this work. Start by exploring the current implementation and the adversarial review below.
+
+Act as an agentic product engineer working with me to deliver the Meta CTO technical assessment. Challenge assumptions, clarify requirements, document decisions, and build a working product.
+
+## Context
+
+An independent adversarial review identified that our implementation is architecturally promising but has gaps between documented requirements and actual product behavior.
+
+The primary concern is that Feature Intelligence currently behaves more like an AI-assisted intake and disposition system than a complete workflow for understanding, consolidating, and prioritizing customer needs.
+
+Review the latest code, original assessment requirements, existing Flow documentation, specifications, decisions, and previous implementation evidence. Do not trust completion checklists without verifying the implementation.
+
+## Adversarial findings
+
+Investigate and address these findings:
+
+1. **Merge functionality:** PMs can select Merge without choosing a valid target. Canonical relationships and supporter consolidation are incomplete.
+2. **AI resilience:** Synthesis errors can leave requests stuck in triage without an understandable failure state, recovery path, or manual fallback.
+3. **Decision transparency:** Dispositions and rationales are persisted but aren't sufficiently visible to stakeholders. Decision history and traceability are incomplete.
+4. **Domain integrity:** Invalid lifecycle transitions, empty rationales, inconsistent merge references, and unvalidated relationships can be persisted.
+5. **Discovery:** The application has hundreds of seeded requests but lacks practical search, sorting, pagination, and visible support counts.
+6. **Prioritization:** Sorting by popularity alone doesn't adequately support product decisions. Explore impact, strategic alignment, urgency, and evidence-based recommendations without overengineering.
+7. **Duplicate intelligence:** Lexical matching is weak for semantically equivalent requests, and match-confidence labels are not reliably calibrated.
+8. **Analytics:** Some metrics rely on synthetic timestamps, mutable data, or misleading denominators. Historical trends and all-time bucketing need scrutiny.
+9. **Database safety:** Destructive seeding and evaluation setup can accidentally affect shared or production data.
+10. **Verification:** Existing tests and evals sometimes verify implementation details rather than real agent behavior and successful business outcomes.
+11. **Specification drift:** Several capabilities described as complete in product specs are missing or only partially implemented.
+
+Evaluate each finding independently. Distinguish genuine defects from acceptable assessment shortcuts.
+
+## Decisions already made
+
+These decisions are approved and should not be reopened without a compelling reason:
+
+- **Authentication and authorization are out of scope.** This is a functional assessment demo. Use simulated users, names, and persona-based workflows where useful. Document the limitation rather than introducing an authentication system.
+- **Real merge functionality is required**, including target selection, domain validation, canonical relationships, and sensible supporter handling.
+- **AI failure recovery is required.** A model failure must never leave the user with an unusable workflow.
+- **Decision transparency is required**, including rationale, status, timestamps, and simulated actor identity where appropriate.
+- **Domain validation and lifecycle integrity are required.**
+- **Complete discovery functionality is required:** search, filtering, sorting, pagination, and support counts.
+- **Eve agent development is test-driven.** Evals must verify real agent behavior, tool selection, confirmation rules, recovery, and actual outcomes.
+- **MCP/API contracts and integrations should also be test-driven.** Verify real calls, validation, persistence, and error handling. First determine which MCP surfaces actually exist and clarify any proposed expansion.
+- **UI automated testing is intentionally deferred.** Do not introduce Playwright or browser E2E suites during this assessment. Manual UI verification is acceptable.
+
+Prioritize evidence that Eve and the exposed API/MCP capabilities perform correctly.
+
+## Follow the Flow workflow
+
+### Explore
+
+Load the Flow skills and all relevant project context.
+
+Review the codebase, product requirements, existing research, specifications, task documents, and architectural decisions.
+
+Interview me to clarify unresolved requirements and product tradeoffs. Ask focused questions **one at a time**, recommend sensible defaults, and explain important tradeoffs.
+
+Use the existing decisions above to avoid asking questions we've already answered.
+
+Identify what is Decided, Assumed, Open, or Deferred.
+
+Separate assessment requirements from optional production-hardening work.
+
+Record findings and relevant research using Flow conventions.
+
+### Specify
+
+Refine the product requirements through our conversation.
+
+Create or update the appropriate Flow PRDs, initiative documents, feature specifications, user journeys, and acceptance criteria.
+
+Keep `PRODUCT.md` synchronized with the detailed requirements and actual implementation status.
+
+Update `DESIGN.md` when interaction behavior, workflows, or user experience decisions change.
+
+Document architectural decisions and their rationale in `docs/adr/`, following the existing conventions. Update `ARCHITECTURE.md` to reflect accepted technical decisions.
+
+Use research documents for investigation and evidence, not undocumented assumptions.
+
+Avoid duplicating entire specifications across documents. Preserve traceability between decisions, requirements, and implementation.
+
+Request my approval of material requirements and architecture decisions.
+
+### Plan
+
+Produce a prioritized implementation plan using Flow standards.
+
+Break the work into cohesive tasks with dependencies, acceptance criteria, verification methods, and clear boundaries for parallel subagents.
+
+Favor delivering the complete core product workflow over adding peripheral functionality.
+
+Identify which changes can be executed independently and which require sequential integration.
+
+Present the plan for approval before implementation.
+
+### Build
+
+Once the plan is approved, implement it using Flow's agent delegation and execution practices.
+
+Use specialized subagents where meaningful. Maintain clear ownership, bounded tasks, and integration checkpoints.
+
+Follow test-driven development for Eve evals and MCP/API integration tests.
+
+Verify observable outcomes and persisted state, not merely that functions exist or tools were invoked.
+
+Keep product documentation and architectural decisions synchronized as implementation progresses.
+
+### Review
+
+Perform a fresh adversarial review against the original assessment and approved specifications.
+
+Challenge the product from the perspectives of a PM, a submitter, an AI engineer, and a Meta CTO evaluator.
+
+Verify that the application provides a convincing end-to-end product workflow, even though UI automation is deferred.
+
+Report passed, failed, partial, and unverified acceptance criteria with supporting evidence.
+
+Do not mark tasks complete solely because code exists or tests pass superficially.
+
+### Ship
+
+Prepare a concise assessment-ready README and verification summary.
+
+Report what was built, what changed, what was tested, what remains deferred, and which requirements are satisfied.
+
+Include the relevant PRDs/specifications, ADRs, research documents, task records, and commit references.
+
+Preserve Flow's prompt and decision history conventions.
+
+## Flow self-improvement
+
+When you discover a failure caused by Flow's methodology rather than this product, record it separately as actionable Factory feedback.
+
+Do not silently change the Flow methodology while implementing the assessment. Propose those improvements for my approval.
+
+## Start now
+
+Begin with **Flow Explore**.
+
+First inspect the latest `meta-cto` branch and reconcile the adversarial findings against the actual code and existing documentation.
+
+Summarize what is confirmed, what is already resolved, and what requires a product or architectural decision.
+
+Then **interview me one question at a time**, following Flow's normal human-in-the-loop workflow.
+
+Don't skip directly to implementation.
+
+The objective is not merely to resolve review comments. It's to use Flow to deliver a coherent, demonstrably functional product that fulfills the Meta CTO assessment.
+
+Agent: ## Explore — adversarial reconciliation (`meta-cto`) Checked out **`meta-cto`** at **`c537280f8`** (in sync with `origin/meta-cto`). This is **Explore only** — no spec edits, ADRs, or implementation yet. ### What the review got right (genuine gaps) | # | Finding | Evidence in code today | vs your decisions |
 
 ---
+
 ---
-Timestamp: 2026-10-26T02:02:20.948Z
+Timestamp: Sunday, Oct 25, 2026, 8:02 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 71dc98ca-7182-4d60-b8fa-d4207054147e
 
 Human: is there anything you would add improve in retrospect?
 
-Agent: Retrospective: domain truth before demo polish; behavioral evals; seed guards; honesty in PRODUCT status.
+Agent: Retrospective on this assessment arc — what I’d change if we ran it again: ### Sequencing and honesty **Core workflow before demo polish.** The 500-row seed, insights dashboard, and Vercel prod pass landed before merge, discovery, domain validation, and real Eve outcome evals were solid. For an evaluator, that reads as “impressive shell, incomplete product.” I’d gate **demo depth** on a short **workflow completeness checklist** (merge + discovery + AI failure UX + disposition audit) and keep `PRODUCT.md` / tasks in **partial** until each row has code + test evidence. ### Domain-first, not UI-first
 
 ---
+
 ---
-Timestamp: 2026-10-26T02:08:00.000Z
+Timestamp: Sunday, Oct 25, 2026, 8:02 PM (UTC-6)
 Work: feature-intelligence
-Stage: Specify
+Stage: Build
 
 Human: agree, update docs and continue to spec
 
-Agent: Published adversarial research, remediation spec (RC-1–RC-10), ADR 0004, draft remediation tasks; synced PRODUCT, DESIGN, ARCHITECTURE, initiative, core spec index, testing W-R*, seed safety note.
+Agent: Capturing lessons and adversarial reconciliation in docs, then drafting Specify artifacts. Loading Flow conventions and current contracts. Creating research, remediation spec, ADR 0004, and syncing contracts. ## Specify complete Documented the adversarial review, locked remediation requirements, and corrected **implementation status** so contracts match what actually runs.
 
 ---
+
 ---
-Timestamp: 2026-10-26T02:10:00.000Z
+Timestamp: Sunday, Oct 25, 2026, 8:04 PM (UTC-6)
 Work: feature-intelligence
-Stage: Plan
+Stage: Build
 
 Human: now create tasks for dev with dependencies
 
-Agent: Expanded docs/tasks/feature-intelligence-remediation.md with gates G-R1–G-R5, dependency matrix, per-task depends/verify/write-set, worker map; initiative Plan marked ready.
+Agent: ## Dev tasks ready Full checklist: **[docs/tasks/feature-intelligence-remediation.md](docs/tasks/feature-intelligence-remediation.md)** ### Gates | Gate | Unblocks |
 
 ---
----
-Timestamp: 2026-10-26T02:15:00.000Z
-Work: feature-intelligence
-Stage: Ship
-
-Human: git everything is done and test, deploy to vercel meta-cto, make sure vercel deployments run the drizzle mirations and seeds on startup
-
-Agent: Committed 8cf3e07b3 remediation + vercel-build.mjs; pushed meta-cto; production deploy with migrate+seed in build phase; alias meta-cto-two.vercel.app.
 
 ---
----
-Timestamp: 2026-10-26T02:04:11.732Z
+Timestamp: Sunday, Oct 25, 2026, 8:05 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 456b012a-cf8a-4b87-a225-0740292c8723
-
-Human: agree, update docs and continue to spec
-
-Agent: ---
-
----
----
-Timestamp: 2026-10-26T02:05:04.956Z
-Work: feature-intelligence
-Stage: Build
-Generation: 7ec9a63c-32f0-4a25-98a0-07150fa2ec18
-
-Human: now create tasks for dev with dependencies
-
-Agent: ---
-
----
----
-Timestamp: 2026-10-26T02:06:33.477Z
-Work: feature-intelligence
-Stage: Build
-Generation: 83b816f5-192c-43cd-b55b-c27d0a1b79e5
 
 Human: run tasks in parallel subagents all ff merging back to meta-cto branch until we complete all task, you act as orchestrator and review, apply fixes and re-span agents when needed
 
-Agent: Noting `setDisposition` is a thin update with no validation; schema already has `mergeTargetId`, `canonicalRequestId`, and `archived` status. Planning wave-based parallel builders with serial integration to avoid file conflicts.
+Agent: Reviewing the remediation backlog and codebase to draft a parallel subagent execution plan. Noting `setDisposition` is a thin update with no validation; schema already has `mergeTargetId`, `canonicalRequestId`, and `archived` status. Planning wave-based parallel builders with serial integration to avoid file conflicts.
 
 ---
+
 ---
-Timestamp: 2026-10-26T02:13:18.125Z
+Timestamp: Sunday, Oct 25, 2026, 8:06 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 588df616-ae6f-47ce-a7d1-04ca2ad355fb
 
-Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+Human: Feature Intelligence remediation — parallel Build orchestration
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
 
 To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
-Agent: ---
+Agent: Starting Wave 0 (T-R-8): marking the first todo in progress and implementing the seed safety guard. Implementing domain layers (waves A1–A2) and core web changes.
 
 ---
+
 ---
-Timestamp: 2026-10-26T02:13:20.488Z
+Timestamp: Sunday, Oct 25, 2026, 8:08 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 250f2db9-2d74-465f-917b-4109427ff41d
 
-Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+Human: git everything is done and test, deploy to vercel meta-cto, make sure vercel deployments run the drizzle mirations and seeds on startup
 
-Agent: The **`@repo/fi` unit test** run finished successfully: **24 tests, 13 suites, 0 failures** (exit code 0), including the new seed guard and disposition validation cases. That matches what we relied on before the remediation commit and Vercel deploy.
+Agent: Checking repo state, finishing verification, configuring Vercel startup migrations/seeds, then committing and deploying. ## Git - **`meta-cto`** is pushed and **0 ahead / 0 behind** `origin/meta-cto`. - **`8cf3e07b3`** — `feat(fi): workflow remediation and Vercel migrate/seed build` (41 files)
 
 ---
+
 ---
-Timestamp: 2026-10-26T02:50:09.839Z
+Timestamp: Sunday, Oct 25, 2026, 8:48 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 39c5ee1a-308b-4c5e-b522-0c01b75a9a4f
 
 Human: good, now make sure we are running db migrations and non destructive seeds if not present on vercel deploynents
 
-Agent: ---
+Agent: Updating the Vercel build to always migrate and seed only when the database is empty (non-destructive). ## Vercel deploy behavior (updated) **On every production build** ([`apps/web/scripts/vercel-build.mjs`](apps/web/scripts/vercel-build.mjs)): 1. **`pnpm db:migrate`** — always runs Drizzle migrations
 
 ---
+
 ---
-Timestamp: 2026-10-26T02:55:11.434Z
+Timestamp: Sunday, Oct 25, 2026, 8:52 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 6666e6d2-d9a8-46eb-9d51-a9840909ba0e
 
 Human: now lets plan for having full agentic discoverability using npm package is-agentic, lets create an adr and spec for this if needed. make sure the mpc server is reachable from chatgpt, claude and any agent
 
-Agent: ---
+Agent: Planning agentic discoverability with `is-agentic`: reviewing the repo's agent/MCP surfaces and the package's requirements. Creating ADR 0005 and an agentic discoverability spec grounded in the live is-agentic audit (score 59; MCP partial without `/.well-known/mcp`). ## Plan: agentic discoverability + MCP **Evidence:** `npx is-agentic meta-cto-two.vercel.app` → **59/100**. MCP is **partial** (registry only); Is Agentic wants a **live Streamable HTTP handshake** plus **`/.well-known/mcp`**. Essentials failing: **Markdown negotiation**, plus missing **llms.txt / sitemap / agent instructions**.
 
 ---
+
 ---
-Timestamp: 2026-10-26T02:57:06.261Z
+Timestamp: Sunday, Oct 25, 2026, 8:56 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: f7e57d66-bac2-472c-b334-d55129b46a5f
 
 Human: create tasks
 
-Agent: ---
+Agent: ## Agentic discoverability tasks Full checklist: **[docs/tasks/feature-intelligence-agentic-discoverability.md](docs/tasks/feature-intelligence-agentic-discoverability.md)** (pushed on `meta-cto` as `ad8e8090b`). ### Gates | Gate | Meaning |
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:00:07.930Z
+Timestamp: Sunday, Oct 25, 2026, 8:58 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 3086dba9-aa0a-4f05-9943-68b980f348c2
 
 Human: run tasks in parallel using subagents act as orchestrator
 
-Agent: ---
+Agent: (no assistant summary in transcript)
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:08:00.000Z
+Timestamp: Sunday, Oct 25, 2026, 9:01 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: agentic-orchestration-closeout
 
-Human: Agentic discoverability — parallel Build orchestration (implement attached plan; do not edit plan file)
+Human: Agentic discoverability — parallel Build orchestration
 
-Agent: Implemented waves 0–4 on meta-cto: accepted ADR 0005 (demo-open MCP), llms.txt/sitemap/JSON-LD/well-known, markdown negotiation + 404, Streamable HTTP /api/mcp with eight @repo/fi tools, is-agentic script, contract sync. Commits d30796ad3 and 2fc97774a pushed. Local curls and pnpm --filter web test pass; pnpm build:web exit 0. Production deploy failed (db:migrate on Vercel build; CLI deploy Eve edge middleware). pnpm agentic:check still 59/100 until prod ships.
-
----
----
-Timestamp: 2026-10-26T03:07:26.080Z
-Work: feature-intelligence
-Stage: Build
-Generation: 10028875-9ee9-4934-a153-2a79f5beb04b
-
-Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
 
 To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
-Agent: Agentic discoverability is implemented on `meta-cto` per the orchestration plan (waves 0–4). Production is still on the previous build, so Is Agentic on `meta-cto-two.vercel.app` remains **59/100** until a successful Vercel deploy.
+Agent: (no assistant summary in transcript)
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:16:00.000Z
+Timestamp: Sunday, Oct 25, 2026, 9:01 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: deploy-continuation
+
+Human: Agentic discoverability — parallel Build orchestration
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: Implementing the agentic discoverability plan: starting Wave 0 (ADR acceptance and demo-open MCP policy). Applying Wave 0 doc updates and implementing discovery, markdown, and MCP surfaces. **Task report** — Partial · Build Agentic discoverability is implemented on `meta-cto` per the orchestration plan (waves 0–4). Production is still on the previous build, so Is Agentic on `meta-cto-two.vercel.app` remains **59/100** until a successful Vercel deploy.
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 9:08 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
 
 Human: continue
 
-Agent: Unblocked Vercel: skip migrate without DATABASE_URL on Preview; removed middleware (Eve Services edge conflict); fixed Accept rewrite regex. Production deploy READY on meta-cto-two; curl markdown/MCP/well-known pass. is-agentic CLI still shows cached 59 until site rescans.
+Agent: Fixing Vercel deploy blockers so agentic discoverability can ship to production. Preview builds lack `DATABASE_URL` (production-only), so migrate fails. Updating the Vercel build script and triggering a production deploy. Removing `middleware.ts` (likely conflicts with Eve on Vercel Services) and moving markdown negotiation into `next.config.ts`. **Task report** — Completed · Build (deploy continuation)
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:15:43.549Z
+Timestamp: Sunday, Oct 25, 2026, 9:17 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: b24e5faa-0bd1-40c9-866e-3d4051624165
 
-Human: continue
+Human: git push progress to meta-cto and continue
 
-Agent: Production is live with agentic discoverability on `meta-cto-two.vercel.app`. Three Vercel issues were fixed after the first implementation pass.
+Agent: Branch is synced with `origin/meta-cto`; committing the prompt log and implementing agent-friendly 404 Markdown without `middleware.ts`.
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:27:00.000Z
+Timestamp: Sunday, Oct 25, 2026, 9:17 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: markdown-negotiation-builder
 
-Human: Fix is-agentic markdown-negotiation-vary on GET / (text/markdown, Vary: Accept, body ≥500 chars) without middleware; commit meta-cto only, no push.
+Human: maximize use of subagents
 
-Agent: Hardened homepage markdown via next.config rewrites to /markdown/home, /index.md alias, tighter Accept regex (excludes text/html), contract test for ≥500 chars and Vary. Commit ea0b7a0cd on meta-cto (local, not pushed). Rescan is-agentic after deploy.
+Agent: Orchestrating parallel subagents while checking repo state and fixing the catch-all route typo. Integrating subagent work: fixing sitemap and llms.txt, committing the builder's known-path guard, then pushing and verifying.
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:22:00.000Z
-Work: flow-factory + feature-intelligence
-Stage: flow-improve / Build
-Generation: subagent-spinoff
+Timestamp: Sunday, Oct 25, 2026, 9:21 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
 
 Human: when done use flow improve to add this to is-agentic tooling to the main branch only the required changes for flow factory starter tools. no other additions to main at this point
 
-Agent: Completed factory is-agentic hook on main (`f30f6ffca`, pushed). Spawned parallel workers: main commit fix, verifier audit, prod research, deploy guidance, meta-cto fixes (origin, sitemap test, markdown vary, MCP well-known smoke). Pushed `main` and `meta-cto` (`ea0b7a0cd`). Rescan is-agentic after prod deploy for score update.
+Agent: Finishing integration, then applying flow-improve to land only Flow Factory starter is-agentic tooling on `main`.
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:23:00.000Z
-Work: flow-factory + feature-intelligence
+Timestamp: Sunday, Oct 25, 2026, 9:21 PM (UTC-6)
+Work: feature-intelligence
 Stage: Build
-Generation: subagent-spinoff-2
+
+Human: when done use flow improve to add this to is-agentic tooling to the main branch only the required changes for flow factory starter tools. no other additions to main at this point
+
+Agent: (no assistant summary in transcript)
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 9:22 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
 
 Human: spinoff more subagents
 
-Agent: Launched eight subagents (builder/verifier/researcher/deployment); integrated commits and pushed both branches.
+Agent: Checking repo state, then launching parallel subagents for the remaining factory and meta-cto work. Verifying builder commit and pushing `main`; spawning meta-cto fix builders. Spun off **eight parallel subagents** and integrated the results. ### Main (`origin/main` — factory only)
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:34:00.000Z
+Timestamp: 2026-10-26T04:00:49.158Z
 Work: feature-intelligence
 Stage: Build
-Generation: deploy-is-agentic
-
-Human: push to prod and continue; wait for successful vercel deployment before running is agentic again
-
-Agent: Production deploy dpl_BbFJbLjWEG3pZtzSCd9oLhEv5kft READY at ea0b7a0cd; meta-cto-two serves fixed llms/mcp/markdown. is-agentic still 59 — cached report 2026-10-26T02:53:40Z (servedFromCache); needs Rescan on is-agentic.com before CLI reflects fixes.
-
----
----
-Timestamp: 2026-10-26T03:27:49.718Z
-Work: feature-intelligence
-Stage: Build
-Generation: 65ecc346-0082-42c2-a742-cead4592cd3a
-
-Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
-
-Agent: Homepage markdown negotiation for Is Agentic is in place without `middleware.ts` (Eve conflict). `next.config.ts` rewrites `GET /` when `Accept` prefers markdown (and does not list `text/html`) to `/markdown/home`, which returns `text/markdown`, `Vary: Accept`, and a body over 500 characters. `/index.md` points at the same content. HTML for normal browser `Accept` values is unchanged.
-
----
----
-Timestamp: 2026-10-26T03:27:56.149Z
-Work: feature-intelligence
-Stage: Build
-Generation: 857f19ea-544c-4c84-a51a-c1c2c080631b
-
-Human: when done use flow improve to add this to is-agentic tooling to the main branch only the required changes for flow factory starter tools. no other additions to main at this point
-
-Agent: [REDACTED]
-
----
----
-Timestamp: 2026-10-26T03:30:37.158Z
-Work: feature-intelligence
-Stage: Build
-Generation: 0d7ed693-e45b-4f21-852d-c5afdc2d1549
 
 Human: Perform any necessary follow-up actions in response to the subagent completion above. If no follow-up work is needed, no further action is required. If you mention an agent or subagent in your response, link it with the `[Name](id)` Don't use generic label such as `[agent]`, `[worker]`, or `[subagent]`. For cloud subagents, when the agent has edited code, link to `[Review](bc-id#changes)`, or, if you know the exact added and deleted line counts, `[Review +A −D](bc-id#changes)`, replacing A and D with those counts. Never write A or D literally. Use `[Try Live](bc-id#desktop)` only when the agent used computer use. Don't repeat the same confirmation every time.
 
-Agent: [REDACTED]
+Agent: Checking whether the subagent's uncommitted work duplicates what's already on `meta-cto` or needs integration. ### Follow-up on [production discoverability builder](6322e78d-32a9-4568-92ef-2accdb4e7861) That worker’s diff is **already on `meta-cto`** (from `421d5d0ae` through `ea0b7a0cd`); the tree is clean aside from local `prompts.txt`. **No extra commit or merge** was required. | Check | Result |
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:34:09.020Z
+Timestamp: Sunday, Oct 25, 2026, 9:30 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 549712da-f469-4f7b-9204-f0ac225fa77c
 
 Human: push to prod and continue
 
-Agent: [REDACTED]
+Agent: Deploying `meta-cto` to production and continuing verification and remaining agentic fixes.
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:36:22.797Z
+Timestamp: Sunday, Oct 25, 2026, 9:32 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: be360baf-27e7-4980-84a1-d78112c3f447
+
+Human: wait for succesful vercel deployment before running is agentic again
+
+Agent: Polling deployment until it's ready, then promoting the audit alias and running is-agentic. Deploy is live; the CLI returned a cached report. Triggering a fresh scan before re-running the audit. ### Production deploy Waited until **`dpl_BbFJbLjWEG3pZtzSCd9oLhEv5kft`** reached **READY** (`ea0b7a0cd`, production target).
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 9:34 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
 
 Human: continue with the pending tasks and make sure we delivered the full spec
 
-Agent: Here is how the repo lines up today.
+Agent: Reviewing the agentic-discoverability spec and tasks against what's implemented, then closing remaining gaps.
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:38:21.240Z
+Timestamp: Sunday, Oct 25, 2026, 9:36 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: a35237ff-fa2d-448d-9d63-295dcf123cec
+
+Human: are there any other pending tasks or specs ?
+
+Agent: Here is how the repo lines up today. ### Agentic discoverability (the slice you have been shipping) | Artifact | Doc status | Reality | |----------|------------|--------|
+
+---
+
+---
+Timestamp: 2026-10-26T04:00:49.160Z
+Work: feature-intelligence
+Stage: Build
+
+Human: Perform any necessary follow-up actions in response to the subagent completion above. If no follow-up work is needed, no further action is required. If you mention an agent or subagent in your response, link it with the `[Name](id)` Don't use generic label such as `[agent]`, `[worker]`, or `[subagent]`. For cloud subagents, when the agent has edited code, link to `[Review](bc-id#changes)`, or, if you know the exact added and deleted line counts, `[Review +A −D](bc-id#changes)`, replacing A and D with those counts. Never write A or D literally. Use `[Try Live](bc-id#desktop)` only when the agent used computer use. Don't repeat the same confirmation every time.
+
+Agent: (no assistant summary in transcript)
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 9:37 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
 
 Human: make sure all md files are up to date
 
-Agent: [REDACTED]
+Agent: Auditing markdown docs for drift against what's shipped on `meta-cto`, then updating them. Updating product docs to reflect shipped remediation and agentic discoverability, and adding a verification research note. Updated product markdown to match what is actually shipped on `meta-cto`, and aligned Factory validation. ### What changed
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:39:12.793Z
+Timestamp: Sunday, Oct 25, 2026, 9:39 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 89cb85df-f428-4076-a6a5-92c348856cc9
-
-Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
-
-Agent: Production deploy **`dpl_3Hmbro2oVsyt3CpvVff7gdETKstt`** finished **READY** after ~2.3 minutes (poll 9). It carries **`b9b6973e3`** (FI homepage SEO metadata + request-aware JSON-LD), and **`meta-cto-two.vercel.app`** is already aliased to that deployment.
-
----
----
-Timestamp: 2026-10-26T03:40:11.902Z
-Work: feature-intelligence
-Stage: Build
-Generation: dbcf6d36-0f62-4282-b039-f612ce56381d
 
 Human: no leave feature intelligence as is
 
 create a new initiative for mcp discoverability
 
-Agent: [REDACTED]
+Agent: Creating a new MCP discoverability initiative separate from Feature Intelligence. Checking initiative conventions and existing patterns. Created a **Factory** initiative (Feature Intelligence untouched): **[.agents/flow/initiatives/mcp-discoverability.md](.agents/flow/initiatives/mcp-discoverability.md)** - **Status:** Proposed · **Stage:** Explore
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:41:48.841Z
+Timestamp: Sunday, Oct 25, 2026, 9:41 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 8787b388-d69e-4dc0-a820-c89557ed7099
 
 Human: make sure links betwens docs are updated
 
-Agent: Updated cross-links so **[mcp-discoverability.md](.agents/flow/initiatives/mcp-discoverability.md)** sits in the doc graph and product vs Factory boundaries stay clear.
+Agent: Updating the doc graph: linking the MCP discoverability initiative and restoring the Is Agentic verification section on this branch. Updated cross-links so **[mcp-discoverability.md](.agents/flow/initiatives/mcp-discoverability.md)** sits in the doc graph and product vs Factory boundaries stay clear. ### Factory hub - [factory.md](.agents/flow/factory.md) documentation map
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:43:30.094Z
+Timestamp: Sunday, Oct 25, 2026, 9:42 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 76b7abdc-f31f-4fa4-8f21-d2bba0fc2a89
 
 Human: continue with pending tasks if any
 
-Agent: [REDACTED]
+Agent: Checking repo state and what's still open against the task docs and initiatives. Here is what was still open and what I did. ### Done this turn - Pushed `meta-cto`: `4d324d0e9` (MCP discoverability doc links) and `a0446a4b8` (verification log evening re-check).
 
 ---
+
 ---
-Timestamp: 2026-10-26T03:55:52.764Z
+Timestamp: Sunday, Oct 25, 2026, 9:45 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 032aee2a-7444-4b0e-bac0-2ebcef846dfb
 
-Human: Astra tried connecting to https://meta-cto-two.vercel.app/ but couldn’t verify MCP access yet. Please use Flow explore to investigate, then Flow plan, build, and review to resolve any confirmed gaps.
+Human: Improve how ready https://meta-cto-two.vercel.app is for agents.
 
-Evidence from Astra:
-- Direct curl failed with “Could not resolve host,” which may be a limitation of Astra’s environment.
-- The Vercel connector returned 403 Forbidden during read_protection_bypass when requesting deployment aliases. This indicates a connector access issue, not proof that the public app or MCP endpoint is broken.
-- Web retrieval couldn’t access the homepage or the guessed /mcp path.
-- No MCP initialize handshake or tools/list succeeded. The actual MCP endpoint remains unverified.
+Current Is Agentic score: 74/100 (Is Agentic readiness model based on Ora audit evidence).
 
-Review the meta-cto branch and deployed configuration. Find the actual MCP route and transport, check public reachability and authentication requirements, and test initialize → notifications/initialized → tools/list → one safe read-only tools/call against the deployment. Verify that the request reaches the intended Eve agent where applicable; homepage availability alone is insufficient.
+Implement the following fixes in priority order (failures first, then warnings):
 
-Separate application defects from Vercel protection, connector permissions, and client networking limitations. Don’t disable security to make the test pass. If access requires an account configuration change, tell me exactly what to change and why.
+1. OpenAPI spec published (Essential, Failed)
+Evidence: No OpenAPI/Swagger specification found
+Recommended fix: Publish an OpenAPI (Swagger) specification at `/openapi.json` or `/api/openapi.yaml.` This is how agents understand your API surface automatically.
+Current result: Failed.
 
-Check discovery documentation and connection instructions so an external MCP client can find the correct endpoint and authentication method. Distinguish direct MCP protocol access from installing the server as a ChatGPT connector; don’t promise that pasting the homepage URL connects ChatGPT automatically.
+2. JSON error responses (Essential, Failed)
+Evidence: API does not return JSON error responses (or no API detected)
+Recommended fix: Return structured JSON error responses with error codes, messages, and resolution hints. Agents can't parse HTML error pages.
+Current result: Failed.
 
-Follow Flow conventions, update the relevant product and architecture documentation, and add focused MCP/API regression tests for confirmed defects. No UI testing for this task.
+3. Brand name discoverability (Recommended, Failed)
+Evidence: meta-cto-two.vercel.app was not in the top 10 for "Product feature request triage"
+Recommended fix: Make sure your own domain ranks in the top results when people search your brand together with your main product (for example "Acme payments API"). If it does not, your brand may be too generic, conflict with a more established term, or not yet indexed. Strengthen it by describing your main product clearly in your homepage title and headings, earning press mentions that link to your domain, and avoiding redirect chains that mask your main domain in search results.
+Current result: Failed.
 
-Finish with the exact MCP URL, authentication requirements, deployed verification results, any remaining blockers, and concise instructions Astra can use to retry. Clearly distinguish verified results from assumptions.
+4. Developer portal (Recommended, Failed)
+Evidence: No developer portal found
+Recommended fix: Create a developer portal at `/developers` with API keys, documentation, quickstart guides, and a sandbox environment.
+Current result: Failed.
 
-Agent: Explore complete: production MCP responds correctly; Astra’s failures align with client/network/connector limits, not a broken endpoint. Drafting the Flow plan for documentation, tests, and verification.
+5. CLI tool available (Recommended, Failed)
+Evidence: No CLI tool found
+Recommended fix: Publish an official CLI tool on npm, PyPI, or Homebrew. A CLI lets agents and developers script interactions with your product without building API integrations from scratch.
+Current result: Failed.
+
+6. Public API/docs linked from homepage (Recommended, Failed)
+Evidence: No public API or documentation page linked from homepage
+Recommended fix: Publish API documentation at a discoverable URL (`/docs`, `/api`, `/developers`). Include authentication, endpoints, and example requests.
+Current result: Failed.
+
+7. API schema complexity analysis (Recommended, Failed)
+Evidence: No API schema detected
+Recommended fix: Make your API spec self-describing: a unique operationId and a description on every operation, typed parameters, and response schemas. For GraphQL, a fully typed schema with a documented cost or rate limit reads best.
+Current result: Failed.
+
+8. Organization schema completeness (Recommended, Failed)
+Evidence: No Organization type found in JSON-LD
+Recommended fix: Add Organization JSON-LD that includes both contactPoint (with email/phone and contactType) and address (PostalAddress). This lets AI verify your business legitimacy and answer contact queries.
+Current result: Failed.
+
+9. Trust anchor pages (Recommended, Failed)
+Evidence: No trust anchor pages found with sufficient content (About, Contact, Privacy)
+Recommended fix: Publish real `/about`, `/contact`, and `/privacy` pages with at least 500 characters of content each. These are the pages AI agents check to verify your business is legitimate before recommending you.
+Current result: Failed.
+
+10. Metadata completeness (Recommended, Partial)
+Evidence: Only 1/4 metadata signals present - missing: canonical URL, og:image, og:type
+Recommended fix: Add all four signals to your homepage: <link rel="canonical">, <html lang="...">, <meta property="og:image">, and <meta property="og:type">. Agents use these for entity resolution and attribution.
+Current result: Partial (50%).
+
+11. Function calling compatibility (Recommended, Partial)
+Evidence: MCP manifest found but no OpenAPI spec for function calling
+Recommended fix: Ensure API endpoints have unique operation IDs, typed schemas, and descriptions compatible with LLM function-calling formats.
+Current result: Partial (50%).
+
+Requirements:
+- Inspect the existing codebase before changing files.
+- Follow each published protocol or file format exactly.
+- Preserve existing product behavior and visual design.
+- Add or update tests for every behavior you change.
+- Verify every public endpoint and machine-readable file after implementation.
+- Finish with a concise change summary, verification results, and any remaining recommendations that require product decisions or credentials.
+
+Agent: Implementing agent-readiness fixes on `meta-cto`: inspecting API routes and discoverability surfaces, then applying changes in priority order. Implementing OpenAPI, JSON API errors, developer/trust pages, metadata, and a minimal CLI package.
 
 ---
----
-Timestamp: 2026-10-26T04:00:00.000Z
-Work: mcp-external-access-verification
-Stage: Build
-
-Human: Implement MCP access verification plan — alias, docs, tests, fi --mcp-smoke, verification log.
-
-Agent: Shipped /mcp alias, developers MCP curl guidance, ARCHITECTURE canonical URL, route-level MCP tests (19 pass), fi mcp-smoke script; production /api/mcp verified; /mcp alias needs deploy.
 
 ---
----
-Timestamp: 2026-10-26T03:57:10.815Z
+Timestamp: Sunday, Oct 25, 2026, 9:45 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: 9434ff95-8143-4ac2-9eeb-fab65c798d5f
 
-Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+Human: Improve how ready https://meta-cto-two.vercel.app is for agents.
 
-To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+Current Is Agentic score: 74/100 (Is Agentic readiness model based on Ora audit evidence).
 
-Agent: ## Task report
+Implement the following fixes in priority order (failures first, then warnings):
+
+1. OpenAPI spec published (Essential, Failed)
+Evidence: No OpenAPI/Swagger specification found
+Recommended fix: Publish an OpenAPI (Swagger) specification at `/openapi.json` or `/api/openapi.yaml.` This is how agents understand your API surface automatically.
+Current result: Failed.
+
+2. JSON error responses (Essential, Failed)
+Evidence: API does not return JSON error responses (or no API detected)
+Recommended fix: Return structured JSON error responses with error codes, messages, and resolution hints. Agents can't parse HTML error pages.
+Current result: Failed.
+
+3. Brand name discoverability (Recommended, Failed)
+Evidence: meta-cto-two.vercel.app was not in the top 10 for "Product feature request triage"
+Recommended fix: Make sure your own domain ranks in the top results when people search your brand together with your main product (for example "Acme payments API"). If it does not, your brand may be too generic, conflict with a more established term, or not yet indexed. Strengthen it by describing your main product clearly in your homepage title and headings, earning press mentions that link to your domain, and avoiding redirect chains that mask your main domain in search results.
+Current result: Failed.
+
+4. Developer portal (Recommended, Failed)
+Evidence: No developer portal found
+Recommended fix: Create a developer portal at `/developers` with API keys, documentation, quickstart guides, and a sandbox environment.
+Current result: Failed.
+
+5. CLI tool available (Recommended, Failed)
+Evidence: No CLI tool found
+Recommended fix: Publish an official CLI tool on npm, PyPI, or Homebrew. A CLI lets agents and developers script interactions with your product without building API integrations from scratch.
+Current result: Failed.
+
+6. Public API/docs linked from homepage (Recommended, Failed)
+Evidence: No public API or documentation page linked from homepage
+Recommended fix: Publish API documentation at a discoverable URL (`/docs`, `/api`, `/developers`). Include authentication, endpoints, and example requests.
+Current result: Failed.
+
+7. API schema complexity analysis (Recommended, Failed)
+Evidence: No API schema detected
+Recommended fix: Make your API spec self-describing: a unique operationId and a description on every operation, typed parameters, and response schemas. For GraphQL, a fully typed schema with a documented cost or rate limit reads best.
+Current result: Failed.
+
+8. Organization schema completeness (Recommended, Failed)
+Evidence: No Organization type found in JSON-LD
+Recommended fix: Add Organization JSON-LD that includes both contactPoint (with email/phone and contactType) and address (PostalAddress). This lets AI verify your business legitimacy and answer contact queries.
+Current result: Failed.
+
+9. Trust anchor pages (Recommended, Failed)
+Evidence: No trust anchor pages found with sufficient content (About, Contact, Privacy)
+Recommended fix: Publish real `/about`, `/contact`, and `/privacy` pages with at least 500 characters of content each. These are the pages AI agents check to verify your business is legitimate before recommending you.
+Current result: Failed.
+
+10. Metadata completeness (Recommended, Partial)
+Evidence: Only 1/4 metadata signals present - missing: canonical URL, og:image, og:type
+Recommended fix: Add all four signals to your homepage: <link rel="canonical">, <html lang="...">, <meta property="og:image">, and <meta property="og:type">. Agents use these for entity resolution and attribution.
+Current result: Partial (50%).
+
+11. Function calling compatibility (Recommended, Partial)
+Evidence: MCP manifest found but no OpenAPI spec for function calling
+Recommended fix: Ensure API endpoints have unique operation IDs, typed schemas, and descriptions compatible with LLM function-calling formats.
+Current result: Partial (50%).
+
+Requirements:
+- Inspect the existing codebase before changing files.
+- Follow each published protocol or file format exactly.
+- Preserve existing product behavior and visual design.
+- Add or update tests for every behavior you change.
+- Verify every public endpoint and machine-readable file after implementation.
+- Finish with a concise change summary, verification results, and any remaining recommendations that require product decisions or credentials.
+
+Agent: Investigating the `/developers` 500 error — likely blocking the developer-portal audit check. Preview deployment was aliased to production without `DATABASE_URL`, breaking the app. Triggering a production deployment with production environment variables. ## Task report — Completed · Build **Outcome:** Agent-readiness work is on `meta-cto` (`f17becd3f`, plus follow-ups such as `d27b19fc9` on the branch). Production **https://meta-cto-two.vercel.app** runs deployment **`dpl_2q3xvUWKtAyu7cqBxjNM4WVkSXjr`** (commit `f17becd`) with production env (including `DATABASE_URL`). A brief window where a **preview** build was aliased to `meta-cto-two` caused HTML 500s (`DATABASE_URL is required` in `FiSh
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 10:00 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: regenerate prompts.txt again from this session transcript, you have a script for it
+
+Agent: Updated rebuild-from-transcript.mjs to splice pre-session history from origin/meta-cto with all transcript turns; regenerated prompts.txt (84 session blocks, 1822 lines). Prior run used obsolete markers and truncated the log.
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 10:01 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: and finish any pending work git commit push all changes
+
+Agent: Committed regenerated prompts.txt and generalized rebuild-from-transcript.mjs; pushed meta-cto. No other pending code changes beyond prompt log tooling.
+
+---
+---
+Timestamp: 2026-10-26T04:00:55.494Z
+Work: feature-intelligence
+Stage: Build
+Generation: 8af7a49e-4fd5-4c5e-9f24-2828ba53e472
+
+Human: regenerate prompts.txt again from this session transcript, you have a script for it
+
+Agent: ## Task report — Completed · setup
 
 ---
