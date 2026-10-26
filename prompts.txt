@@ -1009,3 +1009,13 @@ Human: review tasks and spec,make sure evrything is fully implemented already
 Agent: Documentation marks tasks complete; evidence shows stale browser verification and a few partial acceptance criteria. Creating a verification plan.
 
 ---
+---
+Timestamp: 2026-10-26T01:22:00.000Z
+Work: feature-intelligence
+Stage: Ship
+
+Human: when git push everything, make sure prod db has the latest migrations and seed data, test mpc calls and use browser agent to verify it all works on vercel
+
+Agent: Pushed meta-cto (604965ed0 docs, 99a9b83b3 dynamic FI layout). Synced Vercel production DATABASE_URL to Neon meta-cto-fi; migrate+seed (500/50). Neon MCP list_projects, run_sql, inspect_database OK. Promoted preview to production; agent-browser on meta-cto-gaboesquivel.vercel.app shows Triage 50 and open queue 50.
+
+---
