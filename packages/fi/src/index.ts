@@ -1,6 +1,7 @@
 export { getDb, loadRootEnv } from "./db/get-db";
 export { computeInsights } from "./metrics/compute-insights";
 export { getInsights } from "./insights/get-insights";
+export type { InsightsRangePreset } from "./insights/insights-range";
 export { listTriageQueue } from "./queue/list-triage-queue";
 export { recordPmReviewStarted } from "./queue/record-pm-review";
 export { setDisposition } from "./queue/set-disposition";

@@ -16,7 +16,7 @@ export const resolveInsightsRange = ({
   const to = computedAt;
   if (preset === "all") {
     return {
-      from: null as Date | null,
+      from: null as string | null,
       preset,
       to: to.toISOString(),
     };
