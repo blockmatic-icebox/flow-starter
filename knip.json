@@ -73,7 +73,10 @@
     "postgres",
     "zod",
     "ai",
-    "eve"
+    "eve",
+    "@openuidev/lang-core",
+    "@typesafe-ai/sdk",
+    "is-agentic"
   ],
   "ignoreBinaries": ["simple-git-hooks", "gitleaks", "osv-scanner", "deepsec"]
 }

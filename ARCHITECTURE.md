@@ -85,4 +85,10 @@ Repo root `agent/` with `withEve` in [`apps/web/next.config.ts`](apps/web/next.c
 
 ## Vercel (`flow-starter` project)
 
-Set **Root Directory** to `apps/web` and **Framework** to Next.js so [`apps/web/vercel.json`](apps/web/vercel.json) install/build commands apply. The assessment **`meta-cto`** project should ignore branch `simple` (Ignored Build Step) so preview deploys do not run Eve against the lean starter. `apps/web` lists `@openuidev/lang-core` so Eve authored-module builds resolve GenUI imports.
+**Root Directory** `apps/web`, **Framework** Next.js — install/build from [`apps/web/vercel.json`](apps/web/vercel.json). Preview deploys track branch **`simple`**.
+
+**Neon:** dedicated project `flow-starter` (`falling-morning-81472258`, `aws-us-east-2`). Link via Vercel Marketplace **Neon** (accept terms in dashboard if CLI prompts) so `DATABASE_URL` / `DATABASE_URL_UNPOOLED` sync to the project; migrations run in [`apps/web/scripts/vercel-build.mjs`](apps/web/scripts/vercel-build.mjs) when `DATABASE_URL` is set. GenUI compose does not require Postgres.
+
+**`meta-cto`:** Ignored Build Step skips branch `simple` so Eve assessment builds do not run on the lean starter.
+
+`apps/web` lists `@openuidev/lang-core` so Eve authored-module builds resolve GenUI imports.
