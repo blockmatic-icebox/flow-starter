@@ -1,11 +1,11 @@
 # Simplified Flow — Product-First Experiment PRD
 
 **Date:** 2026-10-26  
-**Status:** Draft v7 — proposed experiment; not implemented or independently verified  
+**Status:** Draft v8 — proposed experiment; not implemented or independently verified  
 **Repository:** `gaboesquivel/flow-factory`  
 **Working branch:** Fresh `kiss` based on an inspected `meta-cto` commit; do not delete/reset an existing branch without explicit owner action  
 **Companion:** [Flow Factory postmortem](flow-postmortem.md)  
-**Replaces:** Earlier Addy-led Flow Reset / lean agentic starter workflow drafts as the _active experiment proposal_. Their product/technical insights remain historical context.
+**Replaces:** Earlier Addy-led Flow Reset / lean agentic starter workflow drafts as the *active experiment proposal*. Their product/technical insights remain historical context.
 
 ## 1. Decision and experiment goal
 
@@ -19,24 +19,24 @@ This is not a benchmark of agents, an Addy-vs-Matt comparison, or an autonomous 
 
 ### Why this change
 
-The postmortem found a reusable starter, agent-first thinking, agent/MCP TDD and conversational access promising. The largest gaps were oversized scope, process/eval experimentation during delivery, unexamined assumptions, missing comparison with existing products, ambiguous taxonomy, incomplete journeys, weak UX validation, and unrealistic sample requests. The next experiment must protect time for **human product judgment** instead of optimizing the workflow itself.
+The postmortem found a reusable starter, agent-first thinking, agent/MCP TDD and conversational access promising. The largest gaps were oversized scope, process/eval experimentation during delivery, unexamined assumptions, missing comparison with existing products, ambiguous taxonomy, incomplete journeys, weak UX validation, and unrealistic sample requests. The next experiment must protect time for **human product judgment** instead of optimizing the workflow itself. The established boilerplate should make technical defaults discoverable so prompts can emphasize **what** the user needs, while execution tools make outcomes observable.
 
 ## 2. Scope and guardrails
 
 ### In scope
 
-- Inspect current code, runtime, branch, skills and prior decisions before modifying them. Preserve viable starter code and security/stack constraints.
+- Inspect current code, runtime, branch, skills and prior decisions before modifying them. Preserve viable starter code and security/stack constraints. Treat established boilerplate conventions as defaults, not an excuse to stop questioning product choices.
 - Install/configure only the **relevant Matt skills and their stated dependencies**, with GitHub Issues as the tracker. Verify actual client support rather than inferring installation from a lockfile.
 - Document the human operating experience in the root `README.md` and keep `AGENTS.md` small (navigation and a few cross-cutting product principles). No custom Flow skill or phase router.
 - Use Matt's discovery, domain modeling, optional sourced research, prototyping, specs, tickets, implementation/TDD, code review and retrospective methods **when the task warrants them**.
 - Maintain short, accurate `PRODUCT.md`, `DESIGN.md`, and `ARCHITECTURE.md` as the agent's current-state entry points; link them to GitHub issues, PRs and applicable decision records.
 - Build one **end-to-end, agent/MCP-first vertical slice** in a single coherent example product, with realistic personas and seed data; test through an actual supported client.
-- Proactively delegate bounded research, implementation and review where useful; run parallel implementation only when dependencies and client isolation make it safe.
+- Proactively delegate bounded research, implementation and review where useful; run parallel implementation only when dependencies and client isolation make it safe. Make the local software-development lifecycle operable and observable with the fewest trusted tools.
 - Record consequential decisions and product evidence in the existing skill conventions, with a **single decision sequence across product/design/architecture** (no PDR/ADR taxonomy split).
 
 ### Out of scope
 
-A new Flow workflow engine; mandatory project-init command; automatic skill routing; custom subagent roles; new eval/self-improvement infrastructure; automatic documentation rewriting; a second task system; mandatory metrics/business case or visual prototype for every headless feature; all assessment features implemented simultaneously; broad UI/browser automation suites merely to grade the process.
+A new Flow workflow engine; mandatory project-init command; automatic skill routing; custom subagent roles; new eval/self-improvement infrastructure; automatic documentation rewriting; a second task system; mandatory metrics/business case or visual prototype for every headless feature; all assessment features implemented simultaneously; broad UI/browser automation suites merely to grade the process; installing every possible CLI, connector or MCP server in every agent client; a universal cross-client tool abstraction.
 
 **Preserve useful parts of the original agentic-starter technical vision** (Eve, Jev, AI SDK, OpenUI Lang, MCP Apps, shared contracts, `repo/ui`, focused agent/MCP tests) when verified and relevant. This workflow experiment is not authorization to rebuild every technical capability or to remove baseline protections.
 
@@ -47,7 +47,7 @@ README.md           # Human setup, Matt workflow guide, real skills and concrete
 AGENTS.md           # Short pointers to current docs, tracker and relevant conventions
 PRODUCT.md          # Current intended users, core jobs/capabilities, priority, success signals
 DESIGN.md           # Current user journeys and interaction principles; visual system if relevant
-ARCHITECTURE.md     # Verified modules, API/MCP/agent/data flow, boundaries, run/test commands
+ARCHITECTURE.md     # Verified system boundaries, run/test/inspect commands, integration and auth notes
 GLOSSARY.md         # Created lazily if resolved shared domain terms justify it (Matt convention)
 docs/adr/           # Numbered durable decisions, product + design + technical in one sequence
 .github/            # GitHub tracker configuration only if needed by the chosen skills
@@ -83,7 +83,7 @@ Before a meaningful change, the main agent reads relevant current-state summarie
 
 ## 4. How a human uses the selected Matt workflow
 
-The root README should explain what is installed, what is **declared but not installed**, which commands are manually invoked, and what happens automatically _inside a loaded skill_. Skills are not globally loaded just because they appear in a manifest. Use only verified names supported in the chosen client.
+The root README should explain what is installed, what is **declared but not installed**, which commands are manually invoked, and what happens automatically *inside a loaded skill*. Skills are not globally loaded just because they appear in a manifest. Use only verified names supported in the chosen client.
 
 | Situation | Matt skill | Result and proportional rule |
 | --- | --- | --- |
@@ -91,16 +91,16 @@ The root README should explain what is installed, what is **declared but not ins
 | Large unclear effort spanning sessions | `/wayfinder` | Decision map on tracker; **only when genuinely too foggy/large for one session**, not a standard kickoff |
 | Outside evidence could change a decision | `research` | Background subagent with sourced findings; choose relevant existing **products**, not only APIs |
 | Interaction/state/design uncertainty needs firsthand evidence | `/prototype` | Throwaway logic or UI experiment, reviewed by the human; link validated learning |
-| Decided work will span sessions | `/to-spec` | One GitHub spec issue synthesizing _decisions already made_, not a substitute for discovery |
+| Decided work will span sessions | `/to-spec` | One GitHub spec issue synthesizing *decisions already made*, not a substitute for discovery |
 | Multi-session spec needs implementable slices | `/to-tickets` | Native child tickets and blocking graph; question every proposed ticket's demonstrable outcome |
 | One small, clear change | `/implement` | Skip spec/ticket ceremony; test and review proportionally |
 | Independent tickets and safe worktree support | `/implement-spec` | Parallel implementers across ready blockers; integrates in one branch, with review; not useful without true concurrent isolated workers |
 | Analyze a hard bug | `/diagnosing-bugs` | Tight reproducer and regression evidence before changing behavior |
-| Examine results and improve the agent environment | `/retro` | Review _actual_ failures and propose targeted navigation/checks; no autonomous self-improvement loop |
+| Examine results and improve the agent environment | `/retro` | Review *actual* failures and propose targeted navigation/checks; no autonomous self-improvement loop |
 
 Matt's main chain is generally **`grill-with-docs → to-spec → to-tickets → implement / implement-spec → review → retro`**, but only for work needing that much coordination. Keep discovery → spec → ticket decomposition in one context where practical; don't use a new session simply to satisfy a stage. TDD/review are driven by implementation skills; verify they actually ran. The skill docs, not this table, are authoritative for command and dependency details.
 
-**Important operational safeguards:** `ready-for-agent` on a _parent spec_ must not cause an AFK worker to implement the entire spec. Dispatch only actual implementation tickets. Native dependency relationships may not reflect tickets whose code has landed on an integration branch but whose issues remain open; the coordinator needs to track successfully merged work. Isolated worktrees don't prevent shared-file semantic conflicts or guarantee untracked database fixtures exist. Test `implement-spec` on a small graph before relying on it under a deadline.
+**Important operational safeguards:** `ready-for-agent` on a *parent spec* must not cause an AFK worker to implement the entire spec. Dispatch only actual implementation tickets. Native dependency relationships may not reflect tickets whose code has landed on an integration branch but whose issues remain open; the coordinator needs to track successfully merged work. Isolated worktrees don't prevent shared-file semantic conflicts or guarantee untracked database fixtures exist. Test `implement-spec` on a small graph before relying on it under a deadline.
 
 ### README example prompts
 
@@ -109,13 +109,46 @@ Matt's main chain is generally **`grill-with-docs → to-spec → to-tickets →
 - “Our scope is settled. Use `to-spec` to publish the agreed task-creation/triage journey to GitHub, then `to-tickets` if the work needs multiple independent sessions. Keep the first demonstrable MCP path small.”
 - “Implement the first unblocked issue, verify it through an actual MCP client, and report technical checks separately from user-journey verification.”
 
+### Agent-operable local SDLC: capabilities before prompts
+
+The point of *making the SDLC legible* is **tool access plus observable feedback**, not increasingly long prompts. For a relevant task, an agent should be able to discover what exists, start the local system, observe failures, implement a change, run tests, exercise the real application interface, inspect effects and report evidence. Use the smallest existing interface that exposes each capability:
+
+| Capability | Prefer | Evidence that it works |
+| --- | --- | --- |
+| Setup and lifecycle | Documented `pnpm`/project scripts, local services, database setup, official CLIs | A fresh coding session can install approved dependencies and start the application without undocumented steps |
+| GitHub work | Authenticated official `gh` CLI / supported GitHub integration | Can read the relevant spec/tickets, create or inspect PRs and link verified results |
+| API, agent and MCP behavior | Project tests; MCP Inspector or equivalent protocol client; application MCP tools | A real request, tool response, error path and associated trace/request ID are observed |
+| Application state and failures | Structured process logs, test output and scoped read-only database inspection | Can correlate a request with persisted/retrieved state; failures remain visible instead of being silently skipped |
+| Deployed behavior (when in scope) | Official deployment CLI/API and appropriately scoped runtime logs | Verifies the deployed endpoint independently of local success; never assume local success proves deployment |
+| Real client experience | Actual supported ChatGPT/Cursor/Claude/other client for the feature being delivered | Human or agent observes the complete user journey, including correction/recovery, *in that client* |
+
+Start with **one primary local coding client** and one representative end-to-end journey. Verify portability selectively in Cursor, Codex, Claude Code and Gemini CLI where their actual shell/MCP/worktree capabilities permit; do not assume identical installation, authorization or automatic skill loading. **Eve is the application agent runtime**, not a drop-in local coding harness. Its typed tools and supported MCP/managed connections serve application workflows; client tool invocation and **MCP App UI rendering are separate compatibility tests**.
+
+### Trusted installation and authentication
+
+- **Discover before installing.** Inspect available executables, versions, trusted project dependencies and native MCP/plugin integrations. Prefer official maintained CLIs over custom wrappers. Install only what a real task needs; get approval before unfamiliar binaries, installers or risky global changes. Do not blindly run `curl | sh`, `npx` from unverified sources, or unreviewed package lifecycle scripts.
+- **Treat dependencies as executable code.** Preserve lockfiles and verified provenance; consider pinned versions, pnpm dependency build-script approval and release-age controls where supported. Avoid claims that a package is safe merely because it is popular or signed. The repo's chosen CI/security controls remain authoritative.
+- **Use the right identity.** For interactive local tools use supported browser-based OAuth/SSO or native CLI login with least-privilege scopes; use short-lived **OIDC federated workload identity** for CI/cloud agents *only where the target provider supports it*. OAuth user login is not automatically OIDC workload federation, and OIDC does not make software supply-chain compromise impossible.
+- **Keep secrets out of prompts, repository and artifacts.** Use approved OS/provider credential stores or managed connections, scoped to the action. Never print tokens in logs or issue comments; don't grant agents production credentials by default. Access to production logs, customer content and databases must be authorized and appropriately redacted.
+- **Require explicit approval for consequential writes:** production deployment, publishing, billing actions, secret or permission changes, destructive database mutations and customer communications. Prefer read-only inspection until a task genuinely requires more.
+
+`ARCHITECTURE.md` documents **actual tested run/inspect commands, local services, test seams and auth boundaries**, not a universal list of tools that may or may not be installed. `README.md` provides a short human setup. `AGENTS.md` links to them and instructs the agent to prefer supported official tooling and never claim an unexecuted verification step. Do **not** add a new Flow tool-installation skill, MCP wrapper, hook framework or blanket permissions policy for this trial.
+
+### Outcome-first prompts and proof of completion
+
+When the starter already fixes the stack, prompts should lead with **actor, job, desired observable outcome, constraints and verification** rather than dictating internal file placement or implementation steps. Agents should still challenge incompatible contracts or unsafe assumptions rather than blindly following the template. Use prototypes or small comparison tools to explore **several** plausible UX, domain or seeded-data options where a decision requires firsthand comparison, instead of endless serial rewrites.
+
+An implementation is complete only to the extent of its **observed evidence**. Each meaningful issue/PR report distinguishes: **Implemented** (diff/PR and contract impact), **Verified** (specific checks actually run, observed outputs and reproducible walkthrough), and **Unverified** (client, state, failure path, accessibility or user value still unknown). Passing unit tests does not prove MCP usability; passing MCP protocol tests does not prove MCP App rendering or end-to-end triage. An agent's assertion, an unrun command, fabricated log, or fabricated screenshot is **not evidence**. Review disproportionately risky interfaces, data migrations, permissions, side effects and high-blast-radius changes; keep routine low-risk code review proportional.
+
+**Example local outcome-first task:** “Using the starter's existing architecture, let a realistic user create a task from a supported MCP client, retrieve what was persisted, correct a mistake and see the final state. Show the tests, actual client/tool calls, relevant trace and database evidence, and anything you could not verify.”
+
 ## 5. Product-first habits that should steer the skills
 
-**This is the only intentional value-added guidance**, not an additional skill or mandatory questionnaire. Before a substantial product choice or initial spec, consider these questions proportionately:
+**This is product-judgment guidance within Matt's workflow**, not an additional skill, mandatory questionnaire, or new process phase. Before a substantial product choice or initial spec, consider these questions proportionately:
 
 1. **User and job:** Who is the actor and what concrete job/benefit should they achieve? Which 1–3 journeys matter first, across agent chat, MCP, API or web?
 2. **Existing solutions:** What real products already solve something similar? Which workflows, patterns, shortcomings, and architectural constraints are relevant? Ask a research agent to investigate when the answer could change the solution; do not perform routine competitive theatre.
-3. **Language and model:** What do _task_, _request_, _triage_, _severity_, _status_, _confirmation_ and _publication_ mean here? Are relationships and state changes agreed? Challenge inconsistent terms and capture **only confirmed vocabulary**.
+3. **Language and model:** What do *task*, *request*, *triage*, *severity*, *status*, *confirmation* and *publication* mean here? Are relationships and state changes agreed? Challenge inconsistent terms and capture **only confirmed vocabulary**.
 4. **Experience:** For the first user journey, what does the person say/do, what does the system return, how can they inspect/correct it, and what happens on failure? A headless client counts. When visual UI is part of the outcome, ask for references and prototype genuinely different directions before significant implementation.
 5. **Evidence and success:** What is a falsifiable success condition now? A prototype may target successful completion and reliable behavior; do not invent revenue metrics. If business or product metrics are material, research and record why those ones matter.
 6. **Realistic scenarios and seed data:** Choose **one coherent example product**, distinct personas with actual goals and language, and believable requests covering normal, ambiguous and failure cases. Inspect suggestions and fixtures for robotic numbering, internal demo phrasing and accidental JPEG/PNG/file references. Generated Faker records are not automatically realistic.
@@ -147,11 +180,12 @@ A database migration or isolated MCP handler can be a valid **technical spike**,
 1. **Inspect** current `meta-cto`, repository contracts, available Matt skills, and real client/`gh`/worktree capabilities. Record the branch source commit and leave old branches untouched unless separately authorized.
 2. **Configure the tracker** using Matt's `setup-matt-pocock-skills` and its GitHub issue/label conventions. Scope GitHub access correctly; do not publish confidential assessment content to a public issue. Verify native sub-issue/blocking support in the actual environment.
 3. **Simplify human/agent guidance**: root README explains the real workflow; AGENTS.md is a short navigation map; maintain current-state PRODUCT/DESIGN/ARCHITECTURE based on verified facts. Remove legacy Flow routing, duplicate tasks/spec directories and obsolete eval infra **only after assessing dependencies**, not via blind deletion.
-4. **Select one believable product scenario** for a realistic task-creation and triage demo. Have a product conversation via `grill-with-docs`; resolve terminology with the human. Do focused product-solution research and a logic/UI prototype only where genuine uncertainty warrants it. Review example prompts and persona/seed-data realism before implementation.
-5. **Settle the scope** and define the essential jobs and observable acceptance. If multi-session, publish a GitHub spec issue with `/to-spec`, then generate **only useful tracer-bullet** sub-issues with `/to-tickets`; review dependencies and avoid layer-only or over-fragmented tickets. For single-session work, use `/implement` directly.
-6. **Implement a real headless vertical slice**, using TDD and real MCP client verification. Proactively delegate bounded independent work and test `implement-spec` on a small independent ticket graph only if the client can provide safe parallel worktrees. Stop rather than launching unbounded review/fix loops.
-7. **Review product quality and documentation** in the implementation PR: accurate seed/persona examples, complete user journey, errors/recovery, issue and decision links, and affected current-state root documents. Verify separately what was tested, what was observed, and what remains incomplete.
-8. **Run `retro` once** on the concrete experience, capturing failures and low-cost improvements to navigation, checks, skills usage or review practices. Do not automatically implement a new methodology or self-healing harness.
+4. **Prove the local toolchain** with a fresh coding session: discover approved CLIs and MCP access, follow documented startup, authenticate through supported least-privilege methods, run focused tests, inspect a tool call, logs and safe persisted state. Report unavailable capabilities and permissions rather than silently bypassing them.
+5. **Select one believable product scenario** for a realistic task-creation and triage demo. Have a product conversation via `grill-with-docs`; resolve terminology with the human. Do focused product-solution research and a logic/UI prototype only where genuine uncertainty warrants it. Review example prompts and persona/seed-data realism before implementation.
+6. **Settle the scope** and define the essential jobs and observable acceptance. If multi-session, publish a GitHub spec issue with `/to-spec`, then generate **only useful tracer-bullet** sub-issues with `/to-tickets`; review dependencies and avoid layer-only or over-fragmented tickets. For single-session work, use `/implement` directly.
+7. **Implement a real headless vertical slice**, using TDD and actual MCP-client verification: observe input, tool response, application logs, persisted/retrieved state and user-visible result or failure where access permits. Proactively delegate bounded independent work and test `implement-spec` on a small independent ticket graph only if the client can provide safe parallel worktrees. Stop rather than launching unbounded review/fix loops.
+8. **Review product quality and documentation** in the implementation PR with Implemented / Verified / Unverified evidence: accurate seed/persona examples, complete user journey, errors/recovery, issue and decision links, and affected current-state root documents. Verify separately what was tested, what was observed, and what remains incomplete.
+9. **Run `retro` once** on the concrete experience, capturing failures and low-cost improvements to navigation, checks, skills usage or review practices. Do not automatically implement a new methodology or self-healing harness.
 
 ### Acceptance criteria
 
@@ -169,15 +203,22 @@ A database migration or isolated MCP handler can be a valid **technical spike**,
 | A10 | A non-impact fix incurs no ceremonial docs/issue creation; a multi-session feature demonstrates the GitHub spec/tickets flow without over-decomposition. |
 | A11 | The owner conducts a firsthand product-journey review and records UX/data-quality issues separately from code/test pass results. |
 | A12 | One concise retrospective explains what improved or failed without launching another agent-evaluation/self-improvement system. |
+| A13 | A fresh local coding session uses documented **approved** startup, tests and inspection tools; unavailable CLI/MCP/auth capabilities are reported explicitly and there is no silent bypass or arbitrary installer execution. |
+| A14 | The feature report links actual issue/PR changes to reproducible tool requests, test outcomes, logs and scoped persisted/retrieved state; lists incomplete verification separately. No simulated evidence is presented as observed proof. |
+| A15 | Local authentication prefers native OAuth/SSO for humans and supported short-lived OIDC federation for workloads; secrets are not exposed, install/build scripts are controlled and consequential writes require approval. |
+| A16 | One primary client demonstrates the full intended workflow; a second client is checked only if useful, with separate reporting for MCP tool support versus MCP App UI rendering. |
 
 ## 8. Risks and decisions we are deliberately not automating
 
-- **GitHub issue drift:** spec issues are editable snapshots. Preserve consequential revisions in issue discussion/new spec or ADR; root summaries reflect accepted _current_ behavior, not whatever code last changed.
+- **GitHub issue drift:** spec issues are editable snapshots. Preserve consequential revisions in issue discussion/new spec or ADR; root summaries reflect accepted *current* behavior, not whatever code last changed.
 - **Matt skill prerequisites and portability:** `grill-with-docs` needs `grilling` + `domain-modeling`; `implement-spec` needs actual isolated concurrent workers; not every tool/client can honor every slash command. Verify setup rather than assuming it.
 - **Parent spec dispatch:** Matt's `to-spec` may label the parent spec `ready-for-agent`; ensure AFK workers target actual implementation tickets only.
 - **Over-decomposition and shared files:** never create sub-issues merely to parallelize code layers. Review ticket demo paths, blockers, shared contracts, naming and database fixtures before dispatch.
 - **Product validation versus execution evidence:** impressive test counts or a passing evaluation harness do not prove usefulness, realistic seeded data, working triage or good UX. Human observes the outcome.
 - **Sensitive assessment materials:** a public GitHub repository may expose issues and attached specs. Use private issues/repos or redact/seek permission for confidential contents.
+- **Local security and package risk:** malicious packages can execute through dependency installation, and broad credential scopes magnify their impact. OIDC improves credential posture where supported but cannot attest code safety. Avoid unverified installers and inappropriate permissions; no security incident is alleged in this project.
+- **Client-specific capabilities:** MCP compatibility, remote OAuth, shell access, worktree isolation, and MCP App rendering vary by host and version. Test exactly what is available; Eve runtime connections are not coding-client shell access.
+- **Evidence quality:** logs, tests, MCP transcripts and DB checks can be missing or misleading; correlate request IDs and outcomes, disclose unavailable evidence, and do not fabricate certainty.
 - **Limited time:** protect discovery and real-client validation; drop secondary features before compromising the main journey. An incomplete milestone is reported as incomplete.
 
 ## 9. References
