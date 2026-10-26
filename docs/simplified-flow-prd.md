@@ -1,9 +1,11 @@
 # Simplified Flow — Product-First Experiment PRD
 
+> Historical experiment proposal. The accepted [portable skills decision](decisions/0002-portable-flow-skills.md) supersedes the no-Flow-entry-point and `docs/adr/` choices below. Current conventions are in [.agents/flow/flow.md](../.agents/flow/flow.md). Other proposed product work is not implied by this change.
+
 **Date:** 2026-10-26  
-**Status:** Draft v8 — proposed experiment; not implemented or independently verified  
+**Status:** Implementation in progress on branch **`simple`** (Matt skills lockfile, README workflow guide, legacy Flow local skills removed); experiment acceptance criteria not yet independently verified  
 **Repository:** `gaboesquivel/flow-factory`  
-**Working branch:** Fresh `kiss` based on an inspected `meta-cto` commit; do not delete/reset an existing branch without explicit owner action  
+**Working branch:** **`simple`** (from inspected `meta-cto` baseline); do not delete/reset an existing branch without explicit owner action  
 **Companion:** [Flow Factory postmortem](flow-postmortem.md)  
 **Replaces:** Earlier Addy-led Flow Reset / lean agentic starter workflow drafts as the _active experiment proposal_. Their product/technical insights remain historical context.
 
@@ -234,4 +236,4 @@ A database migration or isolated MCP handler can be a valid **technical spike**,
 - [`domain-modeling`](https://github.com/mattpocock/skills/blob/main/skills/engineering/domain-modeling/SKILL.md)
 - [`retro`](https://github.com/mattpocock/skills/blob/main/skills/engineering/retro/SKILL.md)
 
-**Status note:** This document specifies an experiment. It does not claim that Matt's skills have been installed, that a GitHub graph has been created, that the `kiss` branch has been reset, or that the assessment has passed a complete end-to-end test. No repository or branch modifications are authorized by this draft alone.
+**Status note:** Skills setup and human workflow documentation are landing on **`simple`** per the checklist in §7 step 1–3. GitHub tracker configuration (`setup-matt-pocock-skills`), product vertical slice, and acceptance criteria A1–A16 remain to be executed and verified in follow-on work.

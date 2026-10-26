@@ -41,8 +41,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Flow local prompt logs (.agents/flow/prompts.txt never commit; root prompts.txt tracked on meta-cto)
+# Flow local prompt logs
 .agents/flow/prompts.txt
+prompts.txt
 .agents/flow/local/
 
 # Misc
@@ -64,14 +65,16 @@ __dev
 .deepsec/data/**/runs/
 .deepsec/findings/
 
-# Agent and editor local installations (first-party Flow skills are tracked)
+# Agent and editor local skill installations
 .agents/skills/*
+.agents/.agents/
+# Portable first-party skills
 !.agents/skills/flow/
 !.agents/skills/flow/**
-!.agents/skills/flow-eval/
-!.agents/skills/flow-eval/**
-!.agents/skills/flow-improve/
-!.agents/skills/flow-improve/**
+!.agents/skills/f-extract/
+!.agents/skills/f-extract/**
+!.agents/skills/f-ship/
+!.agents/skills/f-ship/**
 .cursor/*
 !.cursor/agents/
 !.cursor/agents/**

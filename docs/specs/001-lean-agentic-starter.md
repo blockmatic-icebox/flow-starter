@@ -10,7 +10,7 @@ Source baseline: `meta-cto` @ `9afd416fa0093d49cdef114ea6837a50e8010b26`
 
 ## Purpose
 
-Experiment on the `simple` branch, created from `meta-cto` in the existing repository, with a much smaller development contract and a clean, reusable agentic web starter. Replace the custom Flow skill workflow with a lean **`FLOW.md`** at the repository root that supplies project overrides to Addy Osmani’s engineering skills. This is a branch experiment, not a fork.
+Experiment on the `simple` branch, created from `meta-cto` in the existing repository, with a much smaller development contract and a clean, reusable agentic web starter. Replace the custom Flow skill router with **Matt Pocock’s published engineering skills** (installed per [`.agents/skills-lock.json`](../../.agents/skills-lock.json); human guide in [README.md](../../README.md) and [docs/simplified-flow-prd.md](../simplified-flow-prd.md)). This is a branch experiment, not a fork.
 
 The starter should let a developer begin an agentic prototype immediately: define API and MCP capabilities first, then expose them through a website, chat and an MCP App. Its reference experience accepts a UI request and generates a creative composition using only **`@repo/ui`** (`packages/ui`) components and realistic sample data.
 
@@ -20,9 +20,9 @@ The primary user is Gabo, with solo developers and small teams as the broader au
 
 The present experiment addresses two sources of friction: too many workflow concepts and documents, and demo-specific code that must be removed before useful product work starts.
 
-The smallest useful outcome is the `kiss` branch with:
+The smallest useful outcome is the `simple` branch with:
 
-- One understandable workflow: **Spec → Tasks → Build → Review → Ship**.
+- One understandable workflow: **discovery → spec (GitHub) → tickets → implement → review → ship**, using Matt skills proportionally (see README).
 - A runnable web starter and MCP App demonstrating the same UI-generation capability.
 - Eve runtime, Jev classification, OpenUI generation and the repository UI library connected end to end.
 - No application authentication, authorization system or database requirement.
@@ -44,7 +44,7 @@ Follow-up refinement, local interaction details and the web chat/preview arrange
 
 | ID | Requirement | Observable acceptance |
 | --- | --- | --- |
-| P1 | Create `kiss` from `meta-cto`; remove the old Flow demo and assessment-specific product behavior from the delivered starter. | Record the source commit above; all implementation lands on `kiss`, leaving `meta-cto` unchanged. The starter has no portfolio, assessment or old Flow-demo dependency in its user flow. |
+| P1 | Create `simple` from `meta-cto`; remove the old Flow demo and assessment-specific product behavior from the delivered starter. | Record the source commit above; all implementation lands on `simple`, leaving `meta-cto` unchanged. The starter has no portfolio, assessment or old Flow-demo dependency in its user flow. |
 | P2 | Define capability contracts before interface implementation. | API and MCP adapters invoke shared capability logic with compatible inputs, outputs and errors; behavior is not implemented separately per surface. |
 | P3 | Use the website’s GenUI technologies and relevant engineering standards. | Eve, Jev, AI SDK and OpenUI responsibilities are explicit and exercised. Exact dependency choices are verified against the reference during implementation. |
 | P4 | Generate only with components exported by `@repo/ui`. | Registered components and layout primitives support varied compositions; unknown components and invalid props produce a usable error or recovery state. No arbitrary React code execution is required. |
@@ -57,9 +57,9 @@ Follow-up refinement, local interaction details and the web chat/preview arrange
 
 “No database” applies to the prototype’s application/data setup. Eve’s actual session/runtime infrastructure requirements must be checked rather than assuming that the runtime itself has no persistence.
 
-### Factory baseline divergence (`kiss` only)
+### Factory baseline divergence (`simple` only)
 
-[Factory ADR 0001](../../.agents/flow/decisions/adr/0001-agentic-architecture.md) assumes Postgres/Drizzle as the reusable baseline. On **`kiss` only**, this spec and updated product `ARCHITECTURE.md` document removal of application database requirements for the prototype. Do not rewrite accepted Factory ADR status on `meta-cto` to claim the Factory baseline changed globally.
+[Factory ADR 0001](../../.agents/flow/decisions/adr/0001-agentic-architecture.md) assumes Postgres/Drizzle as the reusable baseline. On **`simple` only**, this spec and updated product `ARCHITECTURE.md` document removal of application database requirements for the prototype. Do not rewrite accepted Factory ADR status on `meta-cto` to claim the Factory baseline changed globally.
 
 ## Technical direction and reference
 
@@ -77,23 +77,18 @@ The website currently constrains generation to portfolio experiences and approve
 
 Preserve functional schema validation and server-side handling of provider credentials as basic implementation boundaries; do not turn them into an authentication or production-hardening project. Exact generation schema, classifier decisions, model selection and interaction bindings belong to implementation discovery within this spec’s scope.
 
-## Lean Flow contract
+## Development workflow (Matt Pocock skills)
 
-**`FLOW.md`** at the repository root will mirror these overrides. Addy’s skills (installed per [`.agents/skills-lock.json`](../../.agents/skills-lock.json)) supply working methods; Flow should not reimplement their procedures.
+Matt’s installed skills supply working methods; do not add a custom Flow phase router or duplicate their procedures. Human operating guide: [README.md](../../README.md#matt-pocock-workflow); experiment PRD: [docs/simplified-flow-prd.md](../simplified-flow-prd.md).
 
-1. **One unit of work:** everything is a task under **`docs/tasks/`**. No separate idea, initiative or epic lifecycle.
-2. **Specs with concise current-state references:** change requirements, reasoning, design considerations, implementation outline and consequential decisions live together in the owning spec. Keep simple `PRODUCT.md`, `ARCHITECTURE.md` and `DESIGN.md` as current-state summaries, updating them when implemented behavior changes. No separate PRD, ADR or duplicated task plan is required. This document is the initial spec.
-3. **Proportional specification:** a small task can contain its own short spec; related tasks reference a shared numbered spec.
-4. **Product thinking:** before substantial work, establish the user, problem, smallest useful outcome, scope and observable acceptance criteria. Reuse known answers; ask only consequential questions.
-5. **Delegation on every task:** the coordinator owns scope, assignment, canonical spec updates, integration and final synthesis. Delegate discovery, research, critique, design, implementation and verification wherever useful.
-6. **Useful concurrency:** parallelize independent assignments up to available capacity; sequence dependencies and avoid overlapping writes. Require concrete findings or artifacts from subagents.
-7. **Independent review:** a reviewer distinct from the implementer checks the work. The coordinator reconciles findings and verifies acceptance before closure.
-8. **Honest execution:** if subagents are unavailable, explicitly report the constraint and do not describe solo work as compliant.
-9. **Continuity:** preserve links among tasks, specs, decision rationale, evidence, reviews and delivered results. A new session must be able to resume unfinished work.
-10. **Proportional delivery:** tests are part of Build and Review. Ship means delivering the agreed result, not necessarily deploying. No repeated approval gates or extra documents by default.
-11. **Agent and MCP TDD:** before implementing or changing agent behavior or MCP contracts, write a focused failing test, implement the smallest passing change, then refactor and rerun relevant checks. Agent tests must verify observable decisions, tool use, outputs and failure handling; MCP tests must exercise actual handlers and protocol contracts. Do not substitute prompt snapshots or mocked success assertions for behavior verification.
+1. **Tracker:** **GitHub Issues** for multi-session specs and child tasks; numbered specs in `docs/specs/` for durable rationale (this file is the initial spec).
+2. **Current-state docs:** keep `PRODUCT.md`, `ARCHITECTURE.md` and `DESIGN.md` as short summaries; update when verified behavior changes; link issues and `docs/adr/` for consequential decisions.
+3. **Proportional ceremony:** small clear work uses `/implement`; large or foggy work uses `grill-with-docs`, `wayfinder`, `to-spec`, and `to-tickets` only when warranted.
+4. **Product thinking:** before substantial work, establish user, problem, smallest useful outcome, scope and observable acceptance. Reuse known answers; ask only consequential questions.
+5. **Delegation:** delegate research, implementation, and review when useful; the integrator owns scope, conflicts, and evidence.
+6. **Honest verification:** distinguish implemented, verified, and unverified outcomes; agent and MCP TDD for behavior and protocol changes (Matt `tdd` skill where appropriate).
 
-On `kiss`, [AGENTS.md](../../AGENTS.md) must resolve agent entrypoints to **FLOW.md** first. [.agents/flow/flow.md](../../.agents/flow/flow.md) may stub-point to **FLOW.md** so Factory lifecycle docs do not compete.
+On `simple`, [AGENTS.md](../../AGENTS.md) points to root contracts and the README workflow section—not a root **`FLOW.md`** or mandatory Addy skill chain.
 
 ## Documentation and retention
 
@@ -107,7 +102,7 @@ Keep the root documents short and useful:
 - `ARCHITECTURE.md`: stack, package boundaries, API/MCP contracts, Eve/Jev/GenUI data flow and test commands or links to their canonical definitions.
 - `DESIGN.md`: theme tokens, typography, spacing, component treatment, responsive layout, interaction and accessibility rules.
 
-These are living references, not immutable specs. Update them with the corresponding code changes and link to the owning numbered spec. Keep setup in README and process overrides in **FLOW.md**. Do not copy full specs or task histories into root documents.
+These are living references, not immutable specs. Update them with the corresponding code changes and link to the owning numbered spec. Keep setup and the Matt workflow guide in **README.md**. Do not copy full specs or task histories into root documents.
 
 ## Default visual direction: Porcelain
 
@@ -136,8 +131,8 @@ Verify text, focus and control contrast against the actual colors and inspect re
 
 ## Implementation outline
 
-1. Inspect `meta-cto`, record its source commit and create `kiss` without disturbing unrelated changes. If `kiss` already exists, inspect and preserve its work rather than resetting it.
-2. Establish lean **FLOW.md**, this numbered spec and concise root reference documents; resolve conflicting agent instructions.
+1. Inspect `meta-cto`, record its source commit and create `simple` without disturbing unrelated changes. If `simple` already exists, inspect and preserve its work rather than resetting it.
+2. Install Matt workflow skills, document the human guide in README, keep this numbered spec and concise root reference documents; resolve conflicting agent instructions.
 3. Remove assessment/Flow-demo content and unnecessary auth, database and browser/E2E scaffolding while preserving reusable agentic capabilities.
 4. Define the shared generation capability and API/MCP contracts. Write failing agent and MCP tests before implementing the affected behavior.
 5. Implement the Porcelain theme in `@repo/ui` and synchronize `DESIGN.md`; connect the registered components and layout primitives to the OpenUI contract.
@@ -180,7 +175,7 @@ Production authentication and authorization; security-hardening scope; real cust
 | Web layout | Chat beside a live preview, with follow-ups updating the current composition. Suggested, not confirmed. |
 | Interaction scope | Local filtering, sorting, forms, tabs and dialogs where the registered components support them. Suggested initial boundary. |
 | Data/session continuity | Seeded Faker data stable across refinements; no application database. Refresh behavior and Eve session storage remain to be settled. |
-| Source commit | Pinned at top of this spec when `kiss` was cut. |
+| Source commit | Pinned at top of this spec when `simple` was cut. |
 | Performance and cost | Measure first; agree budgets before making them release criteria. |
 
 ## Evidence and status
@@ -191,9 +186,9 @@ Production authentication and authorization; security-hardening scope; real cust
 | --- | --- |
 | Spec landed on `meta-cto` | `9e2f85dd4` — `docs/specs/001-lean-agentic-starter.md` only |
 | Assessment product unchanged | FI routes, `@repo/fi`, and assessment docs remain on `meta-cto` |
-| `kiss` implementation | **Not started** — deferred; cut `kiss` from baseline above when Build is authorized |
+| `simple` implementation | **In progress** — Matt skills setup and workflow docs on `simple`; product vertical slice pending |
 | Workflow trials (small-task / shared-spec) | **Not run** — applies when implementation begins |
-| Product checks P1–P10 | **Not applicable** on `meta-cto` until `kiss` Build |
+| Product checks P1–P10 | **Not applicable** on `meta-cto` until `simple` product slice is verified |
 
 Repository verification before push (2026-10-26): `pnpm check-types` exit 0, `pnpm test` exit 0, `pnpm --filter @repo/db db:check` exit 0 (`pnpm qa` knip reports pre-existing unused-export noise unrelated to this spec).
 
@@ -203,5 +198,5 @@ References:
 - [Jev decisions](https://github.com/gaboesquivel/gaboesquivel.com/blob/b1569c24a3cb680732035787be089a54ba05423a/lib/genui/decisions.ts)
 - [OpenUI composition](https://github.com/gaboesquivel/gaboesquivel.com/blob/b1569c24a3cb680732035787be089a54ba05423a/lib/genui/semantic.ts)
 - [Agent standards](https://github.com/gaboesquivel/gaboesquivel.com/blob/b1569c24a3cb680732035787be089a54ba05423a/AGENTS.md)
-- [Addy: planning and task breakdown](https://github.com/addyosmani/agent-skills/blob/main/skills/planning-and-task-breakdown/SKILL.md)
-- [Addy: incremental implementation](https://github.com/addyosmani/agent-skills/blob/main/skills/incremental-implementation/SKILL.md)
+- [Matt Pocock skills](https://github.com/mattpocock/skills)
+- [Simplified Flow experiment PRD](../simplified-flow-prd.md)
