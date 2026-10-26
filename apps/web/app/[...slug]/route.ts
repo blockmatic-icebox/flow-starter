@@ -5,6 +5,25 @@ import { resolveSiteOrigin } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
+const knownPath = (pathname: string) => {
+  if (pathname === "/" || pathname === "/favicon.ico") return true;
+  const prefixes = [
+    "/requests",
+    "/triage",
+    "/insights",
+    "/chat",
+    "/api",
+    "/llms.txt",
+    "/.well-known",
+    "/sitemap.xml",
+    "/markdown",
+    "/eve",
+  ];
+  return prefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
+};
+
 const notFoundMarkdown = (pathname: string, origin: string) =>
   `# Not found
 
@@ -20,10 +39,11 @@ export const GET = async (
   context: { params: Promise<{ slug: string[] }> }
 ) => {
   const { slug } = await context.params;
+  const pathname = `/${slug.join("/")}`;
+  if (knownPath(pathname)) notFound();
+
   const accept = request.headers.get("accept");
   if (!wantsMarkdown(accept)) notFound();
-
-  const pathname = `/${slug.join("/")}`;
   const origin = resolveSiteOrigin(request);
   return markdownResponse(notFoundMarkdown(pathname, origin), 404);
 };

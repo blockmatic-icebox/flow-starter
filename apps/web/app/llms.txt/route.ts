@@ -1,6 +1,6 @@
 import { resolveSiteOrigin } from "@/lib/site-url";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 const body = (origin: string) => `# Feature Intelligence
 
