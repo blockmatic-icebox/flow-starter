@@ -1,7 +1,7 @@
 # Initiative: Feature Intelligence (Meta CTO assessment)
 
 **Status:** Specified · MVP + demo depth + **remediation built** · **Agentic discoverability** planned (ADR/spec draft)  
-**Stage:** Plan — [agentic discoverability tasks](../tasks/feature-intelligence-agentic-discoverability.md) (Build not authorized)  
+**Stage:** Plan ready — [agentic discoverability tasks](../tasks/feature-intelligence-agentic-discoverability.md) (gates G-A0–G-A4; Build not authorized)  
 **Time box:** ~2–3 hours implementation + ~5 min demo
 
 ## Outcome
@@ -90,7 +90,8 @@ Detail: [MVP cut line](#mvp-cut-line-assessment); specs index in [feature-intell
 
 → **[docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md)** — MVP (complete).  
 → **[docs/tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md)** — demo depth (complete).  
-→ **[docs/tasks/feature-intelligence-remediation.md](../tasks/feature-intelligence-remediation.md)** — workflow remediation (**Plan ready**; gates G-R1–G-R5).
+→ **[docs/tasks/feature-intelligence-remediation.md](../tasks/feature-intelligence-remediation.md)** — workflow remediation (complete).  
+→ **[docs/tasks/feature-intelligence-agentic-discoverability.md](../tasks/feature-intelligence-agentic-discoverability.md)** — agentic discoverability + MCP (**Plan ready**).
 
 ## Non-goals
 

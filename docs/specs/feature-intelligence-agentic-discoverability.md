@@ -169,4 +169,4 @@ Add root script: `"agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-meta-cto-two
 
 ## Approval
 
-**Draft** — pending human approval of [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md). **Build** requires explicit authorization after [tasks](../tasks/feature-intelligence-agentic-discoverability.md) Plan approval.
+**Draft** — pending human approval of [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md). **Plan:** [tasks](../tasks/feature-intelligence-agentic-discoverability.md) (gates G-A0–G-A4). **Build** requires explicit authorization after Plan + ADR acceptance.
