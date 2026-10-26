@@ -590,69 +590,6 @@ To-do's from the plan have already been created. Do not create them again. Mark 
 Agent: Prompt log, product contracts, and spec verification are aligned with the assessment MVP; changes are on `meta-cto` and production is deployed.
 
 ---
-Timestamp: 2026-10-25T18:45:00-06:00
-Work: feature-intelligence
-Stage: Explore
-
-Human: Explore realistic 90-day historical seed (~300 requests, 40–60 open triage) and analytics dashboard for Feature Intelligence; refine scope, challenge low-value work, then Specify and Plan without Build.
-
-Agent: Reviewed metrics, schema, seed, and insights UI; user chose dual seed commands and extending /insights with charts; proposed selective data_origin deletes to preserve manual rows, time-bucketed analytics from existing timestamps, honest limits on AI impact claims; awaiting Specify approval to write specs and tasks.
-
----
-Timestamp: 2026-10-25T18:50:00-06:00
-Work: feature-intelligence
-Stage: Explore
-
-Human: Scope tweaks — no data_origin or simulation seed command; single seed:fi at ~500 rows with updated evals; extend insights; no simulation banner; test Neon MCP.
-
-Agent: Revised plan to one destructive 500-row generator with stable anchor IDs for smoke; Neon MCP list_projects OK on meta-cto-fi; still no Build until authorized.
-
----
-Timestamp: 2026-10-25T18:52:00-06:00
-Work: feature-intelligence
-Stage: Specify
-
-Human: Use 500 (total seed volume).
-
-Agent: Locked TOTAL_REQUESTS=500, OPEN_QUEUE_COUNT=50; wrote seed amendment, analytics spec, and demo-depth tasks; initiative index updated; Build not started.
-
----
-Timestamp: 2026-10-25T19:00:00-06:00
-Work: feature-intelligence
-Stage: Specify
-
-Human: Improve demo-depth specs and generate tasks from retrospective gaps.
-
-Agent: Seed v2 manifest tables, analytics north-star scoping and unified getInsights API, demo-depth tasks W1–W6 with SD/AN acceptance IDs; testing and core spec UI cross-links updated.
-
----
-Timestamp: 2026-10-25T19:05:00-06:00
-Work: feature-intelligence
-Stage: Plan
-
-Human: Are tasks with explicit dependencies ready for execution?
-
-Agent: Upgraded demo-depth tasks with per-task Depends on, gates G-D1–G-D6, critical path, and parallel tracks; status ready pending Build authorization.
-
----
-Timestamp: 2026-10-25T19:30:00-06:00
-Work: feature-intelligence
-Stage: Build
-
-Human: Implement demo depth build plan (500 seed, analytics, phase commits).
-
-Agent: Shipped five commits: seed generator, queue sort/smoke, getInsights trends, insights UI, contracts/tasks; pnpm qa and eve smoke green.
-
----
-Timestamp: 2026-10-25T19:45:00-06:00
-Work: feature-intelligence
-Stage: Review
-
-Human: Update root .md files; ensure tasks and specs are complete and consistent.
-
-Agent: Synced PRODUCT, DESIGN, ARCHITECTURE, GLOSSARY; fixed stale seed queue counts and approval lines across specs, initiative, testing, eve agent, and research notes.
-
----
 ---
 Timestamp: 2026-10-26T00:39:03.902Z
 Work: feature-intelligence
@@ -671,7 +608,7 @@ For analytics, prioritize our existing success metrics and help us understand tr
 
 Read the current implementation, product documents, and assessment brief. Help me refine this scope, challenge anything that adds work without improving the demonstration, and ask the important questions. Then work with me through Flow specification and planning so we have an agreed, prioritized implementation plan. Don’t start building yet.
 
-Agent: ## Stage: Explore (complete) → Specify (needs your approval)
+Agent: Completed Explore on demo depth: reviewed current capture, seed, queue, and /insights; proposed 90-day coherent history with substantial open backlog and honest analytics (measured vs proxy); drafted seed and analytics spec directions; held Build until Specify/Plan approval.
 
 ---
 ---
@@ -688,7 +625,7 @@ Human: 1. ok
 6. not needed
 7. test mpc
 
-Agent: ## Revised scope (your decisions)
+Agent: Locked scope per your answers: no data_origin column; single pnpm seed:fi at ~500 rows (evals use that seed); no pnpm seed:fi:simulation; extend /insights for trends; skip simulation banner; verified Neon MCP (list_projects).
 
 ---
 ---
@@ -721,7 +658,7 @@ Generation: d67ad9ca-c266-4bb6-9e97-c744ed664d6f
 
 Human: ok improve the spec and generate the tasks for them
 
-Agent: Updated the demo-depth specs and task checklist from the retrospective. Highlights:
+Agent: Updated feature-intelligence-seed.md and feature-intelligence-analytics.md; added docs/tasks/feature-intelligence-demo-depth.md (W1–W6, acceptance IDs, verification commands).
 
 ---
 ---
@@ -756,7 +693,7 @@ Human: Implement the plan as specified, it is attached for your reference. Do NO
 
 To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
-Agent: Demo depth build is complete on `meta-cto` in **five commits**:
+Agent: Demo depth build complete on meta-cto in five phase commits: deterministic 500-row seed (manifest, anchors, generator, load); listTriageQueue sorted by support with smoke expecting 50 open; getInsights(range) with bucketing/trends; /insights dashboard (90d default); tasks/docs updated. pnpm qa and eve eval smoke passed.
 
 ---
 ---
@@ -767,7 +704,7 @@ Generation: a17c5796-7c0c-444b-9240-766710f03084
 
 Human: update root .md files as required, make sure there arent missing tasks or incomplete specs
 
-Agent: Synced root contracts and chased down stale spec/task references. Here is what changed and what is intentionally left as history.
+Agent: Synced PRODUCT.md, DESIGN.md, ARCHITECTURE.md, GLOSSARY.md; set demo-depth specs to Current/Implemented and tasks to Complete; fixed stale queue counts (8→50) and cross-links in initiative, testing, and eve agent docs.
 
 ---
 ---
@@ -778,6 +715,38 @@ Generation: 84d8b0c8-0a80-4926-80ed-5143f207c470
 
 Human: run all tests again, make fixed, commit and push changes
 
-Agent: All checks passed; docs are committed and pushed.
+Agent: Re-ran pnpm qa (exit 0) and pnpm exec eve eval smoke (4/4); committed spec/contract sync (be832b7ab) and pushed origin/meta-cto.
+
+---
+---
+Timestamp: 2026-10-26T01:02:51.885Z
+Work: feature-intelligence
+Stage: Build
+Generation: b7a987f3-edbc-4df0-8f9f-4c2047acd86d
+
+Human: make sure we push all changes to meta-cto, review local branches for missing work
+
+Agent: meta-cto matched origin after audit; committed remaining prompts.txt (d02d60ace) and pushed. Local main is behind meta-cto with separate unpushed Factory hook commits; old stashes are superseded WIP—not missing demo-depth work.
+
+---
+---
+Timestamp: 2026-10-26T01:03:22.976Z
+Work: feature-intelligence
+Stage: Review
+Generation: fb59313d-16f3-4358-b0a8-e88ba1cf1ebc
+
+Human: ok
+
+Agent: Acknowledged; assessment and demo depth are on origin/meta-cto at d02d60ace.
+
+---
+---
+Timestamp: 2026-10-26T01:04:30.000Z
+Work: feature-intelligence
+Stage: Review
+
+Human: make sure prompts.txt is up date use this session log
+
+Agent: Reconciled prompts.txt with this session transcript: removed duplicate out-of-order coordinator blocks, enriched hook-thin Agent summaries for demo-depth Explore through Ship, deduped ok entry; committing updated log to meta-cto.
 
 ---
