@@ -80,8 +80,10 @@ MVP + demo depth tasks: [feature-intelligence.md](../tasks/feature-intelligence.
 | VT-1–VT-3, VT-5 | Met | — | Testing spec links; 4 smoke evals; fi unit tests |
 | VT-4 | Met | — | W-* checklist (this doc + prior passes) |
 
-## Production deployment (2026-10-25)
+## Production deployment (Vercel `meta-cto`)
 
 - **URL:** https://meta-cto-gaboesquivel.vercel.app
-- **Deployment:** `dpl_G3N4MQfBFixH4prZhdamdVUC8YPK` (Ready), commit `28f8ca91c`
-- **Note:** Vercel Authentication enabled; unauthenticated HTTP may return 403. Sign in to Vercel or use a deployment share link for browser smoke.
+- **Database:** Neon project `meta-cto-fi` — production `DATABASE_URL` synced to pooled endpoint (2026-10-26); `pnpm seed:fi` against that URL yields **500** rows / **50** open queue (Neon MCP `run_sql` verified).
+- **Browser (2026-10-26):** Pre-fix production showed **8** open (static prerender at old build). **`export const dynamic = "force-dynamic"`** on `app/(fi)/layout.tsx` so triage badge and insights read live DB after redeploy.
+- **Access:** Deployment Protection / SSO — use Vercel share link or `vercel curl` for smoke; do not commit share tokens.
+- **Redeploy:** Push `meta-cto` for Git build; CLI `vercel deploy` must run from monorepo root (project `rootDirectory` = `apps/web`).
