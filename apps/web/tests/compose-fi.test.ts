@@ -104,6 +104,7 @@ describe("composeFiQuery", () => {
     const result = await composeFiQuery({
       deps: {
         getInsights: mockInsights(),
+        listRecentDecisions: () => Promise.resolve([]),
         searchRequests: mockSearch([
           sampleRow,
           {
@@ -127,6 +128,7 @@ describe("composeFiQuery", () => {
     const result = await composeFiQuery({
       deps: {
         getInsights: mockInsights(),
+        listRecentDecisions: () => Promise.resolve([]),
         searchRequests: mockSearch([]),
       },
       input: {

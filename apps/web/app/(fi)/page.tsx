@@ -2,7 +2,6 @@ import {
   getDb,
   getInsights,
   listRecentDecisions,
-  listTriageQueue,
   searchRequests,
 } from "@repo/fi";
 import type { Metadata } from "next";
@@ -22,13 +21,14 @@ export const metadata: Metadata = {
 
 export default async function PulsePage() {
   const db = getDb();
-  const [queue, insights, recent, themes, recentDecisions] = await Promise.all([
-    listTriageQueue({ db }),
+  const [insights30d, themes, recent, recentDecisions] = await Promise.all([
     getInsights({ db, range: "30d" }),
-    searchRequests({ db, page: 1, pageSize: 8, sort: "published_at" }),
     getInsights({ db, range: "90d" }),
+    searchRequests({ db, page: 1, pageSize: 8, sort: "published_at" }),
     listRecentDecisions({ db, limit: 8 }),
   ]);
+  const insights = insights30d;
+  const queueCount = insights.openQueueCount;
 
   const topTheme = themes.trends?.themes.at(0);
   const decisionsThisMonth = insights.sample.dispositionWithRationaleCount ?? 0;
@@ -47,7 +47,7 @@ export default async function PulsePage() {
           </dt>
           <dd className="text-2xl font-semibold tabular-nums">
             <Link className="text-primary hover:underline" href="/review">
-              {queue.length}
+              {queueCount}
             </Link>
           </dd>
         </div>

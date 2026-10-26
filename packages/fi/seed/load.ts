@@ -53,10 +53,10 @@ const insertChunks = async <T>(
 };
 
 if (ifEmpty) {
-  const [{ count }] = await db
+  const [countRow] = await db
     .select({ count: drizzleSql<number>`count(*)::int` })
     .from(featureRequest);
-  const n = Number(count ?? 0);
+  const n = Number(countRow?.count ?? 0);
   if (n > 0) {
     console.log(
       `FI seed skipped (if-empty): feature_request already has ${n} rows`

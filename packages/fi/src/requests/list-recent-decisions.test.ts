@@ -1,9 +1,10 @@
+import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import { listRecentDecisions } from "./list-recent-decisions";
+
 describe("listRecentDecisions", () => {
-  it("module exports listRecentDecisions", async () => {
-    const mod = await import("./list-recent-decisions.ts");
-    if (typeof mod.listRecentDecisions !== "function")
-      throw new Error("missing export");
+  it("exports a function", () => {
+    assert.equal(typeof listRecentDecisions, "function");
   });
 });

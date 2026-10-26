@@ -1,5 +1,5 @@
 import type { AppDatabase } from "@repo/db";
-import { getInsights, searchRequests } from "@repo/fi";
+import { getInsights, listRecentDecisions, searchRequests } from "@repo/fi";
 import {
   answerDocument,
   collectionDocument,
@@ -29,8 +29,16 @@ import {
 type GetInsightsInput = Omit<Parameters<typeof getInsights>[0], "db">;
 type SearchRequestsInput = Omit<Parameters<typeof searchRequests>[0], "db">;
 
+type ListRecentDecisionsInput = Omit<
+  Parameters<typeof listRecentDecisions>[0],
+  "db"
+>;
+
 export interface ComposeFiDeps {
   getInsights: (args: GetInsightsInput) => ReturnType<typeof getInsights>;
+  listRecentDecisions: (
+    args: ListRecentDecisionsInput
+  ) => ReturnType<typeof listRecentDecisions>;
   searchRequests: (
     args: SearchRequestsInput
   ) => ReturnType<typeof searchRequests>;
@@ -38,6 +46,7 @@ export interface ComposeFiDeps {
 
 const defaultDeps = (db: AppDatabase): ComposeFiDeps => ({
   getInsights: (args) => getInsights({ ...args, db }),
+  listRecentDecisions: (args) => listRecentDecisions({ ...args, db }),
   searchRequests: (args) => searchRequests({ ...args, db }),
 });
 
@@ -122,7 +131,7 @@ export const composeFiQuery = async ({
     envelope = sectionStackDocument({
       childExpressions: [
         `StatusMessage(${openUiStringLiteral(
-          "Analysis could not complete. Your prompt is preserved below. Review source signals manually or retry when the model is available."
+          "Automated summarization is unavailable. Source signals are listed below for manual review."
         )}, ${openUiStringLiteral("warning")})`,
         `CollectionGrid(${openUiStringLiteral("grid-cards")}, ${openUiStringList(sourceIds)})`,
       ],
@@ -196,8 +205,10 @@ export const composeFiQuery = async ({
       requestId,
     });
   } else if (intent === "monthly-change") {
-    const insights = await fi.getInsights({ range: "30d" });
-    const prior = await fi.getInsights({ range: "90d" });
+    const [insights, prior] = await Promise.all([
+      fi.getInsights({ range: "30d" }),
+      fi.getInsights({ range: "90d" }),
+    ]);
     records.push(
       metricRecord({
         id: "metric:signals-30d",
@@ -232,14 +243,8 @@ export const composeFiQuery = async ({
       requestId,
     });
   } else if (intent === "recent-decisions") {
-    const recent = await fi.searchRequests({
-      pageSize: 12,
-      sort: "published_at",
-    });
-    const decided = recent.items.filter(
-      (r) => r.disposition && r.dispositionRationale
-    );
-    const timelineIds = decided.slice(0, 8).map((r) => {
+    const decided = await fi.listRecentDecisions({ limit: 8 });
+    const timelineIds = decided.map((r) => {
       records.push(
         evidenceRecord({
           excerpt: `${r.disposition?.replaceAll("_", " ")} — ${r.dispositionRationale ?? ""}`,

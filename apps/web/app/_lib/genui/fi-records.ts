@@ -36,7 +36,6 @@ export const evidenceRecord = ({
   excerpt,
   id: evidenceDocId(id),
   kind: "document",
-  revisedAt: undefined,
   title,
   url: `/signals/${id}`,
 });

@@ -146,8 +146,8 @@ export default async function TriagePage({
                     monitoring.
                   </p>
                   <p className="mt-2 text-sm">
-                    {selected.decisionBrief ??
-                      "Compare wording with top duplicate candidates from triage before choosing merge or monitor."}
+                    Compare wording with related signals and duplicate
+                    candidates from triage before choosing merge or monitor.
                   </p>
                 </section>
                 <TriagePanel
@@ -157,7 +157,6 @@ export default async function TriagePage({
                     title: t.title,
                   }))}
                   requestId={selected.id}
-                  variant="inline"
                 />
               </aside>
             </>
