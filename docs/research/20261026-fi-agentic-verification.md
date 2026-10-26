@@ -29,6 +29,20 @@
 
 **Evening re-check:** Same host — markdown negotiation, `/.well-known/mcp` 200, and `llms.txt` canonical URLs still pass; **G-A4** blocked only on Is Agentic cache until Rescan.
 
+## External MCP access re-verification (2026-10-25)
+
+Context: external agent (Astra) could not verify MCP — DNS failure in client environment, Vercel connector 403 on protection-bypass APIs, and probes against homepage or guessed `/mcp`. Re-checked from a standard network:
+
+| Probe | Result |
+| --- | --- |
+| `POST /api/mcp` `initialize` | 200 — `feature-intelligence` |
+| `POST /api/mcp` `tools/list` | 200 — eight tools |
+| `POST /api/mcp` `tools/call` `search_requests` `query: CSV` | 200 — seeded CSV export rows |
+| `POST /api/mcp` `Accept: application/json` only | 406 |
+| `GET /.well-known/mcp/server-card.json` | 200 — endpoint `https://meta-cto-two.vercel.app/api/mcp`, `authentication.required: false` |
+
+**Build follow-up:** `POST /mcp` alias (same handler as `/api/mcp`) ships in repo; production needs deploy from `meta-cto` before alias is live. Canonical URL for clients remains `/api/mcp`.
+
 ## Is Agentic CLI
 
 | Run | `scanned_at` | Score | Notes |

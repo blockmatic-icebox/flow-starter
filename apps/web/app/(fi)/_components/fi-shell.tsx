@@ -3,8 +3,13 @@ import { Badge } from "@repo/ui/components/badge";
 import Link from "next/link";
 
 export const FiShell = async ({ children }: { children: React.ReactNode }) => {
-  const queue = await listTriageQueue({ db: getDb() });
-  const openCount = queue.length;
+  let openCount = 0;
+  try {
+    const queue = await listTriageQueue({ db: getDb() });
+    openCount = queue.length;
+  } catch {
+    // Preview builds and agent-only pages should still render without DATABASE_URL.
+  }
 
   return (
     <div className="bg-background text-foreground min-h-dvh">

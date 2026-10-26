@@ -1445,3 +1445,209 @@ Human: continue
 Agent: Production is live with agentic discoverability on `meta-cto-two.vercel.app`. Three Vercel issues were fixed after the first implementation pass.
 
 ---
+---
+Timestamp: 2026-10-26T03:27:00.000Z
+Work: feature-intelligence
+Stage: Build
+Generation: markdown-negotiation-builder
+
+Human: Fix is-agentic markdown-negotiation-vary on GET / (text/markdown, Vary: Accept, body ≥500 chars) without middleware; commit meta-cto only, no push.
+
+Agent: Hardened homepage markdown via next.config rewrites to /markdown/home, /index.md alias, tighter Accept regex (excludes text/html), contract test for ≥500 chars and Vary. Commit ea0b7a0cd on meta-cto (local, not pushed). Rescan is-agentic after deploy.
+
+---
+---
+Timestamp: 2026-10-26T03:22:00.000Z
+Work: flow-factory + feature-intelligence
+Stage: flow-improve / Build
+Generation: subagent-spinoff
+
+Human: when done use flow improve to add this to is-agentic tooling to the main branch only the required changes for flow factory starter tools. no other additions to main at this point
+
+Agent: Completed factory is-agentic hook on main (`f30f6ffca`, pushed). Spawned parallel workers: main commit fix, verifier audit, prod research, deploy guidance, meta-cto fixes (origin, sitemap test, markdown vary, MCP well-known smoke). Pushed `main` and `meta-cto` (`ea0b7a0cd`). Rescan is-agentic after prod deploy for score update.
+
+---
+---
+Timestamp: 2026-10-26T03:23:00.000Z
+Work: flow-factory + feature-intelligence
+Stage: Build
+Generation: subagent-spinoff-2
+
+Human: spinoff more subagents
+
+Agent: Launched eight subagents (builder/verifier/researcher/deployment); integrated commits and pushed both branches.
+
+---
+---
+Timestamp: 2026-10-26T03:34:00.000Z
+Work: feature-intelligence
+Stage: Build
+Generation: deploy-is-agentic
+
+Human: push to prod and continue; wait for successful vercel deployment before running is agentic again
+
+Agent: Production deploy dpl_BbFJbLjWEG3pZtzSCd9oLhEv5kft READY at ea0b7a0cd; meta-cto-two serves fixed llms/mcp/markdown. is-agentic still 59 — cached report 2026-10-26T02:53:40Z (servedFromCache); needs Rescan on is-agentic.com before CLI reflects fixes.
+
+---
+---
+Timestamp: 2026-10-26T03:27:49.718Z
+Work: feature-intelligence
+Stage: Build
+Generation: 65ecc346-0082-42c2-a742-cead4592cd3a
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: Homepage markdown negotiation for Is Agentic is in place without `middleware.ts` (Eve conflict). `next.config.ts` rewrites `GET /` when `Accept` prefers markdown (and does not list `text/html`) to `/markdown/home`, which returns `text/markdown`, `Vary: Accept`, and a body over 500 characters. `/index.md` points at the same content. HTML for normal browser `Accept` values is unchanged.
+
+---
+---
+Timestamp: 2026-10-26T03:27:56.149Z
+Work: feature-intelligence
+Stage: Build
+Generation: 857f19ea-544c-4c84-a51a-c1c2c080631b
+
+Human: when done use flow improve to add this to is-agentic tooling to the main branch only the required changes for flow factory starter tools. no other additions to main at this point
+
+Agent: [REDACTED]
+
+---
+---
+Timestamp: 2026-10-26T03:30:37.158Z
+Work: feature-intelligence
+Stage: Build
+Generation: 0d7ed693-e45b-4f21-852d-c5afdc2d1549
+
+Human: Perform any necessary follow-up actions in response to the subagent completion above. If no follow-up work is needed, no further action is required. If you mention an agent or subagent in your response, link it with the `[Name](id)` Don't use generic label such as `[agent]`, `[worker]`, or `[subagent]`. For cloud subagents, when the agent has edited code, link to `[Review](bc-id#changes)`, or, if you know the exact added and deleted line counts, `[Review +A −D](bc-id#changes)`, replacing A and D with those counts. Never write A or D literally. Use `[Try Live](bc-id#desktop)` only when the agent used computer use. Don't repeat the same confirmation every time.
+
+Agent: [REDACTED]
+
+---
+---
+Timestamp: 2026-10-26T03:34:09.020Z
+Work: feature-intelligence
+Stage: Build
+Generation: 549712da-f469-4f7b-9204-f0ac225fa77c
+
+Human: push to prod and continue
+
+Agent: [REDACTED]
+
+---
+---
+Timestamp: 2026-10-26T03:36:22.797Z
+Work: feature-intelligence
+Stage: Build
+Generation: be360baf-27e7-4980-84a1-d78112c3f447
+
+Human: continue with the pending tasks and make sure we delivered the full spec
+
+Agent: Here is how the repo lines up today.
+
+---
+---
+Timestamp: 2026-10-26T03:38:21.240Z
+Work: feature-intelligence
+Stage: Build
+Generation: a35237ff-fa2d-448d-9d63-295dcf123cec
+
+Human: make sure all md files are up to date
+
+Agent: [REDACTED]
+
+---
+---
+Timestamp: 2026-10-26T03:39:12.793Z
+Work: feature-intelligence
+Stage: Build
+Generation: 89cb85df-f428-4076-a6a5-92c348856cc9
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: Production deploy **`dpl_3Hmbro2oVsyt3CpvVff7gdETKstt`** finished **READY** after ~2.3 minutes (poll 9). It carries **`b9b6973e3`** (FI homepage SEO metadata + request-aware JSON-LD), and **`meta-cto-two.vercel.app`** is already aliased to that deployment.
+
+---
+---
+Timestamp: 2026-10-26T03:40:11.902Z
+Work: feature-intelligence
+Stage: Build
+Generation: dbcf6d36-0f62-4282-b039-f612ce56381d
+
+Human: no leave feature intelligence as is
+
+create a new initiative for mcp discoverability
+
+Agent: [REDACTED]
+
+---
+---
+Timestamp: 2026-10-26T03:41:48.841Z
+Work: feature-intelligence
+Stage: Build
+Generation: 8787b388-d69e-4dc0-a820-c89557ed7099
+
+Human: make sure links betwens docs are updated
+
+Agent: Updated cross-links so **[mcp-discoverability.md](.agents/flow/initiatives/mcp-discoverability.md)** sits in the doc graph and product vs Factory boundaries stay clear.
+
+---
+---
+Timestamp: 2026-10-26T03:43:30.094Z
+Work: feature-intelligence
+Stage: Build
+Generation: 76b7abdc-f31f-4fa4-8f21-d2bba0fc2a89
+
+Human: continue with pending tasks if any
+
+Agent: [REDACTED]
+
+---
+---
+Timestamp: 2026-10-26T03:55:52.764Z
+Work: feature-intelligence
+Stage: Build
+Generation: 032aee2a-7444-4b0e-bac0-2ebcef846dfb
+
+Human: Astra tried connecting to https://meta-cto-two.vercel.app/ but couldn’t verify MCP access yet. Please use Flow explore to investigate, then Flow plan, build, and review to resolve any confirmed gaps.
+
+Evidence from Astra:
+- Direct curl failed with “Could not resolve host,” which may be a limitation of Astra’s environment.
+- The Vercel connector returned 403 Forbidden during read_protection_bypass when requesting deployment aliases. This indicates a connector access issue, not proof that the public app or MCP endpoint is broken.
+- Web retrieval couldn’t access the homepage or the guessed /mcp path.
+- No MCP initialize handshake or tools/list succeeded. The actual MCP endpoint remains unverified.
+
+Review the meta-cto branch and deployed configuration. Find the actual MCP route and transport, check public reachability and authentication requirements, and test initialize → notifications/initialized → tools/list → one safe read-only tools/call against the deployment. Verify that the request reaches the intended Eve agent where applicable; homepage availability alone is insufficient.
+
+Separate application defects from Vercel protection, connector permissions, and client networking limitations. Don’t disable security to make the test pass. If access requires an account configuration change, tell me exactly what to change and why.
+
+Check discovery documentation and connection instructions so an external MCP client can find the correct endpoint and authentication method. Distinguish direct MCP protocol access from installing the server as a ChatGPT connector; don’t promise that pasting the homepage URL connects ChatGPT automatically.
+
+Follow Flow conventions, update the relevant product and architecture documentation, and add focused MCP/API regression tests for confirmed defects. No UI testing for this task.
+
+Finish with the exact MCP URL, authentication requirements, deployed verification results, any remaining blockers, and concise instructions Astra can use to retry. Clearly distinguish verified results from assumptions.
+
+Agent: Explore complete: production MCP responds correctly; Astra’s failures align with client/network/connector limits, not a broken endpoint. Drafting the Flow plan for documentation, tests, and verification.
+
+---
+---
+Timestamp: 2026-10-26T04:00:00.000Z
+Work: mcp-external-access-verification
+Stage: Build
+
+Human: Implement MCP access verification plan — alias, docs, tests, fi --mcp-smoke, verification log.
+
+Agent: Shipped /mcp alias, developers MCP curl guidance, ARCHITECTURE canonical URL, route-level MCP tests (19 pass), fi mcp-smoke script; production /api/mcp verified; /mcp alias needs deploy.
+
+---
+---
+Timestamp: 2026-10-26T03:57:10.815Z
+Work: feature-intelligence
+Stage: Build
+Generation: 9434ff95-8143-4ac2-9eeb-fab65c798d5f
+
+Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: ## Task report
+
+---

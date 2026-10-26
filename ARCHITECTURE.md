@@ -102,7 +102,8 @@ Root `pnpm test` includes `@repo/fi`.
 | Root directory | `apps/web` |
 | Build | `pnpm install --frozen-lockfile --filter web...` then `pnpm --filter web build` ([`apps/web/vercel.json`](apps/web/vercel.json); no `ignoreCommand` — always build) |
 | Runtime | `next build --webpack`; `sourceFilesOutsideRootDirectory` enabled for repo-root [`agent/`](agent/) via `withEve` |
-| Production URL | https://meta-cto-gaboesquivel.vercel.app |
+| Production URL (public MCP / Is Agentic) | https://meta-cto-two.vercel.app |
+| Other aliases | e.g. `meta-cto-gaboesquivel.vercel.app` — may use Deployment Protection; prefer **meta-cto-two** for unauthenticated MCP and external auditors ([browser verification](docs/research/20261025-fi-browser-verification.md)) |
 
 Verify: `vercel inspect <deployment-url> -S gaboesquivel` after push. If Vercel Git **Production Branch** remains `main`, trigger production from `meta-cto` via dashboard or deployment API.
 

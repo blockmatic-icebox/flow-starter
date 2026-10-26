@@ -37,7 +37,7 @@ Any standard agent client (Claude, ChatGPT, Cursor, etc.) can:
 | AI catalog | `/.well-known/ai-catalog.json` | Agent discovery |
 | MCP server card | `/.well-known/mcp/server-card.json` | MCP clients |
 | Registry manifest | `/.well-known/mcp.json` | Directories, Is Agentic |
-| MCP transport | `POST /api/mcp` (+ `GET /api/mcp/server-card` if required by SDK) | Streamable HTTP clients |
+| MCP transport | `POST /api/mcp` (canonical); `POST /mcp` convenience alias (same handler) | Streamable HTTP clients |
 | Eve (existing) | `/eve/v1/...` | Eve-native hosts |
 
 **Canonical production host:** `https://meta-cto-two.vercel.app` (or project primary alias). Docs and well-known URLs must use the **same host** clients connect to.
@@ -176,7 +176,13 @@ curl -sS -i -H 'Accept: text/markdown' "https://<host>/" | head -20
 curl -sS -i -H 'Accept: text/html' "https://<host>/" | head -20
 curl -sS -i -H 'Accept: text/markdown' "https://<host>/no-such-agent-path" | head -20
 curl -sS "https://<host>/.well-known/mcp/server-card.json" | head
+curl -sS -X POST "https://<host>/api/mcp" \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"probe","version":"1"}}}'
 ```
+
+Streamable HTTP requires `Accept: application/json, text/event-stream` on MCP POST; `Accept: application/json` alone returns **406**.
 
 ---
 

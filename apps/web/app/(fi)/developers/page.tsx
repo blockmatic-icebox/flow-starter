@@ -2,8 +2,26 @@ import Link from "next/link";
 
 import {
   fiDevelopersIntro,
+  fiMcpCanonicalUrl,
+  fiMcpClientGuidance,
+  fiMcpConnectionSummary,
   fiProductTagline,
 } from "@/lib/fi-agent-surfaces-content";
+
+const mcpInitializeCurl = `curl -sS -X POST '${fiMcpCanonicalUrl}' \\
+  -H 'Content-Type: application/json' \\
+  -H 'Accept: application/json, text/event-stream' \\
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"your-client","version":"1.0.0"}}}'`;
+
+const mcpToolsListCurl = `curl -sS -X POST '${fiMcpCanonicalUrl}' \\
+  -H 'Content-Type: application/json' \\
+  -H 'Accept: application/json, text/event-stream' \\
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'`;
+
+const mcpSearchCurl = `curl -sS -X POST '${fiMcpCanonicalUrl}' \\
+  -H 'Content-Type: application/json' \\
+  -H 'Accept: application/json, text/event-stream' \\
+  -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"search_requests","arguments":{"query":"CSV","limit":3}}}'`;
 
 export default function DevelopersPage() {
   return (
@@ -34,6 +52,24 @@ export default function DevelopersPage() {
           README for publish targets).
         </li>
       </ol>
+      <h2>MCP connection</h2>
+      <p>{fiMcpConnectionSummary}</p>
+      <p>{fiMcpClientGuidance}</p>
+      <h3>Smoke probes (curl)</h3>
+      <p>Initialize:</p>
+      <pre>
+        <code>{mcpInitializeCurl}</code>
+      </pre>
+      <p>List tools:</p>
+      <pre>
+        <code>{mcpToolsListCurl}</code>
+      </pre>
+      <p>
+        Read-only tool call (<code>search_requests</code>):
+      </p>
+      <pre>
+        <code>{mcpSearchCurl}</code>
+      </pre>
       <h2>API catalog</h2>
       <ul>
         <li>
@@ -44,7 +80,7 @@ export default function DevelopersPage() {
         </li>
         <li>
           <code>POST /api/mcp</code> — MCP tools (search, triage, mutations on
-          demo host)
+          demo host); alias <code>POST /mcp</code>
         </li>
         <li>
           <code>POST /api/chat</code> — ask-only streaming chat (no tools)
@@ -54,8 +90,8 @@ export default function DevelopersPage() {
       <p>
         This deployment is the assessment sandbox: seeded data, no API keys
         required for MCP on the public alias. Use <code>search_requests</code>{" "}
-        with query <code>CSV</code> to verify connectivity against seeded rows
-        FR-001 and FR-002.
+        with argument <code>query: &quot;CSV&quot;</code> to verify connectivity
+        against seeded export rows.
       </p>
       <h2>Human docs</h2>
       <p>

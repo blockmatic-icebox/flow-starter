@@ -3,6 +3,12 @@ export const fiProductTagline =
 
 export const fiDevelopersIntro = `Feature Intelligence exposes a Streamable HTTP MCP server, OpenAPI 3.1 description, and ask-only chat for agents and integrators. The assessment demo on meta-cto-two runs without end-user login; mutation tools are open on the public host for demonstration only. Production adopters must gate writes behind authentication per Factory security guidance.`;
 
+export const fiMcpCanonicalUrl = "https://meta-cto-two.vercel.app/api/mcp";
+
+export const fiMcpConnectionSummary = `Canonical MCP URL: ${fiMcpCanonicalUrl} (Streamable HTTP, JSON-RPC over POST). Convenience alias: POST /mcp on the same host reuses the same handler; discovery documents list /api/mcp only. No bearer token on the public assessment alias. Required request headers: Content-Type: application/json and Accept: application/json, text/event-stream — clients that send Accept: application/json alone receive HTTP 406. MCP tools call @repo/fi directly (same validation as in-repo Eve tools); they do not use Eve HTTP sessions at /eve/v1.`;
+
+export const fiMcpClientGuidance = `MCP-capable clients (Cursor, Claude Desktop, MCP Inspector, custom hosts): configure a remote HTTP MCP server with URL ${fiMcpCanonicalUrl} and the Accept header above. ChatGPT or other products that offer a separate “connector” or GPT action flow are not the same as pasting the site homepage — you must add a remote MCP server entry when the product supports Streamable HTTP MCP. OpenAPI at /openapi.json documents tool schemas for function-calling; live invocation uses POST /api/mcp.`;
+
 export const aboutBody = `Feature Intelligence is a Meta CTO assessment product built on Flow Factory. It helps product managers and researchers turn unstructured customer, prospect, support, and internal feedback into published feature requests with duplicate detection, AI-assisted triage, a prioritized review queue, and disposition workflows (merge, monitor, decline, needs discussion) backed by rationale and north-star metrics on the insights dashboard.
 
 The web application serves human personas through a home router, discover and support flows, inline triage, and an ask-only chat that does not mutate domain data. Automation uses the same @repo/fi domain layer through Eve tools in the repository or through the public MCP endpoint on this deployment. Agents should read /llms.txt for when-to-use guidance and /.well-known/mcp/server-card.json for transport metadata.
