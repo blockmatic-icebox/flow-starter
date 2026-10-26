@@ -20,6 +20,8 @@ import {
   sectionStackPropsSchema,
   statusMessagePropsSchema,
   timelineViewPropsSchema,
+  evidenceQuotePropsSchema,
+  rankedSignalListPropsSchema,
 } from "../contract/schemas";
 import { useGenuiRecords } from "./record-context";
 import {
@@ -34,6 +36,8 @@ import {
   SearchResultsView,
   StatusMessageView,
   TimelineViewUi,
+  EvidenceQuoteView,
+  RankedSignalListView,
 } from "./views";
 
 const AnswerComponent = ({
@@ -266,6 +270,44 @@ const StatusMessage = defineComponent({
   props: statusMessagePropsSchema,
 });
 
+const EvidenceQuoteComponent = ({
+  props,
+}: {
+  props: z.infer<typeof evidenceQuotePropsSchema>;
+}) => {
+  const records = useGenuiRecords();
+  return <EvidenceQuoteView documentId={props.documentId} records={records} />;
+};
+
+const RankedSignalListComponent = ({
+  props,
+}: {
+  props: z.infer<typeof rankedSignalListPropsSchema>;
+}) => {
+  const records = useGenuiRecords();
+  return (
+    <RankedSignalListView
+      entityIds={props.entityIds}
+      records={records}
+      reviewHref={props.reviewHref}
+    />
+  );
+};
+
+const EvidenceQuote = defineComponent({
+  component: EvidenceQuoteComponent,
+  description: "Evidence quote.",
+  name: "EvidenceQuote",
+  props: evidenceQuotePropsSchema,
+});
+
+const RankedSignalList = defineComponent({
+  component: RankedSignalListComponent,
+  description: "Ranked signal list.",
+  name: "RankedSignalList",
+  props: rankedSignalListPropsSchema,
+});
+
 export const flowGenuiReactLibrary = createLibrary({
   components: [
     Answer,
@@ -280,6 +322,8 @@ export const flowGenuiReactLibrary = createLibrary({
     InteractiveForm,
     FilePreview,
     StatusMessage,
+    EvidenceQuote,
+    RankedSignalList,
   ],
   root: "Answer",
 });

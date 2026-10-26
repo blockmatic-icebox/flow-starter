@@ -8,6 +8,8 @@ export default defineConfig({
   ignorePatterns: [
     ...core.ignorePatterns,
     ".deepsec/**",
+    ".eve/**",
+    ".output/**",
     "packages/ui/src/components/**",
   ],
   overrides: [

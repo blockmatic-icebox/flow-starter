@@ -1,6 +1,6 @@
 name: CI
 
-# Local parity: `pnpm ci:local` then `pnpm --dir .agents check` and `pnpm --dir .agents test`
+# Local parity: `pnpm ci:local` (product). Factory: `pnpm ci:factory:local` or workflow_dispatch factory job.
 # Manual on GitHub: `gh workflow run CI`
 
 on:
@@ -52,6 +52,7 @@ jobs:
       - run: pnpm build
 
   factory:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -60,5 +61,5 @@ jobs:
       - uses: ./.github/actions/setup-pnpm
 
       - run: pnpm --dir .agents install
-      - run: pnpm --dir .agents check
+      - run: pnpm --dir .agents check:factory
       - run: pnpm --dir .agents test

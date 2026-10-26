@@ -11,6 +11,7 @@ import {
 } from "node:fs";
 import path from "node:path";
 
+import { envForGitCwd } from "../../tooling/git-env.mjs";
 import { evaluatorGitConfig } from "./git-eval-identity.ts";
 import { packageDirInRepo, repoRoot, worktreeRoot } from "./paths.ts";
 import { buildSubjectIdentity } from "./subject-identity.ts";
@@ -103,7 +104,7 @@ export const runGit = ({
   const result = spawnSync("git", [...configArgs, ...args], {
     cwd,
     encoding: "utf-8",
-    env: env ?? process.env,
+    env: envForGitCwd(cwd, process.env, env),
     maxBuffer: 10 * 1024 * 1024,
   });
   const out = `${result.stdout ?? ""}${result.stderr ?? ""}`;

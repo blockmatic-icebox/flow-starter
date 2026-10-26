@@ -1,23 +1,7 @@
-# Web Starter — Product
+# Product
 
-## Purpose
+This repository is an **agentic**, **MCP-first**, and **API-first** application starter.
 
-Provide the starting application for a product built with Flow Factory.
+It exists so you can prototype interfaces and agent workflows quickly: describe a UI in natural language, get a declarative OpenUI composition rendered with the Porcelain-themed `@repo/ui` library and synthetic data, and expose the same capability over MCP and Eve tools. Postgres tooling is included for when you add real persistence; the GenUI demo does not require a populated database.
 
-## Current scope
-
-The application lives in `apps/web` and inherits the Factory's technical foundation, development workflow, and quality conventions.
-
-It currently provides an application starting point rather than domain-specific product functionality.
-
-## Product development
-
-As the product is explored and specified, maintain its purpose, users, capabilities, scope, and accepted requirements in this document.
-
-Bounded initiatives retain their own detailed requirements and implementation progress.
-
-## Related documents
-
-- [Design](DESIGN.md)
-- [Architecture](ARCHITECTURE.md)
-- [Product decisions](docs/adr/0001-use-flow-factory.md)
+See [ARCHITECTURE.md](ARCHITECTURE.md) for verified commands and boundaries, [DESIGN.md](DESIGN.md) for the Porcelain visual system, and [docs/specs/001-lean-agentic-starter.md](docs/specs/001-lean-agentic-starter.md) for the starter specification.

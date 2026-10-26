@@ -26,7 +26,7 @@ The canonical product documents evolve as the product changes. Agents read the r
 
 **Flow** is the methodology and works independently of any particular technology stack.
 
-**Flow Factory** is an opinionated implementation that combines Flow with a TypeScript development foundation, coding-agent tools, and evaluation infrastructure. See [factory.md](factory.md) for adoption and foundation navigation.
+**Flow Factory** is an opinionated implementation that combines Flow with a TypeScript development foundation, coding-agent tools, and evaluation infrastructure. See [factory.md](factory.md) for adoption and foundation navigation. Active Factory initiatives (for example [MCP discoverability](initiatives/mcp-discoverability.md)) live under [initiatives/](initiatives/).
 
 ## Start using Flow
 

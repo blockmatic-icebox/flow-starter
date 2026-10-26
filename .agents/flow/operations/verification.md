@@ -64,7 +64,7 @@ When behavior is unclear (RSC boundaries, caching, server errors), use `pnpm mcp
 
 ## Is Agentic (optional deploy gate)
 
-When the product ships public agent surfaces (for example MCP, `llms.txt`, or Markdown negotiation on `/`), teams can run the [Is Agentic](https://is-agentic.com/docs) audit against a deployed host:
+When a deployment exposes public agent surfaces (MCP, `llms.txt`, Markdown negotiation on `/`), run the [Is Agentic](https://is-agentic.com/docs) audit against the live host:
 
 ```sh
 AGENTIC_CHECK_URL=<host-without-scheme> pnpm agentic:check
@@ -72,7 +72,9 @@ AGENTIC_CHECK_URL=<host-without-scheme> pnpm agentic:check
 
 `pnpm agentic:check` without `AGENTIC_CHECK_URL` exits with an error; set a deployed public host (no `https://` prefix).
 
-The root script uses the `is-agentic` devDependency. It returns the latest stored report for that host; it does not force a rescan. After material deploy changes, open the host report on [is-agentic.com](https://is-agentic.com) and use **Rescan**, then rerun `pnpm agentic:check`. Product acceptance criteria live in product specs; Flow Factory only provides the CLI hook.
+Factory scope and adoption patterns: [MCP discoverability initiative](../initiatives/mcp-discoverability.md). Product-specific agentic requirements live in `docs/specs/` and `docs/adr/` separately. Flow Factory only provides the CLI hook.
+
+The root script uses the `is-agentic` devDependency. It returns the latest stored report for that host; it does not force a rescan. After material deploy changes, open the host report on [is-agentic.com](https://is-agentic.com) and use **Rescan**, then rerun `pnpm agentic:check`.
 
 ## Product readiness vs methodology eval
 

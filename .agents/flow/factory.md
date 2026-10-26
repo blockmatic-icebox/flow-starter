@@ -95,6 +95,7 @@ Full Factory ADR index: [decisions/adr/](decisions/adr/).
 | GenUI contracts | [specs/genui.md](specs/genui.md) |
 | Product and design (adopter) | [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md) |
 | Browser verification | [verification.md](operations/verification.md) |
+| MCP and agent discoverability (starter) | [initiatives/mcp-discoverability.md](initiatives/mcp-discoverability.md) |
 | Parallel worktrees | [worktrees.md](operations/worktrees.md) |
 | Adaptive delegation | [delegation.md](operations/delegation.md) |
 

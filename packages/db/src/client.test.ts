@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createDb, resolveDatabaseConnection } from "./client.js";
+import { createDb, resolveDatabaseConnection } from "./client";
 
 const localUrl = "postgres://neon:npg@localhost:5432/neondb?sslmode=require";
 const remoteUrl = "postgres://app:secret@db.example:5432/app?sslmode=require";
@@ -23,7 +23,7 @@ test("production URL configuration keeps certificate verification", () => {
   assert.equal(resolved.ok, true);
   if (resolved.ok) {
     assert.equal(resolved.insecureTls, false);
-    assert.equal(resolved.ssl, undefined);
+    assert.equal(resolved.ssl, "require");
   }
 });
 
@@ -53,9 +53,14 @@ test("does not disable TLS from a hostname alone", () => {
     env: { DATABASE_TLS_INSECURE_LOCAL: "1", NODE_ENV: "development" },
     url: remoteUrl,
   });
-  for (const resolved of [productionLocal, developmentLocal, flaggedRemote]) {
+  for (const resolved of [productionLocal, developmentLocal]) {
     assert.equal(resolved.ok, true);
     if (resolved.ok) assert.equal(resolved.insecureTls, false);
+  }
+  assert.equal(flaggedRemote.ok, true);
+  if (flaggedRemote.ok) {
+    assert.equal(flaggedRemote.insecureTls, false);
+    assert.equal(flaggedRemote.ssl, "require");
   }
 });
 

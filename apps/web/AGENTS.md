@@ -1,12 +1,12 @@
 # Product application (`apps/web`)
 
-Minimal Next.js starter for a new product. No Flow Agent, GenUI demo, or demo APIs.
+Next.js studio: prompt + sidebar chat + GenUI preview. MCP at `/api/mcp`, compose at `/api/genui/compose`. Eve root agent at repo `agent/`.
 
-- Colocate route code under `app/<route>/` (see ADR 0009).
-- Shared UI from `@repo/ui`; optional database via `@repo/db`.
-- Local hostname: `web.localhost` (Portless).
+- Colocate route code under `app/<route>/`.
+- Shared UI from `@repo/ui`; GenUI from `@repo/genui`.
+- Local hostname: `app.localhost` (portless).
 
-Root `AGENTS.md` and `ARCHITECTURE.md` own monorepo-wide rules.
+Root [AGENTS.md](../../AGENTS.md) and [ARCHITECTURE.md](../../ARCHITECTURE.md) own monorepo-wide rules.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

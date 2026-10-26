@@ -27,6 +27,7 @@ These checks are described in [the security model](.agents/flow/security/securit
 - Tenant isolation and product data.
 - Production secrets, ingress trust, and deployment configuration.
 - Enabling MCP public access or a bearer token deliberately.
+- **MCP exposure:** Streamable HTTP at `/api/mcp` is off by default until you enable it and configure authentication or read-only tools for production.
 - Reviewing dependencies and responding to advisories after they fork.
 
 ## Disclaimer

@@ -21,4 +21,4 @@ jobs:
       - uses: ./.github/actions/setup-pnpm
 
       - name: Validate PR commits
-        run: node .agents/tooling/checks/check-commits.mjs --range ${{ github.event.pull_request.base.sha }}...${{ github.sha }}
+        run: node .agents/tooling/checks/check-commits.mjs --range ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}

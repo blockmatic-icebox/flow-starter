@@ -1,5 +1,7 @@
 import { spawnSync } from "node:child_process";
 
+import { envForGitCwd } from "../git-env.mjs";
+
 export const runGit = ({
   cwd,
   args,
@@ -10,7 +12,7 @@ export const runGit = ({
   const result = spawnSync("git", args, {
     cwd,
     encoding: "utf-8",
-    env: env ? { ...process.env, ...env } : process.env,
+    env: envForGitCwd(cwd, process.env, env),
     maxBuffer: 20 * 1024 * 1024,
     stdio,
   });

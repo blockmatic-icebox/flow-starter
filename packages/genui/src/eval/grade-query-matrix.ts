@@ -27,9 +27,11 @@ const gradeError = ({
 const gradeCategorySurface = ({
   category,
   envelope,
+  result,
 }: {
   category: QueryMatrixCase["category"];
   envelope: CompositionEnvelope | null;
+  result: ComposeResult;
 }) => {
   if (category === "injection") {
     if (!envelope) {
@@ -54,13 +56,25 @@ const gradeCategorySurface = ({
         reason: "unsupported case missing envelope",
       };
     }
-    if (rootExperienceFromOpenUi(envelope.openuiText) === "StatusMessage") {
-      return { grade: "PASS" as const };
+    if (rootExperienceFromOpenUi(envelope.openuiText) !== "StatusMessage") {
+      return {
+        grade: "FAIL" as const,
+        reason: "unsupported expected StatusMessage",
+      };
     }
-    return {
-      grade: "FAIL" as const,
-      reason: "unsupported expected StatusMessage",
-    };
+    if (result.metadata.outcome !== "failed") {
+      return {
+        grade: "FAIL" as const,
+        reason: "unsupported expected failed outcome",
+      };
+    }
+    if (result.metadata.failureCode !== "unsupported_request") {
+      return {
+        grade: "FAIL" as const,
+        reason: "unsupported expected unsupported_request failure code",
+      };
+    }
+    return { grade: "PASS" as const };
   }
   return null;
 };
@@ -124,8 +138,13 @@ export const gradeQueryMatrixCase = ({
   const categoryGrade = gradeCategorySurface({
     category: matrixCase.category,
     envelope,
+    result,
   });
-  if (categoryGrade && categoryGrade.grade === "FAIL") {
+  if (categoryGrade?.grade === "FAIL") return categoryGrade;
+  if (
+    categoryGrade?.grade === "PASS" &&
+    matrixCase.category === "unsupported"
+  ) {
     return categoryGrade;
   }
 

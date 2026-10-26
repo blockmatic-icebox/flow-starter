@@ -1,5 +1,7 @@
 Date: 2026-10-24
 
+> **Archive notice (`simple` branch):** This document describes the Factory phase workflow. On **`simple`**, use [README — Matt Pocock workflow](../../README.md#matt-pocock-workflow) and [ADR 0002](../../docs/adr/0002-matt-workflow-on-simple.md) instead. Keep this file for Factory parity and `meta-cto` reference.
+
 # Flow — Product development workflow
 
 Version: 0.1
@@ -12,7 +14,7 @@ This file defines workflow conventions for any product using Flow. It does not d
 
 | Topic | Canonical owner |
 | --- | --- |
-| Coordinator entry | [.agents/skills/flow/SKILL.md](../skills/flow/SKILL.md) |
+| Active workflow on `simple` | [Matt workflow guide](../../README.md#matt-pocock-workflow) |
 | Delegation and subagents | [operations/delegation.md](operations/delegation.md) |
 | Parallel worktrees | [operations/worktrees.md](operations/worktrees.md) |
 | Verification | [operations/verification.md](operations/verification.md) |

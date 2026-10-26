@@ -1,6 +1,8 @@
 /** Level 1: controlled deterministic selection. Level 2: declarative multi-section compose. Level 3: open-ended primitive assembly (model). */
 export type CompositionTier = 1 | 2 | 3;
 
+export const JEV_CONFIDENCE_THRESHOLD = 0.7;
+
 export interface RoutingDecision {
   confidence: number;
   reason: string;

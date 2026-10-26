@@ -4,12 +4,16 @@ export const GENUI_LIBRARY_VERSION = 1;
 
 export type GroundedRecord =
   | {
+      cta?: string;
+      features?: string[];
       id: string;
+      interval?: string;
       kind: "entity";
-      title: string;
-      url: string;
+      price?: string;
       summary?: string;
       tags?: string[];
+      title: string;
+      url: string;
     }
   | {
       id: string;
@@ -23,9 +27,10 @@ export type GroundedRecord =
       id: string;
       kind: "metric";
       label: string;
-      value: string;
-      unit?: string;
+      series?: number[];
       trend?: "up" | "down" | "flat";
+      unit?: string;
+      value: string;
     }
   | {
       id: string;

@@ -22,6 +22,10 @@ coverage
 # Turbo
 .turbo
 
+# eve local dev/build artifacts
+.eve/
+.output/
+
 # Vercel
 .vercel
 
@@ -37,10 +41,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Flow / assessment local prompt logs (never commit .agents/flow/prompts.txt; root prompts.txt gitignored by default)
+# Flow local prompt logs
 .agents/flow/prompts.txt
-.agents/flow/local/
 prompts.txt
+.agents/flow/local/
 
 # Misc
 .DS_Store
@@ -61,14 +65,9 @@ __dev
 .deepsec/data/**/runs/
 .deepsec/findings/
 
-# Agent and editor local installations (first-party Flow skills are tracked)
+# Agent and editor local skill installations
 .agents/skills/*
-!.agents/skills/flow/
-!.agents/skills/flow/**
-!.agents/skills/flow-eval/
-!.agents/skills/flow-eval/**
-!.agents/skills/flow-improve/
-!.agents/skills/flow-improve/**
+.agents/.agents/
 .cursor/*
 !.cursor/agents/
 !.cursor/agents/**
@@ -78,3 +77,4 @@ __dev
 
 # Neon Local metadata
 .neon_local/
+.neon

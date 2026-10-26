@@ -17,13 +17,21 @@
       "entry": [
         "oxlint.config.ts",
         "tooling/**/*.{mjs,ts}",
-        "tooling/**/*.test.mjs"
+        "tooling/**/*.test.mjs",
+        "agent/**/*.ts",
+        "evals/**/*.ts"
       ],
-      "project": ["tooling/**/*.{mjs,ts}", "oxlint.config.ts"]
+      "project": [
+        "tooling/**/*.{mjs,ts}",
+        "oxlint.config.ts",
+        "agent/**/*.ts",
+        "evals/**/*.ts"
+      ]
     },
     "apps/web": {
       "entry": [
         "app/**/*.{ts,tsx}",
+        "scripts/vercel-build.mjs",
         "tests/**/*.test.ts",
         "tests/**/*.spec.ts"
       ],
@@ -38,7 +46,7 @@
       "project": ["src/**/*.{ts,tsx}"]
     },
     "packages/db": {
-      "entry": ["src/**/*.ts", "drizzle.config.ts"],
+      "entry": ["src/**/*.ts", "drizzle.config.ts", "scripts/db-ping.mjs"],
       "project": ["src/**/*.ts", "drizzle.config.ts", "scripts/**/*.mjs"]
     },
     "packages/ts": {
@@ -54,12 +62,21 @@
   ],
   "ignoreUnresolved": ["next"],
   "ignoreDependencies": [
+    "@ai-sdk/gateway",
+    "@repo/db",
     "typescript-ast",
     "@tailwindcss/postcss",
     "better-auth",
+    "drizzle-orm",
     "next-themes",
     "postcss-load-config",
-    "zod"
+    "postgres",
+    "zod",
+    "ai",
+    "eve",
+    "@openuidev/lang-core",
+    "@typesafe-ai/sdk",
+    "is-agentic"
   ],
   "ignoreBinaries": ["simple-git-hooks", "gitleaks", "osv-scanner", "deepsec"]
 }

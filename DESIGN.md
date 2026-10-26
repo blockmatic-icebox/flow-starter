@@ -1,70 +1,38 @@
 # Design
 
-## Experience direction
+## Visual system — Porcelain
 
-The starter application uses a **neutral, restrained, content-first** interface. Visual and interaction patterns follow **ChatGPT-inspired clarity**—calm surfaces, readable typography, and obvious interactive states—without copying unsupported ChatGPT functionality or implying an official association.
+The starter uses the **Porcelain** theme in `@repo/ui` ([packages/ui/src/styles/globals.css](packages/ui/src/styles/globals.css)): warm off-white canvas, ink typography, muted indigo primary, and restrained chart colors. Generated compositions inherit the same tokens via `GenuiRenderer` and the MCP App preview bundle (`apps/web/mcp-app`, built with the same `globals.css`).
 
-**Current implementation** is a minimal homepage in `apps/web` with system-aware light and dark themes. **Future product-specific** journeys, navigation, and branding belong here once accepted during Explore or Specify.
+### Token parity (`packages/ui`)
 
-## Design system
+| Token                  | Light (`:root`) |
+| ---------------------- | --------------- |
+| `--background`         | `#f7f7f2`       |
+| `--foreground`         | `#202522`       |
+| `--primary`            | `#4f46a5`       |
+| `--primary-foreground` | `#ffffff`       |
+| `--muted-foreground`   | `#626a65`       |
+| `--border`             | `#7d867f`       |
+| `--input`              | `#7d867f`       |
+| `--radius`             | `0.5rem`        |
 
-Shared UI lives in `@repo/ui` (shadcn-style primitives on Tailwind CSS v4). Product routes import tokens and components from the package; do not fork token values in `apps/web`.
+Dark mode uses a restrained ink-on-charcoal palette with indigo accents (`next-themes` on the studio root).
 
-### Color and themes
+## Layout — studio
 
-Semantic colors use **oklch** CSS custom properties in `packages/ui/src/styles/globals.css`. Light theme defaults apply on `:root`; dark theme applies on `.dark` (class strategy via `next-themes`).
+| Area | Behavior |
+| --- | --- |
+| **Landing** | Centered prompt (search-style input) with starter chips when no composition is active |
+| **Sidebar** | Chat thread for follow-up refinement; **Send** uses `mode: refine` |
+| **Preview** | Main pane renders the latest `CompositionEnvelope`; **New composition** clears state and returns to landing |
 
-**Documented token parity (light `:root`)** — values must match `globals.css`:
+Routes: `/` (studio), `/dev` (MCP and API links).
 
-| Token                  | Value              |
-| ---------------------- | ------------------ |
-| `--background`         | `oklch(1 0 0)`     |
-| `--foreground`         | `oklch(0.145 0 0)` |
-| `--primary`            | `oklch(0.205 0 0)` |
-| `--primary-foreground` | `oklch(0.985 0 0)` |
-| `--border`             | `oklch(0.922 0 0)` |
-| `--muted-foreground`   | `oklch(0.556 0 0)` |
-| `--radius`             | `0.625rem`         |
+## Typography and motion
 
-Dark theme inverts surfaces and text while keeping the same semantic roles. Destructive, chart, and sidebar tokens follow the same file.
-
-### Typography
-
-- **Sans:** Geist (`--font-sans`), applied at the root layout.
-- **Mono:** Geist Mono (`--font-mono`) for code and keyboard hints.
-- Body copy uses `text-sm` with comfortable line height on the starter page; headings use `font-medium` at modest scale.
-
-### Spacing and shape
-
-- Base corner radius: `--radius` (`0.625rem`), with derived `radius-sm` through `radius-4xl` in Tailwind theme.
-- Starter page uses generous padding (`p-6`), vertical rhythm (`gap-4`), and `min-h-svh` for full-viewport layout.
-
-### Components and interaction states
-
-Primitives (button, input, dialog, etc.) live under `packages/ui/src/components/`. They use semantic tokens for background, border, ring, and focus outlines (`outline-ring/50` on focusable elements).
-
-The starter surfaces only typography and a keyboard hint; future features should reuse existing primitives before adding variants.
-
-## Layout and responsive behavior
-
-Root layout (`apps/web/app/layout.tsx`) wraps content in `ThemeProvider`, `NuqsAdapter`, and antialiased Geist body text. The homepage is a single column with `max-w-md` and flex alignment—suitable for small screens without a separate breakpoint system yet.
+System sans via Inter on the root layout; monospace via Geist Mono for code. Respect `prefers-reduced-motion`. Focus rings use the indigo `--ring` token.
 
 ## Accessibility
 
-- Root `html` sets `lang="en"`.
-- Theme toggle hotkey (`d`) ignores events when focus is in inputs, text areas, selects, or contenteditable regions.
-- New UI must meet WCAG-oriented contrast using semantic tokens; verify interactive components with keyboard and screen readers.
-
-## Implementation references
-
-| Area | Location |
-| --- | --- |
-| Global tokens and base styles | `packages/ui/src/styles/globals.css` |
-| Theme provider and `d` hotkey | `packages/ui/src/components/theme-provider.tsx` |
-| App layout and fonts | `apps/web/app/layout.tsx` |
-| Starter page | `apps/web/app/page.tsx` |
-| shadcn config | `apps/web/components.json` |
-
-## Evolution
-
-When visual direction, tokens, or interaction conventions change in implementation, update this document in the same change. Proposed design ideas stay clearly marked until accepted; do not publish empty section headings.
+Use semantic headings in the studio shell, labels on inputs, and `role="alert"` for compose errors. GenUI components should remain keyboard-focusable where the underlying shadcn primitives support it.

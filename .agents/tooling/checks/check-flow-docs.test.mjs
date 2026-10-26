@@ -1,19 +1,10 @@
 import assert from "node:assert/strict";
-import {
-  existsSync,
-  mkdtempSync,
-  mkdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { repoRoot as repositoryRoot } from "../lib/repo-paths.mjs";
 import {
-  validateFlowCoordinatorContract,
   validateFlowDocs,
   validateSeparatedProductTasks,
 } from "./check-flow-docs.mjs";
@@ -36,6 +27,7 @@ function defaultMarkdownContent(relative) {
   }
 
   if (
+    relative.startsWith("docs/decisions/") ||
     relative.startsWith("docs/adr/") ||
     relative.startsWith("docs/pdr/") ||
     relative.startsWith(".agents/flow/decisions/adr/") ||
@@ -72,8 +64,6 @@ None.
   return "# Example\n";
 }
 
-const firstPartySkillIds = ["flow", "flow-eval", "flow-improve"];
-
 const requiredDocuments = {
   ".agents/flow/README.md": "# Flow\n",
   ".agents/flow/architecture.md": "# Factory architecture\n",
@@ -82,16 +72,6 @@ const requiredDocuments = {
   "AGENTS.md": "# Agents\n",
   "ARCHITECTURE.md": "# Architecture\n",
 };
-
-function firstPartySkillFixture(skillId) {
-  return `---
-name: ${skillId}
-description: fixture
----
-
-# ${skillId}
-`;
-}
 
 function fixture(t, filenames, contents = {}, options = {}) {
   const root = mkdtempSync(path.join(os.tmpdir(), "flow-docs-"));
@@ -116,14 +96,6 @@ function fixture(t, filenames, contents = {}, options = {}) {
         defaultMarkdownContent(filename),
       "utf-8"
     );
-  }
-
-  for (const skillId of firstPartySkillIds) {
-    const skillFile = path.join(root, ".agents/skills", skillId, "SKILL.md");
-    if (!existsSync(skillFile)) {
-      mkdirSync(path.dirname(skillFile), { recursive: true });
-      writeFileSync(skillFile, firstPartySkillFixture(skillId), "utf-8");
-    }
   }
 
   return root;
@@ -380,34 +352,6 @@ test("ignores links inside fenced code", (t) => {
   assert.deepEqual(validateFlowDocs(root), []);
 });
 
-test("flow coordinator contract rejects stripped skill", () => {
-  const root = path.resolve(import.meta.dirname, "..", "..", "..");
-  const flowPath = path.join(root, ".agents/skills/flow/SKILL.md");
-  const content = readFileSync(flowPath, "utf-8");
-  assert.equal(validateFlowCoordinatorContract(content).length, 0);
-  const broken = content.replaceAll("human-supplied brief", "brief");
-  assert.ok(validateFlowCoordinatorContract(broken).length > 0);
-});
-
-test("flow-improve and flow-eval disable model invocation; flow does not", () => {
-  const root = path.resolve(import.meta.dirname, "..", "..", "..");
-  const flow = readFileSync(
-    path.join(root, ".agents/skills/flow/SKILL.md"),
-    "utf-8"
-  );
-  const improve = readFileSync(
-    path.join(root, ".agents/skills/flow-improve/SKILL.md"),
-    "utf-8"
-  );
-  const evalSkill = readFileSync(
-    path.join(root, ".agents/skills/flow-eval/SKILL.md"),
-    "utf-8"
-  );
-  assert.match(improve, /^disable-model-invocation:\s*true/mu);
-  assert.match(evalSkill, /^disable-model-invocation:\s*true/mu);
-  assert.doesNotMatch(flow, /^disable-model-invocation:/mu);
-});
-
 test("validates current repository product contracts and readme identity", () => {
   const errors = validateFlowDocs();
   assert.equal(errors.length, 0, errors.join("\n"));
@@ -425,10 +369,16 @@ test("flags placeholder markers in product contracts", (t) => {
   );
 });
 
-test("flags adopted readme missing product identity", (t) => {
+test("flags adopted readme with placeholder project name heading", (t) => {
   const root = fixture(
     t,
-    ["README.md", "PRODUCT.md", "DESIGN.md", ".agents/package.json"],
+    [
+      "README.md",
+      "PRODUCT.md",
+      "DESIGN.md",
+      ".agents/package.json",
+      "packages/ui/src/styles/globals.css",
+    ],
     {
       ".agents/package.json": JSON.stringify({
         scripts: {
@@ -437,7 +387,8 @@ test("flags adopted readme missing product identity", (t) => {
       }),
       "DESIGN.md": "# Design\n\n## Experience direction\n\nok\n",
       "PRODUCT.md": "# My App\n\nScope.\n",
-      "README.md": "# My App\n\nGeneric readme.\n",
+      "README.md": "# Project Name\n\nGeneric readme.\n",
+      "packages/ui/src/styles/globals.css": ":root { --background: ok; }\n",
     },
     { omitRequired: true }
   );
@@ -445,21 +396,9 @@ test("flags adopted readme missing product identity", (t) => {
     e.startsWith("README.md:")
   );
   assert.ok(
-    readmeErrors.some((e) =>
-      /web application built with Flow Factory/iu.test(e)
-    ),
+    readmeErrors.some((e) => /Project Name/iu.test(e)),
     readmeErrors.join("\n")
   );
-});
-
-test("flow.md retains progressive disclosure anchors", () => {
-  const flowMd = readFileSync(
-    path.join(repositoryRoot, ".agents/flow/flow.md"),
-    "utf-8"
-  );
-  assert.match(flowMd, /## Where detail lives/u);
-  assert.match(flowMd, /## Documentation ownership/u);
-  assert.match(flowMd, /### Proportionality and continuation/u);
 });
 
 test("requires separated docs/tasks checklist for initiatives with ## Tasks", (t) => {
@@ -519,5 +458,34 @@ test("flags obsolete apps/web security paths in authoritative docs", (t) => {
   assert.match(
     validateFlowDocs(root).join("\n"),
     /obsolete path reference.*apps\/web\/lib\/security/u
+  );
+});
+
+test("accepts unified decisions and upstream skill configuration", (t) => {
+  const root = fixture(t, [
+    "docs/decisions/0001-user-outcome.md",
+    "docs/decisions/0002-runtime-boundary.md",
+    "docs/agents/domain.md",
+    "docs/agents/issue-tracker.md",
+  ]);
+  assert.deepEqual(validateFlowDocs(root), []);
+});
+
+test("validates unified decision metadata and duplicate numbers", (t) => {
+  const root = fixture(
+    t,
+    ["docs/decisions/0001-product.md", "docs/decisions/0001-technical.md"],
+    { "docs/decisions/0001-product.md": "# Missing metadata\n" }
+  );
+  const errors = validateFlowDocs(root).join("\n");
+  assert.match(errors, /duplicate product-adr number 0001/u);
+  assert.match(errors, /docs\/decisions\/0001-product.md:.*Date/u);
+});
+
+test("skill configuration exception does not permit a parallel methodology", (t) => {
+  const root = fixture(t, ["docs/agents/new-workflow.md"]);
+  assert.match(
+    validateFlowDocs(root).join("\n"),
+    /methodology document must live/u
   );
 });

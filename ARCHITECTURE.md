@@ -1,68 +1,94 @@
 # Architecture
 
-> Product technical contract for this starter. [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md) are progressively maintained product contracts. Product decisions: [docs/adr/](docs/adr/).
+> Product technical contract. [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md). Adoption: [ADR 0001](docs/adr/0001-use-flow-factory.md). Starter spec: [001](docs/specs/001-lean-agentic-starter.md).
 
-This product **inherits [Flow Factory](.agents/flow/factory.md)**—methodology, skills, evaluation, and default security and GenUI boundaries. Factory-wide rationale lives under [.agents/flow/](.agents/flow/); see [.agents/flow/architecture.md](.agents/flow/architecture.md) for the full inherited technical architecture.
+## System overview
 
-**Adoption:** [Product ADR 0001 — Use Flow Factory](docs/adr/0001-use-flow-factory.md).
+```text
+┌─────────────────┐     POST /api/genui/compose      ┌──────────────┐
+│   apps/web      │ ───────────────────────────────► │ @repo/genui  │
+│   studio + MCP  │ ◄── OpenUI envelope + records ── │  compose     │
+└────────┬────────┘                                  └──────┬───────┘
+         │                                                   │
+         │  MCP compose_ui                                   ▼
+         ├──────────────────────────────────────────► @repo/ui (render)
+         │
+┌────────┴────────┐
+│ agent/ (eve)    │  compose-ui, list-component-catalog → @repo/genui
+└─────────────────┘
 
-## Application
+Optional: @repo/db (app_meta + Better Auth scaffold) when DATABASE_URL is set
+```
+
+## Components
 
 | Path | Role |
 | --- | --- |
-| `apps/web` | **Product starter** — minimal homepage and the default place to build your product |
+| `apps/web` | Next.js app — studio UI, `/api/mcp`, `/api/genui/compose`, `/api/chat`, discovery routes |
+| `packages/genui` | OpenUI Lang orchestration, validation, React renderer |
+| `packages/ui` | shadcn component library and global CSS |
+| `packages/db` | Drizzle schema and migrations (blank product schema) |
+| `agent/` | Eve root agent and tools |
+| `apps/web/mcp-app/` | Single-file MCP App bundle (`genui-preview.html`) |
 
-Shared workspace packages (`@repo/genui`, `@repo/db`, `@repo/ui`, `@repo/ts`) are available when the product needs them.
+## APIs and agent surfaces
 
-## What the product owns
+| Surface | Notes |
+| --- | --- |
+| `POST /api/genui/compose` | NDJSON stream; no database |
+| `POST /api/mcp` | Streamable HTTP; tools `compose_ui`, `list_component_catalog`, `health` |
+| `POST /api/chat` | Optional Anthropic sidebar chat (`ANTHROPIC_API_KEY`) |
+| `llms.txt`, `.well-known/mcp/*`, `/openapi.json` | Agent discovery |
 
-Document here:
+## Database
 
-- Product-specific routes, APIs, and data models as you add them.
-- Deviations from inherited Factory defaults (each consequential deviation needs an accepted product ADR referencing the relevant Factory ADR).
-- Product authentication, authorization, and domain capabilities once implemented.
+Migrations: `0000_app_meta`, `0001_better_auth_core` only. No product tables on `simple`.
 
-Do not duplicate the Factory stack-selection narrative or the full GenUI specification; link instead.
-
-## Inherited boundaries (summary)
-
-When you extend this starter, these Factory contracts still apply unless a **product ADR** explicitly overrides them:
-
-- **React / Next.js:** route-first colocation, Server Components by default — [Factory ADR 0009](.agents/flow/decisions/adr/0009-react-nextjs-fractal-architecture.md).
-- **GenUI:** validated OpenUI Lang in `@repo/genui` — [Factory spec](.agents/flow/specs/genui.md), [Factory ADR 0003](.agents/flow/decisions/adr/0003-genui-openui-foundation.md).
-- **Public APIs and agents:** bounded inputs, host-owned actions, fail-closed production limits — [security model](.agents/flow/security/security-model.md), [Factory ADR 0011](.agents/flow/decisions/adr/0011-api-and-agent-security-boundaries.md).
-- **Capability-first interfaces:** [Factory PDR 0001](.agents/flow/decisions/pdr/0001-agnostic-api-first.md).
-
-Replacing the database layer, authentication stack, or monorepo layout conflicts with [Factory ADR 0001](.agents/flow/decisions/adr/0001-agentic-architecture.md) until a human accepts a new **product** ADR and any required Factory process for upstream changes.
-
-## Repository layout (product view)
-
-```text
-apps/web/          # your product (extend here)
-packages/          # shared libraries (use as needed)
-docs/adr/          # product architecture decisions
-PRODUCT.md         # product vision and scope
-DESIGN.md          # experience direction
-.agents/           # Flow Factory (methodology, eval, tooling — not product code)
+```bash
+pnpm db:migrate    # when DATABASE_URL is set
+pnpm --filter @repo/db db:check
 ```
 
-## Quality gates
+**Vercel:** [`apps/web/scripts/vercel-build.mjs`](apps/web/scripts/vercel-build.mjs) runs `pnpm db:migrate` when `DATABASE_URL` is present; no seed step.
 
-Local verification used in this repo:
+## Environment
 
-- `pnpm qa` — documentation, architecture boundaries, lint, types, unit tests, schema check.
-- `pnpm --dir .agents flow:check` — Flow and product documentation conventions (Factory).
-- `pnpm architecture:check` — React import and client-boundary rules.
+| Variable | Purpose |
+| --- | --- |
+| `AI_GATEWAY_API_KEY` | Open-ended OpenUI generation (tier 3) |
+| `TYPESAFE_API_KEY` | Jev classification for ambiguous routes (optional; regex fallback when unset) |
+| `ANTHROPIC_API_KEY` | Optional `/api/chat` |
+| `DATABASE_URL` | Optional Postgres for future features |
+| `GENUI_MODEL` | Override gateway model for compose |
+| `AGENTIC_CHECK_URL` | Host passed to `pnpm agentic:check` (no `https://` prefix) |
 
-Factory integrity and evaluation: `pnpm --dir .agents check` and `pnpm --dir .agents test`.
+## Commands
 
-UI changes: [.agents/flow/operations/verification.md](.agents/flow/operations/verification.md).
+```bash
+pnpm setup
+pnpm dev                 # https://app.localhost (portless)
+pnpm qa
+pnpm test
+pnpm exec eve eval smoke
+pnpm agentic:check
+pnpm build:web
+pnpm test:browser
+```
 
-## Adoption and Factory navigation
+## GenUI routing
 
-- Factory overview: [.agents/flow/factory.md](.agents/flow/factory.md)
-- Workflow contract: [.agents/flow/flow.md](.agents/flow/flow.md)
-- Human intro: [.agents/flow/README.md](.agents/flow/README.md)
-- Factory glossary: [.agents/flow/glossary.md](.agents/flow/glossary.md)
+`@repo/genui` uses deterministic regex intents for tier-1 templates (support dashboard, plan comparison, onboarding form), declarative tier-2 stacks, and AI Gateway tier-3 open composition or refinement. When regex does not match, optional **Jev** (`@typesafe-ai/sdk`, `TYPESAFE_API_KEY`) classifies ambiguous prompts; without a key, `tierFromSignals` in `packages/genui/src/core/tiers.ts` applies with `classifier: "regex"`. Unsupported catalog requests return `outcome: "failed"` with `unsupported_request`.
 
-Update this file when **product** implementation or intentional deviations materially change.
+## Eve
+
+Repo root `agent/` with `withEve` in [`apps/web/next.config.ts`](apps/web/next.config.ts). Smoke eval: [`evals/smoke/compose-support-dashboard.eval.ts`](evals/smoke/compose-support-dashboard.eval.ts) (calls `compose-ui` tool `execute`).
+
+## Vercel (`flow-starter` project)
+
+**Root Directory** `apps/web`, **Framework** Next.js — install/build from [`apps/web/vercel.json`](apps/web/vercel.json). Preview deploys track branch **`simple`**.
+
+**Neon:** dedicated project `flow-starter` (`falling-morning-81472258`, `aws-us-east-2`). Link via Vercel Marketplace **Neon** (accept terms in dashboard if CLI prompts) so `DATABASE_URL` / `DATABASE_URL_UNPOOLED` sync to the project; migrations run in [`apps/web/scripts/vercel-build.mjs`](apps/web/scripts/vercel-build.mjs) when `DATABASE_URL` is set. GenUI compose does not require Postgres.
+
+**`meta-cto`:** Ignored Build Step skips branch `simple` so Eve assessment builds do not run on the lean starter.
+
+`apps/web` lists `@openuidev/lang-core` so Eve authored-module builds resolve GenUI imports.

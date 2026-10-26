@@ -16,6 +16,7 @@ describe("composeQuery", () => {
     });
     assert.equal(result.metadata.tier, 1);
     assert.equal(result.metadata.validationOk, true);
+    assert.equal(result.metadata.outcome, "success");
     assert.equal(result.metadata.component, "ComparisonView");
     assert.deepEqual(
       result.events.map((event) => event.type),
@@ -125,7 +126,7 @@ describe("composeQuery", () => {
     assert.ok(!text.includes("entity:pulse-mobile"));
   });
 
-  it("does not attach invented citations to tier 3 fallback answers", async () => {
+  it("surfaces tier 3 missing credentials as StatusMessage failure", async () => {
     const previous = process.env.AI_GATEWAY_API_KEY;
 
     process.env.AI_GATEWAY_API_KEY = "";
@@ -144,12 +145,11 @@ describe("composeQuery", () => {
       assert.ok(complete && complete.type === "complete");
       assert.equal(result.metadata.tier, 3);
       assert.equal(result.metadata.validationOk, true);
+      assert.equal(result.metadata.outcome, "failed");
+      assert.equal(result.metadata.failureCode, "missing_credentials");
       assert.equal(result.modelCalls, 0);
-
-      assert.match(complete.envelope.openuiText, /,\s*\[\]\)$/u);
-      assert.ok(
-        !complete.envelope.openuiText.includes("document:api-overview")
-      );
+      assert.match(complete.envelope.openuiText, /StatusMessage/u);
+      assert.match(complete.envelope.openuiText, /"error"/u);
     } finally {
       if (previous === undefined) {
         delete process.env.AI_GATEWAY_API_KEY;
@@ -157,5 +157,40 @@ describe("composeQuery", () => {
         process.env.AI_GATEWAY_API_KEY = previous;
       }
     }
+  });
+
+  it("reports unsupported catalog requests as failed outcomes", async () => {
+    const result = await composeQuery({
+      input: {
+        clientRequestId: "unsupported",
+        query: "This request is unsupported",
+        version: 1,
+      },
+    });
+
+    const complete = result.events.find((event) => event.type === "complete");
+
+    assert.ok(complete && complete.type === "complete");
+    assert.equal(result.metadata.outcome, "failed");
+    assert.equal(result.metadata.failureCode, "unsupported_request");
+    assert.match(complete.envelope.openuiText, /StatusMessage/u);
+  });
+
+  it("routes onboarding form prompts to tier 1 InteractiveForm stack", async () => {
+    const result = await composeQuery({
+      input: {
+        clientRequestId: "onboarding",
+        query: "Design an onboarding form for new users",
+        version: 1,
+      },
+    });
+
+    const complete = result.events.find((event) => event.type === "complete");
+
+    assert.ok(complete && complete.type === "complete");
+    assert.equal(result.metadata.tier, 1);
+    assert.equal(result.metadata.outcome, "success");
+    assert.match(complete.envelope.openuiText, /InteractiveForm/u);
+    assert.match(complete.envelope.openuiText, /form:onboarding/u);
   });
 });

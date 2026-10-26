@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("homepage renders", async ({ page }) => {
+test("homepage renders studio shell", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("console", (msg) => {
@@ -9,7 +9,10 @@ test("homepage renders", async ({ page }) => {
 
   await page.goto("/");
   await expect(page.getByRole("main")).toBeVisible();
-  await expect(page.locator("html")).toHaveAttribute("class", /antialiased/u);
+  await expect(page.getByText("What should we build?")).toBeVisible();
+  await expect(
+    page.getByPlaceholder(/customer support dashboard/iu)
+  ).toBeVisible();
 
   expect(errors).toEqual([]);
 });

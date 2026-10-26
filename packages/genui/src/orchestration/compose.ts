@@ -9,25 +9,51 @@ import {
   collectionDocument,
   comparisonDocument,
   dataExplorerDocument,
+  onboardingFormDocument,
   sectionStackDocument,
   statusDocument,
+  supportDashboardDocument,
   timelineDocument,
 } from "./builders";
-import { synthesizeOpenEndedAnswer } from "./model";
+import type { ComposeClassifier } from "./classify";
+import { classifyAmbiguousQuery } from "./classify";
+import type { ComposeTurn } from "./generate-openui";
+import {
+  refineOpenUiComposition,
+  synthesizeOpenUiComposition,
+} from "./generate-openui";
 import { defaultEntityIds, routeQuery } from "./routing";
 import type { ComposeStreamEvent } from "./stream";
 
+export type ComposeMode = "create" | "refine";
+
+export type ComposeOutcome = "failed" | "success";
+
+export type ComposeFailureCode =
+  | "classification_failed"
+  | "generation_invalid"
+  | "missing_credentials"
+  | "unsupported_request"
+  | "validation_failed";
+
 export interface ComposeInput {
   clientRequestId: string;
+  mode?: ComposeMode;
+  priorEnvelope?: CompositionEnvelope;
   query: string;
+  turns?: ComposeTurn[];
   version: number;
 }
 
 export interface ComposeResult {
   events: ComposeStreamEvent[];
   metadata: {
+    classifier?: ComposeClassifier;
     component?: string;
     composite?: string | null;
+    failureCode?: ComposeFailureCode;
+    outcome: ComposeOutcome;
+    refined?: boolean;
     tier: CompositionTier;
     validationOk: boolean;
   };
@@ -91,6 +117,14 @@ const controlledDocument = ({
     });
   }
 
+  if (intent === "support-dashboard") {
+    return supportDashboardDocument({ requestId });
+  }
+
+  if (intent === "onboarding-form") {
+    return onboardingFormDocument({ requestId });
+  }
+
   if (intent === "product-timeline") {
     return timelineDocument({
       orderedIds: documentIds,
@@ -119,11 +153,13 @@ const controlledDocument = ({
 export const publishComposition = ({
   emit,
   envelope,
+  metadata,
   requestId,
   sequence,
 }: {
   emit: (event: ComposeStreamEvent) => void;
   envelope: CompositionEnvelope;
+  metadata?: ComposeResult["metadata"];
   requestId: string;
   sequence: number;
 }) => {
@@ -139,8 +175,33 @@ export const publishComposition = ({
   }
 
   emit({ envelope, requestId, sequence, type: "partial" });
-  emit({ envelope, requestId, sequence: sequence + 1, type: "complete" });
+  emit({
+    envelope,
+    metadata,
+    requestId,
+    sequence: sequence + 1,
+    type: "complete",
+  });
   return { compiled: validated.compiled, ok: true as const };
+};
+
+const tierThreeFailureEnvelope = ({
+  failureCode,
+  requestId,
+}: {
+  failureCode: ComposeFailureCode;
+  requestId: string;
+}) => {
+  const message =
+    failureCode === "missing_credentials"
+      ? "Generation requires AI_GATEWAY_API_KEY for open layouts, or try a supported prompt such as customer support dashboard, metrics, plan comparison, or onboarding form."
+      : "The model returned a composition that failed validation. Try a simpler request or a supported starter prompt.";
+  return statusDocument({
+    message,
+    records: acmeCatalogRecords,
+    requestId,
+    variant: "error",
+  });
 };
 
 const declarativeCompound = ({
@@ -188,6 +249,92 @@ const declarativeCompound = ({
   });
 };
 
+const composeCreatePath = async ({
+  query,
+  requestId,
+  signal,
+}: {
+  query: string;
+  requestId: string;
+  signal?: AbortSignal;
+}) => {
+  const routed = routeQuery(query);
+  let { intent, tier } = routed;
+  let classifier: ComposeClassifier | undefined = intent ? "regex" : undefined;
+  let modelCalls = 0;
+  let outcome: ComposeOutcome = "success";
+  let failureCode: ComposeFailureCode | undefined;
+  let envelope: CompositionEnvelope | undefined;
+
+  if (!intent) {
+    const classified = await classifyAmbiguousQuery({ query, routed });
+    const { classifier: resolvedClassifier } = classified;
+    classifier = resolvedClassifier;
+    if ("failure" in classified) {
+      failureCode = "classification_failed";
+      outcome = "failed";
+      envelope = statusDocument({
+        message: "Could not classify this request against the starter catalog.",
+        records: acmeCatalogRecords,
+        requestId,
+        variant: "error",
+      });
+      return { classifier, envelope, failureCode, modelCalls, outcome, tier };
+    }
+    const { intent: classifiedIntent, tier: classifiedTier } = classified;
+    tier = classifiedTier;
+    if (classifiedIntent) intent = classifiedIntent;
+  }
+
+  if (intent === "insufficient-data") {
+    tier = 1;
+    envelope = controlledDocument({ intent, query, requestId });
+    return {
+      classifier,
+      envelope,
+      failureCode: "unsupported_request" as ComposeFailureCode,
+      modelCalls,
+      outcome: "failed" as ComposeOutcome,
+      tier,
+    };
+  }
+
+  if (intent) {
+    tier = 1;
+    envelope = controlledDocument({ intent, query, requestId });
+    return { classifier, envelope, failureCode, modelCalls, outcome, tier };
+  }
+
+  if (tier === 2) {
+    envelope = declarativeCompound({ query, requestId });
+    return { classifier, envelope, failureCode, modelCalls, outcome, tier };
+  }
+
+  tier = 3;
+  const apiKey = process.env.AI_GATEWAY_API_KEY?.trim();
+  if (apiKey) {
+    const generated = await synthesizeOpenUiComposition({
+      query,
+      requestId,
+      signal,
+    });
+    if (generated) {
+      modelCalls = 1;
+      envelope = generated;
+    } else {
+      failureCode = "generation_invalid";
+      outcome = "failed";
+      envelope = tierThreeFailureEnvelope({ failureCode, requestId });
+    }
+  } else {
+    failureCode = "missing_credentials";
+    outcome = "failed";
+    envelope = tierThreeFailureEnvelope({ failureCode, requestId });
+  }
+
+  return { classifier, envelope, failureCode, modelCalls, outcome, tier };
+};
+
 export const composeQuery = async ({
   input,
   onEvent,
@@ -216,46 +363,79 @@ export const composeQuery = async ({
   if (signal?.aborted) {
     return {
       events,
-      metadata: { tier: 1, validationOk: false },
+      metadata: { outcome: "failed", tier: 1, validationOk: false },
       modelCalls: 0,
       parseErrors: 0,
     };
   }
 
-  const routed = routeQuery(query);
-  let envelope: CompositionEnvelope;
-  let tier: CompositionTier = routed.tier;
-  let modelCalls = 0;
+  const refining = input.mode === "refine" && input.priorEnvelope !== undefined;
 
-  if (routed.intent) {
-    tier = 1;
-    envelope = controlledDocument({ intent: routed.intent, query, requestId });
-  } else if (tier === 2) {
-    envelope = declarativeCompound({ query, requestId });
-  } else {
+  let envelope: CompositionEnvelope | undefined;
+  let tier: CompositionTier = 1;
+  let modelCalls = 0;
+  let outcome: ComposeOutcome = "success";
+  let failureCode: ComposeFailureCode | undefined;
+  let classifier: ComposeClassifier | undefined;
+  let refined = false;
+
+  if (refining && input.priorEnvelope) {
     tier = 3;
-    const synthesized = await synthesizeOpenEndedAnswer({ query, signal });
-    if (synthesized) modelCalls = 1;
-    envelope = answerDocument({
-      body:
-        synthesized ??
-        "No grounded answer is available for this request in the demo catalog. Configure AI_GATEWAY_API_KEY to enable optional general model responses.",
-      records: acmeCatalogRecords,
-      requestId,
-      sourceIds: [],
-    });
+    refined = true;
+    const apiKey = process.env.AI_GATEWAY_API_KEY?.trim();
+    if (apiKey) {
+      const generated = await refineOpenUiComposition({
+        priorEnvelope: input.priorEnvelope,
+        query,
+        requestId,
+        signal,
+        turns: input.turns,
+      });
+      if (generated) {
+        modelCalls = 1;
+        envelope = generated;
+      } else {
+        failureCode = "generation_invalid";
+        outcome = "failed";
+        envelope = tierThreeFailureEnvelope({ failureCode, requestId });
+      }
+    } else {
+      failureCode = "missing_credentials";
+      outcome = "failed";
+      envelope = tierThreeFailureEnvelope({ failureCode, requestId });
+    }
+  } else {
+    ({ classifier, envelope, failureCode, modelCalls, outcome, tier } =
+      await composeCreatePath({ query, requestId, signal }));
   }
+
+  const resultMetadata: ComposeResult["metadata"] = {
+    classifier,
+    failureCode,
+    outcome,
+    refined: refined || undefined,
+    tier,
+    validationOk: true,
+  };
+
+  if (!envelope) throw new Error("compose-internal");
 
   const published = publishComposition({
     emit,
     envelope,
+    metadata: resultMetadata,
     requestId,
     sequence,
   });
   if (!published.ok) {
     return {
       events,
-      metadata: { tier, validationOk: false },
+      metadata: {
+        failureCode: "validation_failed",
+        outcome: "failed",
+        tier,
+        validationOk: false,
+      },
       modelCalls: 0,
       parseErrors: 1,
     };
@@ -264,8 +444,12 @@ export const composeQuery = async ({
   return {
     events,
     metadata: {
+      classifier,
       component: published.compiled.component,
       composite: published.compiled.composite,
+      failureCode,
+      outcome,
+      refined: refined || undefined,
       tier,
       validationOk: true,
     },

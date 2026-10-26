@@ -14,6 +14,7 @@ Flow spreads product intent, decisions, and implementation across **ordinary rep
 | Factory stack and agent architecture rationale | [decisions/adr/](../decisions/adr/) |
 | Factory engineering principles | [decisions/pdr/](../decisions/pdr/) |
 | Bounded product work with tasks and findings | `docs/initiatives/` when used |
+| Factory methodology and starter engineering initiatives | [.agents/flow/initiatives/](../initiatives/) (for example [mcp-discoverability.md](../initiatives/mcp-discoverability.md)) |
 | Product research and assessments | `docs/research/` (dated filenames) when used |
 | Product capability contracts | `docs/specs/` when justified |
 | Flow Factory adoption and inherited stack | [factory.md](../factory.md), [architecture.md](../architecture.md) |
