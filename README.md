@@ -43,7 +43,7 @@ pnpm --filter web test:browser  # starter smoke only
 
 Manual FI checklist: [testing spec](docs/specs/feature-intelligence-testing.md). Logged pass: [browser verification](docs/research/20261025-fi-browser-verification.md).
 
-**Prompt log:** Local gitignored `prompts.txt` at repo root (assessment collaboration trail; not committed).
+**Prompt log:** Tracked `prompts.txt` at repo root (assessment collaboration trail; Cursor hooks append each turn when logging is enabled).
 
 ## Product documentation
 

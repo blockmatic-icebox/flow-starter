@@ -532,6 +532,15 @@ Human: Update prompts.txt (tracked + auto per turn); separate Flow skill commit 
 Agent: Added Cursor beforeSubmitPrompt/stop hooks and append-on-stop tooling; Flow docs allow tracked root prompts.txt on product branches; split commits—flow to main, FI + prompts.txt on meta-cto.
 
 ---
+Timestamp: 2026-10-25T18:15:00-06:00
+Work: feature-intelligence
+Stage: Ship
+
+Human: (same) Update prompts.txt tracking, auto per turn, Flow commit to main, assessment on meta-cto only.
+
+Agent: Merged feat(flow) prompt-log hooks to main (4ada0d6); meta-cto has merge + refactor(fi) with tracked prompts.txt, hooks, and prompt-log.config.json; qa green.
+
+---
 ---
 Timestamp: 2026-10-26T00:04:58.538Z
 Work: feature-intelligence
