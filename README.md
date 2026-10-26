@@ -76,5 +76,5 @@ Example prompts:
 ## Docs
 
 - [PRODUCT.md](PRODUCT.md) · [DESIGN.md](DESIGN.md) · [ARCHITECTURE.md](ARCHITECTURE.md)
-- [ADR 0001 — Use Flow Factory](docs/adr/0001-use-flow-factory.md)
+- [ADR 0001 — Use Flow Factory](docs/decisions/0001-use-flow-factory.md)
 - [AGENTS.md](AGENTS.md) — short pointers for coding agents
