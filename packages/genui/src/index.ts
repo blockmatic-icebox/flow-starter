@@ -35,6 +35,18 @@ export {
 } from "./orchestration/compose";
 export { routeQuery } from "./orchestration/routing";
 export {
+  answerDocument,
+  collectionDocument,
+  comparisonDocument,
+  dataExplorerDocument,
+  sectionStackDocument,
+  statusDocument,
+  timelineDocument,
+} from "./orchestration/builders";
+export { publishComposition } from "./orchestration/compose";
+export { openUiStringList, openUiStringLiteral } from "./contract/openui-text";
+export { synthesizeOpenEndedAnswer } from "./orchestration/model";
+export {
   consumeNdjsonResponse,
   parseNdjsonText,
   type ComposeStreamEvent,

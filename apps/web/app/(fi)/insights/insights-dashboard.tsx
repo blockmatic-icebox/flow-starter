@@ -93,7 +93,7 @@ export const InsightsDashboard = ({
         </div>
         <Select
           onValueChange={(value) => {
-            router.push(`/insights?range=${value}`);
+            router.push(`/patterns?range=${value}`);
           }}
           value={range}
         >
@@ -221,7 +221,7 @@ export const InsightsDashboard = ({
                     <li key={row.requestId}>
                       <Link
                         className="text-primary underline"
-                        href={`/requests/${row.requestId}`}
+                        href={`/signals/${row.requestId}`}
                       >
                         {row.title}
                       </Link>

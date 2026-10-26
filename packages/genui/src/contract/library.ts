@@ -13,6 +13,8 @@ import {
   sectionStackPropsSchema,
   statusMessagePropsSchema,
   timelineViewPropsSchema,
+  evidenceQuotePropsSchema,
+  rankedSignalListPropsSchema,
 } from "./schemas";
 
 const noop = () => null;
@@ -101,6 +103,20 @@ const StatusMessage = defineComponent({
   props: statusMessagePropsSchema,
 });
 
+const EvidenceQuote = defineComponent({
+  component: noop,
+  description: "Customer evidence quote with link to source signal.",
+  name: "EvidenceQuote",
+  props: evidenceQuotePropsSchema,
+});
+
+const RankedSignalList = defineComponent({
+  component: noop,
+  description: "Ordered list of signals with supporter context.",
+  name: "RankedSignalList",
+  props: rankedSignalListPropsSchema,
+});
+
 export const flowGenuiContractLibrary = createLibrary({
   components: [
     Answer,
@@ -115,6 +131,8 @@ export const flowGenuiContractLibrary = createLibrary({
     InteractiveForm,
     FilePreview,
     StatusMessage,
+    EvidenceQuote,
+    RankedSignalList,
   ],
   root: "Answer",
 });

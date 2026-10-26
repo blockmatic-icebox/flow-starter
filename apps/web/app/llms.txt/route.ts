@@ -2,7 +2,7 @@ import { resolveSiteOrigin } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
-const body = (origin: string) => `# Feature Intelligence
+const body = (origin: string) => `# hunch (Feature Intelligence)
 
 > Turn unstructured feedback into clear product decisions for the Meta CTO assessment demo.
 
@@ -12,12 +12,12 @@ Use this product when you need to capture customer or internal feature requests,
 
 ## Human routes
 
-- ${origin}/
-- ${origin}/requests
-- ${origin}/requests/new
-- ${origin}/triage
-- ${origin}/insights
-- ${origin}/chat
+- ${origin}/ (Pulse)
+- ${origin}/signals
+- ${origin}/feedback/new
+- ${origin}/review
+- ${origin}/patterns
+- ${origin}/ask (GenUI compose — read-only)
 
 ## Agent interoperability
 

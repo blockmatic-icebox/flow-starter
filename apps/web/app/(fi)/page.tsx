@@ -1,143 +1,190 @@
 import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/card";
+  getDb,
+  getInsights,
+  listRecentDecisions,
+  listTriageQueue,
+  searchRequests,
+} from "@repo/fi";
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import Link from "next/link";
 
-import { fiProductTagline } from "@/lib/fi-agent-surfaces-content";
-import { fiHomeSummary, fiHomeTitle } from "@/lib/fi-home-content";
-import { resolveSiteOriginFromHeaderList } from "@/lib/site-url";
+import { hunchTagline } from "@/lib/hunch-content";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const headerList = await headers();
-  const origin = resolveSiteOriginFromHeaderList(headerList);
-  const url = `${origin}/`;
+import {
+  formatRelativeTime,
+  SignalStatusBadge,
+} from "./_components/signal-status";
 
-  return {
-    alternates: { canonical: url },
-    description: fiProductTagline,
-    openGraph: {
-      description: fiHomeSummary,
-      images: [{ alt: fiHomeTitle, url: `${origin}/opengraph-image` }],
-      title: `${fiHomeTitle} — product feature request triage`,
-      type: "website",
-      url,
-    },
-    title: `${fiHomeTitle} — product feature request triage`,
-  };
-}
+export const metadata: Metadata = {
+  description: hunchTagline,
+  title: "Pulse",
+};
 
-const intents = [
-  {
-    description: "Tell us what you need in plain language.",
-    href: "/requests/new?context=external",
-    title: "Share feedback",
-  },
-  {
-    description: "Paste notes — we check duplicates first.",
-    href: "/requests/new?context=internal",
-    title: "Log customer feedback",
-  },
-  {
-    description: "Decide what we do next.",
-    href: "/triage",
-    title: "Review queue",
-  },
-  {
-    description: "Outcomes and decision capture.",
-    href: "/insights",
-    title: "See outcomes",
-  },
-];
+export default async function PulsePage() {
+  const db = getDb();
+  const [queue, insights, recent, themes, recentDecisions] = await Promise.all([
+    listTriageQueue({ db }),
+    getInsights({ db, range: "30d" }),
+    searchRequests({ db, page: 1, pageSize: 8, sort: "published_at" }),
+    getInsights({ db, range: "90d" }),
+    listRecentDecisions({ db, limit: 8 }),
+  ]);
 
-export default async function HomePage() {
-  const headerList = await headers();
-  const origin = resolveSiteOriginFromHeaderList(headerList);
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        address: {
-          "@type": "PostalAddress",
-          addressCountry: "US",
-          addressLocality: "Austin",
-          postalCode: "78701",
-          streetAddress: "Meta CTO assessment demo",
-        },
-        contactPoint: {
-          "@type": "ContactPoint",
-          contactType: "technical support",
-          email: "contact@gaboesquivel.com",
-          telephone: "+1-512-555-0199",
-        },
-        name: fiHomeTitle,
-        url: origin,
-      },
-      {
-        "@type": "SoftwareApplication",
-        applicationCategory: "BusinessApplication",
-        description: fiHomeSummary,
-        name: fiHomeTitle,
-        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-        url: origin,
-      },
-    ],
-  };
+  const topTheme = themes.trends?.themes.at(0);
+  const decisionsThisMonth = insights.sample.dispositionWithRationaleCount ?? 0;
 
   return (
     <div className="space-y-8">
-      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
-      <div>
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">
-          {fiHomeTitle}
-        </h1>
-        <p className="text-muted-foreground mt-1 text-lg">{fiProductTagline}</p>
-        <p className="text-muted-foreground mt-2">{fiHomeSummary}</p>
-        <p className="text-muted-foreground mt-4 text-sm">
-          <Link className="underline" href="/developers">
-            Developer portal
-          </Link>{" "}
-          ·{" "}
-          <Link className="underline" href="/openapi.json">
-            OpenAPI
-          </Link>{" "}
-          ·{" "}
-          <Link className="underline" href="/.well-known/mcp/server-card.json">
-            MCP server card
-          </Link>{" "}
-          · POST <code className="text-xs">/api/mcp</code> ·{" "}
-          <Link className="underline" href="/llms.txt">
-            llms.txt
+      <header className="space-y-1">
+        <h1 className="text-lg font-semibold tracking-tight">Pulse</h1>
+        <p className="text-muted-foreground text-sm">{hunchTagline}</p>
+      </header>
+
+      <dl className="grid gap-4 sm:grid-cols-3">
+        <div className="space-y-1">
+          <dt className="text-muted-foreground text-xs tracking-wide uppercase">
+            To review
+          </dt>
+          <dd className="text-2xl font-semibold tabular-nums">
+            <Link className="text-primary hover:underline" href="/review">
+              {queue.length}
+            </Link>
+          </dd>
+        </div>
+        <div className="space-y-1">
+          <dt className="text-muted-foreground text-xs tracking-wide uppercase">
+            Themes (90d)
+          </dt>
+          <dd className="text-2xl font-semibold tabular-nums">
+            {themes.trends?.themes.length ?? "—"}
+          </dd>
+        </div>
+        <div className="space-y-1">
+          <dt className="text-muted-foreground text-xs tracking-wide uppercase">
+            Decisions (30d)
+          </dt>
+          <dd className="text-2xl font-semibold tabular-nums">
+            {decisionsThisMonth}
+          </dd>
+        </div>
+      </dl>
+
+      {topTheme ? (
+        <section className="border-primary/30 bg-primary text-primary-foreground rounded-md border px-4 py-4 md:px-6">
+          <p className="text-xs font-medium tracking-wide uppercase opacity-90">
+            Top theme
+          </p>
+          <h2 className="mt-1 text-lg font-semibold">{topTheme.label}</h2>
+          <p className="mt-1 text-sm opacity-90">
+            {topTheme.count} signals in range
+            {topTheme.priorCount === null ? null : (
+              <>
+                {" "}
+                · Δ {topTheme.count - topTheme.priorCount >= 0 ? "+" : ""}
+                {topTheme.count - topTheme.priorCount} vs prior period
+              </>
+            )}
+          </p>
+          <Link
+            className="mt-3 inline-block text-sm font-medium underline underline-offset-2"
+            href={`/signals?theme=${topTheme.themeKey}`}
+          >
+            View signals
           </Link>
-        </p>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {intents.map((intent) => (
-          <Card key={intent.href}>
-            <CardHeader>
-              <CardTitle>{intent.title}</CardTitle>
-              <CardDescription>{intent.description}</CardDescription>
-              <Link
-                className="bg-primary text-primary-foreground mt-2 inline-flex w-fit items-center justify-center rounded-md px-4 py-2 text-sm font-medium"
-                href={intent.href}
-              >
-                Open
-              </Link>
-            </CardHeader>
-          </Card>
-        ))}
-      </div>
-      <Link
-        className="border-border inline-flex items-center justify-center rounded-md border px-4 py-2 text-sm"
-        href="/requests"
-      >
-        Browse all requests
-      </Link>
+        </section>
+      ) : null}
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold">Recent signals</h2>
+          <Link
+            className="text-primary text-sm hover:underline"
+            href="/signals"
+          >
+            All signals
+          </Link>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[36rem] text-left text-sm">
+            <thead>
+              <tr className="border-border text-muted-foreground border-b text-xs">
+                <th className="pr-4 pb-2 font-medium">Title</th>
+                <th className="pr-4 pb-2 font-medium">Theme</th>
+                <th className="pr-4 pb-2 text-right font-medium tabular-nums">
+                  Support
+                </th>
+                <th className="pb-2 font-medium">Received</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recent.items.map((row) => (
+                <tr className="border-border/60 border-b" key={row.id}>
+                  <td className="py-2.5 pr-4">
+                    <Link
+                      className="text-primary font-medium hover:underline"
+                      href={`/signals/${row.id}`}
+                    >
+                      {row.title}
+                    </Link>
+                  </td>
+                  <td className="text-muted-foreground py-2.5 pr-4">
+                    {row.themeLabel ?? "—"}
+                  </td>
+                  <td className="py-2.5 pr-4 text-right tabular-nums">
+                    {row.supportCount}
+                  </td>
+                  <td className="text-muted-foreground py-2.5">
+                    {formatRelativeTime(row.publishedAt)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold">Recent decisions</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[32rem] text-left text-sm">
+            <thead>
+              <tr className="border-border text-muted-foreground border-b text-xs">
+                <th className="pr-4 pb-2 font-medium">Title</th>
+                <th className="pr-4 pb-2 font-medium">Status</th>
+                <th className="pb-2 font-medium">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentDecisions.length === 0 ? (
+                <tr>
+                  <td className="text-muted-foreground py-4" colSpan={3}>
+                    No recorded decisions yet.
+                  </td>
+                </tr>
+              ) : (
+                recentDecisions.map((row) => (
+                  <tr className="border-border/60 border-b" key={row.id}>
+                    <td className="py-2.5 pr-4">
+                      <Link
+                        className="hover:underline"
+                        href={`/signals/${row.id}`}
+                      >
+                        {row.title}
+                      </Link>
+                    </td>
+                    <td className="py-2.5 pr-4">
+                      <SignalStatusBadge disposition={row.disposition} />
+                    </td>
+                    <td className="text-muted-foreground py-2.5">
+                      {formatRelativeTime(row.dispositionAt)}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }

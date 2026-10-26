@@ -80,11 +80,11 @@ test("GET /sitemap.xml returns valid urlset XML for public routes", async () => 
   );
   for (const routePath of [
     "/",
-    "/requests",
-    "/requests/new",
-    "/triage",
-    "/insights",
-    "/chat",
+    "/signals",
+    "/feedback/new",
+    "/review",
+    "/patterns",
+    "/ask",
   ])
     assert.match(
       body,

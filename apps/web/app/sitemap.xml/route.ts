@@ -8,11 +8,11 @@ const publicRoutes = [
   "/contact",
   "/privacy",
   "/developers",
-  "/requests",
-  "/requests/new",
-  "/triage",
-  "/insights",
-  "/chat",
+  "/signals",
+  "/feedback/new",
+  "/review",
+  "/patterns",
+  "/ask",
 ];
 
 const escapeXml = (value: string) =>

@@ -65,6 +65,15 @@ export const sectionStackPropsSchema = z.object({
   children: z.array(z.unknown()).default([]),
 });
 
+export const evidenceQuotePropsSchema = z.object({
+  documentId: z.string(),
+});
+
+export const rankedSignalListPropsSchema = z.object({
+  entityIds: z.array(z.string()),
+  reviewHref: z.string().optional(),
+});
+
 export const componentPropsByName = {
   Answer: answerPropsSchema,
   CollectionGrid: collectionGridPropsSchema,
@@ -72,8 +81,10 @@ export const componentPropsByName = {
   DataExplorer: dataExplorerPropsSchema,
   DetailView: detailViewPropsSchema,
   DocumentationBlock: documentationBlockPropsSchema,
+  EvidenceQuote: evidenceQuotePropsSchema,
   FilePreview: filePreviewPropsSchema,
   InteractiveForm: interactiveFormPropsSchema,
+  RankedSignalList: rankedSignalListPropsSchema,
   SearchResults: searchResultsPropsSchema,
   SectionStack: sectionStackPropsSchema,
   StatusMessage: statusMessagePropsSchema,

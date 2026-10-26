@@ -2,6 +2,20 @@
 
 **Bounded context:** **Feature Intelligence** — turning unstructured feature feedback into recorded product decisions.
 
+### hunch (UI brand)
+
+The **human-facing product name** in `apps/web` for this assessment. **hunch** is presentation and navigation only; APIs, database tables, MCP tools, and `@repo/fi` types still use **feature request** and glossary terms below.
+
+| hunch screen | Domain meaning |
+| --- | --- |
+| Pulse | Overview of queue depth, themes, and recent signals/decisions |
+| Signals | Published **feature requests** (discover/search) |
+| Signal | One published **feature request** |
+| Review | PM **triage queue** and **disposition** workflow |
+| Patterns | **Insights** / trends from persisted data |
+| Ask Hunch | Read-only **GenUI** compose over signal data (no disposition writes) |
+| Add feedback | **Submit** / intake with duplicate check and confirm |
+
 This document is the **ubiquitous language** for product code (`@repo/fi`, `apps/web`, `agent/`). Factory methodology terms live in [.agents/flow/glossary.md](.agents/flow/glossary.md), not here.
 
 When a term appears in specs, UI, tools, or ADRs, use these definitions. Prefer **nouns** from this list over synonyms (e.g. **disposition**, not “status update” or “resolution”).

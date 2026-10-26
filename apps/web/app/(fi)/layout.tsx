@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
-import { fiHomeSummary, fiHomeTitle } from "@/lib/fi-home-content";
+import { hunchProductName, hunchSummary } from "@/lib/hunch-content";
 
 import { FiShell } from "./_components/fi-shell";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  description: fiHomeSummary,
+  description: hunchSummary,
   title: {
-    default: fiHomeTitle,
-    template: `%s | ${fiHomeTitle}`,
+    default: hunchProductName,
+    template: `%s | ${hunchProductName}`,
   },
 };
 

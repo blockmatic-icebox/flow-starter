@@ -19,6 +19,24 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  redirects() {
+    return [
+      { destination: "/signals", permanent: false, source: "/requests" },
+      {
+        destination: "/signals/:path*",
+        permanent: false,
+        source: "/requests/:path*",
+      },
+      {
+        destination: "/feedback/new",
+        permanent: false,
+        source: "/requests/new",
+      },
+      { destination: "/review", permanent: false, source: "/triage" },
+      { destination: "/patterns", permanent: false, source: "/insights" },
+      { destination: "/ask", permanent: false, source: "/chat" },
+    ];
+  },
   rewrites() {
     return {
       beforeFiles: [
@@ -40,7 +58,7 @@ const nextConfig: NextConfig = {
       ],
     };
   },
-  transpilePackages: ["@repo/db", "@repo/fi", "@repo/ui"],
+  transpilePackages: ["@repo/db", "@repo/fi", "@repo/genui", "@repo/ui"],
 };
 
 export default withEve(nextConfig, { eveRoot: "../.." });

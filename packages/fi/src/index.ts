@@ -15,6 +15,7 @@ export {
   searchRequests,
   type SearchRequestsSort,
 } from "./requests/search-requests";
+export { listRecentDecisions } from "./requests/list-recent-decisions";
 export type { TriageQueueSort } from "./queue/list-triage-queue";
 export { runTriageHarness } from "./triage/run-triage-harness";
 export type { DuplicateCandidate, TriageStepsPayload } from "./triage/types";

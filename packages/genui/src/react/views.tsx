@@ -20,11 +20,27 @@ export const AnswerView = ({
     <p className="text-foreground text-sm leading-relaxed">{body}</p>
     {sourceIds.length > 0 ? (
       <ul className="text-muted-foreground flex flex-wrap gap-2 text-xs">
-        {sourceIds.map((id) => (
-          <li className="border-border rounded-md border px-2 py-1" key={id}>
-            {recordTitle(records, id)}
-          </li>
-        ))}
+        {sourceIds.map((id) => {
+          const record = records.find((r) => r.id === id);
+          const href =
+            record &&
+            (record.kind === "entity" || record.kind === "document") &&
+            record.url.startsWith("/")
+              ? record.url
+              : null;
+          const label = recordTitle(records, id);
+          return (
+            <li className="border-border rounded-md border px-2 py-1" key={id}>
+              {href ? (
+                <a className="text-primary hover:underline" href={href}>
+                  {label}
+                </a>
+              ) : (
+                label
+              )}
+            </li>
+          );
+        })}
       </ul>
     ) : null}
   </article>
@@ -44,11 +60,33 @@ export const CollectionGridView = ({
       {composite}
     </p>
     <ul className="grid gap-3 sm:grid-cols-2">
-      {entityIds.map((id) => (
-        <li className="border-border rounded-lg border p-3" key={id}>
-          <h3 className="font-medium">{recordTitle(records, id)}</h3>
-        </li>
-      ))}
+      {entityIds.map((id) => {
+        const record = records.find((r) => r.id === id);
+        const href =
+          record?.kind === "entity" && record.url.startsWith("/")
+            ? record.url
+            : null;
+        const title = recordTitle(records, id);
+        const summary =
+          record?.kind === "entity" && record.summary ? record.summary : null;
+        return (
+          <li className="border-border rounded-lg border p-3" key={id}>
+            {href ? (
+              <a
+                className="text-primary font-medium hover:underline"
+                href={href}
+              >
+                {title}
+              </a>
+            ) : (
+              <h3 className="font-medium">{title}</h3>
+            )}
+            {summary ? (
+              <p className="text-muted-foreground mt-1 text-xs">{summary}</p>
+            ) : null}
+          </li>
+        );
+      })}
     </ul>
   </section>
 );
@@ -61,11 +99,33 @@ export const ComparisonViewUi = ({
   records: GroundedRecord[];
 }) => (
   <div className="grid gap-3 md:grid-cols-2">
-    {entityIds.map((id) => (
-      <div className="border-border rounded-lg border p-4" key={id}>
-        <h3 className="font-semibold">{recordTitle(records, id)}</h3>
-      </div>
-    ))}
+    {entityIds.map((id) => {
+      const record = records.find((r) => r.id === id);
+      const href =
+        record?.kind === "entity" && record.url.startsWith("/")
+          ? record.url
+          : null;
+      const title = recordTitle(records, id);
+      const summary =
+        record?.kind === "entity" && record.summary ? record.summary : null;
+      return (
+        <div className="border-border rounded-lg border p-4" key={id}>
+          {href ? (
+            <a
+              className="text-primary font-semibold hover:underline"
+              href={href}
+            >
+              {title}
+            </a>
+          ) : (
+            <h3 className="font-semibold">{title}</h3>
+          )}
+          {summary ? (
+            <p className="text-muted-foreground mt-2 text-sm">{summary}</p>
+          ) : null}
+        </div>
+      );
+    })}
   </div>
 );
 
@@ -283,4 +343,85 @@ export const InteractiveFormView = ({
       variant="warning"
     />
   </section>
+);
+
+export const EvidenceQuoteView = ({
+  documentId,
+  records,
+}: {
+  documentId: string;
+  records: GroundedRecord[];
+}) => {
+  const doc = records.find((record) => record.id === documentId);
+  if (!doc || doc.kind !== "document") return null;
+  return (
+    <blockquote className="border-primary/40 border-l-2 pl-4 text-sm">
+      <p className="leading-relaxed italic">{doc.excerpt}</p>
+      <footer className="mt-2 not-italic">
+        <a
+          className="text-primary text-xs font-medium hover:underline"
+          href={doc.url}
+        >
+          {doc.title}
+        </a>
+      </footer>
+    </blockquote>
+  );
+};
+
+export const RankedSignalListView = ({
+  entityIds,
+  records,
+  reviewHref,
+}: {
+  entityIds: string[];
+  records: GroundedRecord[];
+  reviewHref?: string;
+}) => (
+  <ol className="space-y-2">
+    {entityIds.map((id, index) => {
+      const record = records.find((r) => r.id === id);
+      const title = record?.kind === "entity" ? record.title : id;
+      const href =
+        record?.kind === "entity" && record.url.startsWith("/")
+          ? record.url
+          : null;
+      const support =
+        record?.kind === "entity" && record.summary
+          ? record.summary.split("·").at(0)?.trim()
+          : null;
+      return (
+        <li
+          className="border-border/60 flex items-start gap-3 border-b pb-2 text-sm"
+          key={id}
+        >
+          <span className="text-muted-foreground w-5 shrink-0 tabular-nums">
+            {index + 1}
+          </span>
+          <div className="min-w-0 flex-1">
+            {href ? (
+              <a
+                className="text-primary font-medium hover:underline"
+                href={href}
+              >
+                {title}
+              </a>
+            ) : (
+              <span className="font-medium">{title}</span>
+            )}
+            {support ? (
+              <p className="text-muted-foreground text-xs">{support}</p>
+            ) : null}
+          </div>
+        </li>
+      );
+    })}
+    {reviewHref ? (
+      <li className="pt-2">
+        <a className="text-primary text-sm underline" href={reviewHref}>
+          Open Review to record a decision
+        </a>
+      </li>
+    ) : null}
+  </ol>
 );

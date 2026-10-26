@@ -2,9 +2,11 @@
 
 ## Purpose
 
-**Feature Intelligence** helps product teams turn unstructured feature requests—from customers, prospects, support, and internal stakeholders—into **clear, actionable product decisions** with measurable outcomes (readiness, triage effort, capture rate, intake linking).
+**Feature Intelligence** (human UI brand: **hunch**) helps product teams turn unstructured feature requests—from customers, prospects, support, and internal stakeholders—into **clear, actionable product decisions** with measurable outcomes (readiness, triage effort, capture rate, intake linking).
 
-This checkout is the Meta CTO technical assessment on [Flow Factory](.agents/flow/factory.md): methodology, quality gates, and agent-ready patterns (`apps/web`, `@repo/fi`, eve).
+This checkout is the Meta CTO technical assessment on [Flow Factory](.agents/flow/factory.md): methodology, quality gates, and agent-ready patterns (`apps/web`, `@repo/fi`, `@repo/genui`, eve).
+
+**Hunch redesign:** [initiative](docs/initiatives/hunch-redesign.md) · [GenUI spec](docs/specs/hunch-genui.md) · [tasks](docs/tasks/hunch-redesign.md) · [phase 2 hardening](docs/tasks/hunch-hardening.md). UI brand **hunch**; domain language remains Feature Intelligence ([GLOSSARY.md](GLOSSARY.md#hunch-ui-brand)).
 
 ## Users and jobs
 
@@ -39,7 +41,7 @@ Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence
 | **Database** | **Live** — Vercel build: `db:migrate` + **if-empty** seed (`FI_SEED_IF_EMPTY`); local full reseed via `pnpm seed:fi` ([seed spec](docs/specs/feature-intelligence-seed.md)) |
 | **Domain (`@repo/fi`)** | **Live** — disposition validation, merge rollup, discovery pagination, degraded triage flags ([remediation](docs/specs/feature-intelligence-remediation.md)) |
 | **eve (`agent/`)** | **Live** — behavioral smoke evals (AG-7 + disposition monitor); `pnpm exec eve eval smoke` |
-| **Human UI (`apps/web`)** | **Live** — merge picker, discover search/sort/page, AI failure UX, decision sidebar; manual W-R pass on deploy |
+| **Human UI (`apps/web`)** | **Live** — **Hunch** shell (Pulse, Signals, Review, Patterns, Ask Hunch GenUI); merge picker, search/sort/page, AI failure UX, decision sidebar; legacy URL redirects |
 | **Agentic discoverability** | **Live** — `llms.txt`, well-known MCP, Streamable HTTP `/api/mcp` (open demo tools), `pnpm agentic:check` ([spec](docs/specs/feature-intelligence-agentic-discoverability.md)) |
 | **Deployment (demo)** | **Live** — Vercel `meta-cto`, https://meta-cto-two.vercel.app (`DATABASE_URL`, gateway/Anthropic keys on Production) |
 

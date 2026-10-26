@@ -1,82 +1,57 @@
 # Design
 
-## Experience direction
+## Experience direction — Hunch (assessment UI)
 
-**Feature Intelligence** uses a **neutral, restrained, content-first** interface on the **[Meta CTO](https://www.metacto.com/) design system**—warm cloud surfaces, ink typography, orange primary actions, teal focus and secondary accents. Patterns keep **ChatGPT-inspired clarity** (obvious states, readable type) without implying a chat product. **FI workflows are structured screens**, not a single assistant thread.
+**hunch** is the human-facing brand for the Meta CTO Feature Intelligence assessment. The interface is **Paper + Cobalt**, content-first, and **Framed Sheet**: quiet sidebar and top bar, inset white workspace (`WorkspaceSheet`), subtle borders, restrained corners, **no resting shadows**.
 
-**Implemented today:** Feature Intelligence under `apps/web/app/(fi)/` — persona home, discover, submit (`?context=external|internal`), detail, inline triage, insights, ask-only `/chat`. Meta CTO tokens via `@repo/ui`; `FiShell` nav with triage badge. Theme toggle on root layout (`d` hotkey).
+| Token  | Value     | Use                                                |
+| ------ | --------- | -------------------------------------------------- |
+| Paper  | `#F5F3ED` | App background (`--background`)                    |
+| Ink    | `#22241F` | Text (`--foreground`)                              |
+| Cobalt | `#3454ED` | Primary action, evidence links, top-theme emphasis |
+| White  | `#FFFFFF` | Working surfaces (`--card`)                        |
 
-Product copy and labels should match [GLOSSARY.md](GLOSSARY.md) (e.g. **disposition**, **problem statement**, **intake link**).
+**Reserve cobalt** for meaningful evidence, selection, and the single primary action (Add feedback). Navigation selection stays neutral (`bg-muted`). No gradients, glows, oversized marketing headlines, or decorative KPI tiles.
 
-## User journeys (accepted v1.3)
+**Implemented:** `apps/web/app/(fi)/` — Pulse, Signals, Add feedback, Review, Patterns, Ask Hunch. Domain terms remain in [GLOSSARY.md](GLOSSARY.md) (signal = published feature request, disposition, etc.). Spec: [docs/specs/hunch-genui.md](docs/specs/hunch-genui.md).
 
-Full spec: **[docs/specs/feature-intelligence-journeys.md](docs/specs/feature-intelligence-journeys.md)** (personas, UI detail, AI UX cross-links). Patterns: **[feature-intelligence-ai-ux-patterns.md](docs/specs/feature-intelligence-ai-ux-patterns.md)**.
+### Screens
 
-**Home** acts as a **persona router** — four intents: Share feedback (external), Log feedback (internal), Review queue (PM), See outcomes (leader). Nav badge on Triage when open queue &gt; 0.
-
-| Persona | Streamlined path | UI tone |
-| --- | --- | --- |
-| External submitter | Home → submit → thank-you (no PM jargon) | “Feedback”, “similar ideas” |
-| Internal submitter | Home → paste → duplicates first | Duplicate prevention |
-| PM | Home/Triage → expand row → disposition | Glossary terms |
-| Leader | Home → Insights (range + trends) → optional audit | Read-only metrics; no AI lift claims |
-
-**Demo script (recording direction only—not in-app):** Insights glance → PM triage (×2) → Insights refresh → optional live external submit. No Loom or recorder integration in the product.
-
-## Feature Intelligence — screens (accepted)
-
-Spec: [docs/specs/feature-intelligence.md](docs/specs/feature-intelligence.md). Product name in UI: **Feature Intelligence** (subtitle: turn feedback into decisions).
-
-| Route | Screen | Layout / behavior |
-| --- | --- | --- |
-| `/` | Home (persona router) | Four intent cards + Browse secondary; not a flat feature list |
-| `/requests` | Discover | **Search**, **sort** (support / recent / title), **pagination** (~25/page), theme chips; cards show **support count**, disposition badge when set ([remediation RC-5](docs/specs/feature-intelligence-remediation.md)) |
-| `/requests/new` | Submit | Step 1 form → step 2 triage preview; on AI failure/degraded: honest partial UI, **Submit anyway**, **Retry AI review** ([RC-2](docs/specs/feature-intelligence-remediation.md)) |
-| `/requests/[id]` | Detail | Main: problem, description, brief; sidebar: support, **Decision** (outcome, rationale, time, simulated PM, merge link), transparency (“How this was evaluated”) |
-| `/triage` | PM queue | Card list with **sort** (support default); inline panel — disposition, **merge target picker** when Merge, rationale; badge when item needs AI/manual review |
-| `/insights` | Metrics | 2×3 metric grid (incl. PM triage median); **range** selector (`7d`–`all`, default `90d`); horizontal bar panels for weekly submissions, dispositions, queue depth; theme list + judgment table; proxy footnote when `pmTriageN < 2` |
-| `/chat` | Ask-only help | `max-w-2xl` thread; **no** tool UI; secondary nav item |
-
-### Interaction principles
-
-- **Triage is not chat** — submit flow uses cards and explicit confirm/publish.
-- **Primary actions:** Publish request / Submit feedback (persona), Save disposition.
-- **Destructive:** Decline disposition (same form; no separate destructive button style required in MVP).
-- **Metrics UI:** PM triage card uses `medianPmTriageMs` when `pmTriageN >= 2`; otherwise headline may use **proxy** with explanatory footnote (see [analytics spec](docs/specs/feature-intelligence-analytics.md)).
-- **Motion:** Skeleton on triage loading only; toast on disposition save; keep demo recording calm.
-- **AI UX:** Submit loading uses harness **stage labels** + time estimate; human confirm before publish/disposition. Pattern map: [feature-intelligence-ai-ux-patterns.md](docs/specs/feature-intelligence-ai-ux-patterns.md) ([AI UX Playground](https://www.aiuxplayground.com/patterns)).
-
-### App shell (FI)
-
-Sticky header: brand + Browse · Submit · Triage (badge when queue &gt; 0) · Insights. Main content uses route `max-w` from [journeys spec](docs/specs/feature-intelligence-journeys.md#ui-detail-design-system) (`xl` submit, `5xl` triage). Home remains persona **card grid** (`sm:grid-cols-2`), not four equal nav destinations.
-
-### Component map (prefer `@repo/ui`)
-
-| UX need | Primitive |
+| Route | Screen |
 | --- | --- |
-| Persona home, thank-you, metrics | `Card`, `Button`, `Badge` |
-| Submit form | `Field`, `FieldLabel`, `Input`, `Textarea`, `Collapsible` |
-| Duplicate pick | `RadioGroup`, `FieldSet` |
-| Triage queue + inline review | `Table` / `Item`, `Collapsible` or `Accordion`, `Select`, `Textarea` |
-| Empty queue | `Empty`, `EmptyTitle` |
-| Loading triage | `Skeleton`; submit uses `Spinner` + `aria-live` |
-| Insights | `Card` grid + **horizontal bar** trend panels (CSS bars, not Recharts); `Select` for range |
-| Detail audit | `Collapsible`, sidebar at `lg` |
-| Feedback | `toast` after disposition |
+| `/` | Pulse — queue count, themes, recent signals/decisions |
+| `/signals` | Searchable, filterable table |
+| `/signals/[id]` | Problem, evidence, support, related signals, decision history |
+| `/feedback/new` | Capture → duplicate check → publish (existing harness) |
+| `/review` | Queue + disposition (inline triage panel) |
+| `/patterns` | Grounded trends from `getInsights` |
+| `/ask` | Ask Hunch — GenUI compose (read-only) |
 
-### Deferred / cut-if-late
+Legacy paths redirect (`/requests` → `/signals`, etc.).
 
-- Markdown export of briefs
+### Shell
+
+`HunchShell` / `HunchAppFrame`: wordmark (lowercase + cobalt dot cluster), nav with Review badge, Ask Hunch footer, mobile bottom nav. Top bar: Add feedback + avatar placeholder.
+
+### GenUI
+
+Same design system as static pages via `@repo/genui/react` `GenuiRenderer`. Entity records link to `/signals/[id]`. Generating a view does not write data; merge/publish/disposition stay on Review and Add feedback flows.
+
+### Component map
+
+| UX need               | Location / primitive                   |
+| --------------------- | -------------------------------------- |
+| Status, relative time | `_components/signal-status.tsx`        |
+| Tables                | Semantic `<table>`, tabular nums       |
+| Review queue          | Existing `triage-panel.tsx`            |
+| Submit                | `requests/new/submit-form.tsx`         |
+| GenUI                 | `@repo/genui` + `ask-hunch-client.tsx` |
 
 ## Design system
 
-Shared UI: `@repo/ui` (**shadcn primitives**, **Meta CTO tokens**—not the default neutral shadcn theme). Import tokens and primitives from the package; do not fork token values in `apps/web`. Brand reference: [metacto.com](https://www.metacto.com/).
+Shared UI: `@repo/ui` (shadcn + semantic tokens in `packages/ui/src/styles/globals.css`). Assessment maps Meta CTO aliases to Hunch Paper/Cobalt on `:root`. Dark theme remains available via `next-themes`.
 
-### Color and themes
-
-Semantic **oklch** tokens in `packages/ui/src/styles/globals.css`, mapped from Meta CTO palette (`--metacto-*` aliases). Light on `:root`; dark on `.dark` (`next-themes`).
-
-**Light `:root` parity** (must match `globals.css`):
+### Token parity (`:root` ↔ `globals.css`)
 
 | Token                  | Value                   |
 | ---------------------- | ----------------------- |
@@ -86,48 +61,31 @@ Semantic **oklch** tokens in `packages/ui/src/styles/globals.css`, mapped from M
 | `--primary-foreground` | `oklch(1 0 0)`          |
 | `--border`             | `var(--metacto-mist)`   |
 | `--muted-foreground`   | `var(--metacto-pewter)` |
-| `--radius`             | `0.75rem`               |
-
-Meta aliases: cloud `#faf6f0`, ink `#2a3439`, orange `#f18700`, mist `#e8e4de`, pewter `#a8a29e`, teal `#3d7a72` (ring/accent). Cards and popovers use white (`oklch(1 0 0)`).
-
-Cards and popovers stay **white** on cloud background for contrast (metacto.com pattern).
+| `--radius`             | `0.375rem`              |
 
 ### Typography
 
-- **Sans:** Inter (`--font-sans`) on root layout—body and UI.
-- **Heading:** Barlow (`--font-heading-family`)—`font-heading` on Card titles, dialogs, empty states.
-- **Mono:** Geist Mono for code and keyboard hints.
-- Body: `text-sm`, comfortable line height; headings `font-medium` / Barlow semibold, modest scale.
-
-### Components
-
-Primitives under `packages/ui/src/components/`. FI routes should compose Button, Input, Textarea, Select, Card, Badge, Dialog, Collapsible before new variants.
-
-## Layout and responsive behavior
-
-Root layout: `ThemeProvider`, `NuqsAdapter`, Inter + Barlow + Geist Mono (`apps/web/app/layout.tsx`). FI routes use journey `max-w` targets (`max-w-xl` submit, `max-w-4xl` discover, wider triage list).
+Inter body (`text-sm`), compact headings (`text-lg font-semibold`), tabular numerals in tables. Barlow heading font may remain on root layout but Hunch screens prefer compact sans headings.
 
 ## Accessibility
 
-- `lang="en"` on `html`.
-- Theme hotkey `d` disabled when focus in inputs/editables.
-- FI flows: keyboard-accessible **inline triage** disposition controls; transparency `Collapsible` with visible focus.
+- Keyboard: nav links, form controls, Ask prompt, `aria-live` on compose loading.
+- Focus visible via ring tokens; contrast aligned to ink on paper/white.
+- Loading/error/empty states on Ask Hunch and compose failure paths.
 
 ## Verification
 
-FI UI: **manual** W-* checklist ([testing spec](docs/specs/feature-intelligence-testing.md))—logged in [20261025-fi-browser-verification.md](docs/research/20261025-fi-browser-verification.md); starter Playwright smoke only (homepage). agent-browser per [.agents/flow/operations/verification.md](.agents/flow/operations/verification.md).
+Manual: Pulse → Signals → detail → Add feedback → Review disposition → Patterns → Ask scenarios from [hunch-genui.md](docs/specs/hunch-genui.md). `pnpm --filter web check-types`, `pnpm --filter @repo/genui test`, `pnpm --filter web test`. agent-browser for responsive pass per [verification.md](.agents/flow/operations/verification.md).
 
 ## Implementation references
 
-| Area | Location |
-| --- | --- |
-| Tokens | `packages/ui/src/styles/globals.css` |
-| Theme provider | `packages/ui/src/components/theme-provider.tsx` |
-| App layout | `apps/web/app/layout.tsx` |
-| FI shell + routes | `apps/web/app/(fi)/` |
-| Ask-only chat API | `apps/web/app/api/chat/route.ts` |
-| Submit loading (W-9) | `apps/web/app/(fi)/requests/new/submit-form.tsx` (`aria-live`, stage labels) |
+| Area          | Location                                    |
+| ------------- | ------------------------------------------- |
+| Tokens        | `packages/ui/src/styles/globals.css`        |
+| Shell         | `apps/web/app/(fi)/_components/hunch-*.tsx` |
+| GenUI adapter | `apps/web/app/_lib/genui/`                  |
+| Compose API   | `apps/web/app/api/genui/compose/route.ts`   |
 
-## Evolution
+## Historical — Feature Intelligence v1.3
 
-Update this file in the same change as material UI or token changes. Mark proposals until accepted; no empty section headings.
+Prior FI/Meta CTO orange shell and persona home are superseded by Hunch for the assessment UI. Journey and AI UX specs remain background for harness behavior: [feature-intelligence-journeys.md](docs/specs/feature-intelligence-journeys.md), [feature-intelligence-ai-ux-patterns.md](docs/specs/feature-intelligence-ai-ux-patterns.md).

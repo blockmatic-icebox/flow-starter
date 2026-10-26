@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { FeedbackSteps } from "../../_components/hunch/feedback-steps";
 import {
   actionConfirmRequest,
   actionCreateDraftAndTriage,
@@ -56,7 +57,7 @@ const DuplicateLinkSection = ({
             <li key={d.id}>
               <Link
                 className="text-primary underline"
-                href={`/requests/${d.id}`}
+                href={`/signals/${d.id}`}
               >
                 {d.title}
               </Link>
@@ -167,7 +168,7 @@ export const SubmitForm = ({
       setThankYou(true);
       return;
     }
-    router.push(`/requests/${requestId}`);
+    router.push(`/signals/${requestId}`);
   };
 
   if (thankYou && requestId)
@@ -178,7 +179,7 @@ export const SubmitForm = ({
         </p>
         <Link
           className="text-primary text-sm underline"
-          href={`/requests/${requestId}`}
+          href={`/signals/${requestId}`}
         >
           View your submission
         </Link>
@@ -203,12 +204,13 @@ export const SubmitForm = ({
   if (!requestId)
     return (
       <form
-        className="mx-auto max-w-xl space-y-4"
+        className="space-y-4"
         onSubmit={(e) => {
           e.preventDefault();
           runTriage().catch(console.error);
         }}
       >
+        <FeedbackSteps current={1} />
         <Input
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Title"
@@ -227,7 +229,7 @@ export const SubmitForm = ({
           value={description}
         />
         <Button disabled={loading} type="submit">
-          Continue
+          Find related signals
         </Button>
       </form>
     );
@@ -251,7 +253,8 @@ export const SubmitForm = ({
   };
 
   return (
-    <div className="mx-auto max-w-xl space-y-4">
+    <div className="space-y-4">
+      <FeedbackSteps current={2} />
       {degraded ? (
         <output className="border-border bg-muted/50 block space-y-2 rounded-lg border p-4 text-sm">
           <p className="font-medium">AI review was limited</p>

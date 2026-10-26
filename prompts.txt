@@ -1891,3 +1891,182 @@ Q: Implement Astra MCP diagnosis plan — promote production, verify MCP, docume
 A: Root cause: MCP healthy on meta-cto-two (POST /api/mcp); Astra DNS and Vercel connector 403 are client-side; production alias lagged at f17becd so POST /mcp returned 405 until vercel promote → dpl_26uHp (d7b477c). Promoted production; POST /mcp now 200. Docs: research log, developers host/auditor guidance, task checklist; live AGENTIC_LIVE_MCP test for /mcp alias. Tests: pnpm --filter web test exit 0; live tests exit 0; fi mcp-smoke exit 0. Astra must resolve meta-cto-two and use /api/mcp with Accept application/json, text/event-stream — not team URL or Vercel bypass APIs.
 
 ---
+---
+Timestamp: 2026-10-26T04:19:04.878Z
+Work: feature-intelligence
+Stage: Build
+Generation: 51b58e03-bb73-493d-acc4-848001138c47
+
+Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: ## Task report — Completed · Ship
+
+---
+---
+Timestamp: 2026-10-26T04:25:00.000Z
+Work: hunch-redesign
+Stage: Build
+
+Q: Use Flow to redesign the Meta CTO assessment app as Hunch with GenUI-ready interface (apps/flow reference), approved Paper+Cobalt visuals, full product surfaces and Ask Hunch scenarios.
+
+A: Rebranded UI to hunch (framed shell, Pulse/Signals/Review/Patterns/Ask), wired POST /api/genui/compose via compose-fi over @repo/fi, extended @repo/genui exports and entity links; docs in hunch-genui spec, initiative, tasks; PRODUCT/DESIGN/ARCHITECTURE updated. apps/flow absent (ADR 0014)—used @repo/genui. design-taste-frontend not in skills-lock. Verified: pnpm --filter web check-types exit 0, @repo/genui test 129 pass, web test 19 pass.
+
+---
+---
+Timestamp: 2026-10-26T04:24:34.793Z
+Work: feature-intelligence
+Stage: Build
+Generation: accca151-f358-4a9b-9e7d-2c443223be47
+
+Human: Use Flow to redesign the Meta CTO assessment app as Hunch and make its interface GenUI-ready, using apps/flow as the implementation reference.
+
+Work on the assessment branch. Start with flow explore: read the current product documentation, inspect the existing application and apps/flow demo, and load design-taste-frontend. Understand the demo’s actual generative UI architecture, components, rendering, and integration patterns before deciding what to reuse.
+
+Treat the attached image as the approved visual direction. Preserve existing product capabilities and working backend integrations. The image’s sample content and numbers are illustrative; use application data.
+
+Design direction:
+- Brand: hunch, lowercase wordmark with a small cobalt dot cluster.
+- Paper + Cobalt: warm paper #F5F3ED, ink #22241F, cobalt #3454ED, white working surfaces.
+- Follow Taste’s Framed Sheet app-screen guidance: quiet shared sidebar/top-bar frame, inset white workspace, subtle borders, restrained corners, no resting shadows.
+- Compact headings, readable interface typography, aligned numeric columns, meaningful density.
+- Neutral navigation selection; reserve cobalt for meaningful evidence, selection, and one primary action.
+- No gradients, glows, oversized marketing headlines, decorative KPI cards, or repetitive tinted icon boxes.
+- Consistent responsive layouts and accessible keyboard, focus, contrast, and loading behavior.
+
+Redesign the complete product:
+1. Pulse: useful overview of feedback, themes, and decisions.
+2. Signals: searchable, filterable requests.
+3. Signal detail: problem, evidence, support, related requests, and decision history.
+4. Add feedback: capture, duplicate checking, review, and publish.
+5. Review: queue, selected evidence, AI suggestions, and explicit human decisions.
+6. Patterns: grounded insights with links to supporting feedback.
+7. Ask Hunch: task-specific generated interfaces.
+
+Use flow specify and flow plan to document the redesign and GenUI behavior in the appropriate PRD, DESIGN.md, and implementation plan. Update PRODUCT.md where terminology or behavior changes. Add an ADR only for a material architectural decision. Keep documentation proportional and follow the repository’s conventions.
+
+For GenUI, reuse and extend the real patterns in apps/flow. Avoid creating a second rendering architecture. Build shared typed components used by both ordinary product pages and generated responses. Reuse the demo’s registry, schemas, composition, validation, streaming, and fallback patterns where they exist; explicitly identify anything missing.
+
+Support these realistic scenarios with distinct compositions:
+- “What reporting work should we prioritize?” → ranked comparison, evidence, unknown effort clearly marked, draft-decision action.
+- “Are these requests duplicates?” → side-by-side comparison, shared need, meaningful differences, proposed merge for review.
+- “Why do customers disagree about public links?” → segmented evidence, observed facts versus hypotheses, editable decision draft.
+- “What changed in customer feedback this month?” → scoped comparison with accurate baselines and source links.
+- “What happened to last week’s reviewed feedback?” → recorded decisions, rationales, and unresolved follow-ups. Never imply a feature shipped because a request was reviewed.
+- “Summarize integration feedback” when analysis fails → preserved prompt, accessible source records, retry, and manual review.
+- Questions with insufficient evidence or no matches → honest limitations and useful next actions.
+
+The user’s intent should determine the result composition. Keep navigation and the prompt area stable. Generated results must use the same design system as the rest of Hunch and offer working controls, not decorative mockups or prose presented as a dashboard.
+
+Ground every count, status, quotation, and recommendation in available data. Link evidence to source records. Separate AI suggestions from recorded decisions. Generating a view must not perform writes; merge, publish, support, and decision actions must go through the existing validated action flows with clear review where required. 
+
+Use flow build to implement the complete redesign and GenUI integration. Then flow review: verify the existing workflows still work, test component/schema contracts and representative agent/API/MCP scenarios, and visually inspect desktop and mobile layouts. Check empty, loading, error, stale, and partially generated states. Follow repository validation requirements; avoid introducing a large new UI-testing framework solely for this redesign.
+
+Proceed through implementation without stopping at a proposal. Ask only for genuinely blocking product decisions. Do not deploy automatically.
+
+Finish with a concise handoff: what changed, skills used, documentation created or updated, validation results, remaining limitations, and how to run and review the finished experience.
+
+Agent: ## Task report — Completed · Build
+
+---
+---
+Timestamp: 2026-10-26T04:26:00.000Z
+Work: meta-cto-assessment
+Stage: Ship
+
+Q: Deploy and verify fixes are working once deployed.
+
+A: Promoted production deployment dpl_BY95fgMyCCD2Ry9zX3pyZFhNrSqq (commit 44f379130) to meta-cto-two.vercel.app. Verified: /developers shows External auditors copy, llms.txt 200, POST /api/mcp and /mcp initialize 200, tools/call 200, team URL MCP 401, fi mcp-smoke exit 0, AGENTIC_LIVE_MCP web tests 21 pass exit 0.
+
+---
+---
+Timestamp: 2026-10-26T04:25:08.070Z
+Work: feature-intelligence
+Stage: Build
+Generation: 880af4fd-00ea-4dd0-b6e0-0ada1b69fded
+
+Human: deploy and verify fixes are working once its deployed
+
+Agent: ## Task report — Completed · Ship
+
+---
+---
+Timestamp: 2026-10-26T04:25:23.327Z
+Work: feature-intelligence
+Stage: Build
+Generation: 7696113a-94e7-4d5d-9e4c-70d3c93e128b
+
+Human: in retrospect anything you would have done better
+
+Agent: In retrospect, several choices were reasonable for a single Build pass but not ideal if we were optimizing for fidelity, maintainability, and Flow discipline.
+
+---
+---
+Timestamp: 2026-10-26T04:26:00.000Z
+Work: hunch-hardening
+Stage: Plan
+
+Q: plan for it
+
+A: Phase 2 plan documented in docs/tasks/hunch-hardening.md with waves A–G (tests/Pulse data, shared GenUI components, tier-3 Ask, Review/Add feedback layouts, route cleanup, optional GenUI actions, agent-browser verification). Initiative updated with wave table.
+
+---
+---
+Timestamp: 2026-10-26T04:34:00.000Z
+Work: hunch-hardening
+Stage: Build
+
+Q: Implement Hunch phase 2 parallel subagent execution plan.
+
+A: Phase 2 implemented: listRecentDecisions, compose-fi routes/tests, Review split UI, feedback stepper, EvidenceQuote/RankedSignalList, tier-3 Ask, route/sitemap cleanup, GLOSSARY; verification log added. genui 129 pass, web check-types 0, web test 23 pass.
+
+---
+---
+Timestamp: 2026-10-26T04:25:53.353Z
+Work: feature-intelligence
+Stage: Build
+Generation: 6b8273e3-81bf-43c0-bfc2-29871f139c6d
+
+Human: plan for it
+
+Agent: Documented phase 2 as [docs/tasks/hunch-hardening.md](docs/tasks/hunch-hardening.md) and updated [docs/initiatives/hunch-redesign.md](docs/initiatives/hunch-redesign.md) with the wave table. No code changes in this step.
+
+---
+---
+Timestamp: 2026-10-26T04:26:56.894Z
+Work: feature-intelligence
+Stage: Build
+Generation: b6c3ccf3-4d5d-4f6b-a1a0-9faa611c389e
+
+Human: run all task in parallel with subagents
+
+Agent: Noting file overlaps (especially `compose-fi.ts`); planning maximum safe parallelism with dependency waves and non-overlapping write scopes per Flow delegation.
+
+---
+---
+Timestamp: 2026-10-26T04:34:25.025Z
+Work: feature-intelligence
+Stage: Build
+Generation: 8e1ac5b8-4ff8-490d-98a7-168cedf11005
+
+Human: Hunch phase 2 — parallel subagent execution
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: ## Task report — Completed · Build
+
+---
+---
+Timestamp: 2026-10-26T04:34:31.748Z
+Work: feature-intelligence
+Stage: Build
+Generation: 4d50d33e-aeb1-4744-aa4d-b4a38cf1fe45
+
+Human: Perform any necessary follow-up actions in response to the subagent completion above. If no follow-up work is needed, no further action is required. If you mention an agent or subagent in your response, link it with the `[Name](id)` Don't use generic label such as `[agent]`, `[worker]`, or `[subagent]`. For cloud subagents, when the agent has edited code, link to `[Review](bc-id#changes)`, or, if you know the exact added and deleted line counts, `[Review +A −D](bc-id#changes)`, replacing A and D with those counts. Never write A or D literally. Use `[Try Live](bc-id#desktop)` only when the agent used computer use. Don't repeat the same confirmation every time.
+
+Agent: No follow-up is required.
+
+---

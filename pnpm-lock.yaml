@@ -251,6 +251,9 @@ importers:
       '@repo/fi':
         specifier: workspace:*
         version: link:../../packages/fi
+      '@repo/genui':
+        specifier: workspace:*
+        version: link:../../packages/genui
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -365,6 +368,8 @@ importers:
       typescript:
         specifier: 7.0.2
         version: 7.0.2
+
+  packages/fi-cli: {}
 
   packages/genui:
     dependencies:

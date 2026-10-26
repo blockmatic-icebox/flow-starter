@@ -1,6 +1,6 @@
 # Product application (`apps/web`)
 
-Minimal Next.js product app. **Feature Intelligence** human UI + **ask-only** `/chat` (no mutation tools). **eve** root agent lives at repo `agent/` (not in-app agent sidebar). No GenUI demo unless the product needs it.
+Minimal Next.js product app. **Hunch** human UI (Feature Intelligence domain) + **Ask Hunch** GenUI at `/ask` via `POST /api/genui/compose` (read-only; no mutations from generated UI). Legacy `/chat` redirects to `/ask`. **eve** root agent lives at repo `agent/` (not in-app agent sidebar).
 
 **FI MVP testing:** Manual browser verification only — do not add Playwright specs under `tests/browser/` for feature-intelligence routes. See [docs/specs/feature-intelligence-testing.md](../../docs/specs/feature-intelligence-testing.md).
 

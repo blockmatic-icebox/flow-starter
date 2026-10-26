@@ -6,7 +6,7 @@
 @source "../../../../apps/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
 
-/* Meta CTO design system — semantic mapping for shadcn tokens (https://www.metacto.com/) */
+/* Hunch (assessment) — Paper + Cobalt on Meta CTO token structure */
 @theme inline {
   --font-heading: var(--font-heading-family, var(--font-sans));
   --color-sidebar-ring: var(--sidebar-ring);
@@ -51,10 +51,15 @@
 }
 
 :root {
-  --metacto-ink: oklch(0.305 0.016 227.4);
-  --metacto-cloud: oklch(0.979 0.007 88.6);
-  --metacto-orange: oklch(0.704 0.177 54.5);
-  --metacto-teal: oklch(0.508 0.062 180);
+  --hunch-paper: #f5f3ed;
+  --hunch-ink: #22241f;
+  --hunch-cobalt: #3454ed;
+  --hunch-border: #e4e0d6;
+
+  --metacto-ink: var(--hunch-ink);
+  --metacto-cloud: var(--hunch-paper);
+  --metacto-orange: var(--hunch-cobalt);
+  --metacto-teal: var(--hunch-cobalt);
   --metacto-seafoam-deep: oklch(0.619 0.065 175);
   --metacto-mist: oklch(0.928 0.006 88);
   --metacto-pewter: oklch(0.709 0.009 88);
@@ -83,7 +88,7 @@
   --chart-3: var(--metacto-seafoam-deep);
   --chart-4: var(--metacto-slate);
   --chart-5: var(--metacto-pewter);
-  --radius: 0.75rem;
+  --radius: 0.375rem;
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: var(--metacto-ink);
   --sidebar-primary: var(--metacto-orange);
