@@ -190,7 +190,8 @@ Production authentication and authorization; security-hardening scope; real cust
 | Workflow trials (small-task / shared-spec) | **Partial** — Matt skills in lockfile; ADR 0002 documents Matt workflow; GitHub tracker setup via `setup-matt-pocock-skills` not automated in CI |
 | Product checks P1–P10 | **Mostly verified** on `simple` — P3 Jev wired for ambiguous routes with regex fallback; P5 MCP App host rendering unverified without live host; P8 unsupported requests fail honestly |
 | Closeout evidence (2026-10-26) | `pnpm --filter @repo/genui test` and `pnpm eval:genui:offline` 102/102 pass; studio create vs refine; Eve `compose-ui` execute test in `apps/web/tests/agent/`; Vercel `flow-starter` → `apps/web`; Neon project `flow-starter` for optional `DATABASE_URL` |
-| Deploy (2026-10-26) | PR [#8](https://github.com/gaboesquivel/flow-factory/pull/8) on `simple`; preview alias `flow-starter-git-simple-gaboesquivel.vercel.app`; complete Neon Marketplace install if integration terms pending |
+| Deploy (2026-10-26) | PR [#8](https://github.com/gaboesquivel/flow-factory/pull/8) **merged** to `main` (`edfdefe42`); production https://flow-starter-gaboesquivel.vercel.app/ |
+| Audit (2026-10-26) | External review at `447de36c` — [reconciliation](001-audit-reconciliation-2026-10-26.md) maps findings to post-closeout `main` |
 | CI fixes (2026-10-26) | PR commit check uses `pull_request.head.sha`; knip ignores Eve/Jev deps; `undici>=8.12.2` override in `pnpm-workspace.yaml` |
 
 Repository verification (2026-10-26): `pnpm check-types`, `pnpm test`, `pnpm knip`, `pnpm security:osv` (main lockfile) exit 0. P5 MCP App **host** rendering remains manual; protocol tests + `build:mcp-app` cover bundle and routes.
