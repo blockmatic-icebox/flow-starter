@@ -8,13 +8,13 @@ The **human-facing product name** in `apps/web` for this assessment. **hunch** i
 
 | hunch screen | Domain meaning |
 | --- | --- |
-| Pulse | Overview of queue depth, themes, and recent signals/decisions |
-| Signals | Published **feature requests** (discover/search) |
-| Signal | One published **feature request** |
-| Review | PM **triage queue** and **disposition** workflow |
-| Patterns | **Insights** / trends from persisted data |
-| Ask Hunch | Read-only **GenUI** compose over signal data (no disposition writes) |
+| Overview | Needs attention, outcome metrics, demand changes, recent **decisions** |
+| Feedback | Published **feature requests** (discover/search); UI says “feedback” |
+| Review / Triage (UI) | PM **triage queue** and **disposition** workflow (“Record decision” in UI) |
+| Insights | **Insights** / trends from persisted data (`getInsights`) |
+| Ask Hunch | Read-only **GenUI** compose over feedback data (no disposition writes) |
 | Add feedback | **Submit** / intake with duplicate check and confirm |
+| Developer overview (`/dev`) | MCP, OpenAPI, and agent discovery (not product triage) |
 
 This document is the **ubiquitous language** for product code (`@repo/fi`, `apps/web`, `agent/`). Factory methodology terms live in [.agents/flow/glossary.md](.agents/flow/glossary.md), not here.
 

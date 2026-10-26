@@ -21,7 +21,7 @@ This demo intentionally omits SSO and multi-tenant administration so evaluators 
 
 export const contactBody = `For the Meta CTO technical assessment, Feature Intelligence is operated as a public demo deployment. Product questions about scope and acceptance criteria belong to the assessment brief; engineering questions about Flow Factory belong to the flow-factory repository.
 
-Agent integrators can verify live behavior with GET /openapi.json, POST /api/mcp (Streamable HTTP), and the developer portal at /developers. For API errors, clients receive JSON bodies with code, error, and resolution fields. Human visitors can use the in-app Ask chat at /chat when ANTHROPIC_API_KEY is configured on the host.
+Agent integrators can verify live behavior with GET /openapi.json, POST /api/mcp (Streamable HTTP), and the developer overview at /dev. For API errors, clients receive JSON bodies with code, error, and resolution fields. Human visitors can use the in-app Ask chat at /chat when ANTHROPIC_API_KEY is configured on the host.
 
 Assessment contact for the deploying organization should be listed in your submission materials; this page exists so automated trust checks can confirm a reachable contact narrative on the same origin as the product.`;
 

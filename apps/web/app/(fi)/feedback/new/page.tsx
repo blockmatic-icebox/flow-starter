@@ -4,10 +4,11 @@ import { SubmitForm } from "../../requests/new/submit-form";
 export default async function AddFeedbackPage({
   searchParams,
 }: {
-  searchParams: Promise<{ context?: string }>;
+  searchParams: Promise<{ context?: string; resume?: string }>;
 }) {
   const params = await searchParams;
   const context = params.context === "internal" ? "internal" : "external";
+  const resume = params.resume?.trim() || undefined;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -18,11 +19,11 @@ export default async function AddFeedbackPage({
         <p className="text-muted-foreground text-sm">
           {context === "external"
             ? "Capture customer feedback in plain language."
-            : "Paste notes from calls or tickets — we check related signals first."}
+            : "Paste notes from calls or tickets — we check related feedback first."}
         </p>
       </header>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_14rem]">
-        <SubmitForm context={context} />
+        <SubmitForm context={context} resumeRequestId={resume} />
         <FeedbackNextSidebar />
       </div>
     </div>

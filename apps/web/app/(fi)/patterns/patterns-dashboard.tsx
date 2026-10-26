@@ -11,6 +11,8 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { hunchNav, hunchPageSubtitles } from "@/lib/hunch-content";
+
 type InsightsPayload = Awaited<ReturnType<typeof getInsights>>;
 
 const SimpleBars = ({ data }: { data: { label: string; value: number }[] }) => {
@@ -58,9 +60,11 @@ export const PatternsDashboard = ({
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <header className="space-y-1">
-          <h1 className="text-lg font-semibold tracking-tight">Patterns</h1>
+          <h1 className="text-lg font-semibold tracking-tight">
+            {hunchNav.insights.label}
+          </h1>
           <p className="text-muted-foreground text-sm">
-            Grounded trends from recorded feedback and decisions.
+            {hunchPageSubtitles.insights}
           </p>
         </header>
         <Select
@@ -82,7 +86,7 @@ export const PatternsDashboard = ({
       <dl className="grid gap-4 sm:grid-cols-3">
         <div>
           <dt className="text-muted-foreground text-xs uppercase">
-            Signals received
+            Feedback received
           </dt>
           <dd className="text-2xl font-semibold tabular-nums">
             {insights.sample.publishedCount}
@@ -93,7 +97,7 @@ export const PatternsDashboard = ({
             Decisions recorded
           </dt>
           <dd className="text-2xl font-semibold tabular-nums">
-            {insights.sample.dispositionWithRationaleCount}
+            {insights.sample.decisionsInRangeCount}
           </dd>
         </div>
         <div>
@@ -114,7 +118,7 @@ export const PatternsDashboard = ({
             {topTheme.label} requests are prominent
           </p>
           <p className="text-muted-foreground mt-1 text-sm">
-            {topTheme.count} signals in range
+            {topTheme.count} feedback items in range
             {topTheme.priorCount === null ? null : (
               <>
                 {" "}
@@ -127,7 +131,7 @@ export const PatternsDashboard = ({
             className="text-primary mt-2 inline-block text-sm underline"
             href={`/signals?theme=${topTheme.themeKey}`}
           >
-            View supporting signals
+            View feedback
           </Link>
         </section>
       ) : null}
@@ -135,7 +139,7 @@ export const PatternsDashboard = ({
       {insights.trends ? (
         <div className="grid gap-8 lg:grid-cols-2">
           <section className="space-y-3">
-            <h2 className="text-sm font-semibold">Signals by theme</h2>
+            <h2 className="text-sm font-semibold">Feedback by theme</h2>
             <ul className="space-y-2 text-sm">
               {(() => {
                 const themeTrends = insights.trends.themes;

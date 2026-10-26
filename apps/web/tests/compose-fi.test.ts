@@ -52,11 +52,13 @@ const mockInsights = (): ComposeFiDeps["getInsights"] => () =>
     openQueueCount: 2,
     range: null,
     sample: {
+      decisionsInRangeCount: 1,
       dispositionWithRationaleCount: 1,
       intakeLinkCount: 0,
       openQueueCount: 2,
       pmTriageN: 0,
       publishedCount: 5,
+      readinessDegradedN: 0,
       readinessN: 0,
     },
     trends: {

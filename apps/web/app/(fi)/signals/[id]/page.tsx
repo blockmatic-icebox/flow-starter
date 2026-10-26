@@ -41,7 +41,7 @@ export default async function SignalDetailPage({
     <div className="space-y-6">
       <nav aria-label="Breadcrumb" className="text-muted-foreground text-xs">
         <Link className="hover:underline" href="/signals">
-          Signals
+          Feedback
         </Link>
         {req.themeLabel ? (
           <>
@@ -75,7 +75,7 @@ export default async function SignalDetailPage({
           }}
         >
           <Button size="sm" type="submit" variant="outline">
-            {externalView ? "Add support" : "Support signal"}
+            {externalView ? "Add support" : "Support feedback"}
           </Button>
         </form>
       </header>
@@ -107,7 +107,7 @@ export default async function SignalDetailPage({
           ) : null}
 
           <section className="space-y-2">
-            <h2 className="text-sm font-semibold">Related signals</h2>
+            <h2 className="text-sm font-semibold">Related feedback</h2>
             <ul className="divide-border divide-y text-sm">
               {related.items
                 .filter((r) => r.id !== id)
@@ -176,7 +176,7 @@ export default async function SignalDetailPage({
             <p className="text-muted-foreground text-sm">
               No recorded decision yet.{" "}
               <Link className="text-primary underline" href="/review">
-                Review queue
+                Triage queue
               </Link>
             </p>
           )}

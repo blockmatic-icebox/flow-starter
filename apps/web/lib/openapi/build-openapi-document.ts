@@ -221,7 +221,7 @@ export const buildOpenApiDocument = (origin: string) => {
     },
     externalDocs: {
       description: "Developer portal",
-      url: `${origin}/developers`,
+      url: `${origin}/dev`,
     },
     info: {
       description:

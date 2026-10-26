@@ -1,11 +1,18 @@
 import { themeRegistry } from "@repo/fi";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+import { hunchNav, hunchPageSubtitles } from "@/lib/hunch-content";
 
 import {
   formatRelativeTime,
   SignalStatusBadge,
 } from "../_components/signal-status";
 import { actionSearchRequests } from "../actions";
+
+export const metadata: Metadata = {
+  title: hunchNav.feedback.label,
+};
 
 export default async function SignalsPage({
   searchParams,
@@ -52,9 +59,11 @@ export default async function SignalsPage({
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <h1 className="text-lg font-semibold tracking-tight">Signals</h1>
+        <h1 className="text-lg font-semibold tracking-tight">
+          {hunchNav.feedback.label}
+        </h1>
         <p className="text-muted-foreground text-sm">
-          Search and filter published feedback.
+          {hunchPageSubtitles.feedback}
         </p>
       </header>
 
@@ -105,7 +114,7 @@ export default async function SignalsPage({
       </div>
 
       <p className="text-muted-foreground text-sm tabular-nums">
-        {result.total} signals · page {result.page} of {totalPages}
+        {result.total} items · page {result.page} of {totalPages}
       </p>
 
       <div className="overflow-x-auto">

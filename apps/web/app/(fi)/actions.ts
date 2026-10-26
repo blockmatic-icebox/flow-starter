@@ -15,6 +15,7 @@ import {
   supportRequest,
 } from "@repo/fi";
 import type { FeatureRequestSource, SearchRequestsSort } from "@repo/fi";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 const db = () => getDb();
@@ -48,7 +49,9 @@ export async function actionSetDisposition(input: {
   mergeTargetId?: string | null;
 }) {
   try {
-    return await setDisposition({ db: db(), ...input });
+    const result = await setDisposition({ db: db(), ...input });
+    revalidatePath("/", "layout");
+    return result;
   } catch (error) {
     if (error instanceof DispositionError)
       throw new Error(error.message, { cause: error });

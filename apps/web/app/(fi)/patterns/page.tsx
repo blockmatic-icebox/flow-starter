@@ -1,7 +1,14 @@
 import { getDb, getInsights } from "@repo/fi";
 import type { InsightsRangePreset } from "@repo/fi";
+import type { Metadata } from "next";
+
+import { hunchNav } from "@/lib/hunch-content";
 
 import { PatternsDashboard } from "./patterns-dashboard";
+
+export const metadata: Metadata = {
+  title: hunchNav.insights.label,
+};
 
 const isRange = (value: string | undefined): value is InsightsRangePreset =>
   value === "7d" || value === "30d" || value === "90d" || value === "all";

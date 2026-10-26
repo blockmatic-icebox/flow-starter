@@ -87,7 +87,16 @@ type GetInsightsResult = {
   decisionCaptureRate: number | null;
   intakeLinkRate: number | null;
   openQueueCount: number;
-  sample: {/* unchanged keys */};
+  sample: {
+    readinessN: number;
+    readinessDegradedN: number; // degraded triage in readiness numerator (period scope)
+    pmTriageN: number;
+    publishedCount: number;
+    intakeLinkCount: number;
+    dispositionWithRationaleCount: number; // snapshot (capture rate context)
+    decisionsInRangeCount: number; // disposition_at in range when range set; else same as snapshot closed count
+    openQueueCount: number;
+  };
   computedAt: string;
   range: { preset: InsightsRangePreset; from: string; to: string } | null;
   trends: null | {

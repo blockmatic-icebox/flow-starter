@@ -37,7 +37,7 @@ Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundar
 | `packages/fi` | Metrics, queue/CRUD, **disposition gate** (remediation), T0–T3 harness, `seed/` (500 rows + safety guard) | **Live** — RC-1–RC-8 per [remediation tasks](docs/tasks/feature-intelligence-remediation.md) |
 | `packages/db` | Drizzle schema; `fi-schema.ts`; migrations through `0002_feature_intelligence` | **Live** — `pnpm db:migrate`, remote SSL in client |
 | `agent/` | eve root agent; `instructions.md` + 8 tools → `@repo/fi` | **Live** — smoke evals in `evals/` |
-| `apps/web` | Next.js + `eve/next`; Hunch UI under `app/(fi)/`; GenUI `POST /api/genui/compose`; agentic routes (`llms.txt`, well-known MCP, `/api/mcp`) — **`force-dynamic`** on FI layout | **Live** — [hunch-genui](docs/specs/hunch-genui.md) + [agentic discoverability](docs/specs/feature-intelligence-agentic-discoverability.md) |
+| `apps/web` | Next.js + `eve/next`; Hunch UI under `app/(fi)/` (Overview, Feedback, Triage, Insights, `/dev`); GenUI `POST /api/genui/compose`; agentic routes (`llms.txt`, well-known MCP, `/api/mcp`) — **`force-dynamic`** on FI layout | **Live** — [hunch-pm-overview](docs/specs/hunch-pm-overview.md), [hunch-genui](docs/specs/hunch-genui.md) + [agentic discoverability](docs/specs/feature-intelligence-agentic-discoverability.md) |
 | `evals/` | eve smoke (`pnpm exec eve eval smoke`) | **Live** — behavioral smoke; deeper outcome evals optional (RC-9) |
 
 Also available: `@repo/ui`, `@repo/genui` (Ask Hunch compose + renderer), `@repo/ts`.

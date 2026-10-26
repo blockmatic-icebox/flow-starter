@@ -1,3 +1,5 @@
+import type { TriageStepsPayload } from "../triage/types";
+
 export interface InsightRow {
   status: string;
   disposition: string | null;
@@ -8,6 +10,7 @@ export interface InsightRow {
   publishedAt: Date | null;
   pmReviewStartedAt: Date | null;
   dispositionAt: Date | null;
+  triageSteps?: TriageStepsPayload | null;
 }
 
 const median = (values: number[]) => {
@@ -66,11 +69,13 @@ export const computeInsights = ({ rows }: { rows: InsightRow[] }) => {
     medianPmTriageMsProxy: median(pmTriageProxyMs),
     openQueueCount,
     sample: {
+      decisionsInRangeCount: closedCount,
       dispositionWithRationaleCount: closedCount,
       intakeLinkCount: intakeLinks.length,
       openQueueCount,
       pmTriageN: pmTriageMs.length,
       publishedCount: published.length,
+      readinessDegradedN: 0,
       readinessN: readinessMs.length,
     },
   };

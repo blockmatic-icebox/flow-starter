@@ -43,7 +43,7 @@ Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence
 | **Database** | **Live** — Vercel build: `db:migrate` + **if-empty** seed (`FI_SEED_IF_EMPTY`); local full reseed via `pnpm seed:fi` ([seed spec](docs/specs/feature-intelligence-seed.md)) |
 | **Domain (`@repo/fi`)** | **Live** — disposition validation, merge rollup, discovery pagination, degraded triage flags ([remediation](docs/specs/feature-intelligence-remediation.md)) |
 | **eve (`agent/`)** | **Live** — behavioral smoke evals (AG-7, owned confirm/monitor/merge); `pnpm exec eve eval smoke` |
-| **Human UI (`apps/web`)** | **Live** — **Hunch** shell (Pulse, Signals, Review, Patterns, Ask Hunch GenUI); merge picker, search/sort/page, AI failure UX, decision sidebar; legacy URL redirects |
+| **Human UI (`apps/web`)** | **Live** — **Hunch** shell (Overview, Feedback, Triage, Insights, Ask Hunch, `/dev`); PM Overview dashboard, trustworthy period metrics; legacy URL redirects |
 | **Agentic discoverability** | **Live** — `llms.txt`, well-known MCP, Streamable HTTP `/api/mcp` (open demo tools), `pnpm agentic:check` ([spec](docs/specs/feature-intelligence-agentic-discoverability.md)) |
 | **MCP App (Hunch Explorer)** | **Planned** — interactive `ui://hunch/explorer` for Apps-capable hosts; non-UI fallback required ([initiative](docs/initiatives/hunch-mcp-app.md), [spec](docs/specs/hunch-mcp-app.md)) |
 | **Deployment (demo)** | **Live** — Vercel `meta-cto`, https://meta-cto-two.vercel.app (`DATABASE_URL`, gateway/Anthropic keys on Production) |

@@ -85,6 +85,7 @@ test("GET /sitemap.xml returns valid urlset XML for public routes", async () => 
     "/review",
     "/patterns",
     "/ask",
+    "/dev",
   ])
     assert.match(
       body,

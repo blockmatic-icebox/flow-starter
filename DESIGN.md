@@ -13,19 +13,20 @@
 
 **Reserve cobalt** for meaningful evidence, selection, and the single primary action (Add feedback). Navigation selection stays neutral (`bg-muted`). No gradients, glows, oversized marketing headlines, or decorative KPI tiles.
 
-**Implemented:** `apps/web/app/(fi)/` — Pulse, Signals, Add feedback, Review, Patterns, Ask Hunch. Domain terms remain in [GLOSSARY.md](GLOSSARY.md) (signal = published feature request, disposition, etc.). Spec: [docs/specs/hunch-genui.md](docs/specs/hunch-genui.md).
+**Implemented:** `apps/web/app/(fi)/` — Overview, Feedback, Add feedback, Triage, Insights, Ask Hunch, Developer overview (`/dev`). Domain terms remain in [GLOSSARY.md](GLOSSARY.md) (signal = published feature request, disposition in API, “decision” in UI). Specs: [hunch-genui.md](docs/specs/hunch-genui.md), [hunch-pm-overview.md](docs/specs/hunch-pm-overview.md).
 
 ### Screens
 
 | Route | Screen |
 | --- | --- |
-| `/` | Pulse — queue count, themes, recent signals/decisions |
-| `/signals` | Searchable, filterable table |
-| `/signals/[id]` | Problem, evidence, support, related signals, decision history |
+| `/` | Overview — needs attention, outcome metrics, demand, recent decisions |
+| `/signals` | Feedback — searchable, filterable table |
+| `/signals/[id]` | Problem, evidence, support, related feedback, decision history |
 | `/feedback/new` | Capture → duplicate check → publish (existing harness) |
-| `/review` | Queue + disposition (inline triage panel) |
-| `/patterns` | Grounded trends from `getInsights` |
+| `/review` | Triage — queue + record decision (inline panel) |
+| `/patterns` | Insights — grounded trends from `getInsights` |
 | `/ask` | Ask Hunch — GenUI compose (read-only) |
+| `/dev` | Developer overview — MCP, OpenAPI, discovery |
 
 Legacy paths redirect (`/requests` → `/signals`, etc.).
 

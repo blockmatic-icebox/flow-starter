@@ -1,5 +1,11 @@
-import { getDb, listTriageQueue, searchRequests } from "@repo/fi";
-import type { TriageQueueSort } from "@repo/fi";
+import {
+  getDb,
+  getRequest,
+  isTriageDegraded,
+  listTriageQueue,
+  searchRequests,
+} from "@repo/fi";
+import type { TriageQueueSort, TriageStepsPayload } from "@repo/fi";
 import { Badge } from "@repo/ui/components/badge";
 import {
   Empty,
@@ -7,9 +13,16 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from "@repo/ui/components/empty";
+import type { Metadata } from "next";
 import Link from "next/link";
 
+import { hunchNav, hunchPageSubtitles } from "@/lib/hunch-content";
+
 import { TriagePanel } from "./triage-panel";
+
+export const metadata: Metadata = {
+  title: hunchNav.triage.label,
+};
 
 export default async function TriagePage({
   searchParams,
@@ -22,6 +35,7 @@ export default async function TriagePage({
 
   const db = getDb();
   const queue = await listTriageQueue({ db, sort });
+  const queueIds = queue.map((row) => row.id);
   const { items: mergeTargets } = await searchRequests({
     db,
     pageSize: 100,
@@ -29,6 +43,10 @@ export default async function TriagePage({
   });
 
   const selected = queue.find((row) => row.id === focus) ?? queue.at(0) ?? null;
+
+  const detail = selected
+    ? await getRequest({ db, requestId: selected.id })
+    : null;
 
   let sortLabel = "support";
   if (sort === "newest") sortLabel = "newest first";
@@ -41,12 +59,27 @@ export default async function TriagePage({
     return `/review?${sp.toString()}`;
   };
 
+  const triageSteps = selected?.triageSteps as TriageStepsPayload | null;
+  const degraded = isTriageDegraded(triageSteps);
+
   return (
     <div className="space-y-6">
+      <nav aria-label="Breadcrumb" className="text-muted-foreground text-xs">
+        <Link className="hover:underline" href="/">
+          Overview
+        </Link>
+        {" / "}
+        <span>{hunchNav.triage.label}</span>
+      </nav>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight">Review</h1>
+          <h1 className="text-lg font-semibold tracking-tight">
+            {hunchNav.triage.label}
+          </h1>
           <p className="text-muted-foreground text-sm">
+            {hunchPageSubtitles.triage}
+          </p>
+          <p className="text-muted-foreground mt-1 text-xs tabular-nums">
             {queue.length} awaiting review · sorted by {sortLabel}
           </p>
         </div>
@@ -75,11 +108,11 @@ export default async function TriagePage({
           <EmptyHeader>
             <EmptyTitle>Queue is clear</EmptyTitle>
             <EmptyDescription>
-              No open items need review right now.
+              No published feedback needs a decision right now.
             </EmptyDescription>
           </EmptyHeader>
           <Link className="text-primary text-sm underline" href="/patterns">
-            View Patterns
+            View Insights
           </Link>
         </Empty>
       ) : (
@@ -117,9 +150,24 @@ export default async function TriagePage({
                   <Badge variant="secondary">
                     {selected.supportCount ?? 0} supporters
                   </Badge>
+                  <Link
+                    className="text-primary text-xs hover:underline"
+                    href={`/signals/${selected.id}`}
+                  >
+                    View feedback
+                  </Link>
                 </div>
+                {degraded ? (
+                  <output className="block rounded-md border border-amber-200/80 bg-amber-50/80 p-3 text-sm dark:border-amber-900/40 dark:bg-amber-950/30">
+                    <p className="font-medium">Degraded AI processing</p>
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      Triage output may be incomplete. Verify problem statement
+                      and brief before recording a decision.
+                    </p>
+                  </output>
+                ) : null}
                 <div className="space-y-2">
-                  <h3 className="text-sm font-semibold">Problem</h3>
+                  <h3 className="text-sm font-semibold">Problem (persisted)</h3>
                   <p className="text-sm leading-relaxed">
                     {selected.problemStatement ?? selected.description}
                   </p>
@@ -132,8 +180,35 @@ export default async function TriagePage({
                 </div>
                 {selected.decisionBrief ? (
                   <div className="space-y-2">
-                    <h3 className="text-sm font-semibold">Desired outcome</h3>
-                    <p className="text-sm">{selected.decisionBrief}</p>
+                    <h3 className="text-sm font-semibold">
+                      Brief (AI suggestion)
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      {selected.decisionBrief}
+                    </p>
+                  </div>
+                ) : null}
+                {detail && detail.duplicates.length > 0 ? (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold">
+                      Duplicate candidates
+                    </h3>
+                    <ul className="space-y-1 text-sm">
+                      {detail.duplicates.map((d) => (
+                        <li key={d.id}>
+                          <Link
+                            className="text-primary hover:underline"
+                            href={`/signals/${d.candidateRequestId}`}
+                          >
+                            {d.title}
+                          </Link>
+                          <span className="text-muted-foreground text-xs">
+                            {" "}
+                            — {d.explanation}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 ) : null}
               </section>
@@ -142,12 +217,8 @@ export default async function TriagePage({
                 <section className="rounded-md border border-amber-200/80 bg-amber-50/80 p-3 text-sm dark:border-amber-900/40 dark:bg-amber-950/30">
                   <h3 className="font-semibold">Hunch suggestion</h3>
                   <p className="text-muted-foreground mt-1 text-xs">
-                    Not a recorded decision — review evidence before merging or
-                    monitoring.
-                  </p>
-                  <p className="mt-2 text-sm">
-                    Compare wording with related signals and duplicate
-                    candidates from triage before choosing merge or monitor.
+                    Not a recorded decision — compare evidence and duplicate
+                    candidates before you choose merge or monitor.
                   </p>
                 </section>
                 <TriagePanel
@@ -156,7 +227,9 @@ export default async function TriagePage({
                     id: t.id,
                     title: t.title,
                   }))}
+                  queueIds={queueIds}
                   requestId={selected.id}
+                  sort={sort}
                 />
               </aside>
             </>

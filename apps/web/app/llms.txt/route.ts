@@ -12,16 +12,16 @@ Use this product when you need to capture customer or internal feature requests,
 
 ## Human routes
 
-- ${origin}/ (Pulse)
-- ${origin}/signals
+- ${origin}/ (Overview)
+- ${origin}/signals (Feedback)
 - ${origin}/feedback/new
-- ${origin}/review
-- ${origin}/patterns
+- ${origin}/review (Triage)
+- ${origin}/patterns (Insights)
 - ${origin}/ask (GenUI compose — read-only)
 
 ## Agent interoperability
 
-- Developer portal: ${origin}/developers
+- Developer overview: ${origin}/dev
 - OpenAPI 3.1: ${origin}/openapi.json
 - MCP server card: ${origin}/.well-known/mcp/server-card.json
 - MCP registry: ${origin}/.well-known/mcp.json

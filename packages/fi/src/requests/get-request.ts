@@ -21,8 +21,18 @@ export const getRequest = async ({
   if (!row) return null;
 
   const duplicates = await db
-    .select()
+    .select({
+      candidateRequestId: featureRequestDuplicateCandidate.candidateRequestId,
+      explanation: featureRequestDuplicateCandidate.explanation,
+      id: featureRequestDuplicateCandidate.id,
+      score: featureRequestDuplicateCandidate.score,
+      title: featureRequest.title,
+    })
     .from(featureRequestDuplicateCandidate)
+    .innerJoin(
+      featureRequest,
+      eq(featureRequestDuplicateCandidate.candidateRequestId, featureRequest.id)
+    )
     .where(eq(featureRequestDuplicateCandidate.requestId, requestId));
 
   const [supportRow] = await db

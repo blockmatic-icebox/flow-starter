@@ -1,6 +1,10 @@
 import { inRange } from "../insights/insights-range";
+import { isTriageDegraded } from "../triage/is-triage-degraded";
 import type { InsightRow } from "./compute-insights";
 import { computeInsights } from "./compute-insights";
+
+const hasDecisionRationale = (r: InsightRow) =>
+  Boolean(r.disposition && r.dispositionRationale?.trim());
 
 const mean = (values: number[]) =>
   values.length === 0
@@ -40,10 +44,17 @@ export const computeInsightsScoped = ({
   const readinessRows = published.filter((r) =>
     inRange({ date: r.submittedAt, from, to })
   );
-  const readinessMs = readinessRows.flatMap((r) => {
+  const readinessPairs = readinessRows.flatMap((r) => {
     if (!r.submittedAt || !r.triageCompletedAt) return [];
-    return [r.triageCompletedAt.getTime() - r.submittedAt.getTime()];
+    return [
+      {
+        degraded: isTriageDegraded(r.triageSteps),
+        ms: r.triageCompletedAt.getTime() - r.submittedAt.getTime(),
+      },
+    ];
   });
+  const readinessMs = readinessPairs.map((p) => p.ms);
+  const readinessDegradedN = readinessPairs.filter((p) => p.degraded).length;
 
   const pmRows = published.filter((r) =>
     inRange({ date: r.dispositionAt, from, to })
@@ -63,6 +74,11 @@ export const computeInsightsScoped = ({
 
   const intakeLinks = intakeDenom.filter((r) => r.intakeLinkedRequestId);
 
+  const decisionsInRange = published.filter(
+    (r) =>
+      inRange({ date: r.dispositionAt, from, to }) && hasDecisionRationale(r)
+  );
+
   return {
     ...snapshot,
     avgDecisionReadinessMs: mean(readinessMs),
@@ -72,9 +88,11 @@ export const computeInsightsScoped = ({
     medianPmTriageMsProxy: median(pmTriageProxyMs),
     sample: {
       ...snapshot.sample,
+      decisionsInRangeCount: decisionsInRange.length,
       intakeLinkCount: intakeLinks.length,
       pmTriageN: pmTriageMs.length,
       publishedCount: intakeDenom.length,
+      readinessDegradedN,
       readinessN: readinessMs.length,
     },
   };

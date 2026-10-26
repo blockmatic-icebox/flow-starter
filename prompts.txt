@@ -3057,3 +3057,354 @@ To-do's from the plan have already been created. Do not create them again. Mark 
 Agent: ## Subagent fleet (this session)
 
 ---
+---
+Timestamp: 2026-10-26T05:27:07.596Z
+Work: feature-intelligence
+Stage: Build
+Generation: 3a0e11c5-f5c5-48ef-a475-33b433701ffc
+
+Human: verify all task completed, run tests, and push to prod
+
+Agent: ## Task report — Completed · Ship
+
+---
+---
+Timestamp: 2026-10-26T05:27:12.470Z
+Work: feature-intelligence
+Stage: Build
+Generation: c6cc5fbc-8fd6-41d8-9c41-c664de75a154
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: **Done.** Hunch MCP App and workflow hardening are on `meta-cto` (`a9ccd5f1e` feature commit, plus small doc/log follow-ups). Local checks passed: lint, types, `pnpm test`, Eve smoke (9 passed, 1 skipped), and `build:web`.
+
+---
+---
+Timestamp: 2026-10-26T05:30:08.035Z
+Work: feature-intelligence
+Stage: Build
+Generation: a947a3a4-2bb7-4fff-9186-89ea74d6f2a4
+
+Human: git push
+
+Agent: `git push origin meta-cto` completed: **everything up-to-date** with `origin/meta-cto`.
+
+---
+---
+Timestamp: 2026-10-26T05:32:30.204Z
+Work: feature-intelligence
+Stage: Build
+Generation: 53e7d906-e1e5-4498-8fdb-c817f4662c15
+
+Human: when deploy is up use broser agent to check it all works fix what needs fix
+
+Agent: ## Browser check (production)
+
+---
+---
+Timestamp: 2026-10-26T06:00:20.563Z
+Work: feature-intelligence
+Stage: Build
+Generation: e61e00ab-8487-40ee-8bfb-5777bb967835
+
+Human: Improve Hunch so it helps product managers turn feedback into useful, documented decisions. Work on the meta-cto branch and use Flow to inspect the current implementation, specify the changes, organize tasks, build, and review them.
+
+This authorizes implementation of the scope below. Do not push or deploy.
+
+The outcome I want: a PM opens the app, understands what needs attention, inspects the evidence, records a decision, and sees the dashboard reflect that work. Keep the current Paper + Cobalt design and make the language immediately understandable.
+
+1. Inspect the current product before changing it
+
+Read AGENTS.md, load Flow, and inspect PRODUCT.md, DESIGN.md, ARCHITECTURE.md, GLOSSARY.md, and the relevant Feature Intelligence, analytics, remediation, and Hunch specifications.
+
+Review the actual implementations of:
+- The app shell and desktop/mobile navigation.
+- Pulse, Signals, Review, Patterns, Add feedback, and Ask Hunch.
+- getInsights, listTriageQueue, listRecentDecisions, and feedback search.
+- Publication, disposition, intake linking, and merge operations.
+- Related API/MCP contracts, agent tools, tests, and evals.
+
+Verify these previously observed issues against current code:
+- Pulse emphasized counts and recent activity instead of the four original product metrics.
+- “Decisions (30d)” used sample.dispositionWithRationaleCount, which might represent a snapshot rather than a period-filtered count.
+- A queue-loading error could leave the sidebar count at zero.
+- triage_completed_at could be populated after degraded AI processing.
+- pm_review_started_at → disposition_at measures elapsed time, including interruptions.
+
+Preserve existing local work. Fix verified gaps within this scope; do not redo improvements that already work.
+
+2. Use clear product language
+
+Apply this navigation consistently:
+- Pulse → Overview.
+- Signals → Feedback.
+- Review → Triage.
+- Patterns → Insights.
+- Keep Ask Hunch.
+- Keep Add feedback as the primary action.
+
+Use these page subtitles:
+- Overview: “See what needs attention and how feedback is becoming decisions.”
+- Feedback: “Explore customer feedback, requests, and supporting evidence.”
+- Triage: “Review feedback and record what happens next.”
+- Insights: “Understand recurring themes and changes in demand.”
+
+Update sidebar and mobile navigation, page headings, browser titles, breadcrumbs, buttons, empty states, accessibility labels, and user-facing generated compositions.
+
+Use “feedback” instead of “signals” in customer-facing copy. Prefer actions such as “View feedback,” “Review next item,” and “Record decision.” Use “decision” in user-facing copy where “disposition” adds unnecessary jargon, while retaining precise domain semantics.
+
+Preserve existing route URLs and redirects. This does not require a URL migration. Keep internal identifiers, database fields, API contracts, and tool names unchanged unless another functional requirement genuinely requires a change.
+
+3. Make the original metrics trustworthy
+
+Keep business logic in @repo/fi. Web, MCP, and eve must reuse the same definitions rather than calculating metrics independently.
+
+For each metric, verify:
+- Numerator and denominator.
+- Population included and excluded.
+- Timestamp used for filtering.
+- Period metric versus current snapshot.
+- Nulls, insufficient samples, and degraded records.
+- Sample size and computation time.
+
+Decision readiness time:
+- Preserve the accepted definition.
+- Do not imply that completion of a failed AI attempt proves a useful brief exists.
+- Surface degraded processing separately using persisted data.
+- If the current metric includes degraded attempts, disclose that limitation rather than silently redefining it.
+
+PM triage effort:
+- Clearly label the existing measure as elapsed review time.
+- Distinguish direct measurement from the existing proxy.
+- Do not claim active work time, productivity gains, or time saved.
+- Do not add client timers or session-tracking infrastructure for this scope.
+
+Decision capture rate:
+- Preserve the canonical denominator.
+- Distinguish the current snapshot from decisions recorded during a selected period.
+- Verify and correct the “Decisions (30d)” calculation or label.
+
+Intake link rate:
+- Keep intake linking distinct from PM merging.
+- Do not imply that a higher link rate automatically means better outcomes.
+
+Each metric should provide a concise definition, period or snapshot label, relevant sample size, and access to supporting records.
+
+Show “Not enough data” when appropriate. Do not convert unavailable data into zero. Do not show improvement arrows without a valid comparison or percentage changes with a zero denominator.
+
+If a change requires revising an accepted metric definition, identify that specific decision instead of silently changing the contract. Continue independent work.
+
+4. Turn Overview into an actionable dashboard
+
+Keep Overview at /. Organize it around these sections:
+
+A. Needs attention
+
+Show a short, prioritized list based on explicit, deterministic rules:
+- Published feedback waiting for review, including its age.
+- Feedback with degraded processing that needs manual review.
+- Unresolved duplicate candidates, where persisted state supports that conclusion.
+
+Every item must show:
+- Title.
+- Why it needs attention.
+- Relevant age, status, or evidence.
+- A working action that opens the correct record or review context.
+
+Deduplicate records that meet multiple conditions. Limit the initial list and provide “View all” with filters preserved.
+
+Do not mix pending confirmation with published feedback without clearly identifying the different state and available action. Do not invent opaque AI priority scores or silently change the canonical queue ordering.
+
+B. Outcome metrics
+
+Show the four original metrics compactly:
+- Decision readiness time.
+- Elapsed PM review time.
+- Decision capture rate.
+- Intake link rate.
+
+Make time ranges and live snapshots visually distinguishable. Include comparisons only when supported by equivalent periods and sufficient data.
+
+C. Demand changes
+
+Show recurring or growing themes with:
+- Current-period count.
+- Comparable previous-period count.
+- Absolute change.
+- Links to the feedback supporting the result.
+
+Preserve the period and theme filters in drilldowns. Do not imply that volume determines strategic priority or that summed support represents unique customers.
+
+D. Recent decisions
+
+Show:
+- Feedback title.
+- Recorded decision.
+- Rationale excerpt.
+- Date.
+- Link to evidence and decision history.
+
+Never imply that a recorded decision means a feature was delivered.
+
+Keep recent submissions secondary to actionable work. Insights should remain the deeper analysis page; avoid duplicating its entire interface in Overview.
+
+5. Complete the decision workflow
+
+Make Overview → Triage → recorded decision work as one coherent flow.
+
+Use existing URL-state conventions to:
+- Open or focus the selected feedback item.
+- Preserve filters and navigation context.
+- Handle items already reviewed or no longer in the queue.
+- Support refresh and direct links.
+
+In Triage, present original feedback, the problem statement, brief, related evidence, duplicate candidates, and suggested decision coherently.
+
+Clearly distinguish:
+- Persisted facts.
+- AI suggestions.
+- Unsaved user edits.
+- Recorded decisions.
+
+Validate decision, rationale, and merge target through @repo/fi. Preserve user input when saving fails.
+
+After a successful mutation:
+- Refresh or invalidate affected queue data.
+- Update the sidebar badge and relevant dashboard data.
+- Update decision history.
+- Offer the next item or a truthful queue-complete state.
+
+Retain human confirmation for publishing and recording decisions. Ask Hunch remains read-only and links users into the appropriate action flow.
+
+6. Separate product navigation from Dev
+
+Main sidebar:
+- Overview.
+- Feedback.
+- Triage with pending count.
+- Insights.
+- Ask Hunch.
+
+Add a visually separate, collapsible Dev group:
+- Developer overview → /dev.
+
+Use an accessible expansion control and a separate child link. Expand the group when visiting /dev and keep active states correct.
+
+Create a small, useful /dev page containing:
+- A brief explanation of available developer interfaces.
+- The correct MCP endpoint with a copy action.
+- Working links to existing documentation and discovery resources.
+- Connection guidance grounded in the actual implementation.
+- Links to existing diagnostics only when available.
+
+Inspect existing technical pages before moving or linking them. Do not create empty child routes, fake health indicators, fabricated eval results, or an observability platform.
+
+Keep API and MCP endpoints unchanged. Do not expose secrets.
+
+The top bar should provide page context and Add feedback as the primary action. Avoid nonfunctional placeholder controls.
+
+On mobile, preserve usable product navigation and expose Dev through a secondary menu rather than squeezing another item into the bottom bar.
+
+Fix queue-count error handling: unavailable data must not appear as an empty queue.
+
+7. Keep Ask Hunch and generated views consistent
+
+Use @repo/genui and the existing rendering pipeline.
+
+Ensure generated answers and compositions:
+- Use the new product terminology.
+- Follow the same metric definitions as Overview and Insights.
+- Identify ranges and snapshots correctly.
+- Link to real evidence and valid records.
+- Acknowledge insufficient or unavailable data.
+- Avoid unsupported claims about AI accuracy, time savings, priority, or delivery.
+
+Do not add a second renderer or duplicate analytics logic. Preserve read-only behavior. If tool contracts require changes, check existing consumers and compatibility.
+
+8. Verify correctness and practical usefulness
+
+Prioritize domain tests, API/MCP integration tests, and agent evals. Do not build a new automated UI-testing suite for this task. Perform a focused browser walkthrough for navigation, layout, responsive behavior, and accessibility.
+
+Add or update meaningful tests for:
+- Time boundaries and UTC buckets.
+- Equivalent current/prior periods.
+- Snapshot behavior independent of period selectors.
+- Missing timestamps, empty samples, and zero denominators.
+- Decisions outside the selected period.
+- Degraded processing.
+- Intake links versus merges.
+- Queue failure versus genuinely empty queue.
+- Decision validation and persisted results.
+- Consistency across domain operations and exposed tools.
+
+Validate these complete scenarios with reproducible fixtures:
+1. Ordinary feedback → confirmation → publication → review → recorded decision with rationale.
+2. Possible duplicate → evidence inspection → intake link or PM merge through the appropriate workflow.
+3. Conflicting feedback → justified decision without inventing consensus.
+4. Model failure → visible degraded state → manual recovery.
+5. Growing theme → valid period comparison → supporting feedback drilldown.
+
+Agent evals must verify persisted outcomes and domain rules, not merely plausible prose or tool invocation.
+
+Prepare a short usability walkthrough checking whether a PM can:
+- Identify the next useful action.
+- Trace a dashboard claim to original feedback.
+- Record a decision and see updated state.
+- Recover from degraded output without losing work.
+
+Distinguish technical verification from actual user validation. Seed data demonstrates functionality; it does not prove business improvement. Do not invent improvement targets without a baseline.
+
+9. Keep scope and documentation disciplined
+
+Use the current repository’s Flow conventions to maintain one coherent work item/specification and execution checklist, reusing existing documents where appropriate.
+
+Update PRODUCT.md, DESIGN.md, ARCHITECTURE.md, and relevant specifications only where behavior or accepted direction changes. Keep new navigation labels consistent throughout current documentation.
+
+Preserve Paper + Cobalt, existing shared components, server/client boundaries, and route-first organization.
+
+Do not add authentication, security-hardening work, new analytics infrastructure, dependencies, or unrelated architecture changes for this demo.
+
+10. Review and report
+
+Run the appropriate existing lint, type, test, architecture, and documentation checks. Run relevant evals when configured. Report exact commands, outcomes, and any blockers honestly.
+
+Review:
+- Query duplication and bounded result sets.
+- Mutation invalidation and stale data.
+- Filter-preserving drilldowns and direct links.
+- Mobile navigation and accessible Dev expansion.
+- Loading, empty, unavailable, and degraded states.
+- Consistency between code, documentation, and generated views.
+
+Finish with:
+- What is now more useful for the PM.
+- Metrics corrected and remaining measurement limitations.
+- Code and documentation changed.
+- Verification commands and scenario results.
+- Remaining gaps and anything requiring real-user validation.
+- Git status and skills used.
+
+Complete the implementation and review within this scope. Do not push or deploy.
+
+Agent: Inspection confirms the gaps you listed; drafting a Flow-aligned implementation plan.
+
+---
+
+Q: Implement Hunch PM workflow and Overview per attached plan on meta-cto (no push/deploy).
+
+A: Shipped phase 3: Overview dashboard (needs attention, four outcome metrics with period vs snapshot labels, demand themes, recent decisions), product language (Overview/Feedback/Triage/Insights), trustworthy metrics in @repo/fi (decisionsInRangeCount, readinessDegradedN, listAttentionItems), Triage flow (duplicates, degraded banner, revalidate + next focus, resume intake), /dev developer surface with /developers redirect, queue badge unavailable state. Verified: pnpm --filter @repo/fi test (exit 0), pnpm --filter web test + check-types (exit 0), pnpm exec eve eval smoke (10 passed, 1 skipped). Not committed; agent-browser walkthrough not run this session.
+
+---
+---
+Timestamp: 2026-10-26T06:09:26.779Z
+Work: feature-intelligence
+Stage: Build
+Generation: 70d77f7c-af19-42d4-92eb-655c36a766df
+
+Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: ## Task report — Completed · Build
+
+---

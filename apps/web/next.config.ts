@@ -39,6 +39,12 @@ const nextConfig: NextConfig = {
       { destination: "/review", permanent: false, source: "/triage" },
       { destination: "/patterns", permanent: false, source: "/insights" },
       { destination: "/ask", permanent: false, source: "/chat" },
+      { destination: "/dev", permanent: false, source: "/developers" },
+      {
+        destination: "/dev/:path*",
+        permanent: false,
+        source: "/developers/:path*",
+      },
     ];
   },
   rewrites() {

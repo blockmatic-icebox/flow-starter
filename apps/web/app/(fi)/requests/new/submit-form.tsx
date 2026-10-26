@@ -20,6 +20,7 @@ import { FeedbackSteps } from "../../_components/hunch/feedback-steps";
 import {
   actionConfirmRequest,
   actionCreateDraftAndTriage,
+  actionGetRequest,
   actionRetryTriage,
 } from "../../actions";
 
@@ -105,8 +106,10 @@ const DuplicateLinkSection = ({
 
 export const SubmitForm = ({
   context,
+  resumeRequestId,
 }: {
   context: "external" | "internal";
+  resumeRequestId?: string;
 }) => {
   const router = useRouter();
   const isExternal = context === "external";
@@ -131,6 +134,36 @@ export const SubmitForm = ({
     }, 3500);
     return () => clearInterval(timer);
   }, [loading]);
+
+  useEffect(() => {
+    if (!resumeRequestId || requestId) return;
+    const load = async () => {
+      setLoading(true);
+      const detail = await actionGetRequest({ requestId: resumeRequestId });
+      if (!detail || detail.request.status !== "pending_confirm") {
+        setLoading(false);
+        return;
+      }
+      const req = detail.request;
+      setRequestId(req.id);
+      setTitle(req.title);
+      setDescription(req.description);
+      setProblemStatement(req.problemStatement ?? req.description);
+      setDecisionBrief(req.decisionBrief ?? "");
+      setDuplicates(
+        detail.duplicates.map((d) => ({
+          explanation: d.explanation,
+          id: d.candidateRequestId,
+          score: d.score,
+          title: d.title,
+        }))
+      );
+      const steps = req.triageSteps as { degraded?: boolean } | null;
+      setDegraded(steps?.degraded === true);
+      setLoading(false);
+    };
+    load().catch(console.error);
+  }, [resumeRequestId, requestId]);
 
   const runTriage = async () => {
     setLoading(true);
@@ -229,7 +262,7 @@ export const SubmitForm = ({
           value={description}
         />
         <Button disabled={loading} type="submit">
-          Find related signals
+          Find related feedback
         </Button>
       </form>
     );

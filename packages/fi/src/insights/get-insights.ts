@@ -3,6 +3,7 @@ import type { AppDatabase } from "@repo/db";
 import { sql } from "drizzle-orm";
 
 import { computeInsightsScoped } from "../metrics/compute-insights-scoped";
+import type { TriageStepsPayload } from "../triage/types";
 import { computeTrends } from "./compute-trends";
 import type { InsightsRangePreset } from "./insights-range";
 import { resolveInsightsRange } from "./insights-range";
@@ -46,6 +47,7 @@ export const getInsights = async ({
     themeLabel: r.themeLabel,
     title: r.title,
     triageCompletedAt: r.triageCompletedAt,
+    triageSteps: r.triageSteps as TriageStepsPayload | null,
   }));
 
   const rangeMeta = range

@@ -228,14 +228,14 @@ export const composeFiQuery = async ({
     ]);
     records.push(
       metricRecord({
-        id: "metric:signals-30d",
-        label: "Published signals (last 30 days)",
+        id: "metric:feedback-30d",
+        label: "Published feedback (last 30 days)",
         value: String(insights.sample.publishedCount),
       }),
       metricRecord({
         id: "metric:decisions-30d",
-        label: "Decisions with rationale (last 30 days)",
-        value: String(insights.sample.dispositionWithRationaleCount),
+        label: "Decisions recorded (last 30 days)",
+        value: String(insights.sample.decisionsInRangeCount),
       }),
       metricRecord({
         id: "metric:queue",
@@ -247,7 +247,7 @@ export const composeFiQuery = async ({
     envelope = sectionStackDocument({
       childExpressions: [
         `DataExplorer(${openUiStringLiteral("metrics-dashboard")}, ${openUiStringList(
-          ["metric:signals-30d", "metric:decisions-30d", "metric:queue"]
+          ["metric:feedback-30d", "metric:decisions-30d", "metric:queue"]
         )})`,
         `Answer(${openUiStringLiteral(
           top

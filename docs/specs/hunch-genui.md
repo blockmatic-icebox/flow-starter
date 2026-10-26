@@ -8,12 +8,13 @@
 
 | Route | Screen | Backend |
 | --- | --- | --- |
-| `/` | Pulse | `listTriageQueue`, `getInsights`, `searchRequests` |
-| `/signals` | Signals list | `searchRequests` |
-| `/signals/[id]` | Signal detail | `getRequest`, support action |
+| `/` | Overview | `listAttentionItems`, `getInsights`, `listRecentDecisions` |
+| `/signals` | Feedback list | `searchRequests` |
+| `/signals/[id]` | Feedback detail | `getRequest`, support action |
 | `/feedback/new` | Add feedback | `createDraftAndTriage`, `confirmRequest` |
-| `/review` | Review queue | `listTriageQueue`, `setDisposition` |
-| `/patterns` | Patterns | `getInsights` |
+| `/review` | Triage queue | `listTriageQueue`, `setDisposition` |
+| `/patterns` | Insights | `getInsights` |
+| `/dev` | Developer overview | static discovery links |
 | `/ask` | Ask Hunch | `POST /api/genui/compose` (read-only) |
 
 Legacy paths (`/requests`, `/triage`, `/insights`, `/chat`) redirect to the routes above.

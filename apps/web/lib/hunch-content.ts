@@ -4,9 +4,27 @@ export const hunchTagline =
   "Turn customer feedback into clear product decisions.";
 
 export const hunchSummary =
-  "Hunch helps product teams capture signals, check duplicates, review a prioritized queue, and record decisions with rationale. Ask Hunch generates grounded views from your feedback data—without mutating records from generated UI.";
+  "Hunch helps product teams capture feedback, check duplicates, review a prioritized queue, and record decisions with rationale. Ask Hunch generates grounded views from your feedback data—without mutating records from generated UI.";
 
 export const hunchWorkspaceLabel = "Demo workspace";
+
+export const hunchNav = {
+  ask: { href: "/ask", label: "Ask Hunch" },
+  dev: { href: "/dev", label: "Developer overview" },
+  feedback: { href: "/signals", label: "Feedback" },
+  insights: { href: "/patterns", label: "Insights" },
+  overview: { href: "/", label: "Overview" },
+  triage: { badge: true, href: "/review", label: "Triage" },
+} as const;
+
+export const hunchPageSubtitles = {
+  addFeedback: "Capture customer feedback in plain language.",
+  ask: "Ask questions about your feedback data. Generated views are read-only.",
+  feedback: "Explore customer feedback, requests, and supporting evidence.",
+  insights: "Understand recurring themes and changes in demand.",
+  overview: "See what needs attention and how feedback is becoming decisions.",
+  triage: "Review feedback and record what happens next.",
+} as const;
 
 export const fiHomeTitle = hunchProductName;
 export const fiHomeSummary = hunchSummary;
@@ -17,12 +35,13 @@ ${hunchSummary}
 
 ## Start here
 
-- [Pulse](/) — overview of signals, themes, and decisions
-- [Signals](/signals) — search published feedback
+- [Overview](/) — needs attention, metrics, and recent decisions
+- [Feedback](/signals) — search published feedback
 - [Add feedback](/feedback/new) — capture and publish with duplicate check
-- [Review](/review) — disposition queue
-- [Patterns](/patterns) — trends grounded in data
+- [Triage](/review) — review queue and record decisions
+- [Insights](/patterns) — trends grounded in data
 - [Ask Hunch](/ask) — generative views (read-only compose)
+- [Developer overview](/dev) — MCP and API discovery
 
 ## Agents
 
