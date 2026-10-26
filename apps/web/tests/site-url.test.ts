@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { GET as getLlmsTxt } from "../app/llms.txt/route";
-import { resolveSiteOrigin } from "../lib/site-url";
+import {
+  resolveSiteOrigin,
+  resolveSiteOriginFromHeaderList,
+} from "../lib/site-url";
 
 const withoutPublicOrigin = <T>(run: () => T) => {
   const prior = process.env.NEXT_PUBLIC_APP_ORIGIN;
@@ -14,6 +17,19 @@ const withoutPublicOrigin = <T>(run: () => T) => {
     else process.env.NEXT_PUBLIC_APP_ORIGIN = prior;
   }
 };
+
+test("resolveSiteOriginFromHeaderList uses host and forwarded proto", () => {
+  withoutPublicOrigin(() => {
+    const headerList = new Headers({
+      host: "meta-cto.localhost",
+      "x-forwarded-proto": "http",
+    });
+    assert.equal(
+      resolveSiteOriginFromHeaderList(headerList),
+      "http://meta-cto.localhost"
+    );
+  });
+});
 
 test("resolveSiteOrigin uses request URL when Vercel x-forwarded-host is deployment id", () => {
   withoutPublicOrigin(() => {

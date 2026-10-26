@@ -4,10 +4,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
+import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 
 import { fiHomeSummary, fiHomeTitle } from "@/lib/fi-home-content";
-import { resolveSiteOrigin } from "@/lib/site-url";
+import { resolveSiteOriginFromHeaderList } from "@/lib/site-url";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const headerList = await headers();
+  const origin = resolveSiteOriginFromHeaderList(headerList);
+  const url = `${origin}/`;
+
+  return {
+    alternates: { canonical: url },
+    openGraph: {
+      description: fiHomeSummary,
+      title: fiHomeTitle,
+      type: "website",
+      url,
+    },
+    title: fiHomeTitle,
+  };
+}
 
 const intents = [
   {
@@ -32,17 +51,19 @@ const intents = [
   },
 ];
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  applicationCategory: "BusinessApplication",
-  description: fiHomeSummary,
-  name: fiHomeTitle,
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  url: resolveSiteOrigin(),
-};
+export default async function HomePage() {
+  const headerList = await headers();
+  const origin = resolveSiteOriginFromHeaderList(headerList);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    applicationCategory: "BusinessApplication",
+    description: fiHomeSummary,
+    name: fiHomeTitle,
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    url: origin,
+  };
 
-export default function HomePage() {
   return (
     <div className="space-y-8">
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>

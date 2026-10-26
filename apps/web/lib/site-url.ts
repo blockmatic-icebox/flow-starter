@@ -1,3 +1,16 @@
+type HeaderLike = Pick<Headers, "get">;
+
+export const requestFromHeaderList = (headerList: HeaderLike) => {
+  const host = headerList.get("host") ?? headerList.get("x-forwarded-host");
+  const normalizedHost = host?.split(",")[0]?.trim();
+  if (!normalizedHost) return;
+  const proto = headerList.get("x-forwarded-proto") ?? "https";
+  return new Request(`${proto}://${normalizedHost}/`);
+};
+
+export const resolveSiteOriginFromHeaderList = (headerList: HeaderLike) =>
+  resolveSiteOrigin(requestFromHeaderList(headerList));
+
 export const resolveSiteOrigin = (request?: Request) => {
   const fromEnv = process.env.NEXT_PUBLIC_APP_ORIGIN?.trim();
   if (fromEnv) return fromEnv.replace(/\/$/u, "");
