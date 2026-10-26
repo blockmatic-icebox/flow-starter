@@ -4,7 +4,9 @@ import path from "node:path";
 import test from "node:test";
 
 import { GET as getCatchAllSlug } from "../app/[...slug]/route";
+import { GET as getHomeMarkdown } from "../app/markdown/home/route";
 import { GET as getSitemap } from "../app/sitemap.xml/route";
+import { fiHomeMarkdown } from "../lib/fi-home-content";
 
 const root = path.join(import.meta.dirname, "..");
 const appRoot = path.join(root, "app");
@@ -30,6 +32,19 @@ const getMarkdownNotFound = (pathname: string) => {
   });
   return getCatchAllSlug(request, { params: Promise.resolve({ slug }) });
 };
+
+test("homepage markdown route meets agentic negotiation body and headers", async () => {
+  const response = await getHomeMarkdown();
+  assert.equal(response.status, 200);
+  assert.equal(
+    response.headers.get("content-type"),
+    "text/markdown; charset=utf-8"
+  );
+  assert.match(response.headers.get("vary") ?? "", /accept/iu);
+  const body = await response.text();
+  assert.equal(body, fiHomeMarkdown);
+  assert.ok(body.length >= 500);
+});
 
 test("unknown path with Accept text/markdown returns markdown 404 and llms.txt link", async () => {
   const response = await getMarkdownNotFound("/no-such-agent-path");

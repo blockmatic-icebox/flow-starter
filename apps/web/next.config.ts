@@ -1,6 +1,9 @@
 import { withEve } from "eve/next";
 import type { NextConfig } from "next";
 
+/** Markdown negotiation when Accept asks for markdown and does not list text/html. */
+const markdownAcceptPattern = "^(?!.*text/html).*text/markdown";
+
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["meta-cto.localhost", "*.meta-cto.localhost"],
   experimental: {
@@ -21,11 +24,15 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         {
           destination: "/markdown/home",
+          source: "/index.md",
+        },
+        {
+          destination: "/markdown/home",
           has: [
             {
               key: "accept",
               type: "header",
-              value: ".*text/markdown.*",
+              value: markdownAcceptPattern,
             },
           ],
           source: "/",
