@@ -4,6 +4,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { GET as getCatchAllSlug } from "../app/[...slug]/route";
+import { GET as getSitemap } from "../app/sitemap.xml/route";
 
 const root = path.join(import.meta.dirname, "..");
 const appRoot = path.join(root, "app");
@@ -45,6 +46,38 @@ test("unknown path with Accept text/markdown returns markdown 404 and llms.txt l
 
 test("known-prefix unknown subpath does not use catch-all markdown 404", async () => {
   await assert.rejects(() => getMarkdownNotFound("/api/no-such-mcp-route"));
+});
+
+test("GET /sitemap.xml returns valid urlset XML for public routes", async () => {
+  const response = getSitemap(
+    new Request("https://meta-cto-two.vercel.app/sitemap.xml")
+  );
+  assert.equal(response.status, 200);
+  assert.equal(
+    response.headers.get("content-type"),
+    "application/xml; charset=utf-8"
+  );
+  const body = await response.text();
+  assert.match(body, /^<\?xml version="1\.0"/u);
+  assert.match(
+    body,
+    /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/u
+  );
+  for (const routePath of [
+    "/",
+    "/requests",
+    "/requests/new",
+    "/triage",
+    "/insights",
+    "/chat",
+  ])
+    assert.match(
+      body,
+      new RegExp(
+        `<loc>https://meta-cto-two\\.vercel\\.app${routePath === "/" ? "/" : routePath}</loc>`,
+        "u"
+      )
+    );
 });
 
 test("product app does not import Factory or reference removed Flow app", () => {
