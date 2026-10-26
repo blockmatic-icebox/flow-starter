@@ -141,7 +141,7 @@ If tool count grows, mark `get_insights` as `deferred: true` per eve docs.
 | **Terminal** | `eve dev` — demo agent tool calls |
 | **HTTP** | `/eve/v1/...` on deployed app (eve default) |
 | **In-app eve web channel** | **Not in scope** — chat UI is ask-only, not full eve channel |
-| **MCP** | Phase 2: read-only tools mirroring `search_requests` + `get_request` (Factory [ADR 0006](../../.agents/flow/decisions/adr/0006-external-invocation-is-read-only.md) pattern) |
+| **MCP** | Planned — [agentic discoverability spec](./feature-intelligence-agentic-discoverability.md) + [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) (Streamable HTTP, read-only Phase A) |
 
 Durable sessions: use eve defaults so a PM copilot can continue a triage conversation across turns.
 

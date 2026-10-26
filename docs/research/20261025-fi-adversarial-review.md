@@ -54,6 +54,10 @@ The assessment delivers a credible **intake → publish → triage → insights*
 - Checklist “complete” should require **AC + code + test** row, not task checkbox alone.
 - Static source-grep “evals” should be disallowed in [feature-intelligence-testing.md](../specs/feature-intelligence-testing.md) remediation section.
 
+## Agentic discoverability baseline (2026-10-26)
+
+`npx is-agentic meta-cto-two.vercel.app` → **59/100**. Notable gaps: `markdown-negotiation-vary` (failed), `mcp-server` (partial — no `/.well-known/mcp` handshake on origin). Plan: [agentic discoverability spec](../specs/feature-intelligence-agentic-discoverability.md).
+
 ## Related
 
 - [feature-intelligence-remediation.md](../specs/feature-intelligence-remediation.md)

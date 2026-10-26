@@ -21,6 +21,7 @@
 | [docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md) | MVP build checklist (complete) |
 | [docs/tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) | Demo depth checklist (complete) |
 | [feature-intelligence-remediation.md](./feature-intelligence-remediation.md) | Workflow gap closure (RC-1–RC-10) |
+| [feature-intelligence-agentic-discoverability.md](./feature-intelligence-agentic-discoverability.md) | Is Agentic + public MCP (ADR 0005) |
 | [docs/tasks/feature-intelligence-remediation.md](../tasks/feature-intelligence-remediation.md) | Remediation execution checklist (Plan) |
 | [ADR 0003](../adr/0003-feature-intelligence-model-providers.md) | Gateway (Jev/triage) vs Anthropic (`/chat`) |
 | [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md) | Merge, validation, seed safety, eval bar |

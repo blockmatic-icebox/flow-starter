@@ -1,7 +1,7 @@
 # Initiative: Feature Intelligence (Meta CTO assessment)
 
-**Status:** Specified · **MVP + demo depth built** · **Workflow remediation specified** (not built)  
-**Stage:** Specify complete for remediation → **Plan** next (Build not authorized)  
+**Status:** Specified · MVP + demo depth + **remediation built** · **Agentic discoverability** planned (ADR/spec draft)  
+**Stage:** Plan — [agentic discoverability tasks](../tasks/feature-intelligence-agentic-discoverability.md) (Build not authorized)  
 **Time box:** ~2–3 hours implementation + ~5 min demo
 
 ## Outcome
@@ -33,6 +33,7 @@ Help a product team turn **unstructured feature requests** from customers, prosp
 - **Duplicate retrieval:** **Lexical top-10** for assessment (no pgvector).
 - **Testing:** [eve eval smoke + seed](../../docs/specs/feature-intelligence-testing.md); **web FI manual only** (no new Playwright for MVP).
 - **Remediation (2026-10-25):** Merge with **supporter rollup**; AI failure non-blocking UX; discovery search/sort/pagination; domain validation; decision transparency (outcome + audit on detail); seed production guard; **behavioral** Eve evals — [remediation spec](../specs/feature-intelligence-remediation.md), [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md).
+- **Agentic discoverability (2026-10-26):** `llms.txt`, well-known MCP, Streamable HTTP `/api/mcp`, Is Agentic verification — [spec](../specs/feature-intelligence-agentic-discoverability.md), [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) (Proposed).
 - **Agents:** Single eve root agent (no subagents in v1).
 - **Triage:** [Jev harness](../../docs/specs/feature-intelligence-triage-harness.md) via **AI Gateway** (`AI_GATEWAY_API_KEY`, `typesafe-ai/jev`); reference `@repo/genui` gateway wiring.
 - **Ask-only chat:** **Direct Anthropic** (`ANTHROPIC_API_KEY`); port Flow demo `streamText` pattern ([ADR 0010](../../.agents/flow/decisions/adr/0010-site-consultant-chat-and-mcp.md)) — [ADR 0003](../adr/0003-feature-intelligence-model-providers.md).
