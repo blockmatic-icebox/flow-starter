@@ -2102,3 +2102,13 @@ Human: Briefly inform the user about the task result and perform any follow-up a
 Agent: The pending Hunch work is landed: TypeScript and lint issues are fixed, **`f03d3135d`** and **`0dea48293`** are on **`origin/meta-cto`**, and production on **`meta-cto-two.vercel.app`** was promoted and checked (home, Ask, developers copy, MCP smoke all good).
 
 ---
+---
+Timestamp: 2026-10-26T04:46:00.000Z
+Work: meta-cto-assessment
+Stage: Ship
+
+Q: Push and run is agentic after deployment.
+
+A: Pushed 69a06d1fd (prompts.txt). Production alias on f03d3135d (Ready). AGENTIC_CHECK_URL=meta-cto-two.vercel.app pnpm agentic:check exit 0 — 74/100 but scanned_at 2026-10-26T03:33Z (cached, predates Hunch/OpenAPI fixes). Live /openapi.json and /developers return 200. Fresh score needs manual Rescan at is-agentic.com/scan/meta-cto-two.vercel.app then re-run agentic:check.
+
+---
