@@ -27,6 +27,8 @@
 | Unknown path + `Accept: text/markdown` | 404 + Markdown body with `/llms.txt` link |
 | `GET /` HTML | JSON-LD `SoftwareApplication`; extracted text content ≫500 chars |
 
+**Evening re-check:** Same host — markdown negotiation, `/.well-known/mcp` 200, and `llms.txt` canonical URLs still pass; **G-A4** blocked only on Is Agentic cache until Rescan.
+
 ## Is Agentic CLI
 
 | Run | `scanned_at` | Score | Notes |
