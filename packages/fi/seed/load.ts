@@ -1,9 +1,14 @@
-import { createDb, featureRequest, featureRequestSupport } from "@repo/db";
+import {
+  createDb,
+  featureRequest,
+  featureRequestDuplicateCandidate,
+  featureRequestSupport,
+} from "@repo/db";
 
 import { loadRootEnv } from "../src/db/get-db";
-import type { ThemeKey } from "../src/theme/registry";
-import { themeLabelForKey } from "../src/theme/registry";
-import { seedRequests } from "./fixture";
+import { generateSeed } from "./generate-seed";
+import { labelForThemeKey } from "./theme-label";
+import { validateGeneratedSeed } from "./validate-manifest";
 
 loadRootEnv();
 const url = process.env.DATABASE_URL?.trim();
@@ -20,51 +25,101 @@ if (env.NODE_ENV !== "production" && localProxy)
 
 const { db, sql } = createDb({ env, url });
 
-const now = new Date("2026-10-25T12:00:00Z");
+const seedSteps = {
+  duration_ms: 0,
+  model: "seed",
+  steps: [{ detail: "Generated demo seed row", name: "seed" }],
+  version: 1,
+};
+
+const chunk = 50;
+
+const insertChunks = async <T>(
+  items: T[],
+  insert: (slice: T[]) => Promise<unknown>
+) => {
+  const tasks: Promise<unknown>[] = [];
+  for (let i = 0; i < items.length; i += chunk) {
+    tasks.push(insert(items.slice(i, i + chunk)));
+  }
+  await Promise.all(tasks);
+};
+
+const { duplicateCandidates, requests } = generateSeed();
+const validation = validateGeneratedSeed({ duplicateCandidates, requests });
+if (!validation.ok) {
+  console.error("Seed manifest validation failed:");
+  for (const e of validation.errors) console.error(`  - ${e}`);
+  process.exit(1);
+}
 
 await sql`DELETE FROM feature_request_support`;
 await sql`DELETE FROM feature_request_duplicate_candidate`;
 await sql`DELETE FROM feature_request`;
 
-await Promise.all(
-  seedRequests.map(async (row) => {
-    const themeKey = row.themeKey as ThemeKey;
-    await db.insert(featureRequest).values({
-      decisionBrief: "Seeded PM brief for assessment demo.",
-      description: `${row.title} — seeded description for demo.`,
+await insertChunks(requests, (slice) =>
+  db.insert(featureRequest).values(
+    slice.map((row) => ({
+      canonicalRequestId: row.canonicalRequestId ?? null,
+      decisionBrief: row.decisionBrief ?? null,
+      description: row.description,
       disposition: row.disposition ?? null,
-      dispositionAt: row.disposition ? now : null,
-      dispositionRationale:
-        "dispositionRationale" in row ? row.dispositionRationale : null,
+      dispositionAt: row.dispositionAt ?? null,
+      dispositionRationale: row.dispositionRationale ?? null,
       id: row.id,
-      problemStatement: `Underlying need related to ${row.title}`,
-      publishedAt: now,
+      intakeLinkedRequestId: row.intakeLinkedRequestId ?? null,
+      mergeTargetId: row.mergeTargetId ?? null,
+      pmReviewStartedAt: row.pmReviewStartedAt ?? null,
+      problemStatement: row.problemStatement,
+      publishedAt: row.publishedAt ?? null,
       source: row.source,
       status: row.status,
-      submittedAt: now,
-      themeKey,
-      themeLabel: themeLabelForKey(themeKey),
-      themeRationale: "Seed fixture",
+      submittedAt: row.submittedAt,
+      themeKey: row.themeKey,
+      themeLabel: labelForThemeKey(row.themeKey),
+      themeRationale: "Seed demo",
       title: row.title,
-      triageCompletedAt: now,
-      triageSteps: {
-        duration_ms: 0,
-        model: "seed",
-        steps: [{ detail: "Fixture row", name: "seed" }],
-        version: 1,
-      },
-    });
-
-    await Promise.all(
-      Array.from({ length: row.support }, (_, i) =>
-        db.insert(featureRequestSupport).values({
-          requestId: row.id,
-          supporterKey: `seed-supporter-${row.id}-${i}`,
-        })
-      )
-    );
-  })
+      triageCompletedAt: row.triageCompletedAt ?? null,
+      triageSteps:
+        row.status === "published" || row.status === "pending_confirm"
+          ? seedSteps
+          : null,
+    }))
+  )
 );
 
-console.log(`Seeded ${seedRequests.length} feature requests`);
+await insertChunks(duplicateCandidates, (slice) =>
+  db.insert(featureRequestDuplicateCandidate).values(
+    slice.map((d) => ({
+      candidateRequestId: d.candidateRequestId,
+      explanation: d.explanation,
+      requestId: d.requestId,
+      score: d.score,
+    }))
+  )
+);
+
+const supportRows: { requestId: string; supporterKey: string }[] = [];
+for (const row of requests) {
+  const keys = row.supporterKeys ?? [];
+  if (keys.length > 0) {
+    for (const k of keys)
+      supportRows.push({ requestId: row.id, supporterKey: k });
+    continue;
+  }
+  for (let s = 0; s < row.supportCount; s += 1) {
+    supportRows.push({
+      requestId: row.id,
+      supporterKey: `seed-${row.id.slice(-8)}-${s}`,
+    });
+  }
+}
+
+await insertChunks(supportRows, (slice) =>
+  db.insert(featureRequestSupport).values(slice)
+);
+
+console.log(
+  `Seeded ${requests.length} feature requests (${duplicateCandidates.length} duplicate candidates, ${supportRows.length} support rows)`
+);
 await sql.end();
