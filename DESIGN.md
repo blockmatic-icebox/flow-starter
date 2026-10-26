@@ -2,21 +2,23 @@
 
 ## Visual system — default shadcn/ui
 
-The starter uses the **default shadcn/ui** theme shipped in `@repo/ui` (`packages/ui/src/styles/globals.css`): neutral surfaces, standard primary/secondary tokens, and component variants from the new-york style set.
+The starter uses the **default shadcn/ui neutral** theme in `@repo/ui` (`packages/ui/src/styles/globals.css`): light-first surfaces, neutral primary, and component variants from the base-nova style set.
 
-Do not introduce a custom product brand palette in this branch. Generated compositions inherit the same tokens via `GenuiRenderer` and the MCP App preview bundle.
+Do not introduce a custom product brand palette in this branch. Generated compositions inherit the same tokens via `GenuiRenderer` and the MCP App preview bundle (`apps/web/mcp-app`, built with the same `globals.css`).
 
 ### Token parity (`packages/ui`)
 
-| Token | Value |
+| Token | Light (`:root`) |
 | --- | --- |
-| `--background` | `var(--metacto-cloud)` |
-| `--foreground` | `var(--metacto-ink)` |
-| `--primary` | `var(--metacto-orange)` |
-| `--primary-foreground` | `oklch(1 0 0)` |
-| `--border` | `var(--metacto-mist)` |
-| `--muted-foreground` | `var(--metacto-pewter)` |
-| `--radius` | `0.375rem` |
+| `--background` | `oklch(1 0 0)` |
+| `--foreground` | `oklch(0.145 0 0)` |
+| `--primary` | `oklch(0.205 0 0)` |
+| `--primary-foreground` | `oklch(0.985 0 0)` |
+| `--border` | `oklch(0.922 0 0)` |
+| `--muted-foreground` | `oklch(0.556 0 0)` |
+| `--radius` | `0.625rem` |
+
+Dark mode uses the matching `.dark` neutral tokens on the document root (via `next-themes` in the studio).
 
 ## Layout — studio
 
