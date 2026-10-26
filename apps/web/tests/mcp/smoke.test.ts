@@ -3,6 +3,8 @@ import test from "node:test";
 
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 
+import { GET as getMcpDiscovery } from "../../app/.well-known/mcp/route";
+import { GET as getMcpServerCard } from "../../app/.well-known/mcp/server-card.json/route";
 import { createFiMcpServer } from "../../lib/mcp/create-mcp-server";
 import { fiMcpToolCatalog } from "../../lib/mcp/tool-catalog";
 
@@ -29,6 +31,34 @@ const mcpPost = async (body: unknown, sessionId?: string) => {
   await server.close();
   return response;
 };
+
+test("GET /.well-known/mcp returns discovery index", async () => {
+  const response = getMcpDiscovery(
+    new Request("http://meta-cto.localhost/.well-known/mcp")
+  );
+  assert.equal(response.status, 200);
+  const json = (await response.json()) as {
+    serverCard?: string;
+    serverCards?: string[];
+  };
+  assert.match(
+    json.serverCard ?? "",
+    /\/\.well-known\/mcp\/server-card\.json$/u
+  );
+  assert.deepEqual(json.serverCards, [json.serverCard]);
+});
+
+test("GET /.well-known/mcp/server-card.json matches live transport", async () => {
+  const response = getMcpServerCard(
+    new Request("http://meta-cto.localhost/.well-known/mcp/server-card.json")
+  );
+  assert.equal(response.status, 200);
+  const json = (await response.json()) as {
+    transport?: { endpoint?: string; type?: string };
+  };
+  assert.equal(json.transport?.type, "streamable-http");
+  assert.equal(json.transport?.endpoint, "http://meta-cto.localhost/api/mcp");
+});
 
 test("MCP initialize and tools/list exposes all FI tools", async () => {
   const init = await mcpPost({
