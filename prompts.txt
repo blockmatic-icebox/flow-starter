@@ -377,204 +377,354 @@ Q: Execute parallel FI build plan on meta-cto (orchestrator + worktrees); comple
 A: Factory: advanceIntegrationRefIfSafe + worktrees integrate CLI; Neon DATABASE_URL; Wave 0 green; @repo/fi harness/CRUD/queue; web (fi) routes; agent.ts + core eve tools; pnpm qa exit 0; README assessment; tasks/initiative/ARCHITECTURE updated. Open: T-3-9 browser, T-2-5/6 evals, T-4-1/2/5, optional eve tools T-2-4.
 
 ---
----
-Timestamp: 2026-10-25T22:40:00-06:00
+Timestamp: Sunday, Oct 25, 2026, 4:12 PM (UTC-6)
 Work: feature-intelligence
-Stage: setup
+Stage: Build
+
+Human: lets make a plan to run our task in parallel using subagents on worktrees all merging back to meta-cto branch. according to the dependency you will act as orchestrator, rerunning and assist with required fixes. you report back progress until everything is built
+
+Agent: Gathering context on the active initiative, worktree tooling, and the `meta-cto` branch so we can plan parallel subagent execution. Confirming one blocker before finalizing the orchestration plan: Incorporating orchestrator-led Wave 0 DB setup and Cursor Task subagents with coordinator integration.
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 4:14 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: anything to improve in retrospect do it
+
+Agent: Reviewing the plan and codebase to identify concrete improvements. Updating the plan with worktree task-id constraints, `.env` propagation, coordinator verify/integrate steps, and concrete ownership details. Updated the plan file with retrospective fixes. Highlights: ### Critical fixes
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 4:16 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: git commit everything subagent work or ff merge is multiple commits in subagents work
+
+Agent: Checking how worktrees handle commits today so we can align the plan with your git policy. Adding a explicit git/commit policy: subagents commit all scoped work; ff-merge onto `meta-cto` preserves multiple task commits (no squash). Updated the plan with a **Git and commit policy** section. Summary: ### Builders
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 4:16 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: Parallel FI build on `meta-cto` (orchestrator + worktree subagents)
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: Executing the plan: starting factory worktree integration fixes, then Wave 0 DB setup. Implementing the domain layer and adding initiative waves. We'll integrate work in focused commits. Creating core triage and request modules: ## Task report
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 4:24 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: plan verify everything is working so far, use browser agent for in browser tests, and plan to complete all specs and tasks if anything is missing
+
+Agent: Reviewing open tasks, testing specs, and verification requirements to draft a verify-and-complete plan.
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 4:26 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: Verify FI build and complete full spec surface
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: 
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 4:26 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: Verify FI build and complete full spec surface
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: Executing the verify-and-complete plan: starting Phase 1 deterministic checks, then browser verification and implementation gaps.
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 4:26 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: remember to commit frequently
+
+Agent: Continuing the plan and committing frequently on `meta-cto`. Checking verification status and current git state. Finishing Phase 1 checks, then splitting the large WIP into frequent conventional commits before continuing implementation. Fixing server actions and implementing remaining gaps; committing in logical chunks. Implementing remaining gaps and committing in logical chunks.
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 4:38 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
 
 Human: for eve's env key copy over form flow/.env
 
-Agent: Merged AI_GATEWAY_API_KEY and ANTHROPIC_API_KEY into repo-root .env and .env.local (eve dev reads .env.local); created flow/.env with the same keys and synced apps/web/.env.local for /chat. flow/.env was not present initially—keys were taken from the first available legacy Flow-style env file on disk; replace flow/.env with your canonical Flow app copy if different.
+Agent: Locating `flow/.env` and merging eve-related keys into the repo-root `.env`. Eve and FI need the same AI credentials the old Flow app used. Here’s what was set up: ### What I did `flow/.env` was not in the repo yet (no `apps/flow` on `meta-cto`). I pulled **`AI_GATEWAY_API_KEY`** and **`ANTHROPIC_API_KEY`** from the first available Flow-style env on your machine and:
 
 ---
-Timestamp: 2026-10-25T22:54:00-06:00
-Work: flow-skill
-Stage: Build
-
-Human: git commit your changes separately and merge only that commit to main
-
-Agent: Committed four Factory flow files on meta-cto (8e5f48e), cherry-picked onto main as 214f354; restored meta-cto WIP without pushing.
 
 ---
----
-Timestamp: 2026-10-25T22:57:00-06:00
-Work: flow-fix
-Stage: Build
-
-Human: fix issues on flow only, commit and merge that fix to main
-
-Agent: Restored eval adoption tooling on meta-cto; flow:check guard, test arg forwarding, README identity fix; main at 5545876.
-
----
-Timestamp: 2026-10-25T17:50:00-06:00
+Timestamp: Sunday, Oct 25, 2026, 4:46 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
-Human: Complete Verify FI build and full spec surface plan on meta-cto.
+Human: make sure the plan is fully implemented and that browser agent test pass, and primarly that eve agent is functional and passes defined evals
 
-Agent: Green pnpm qa and webpack web build; eve smoke 4/4; FI web routes + agent tools + evals; agent-browser W-* log and demo script in docs/research/fi-browser-verification.md; ARCHITECTURE and tasks checklist updated. Partial harness T2/T3 and W-2i/W-9 noted in verification log.
-
----
-Timestamp: 2026-10-25T16:12:00-06:00
-Work: feature-intelligence
-Stage: Plan
-
-Human: Plan parallel Build on meta-cto using worktree subagents; orchestrator merges back and reports until complete.
-
-Agent: Planned dependency-ordered waves with worktrees check/prepare; orchestrator integrates fixes on meta-cto.
+Agent: Verifying eve evals, QA/build, and browser checks, then closing any remaining plan gaps. Fixing QA (ignore `.eve/`), resolving eve eval dependency resolution, then running full verification. Eve smoke evals are green. Running QA, web build, and browser verification.
 
 ---
-Timestamp: 2026-10-25T16:14:00-06:00
+
+---
+Timestamp: Sunday, Oct 25, 2026, 5:39 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
-Human: Anything to improve in retrospect — do it.
+Human: commit often
 
-Agent: Applied small factory/worktree and doc hygiene fixes from parallel build retrospective.
+Agent: Splitting the WIP into frequent conventional commits and finishing verification.
 
 ---
-Timestamp: 2026-10-25T16:16:00-06:00
+
+---
+Timestamp: Sunday, Oct 25, 2026, 5:41 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
-Human: Git commit subagent work (or fast-forward multiple subagent commits).
+Human: make sure to complete Verify FI build and complete full spec surface plan
 
-Agent: Integrated worktree branches onto meta-cto with conventional commits for FI waves.
+Agent: Assessing repo state and closing remaining plan gaps, with frequent commits.
 
 ---
-Timestamp: 2026-10-25T16:16:00-06:00
+
+---
+Timestamp: Sunday, Oct 25, 2026, 5:41 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
-Human: Implement Parallel FI build plan on meta-cto; complete all plan todos without editing the plan file.
+Human: make sure to complete Verify FI build and complete full spec surface plan
 
-Agent: Wave 0–3 delivery: @repo/fi CRUD/queue/harness baseline, eve agent + read tools, web (fi) shell and routes, README assessment slice; qa green on integration branch.
-
----
-Timestamp: 2026-10-25T16:24:00-06:00
-Work: feature-intelligence
-Stage: Plan
-
-Human: Plan verify working state, browser agent tests, and gap closure for specs/tasks.
-
-Agent: Authored verify-and-complete plan (deterministic qa, W-1–W-9, eve evals, UX gaps, reverify ship).
+Agent: The plan’s verify-and-ship slice is done: `pnpm qa` and `pnpm build:web` (webpack, because Turbopack does not honor `extensionAlias` for `@repo/fi` `.js` imports), `pnpm eval:smoke` (4/4), Playwright smoke, and agent-browser dogfood for W-1–W-8 with notes for partial items.
 
 ---
-Timestamp: 2026-10-25T16:26:00-06:00
+
+---
+Timestamp: Sunday, Oct 25, 2026, 5:48 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
-Human: Execute Verify FI build and complete full spec surface plan; commit frequently.
+Human: something went wrong at prompts.txt is empty, fill it using session log then review the code base and commit all unstaged changes
 
-Agent: Started deterministic verification (db, seed, fi tests); unblocked oxlint on .eve/.output; began eve tools/evals and web surface completion.
+Agent: Restoring `prompts.txt` from the session log, then reviewing changes and committing. Root `prompts.txt` has content; `.agents/flow/prompts.txt` is empty. Appending missing session-log entries, running QA, then committing all staged changes. **Task report** — Completed · Build **Prompt log:** Root `prompts.txt` was not empty (417 lines); `.agents/flow/prompts.txt` was empty. I extended the root log with parallel-build / verify-session entries, synced a copy to `.agents/flow/prompts.txt`, and left both gitignored.
 
 ---
-Timestamp: 2026-10-25T16:46:00-06:00
+
+---
+Timestamp: Sunday, Oct 25, 2026, 5:49 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
-Human: Ensure plan fully implemented — browser agent tests pass; eve agent functional with defined evals.
+Human: verify current implementation satifies the product specs and task, make sure document are up to date including product, architecture and design md
 
-Agent: Fixed eve package version and eval bundling; submit_request/confirm_request AG-7 split; smoke evals 4/4; web build fixes (webpack, get-db path, duplicate candidate titles).
+Agent: Verifying implementation against specs and tasks, then aligning PRODUCT, ARCHITECTURE, and DESIGN with what's shipped. Updating root contracts and the assessment README to match what's implemented, and documenting known spec gaps. **Task report** — Completed · Review Audited the repo against [feature-intelligence specs](docs/specs/feature-intelligence.md) and [tasks](docs/tasks/feature-intelligence.md), then brought **PRODUCT.md**, **DESIGN.md**, **ARCHITECTURE.md**, and the assessment **README** in line with what is actually shipped.
 
 ---
-Timestamp: 2026-10-25T17:39:00-06:00
+
+---
+Timestamp: Sunday, Oct 25, 2026, 5:51 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
-Human: Commit often.
+Human: make sure to implement any missing features and fill gaps
 
-Agent: Deferred single large commit pending final qa/browser pass; working tree held FI agent/web/eval delta on meta-cto.
+Agent: Reviewing documented gaps and the codebase to draft an implementation plan. Documented gaps map to open harness tasks and a few UX acceptance criteria. Creating a focused implementation plan.
 
 ---
-Timestamp: 2026-10-25T17:48:00-06:00
+
+---
+Timestamp: Sunday, Oct 25, 2026, 5:52 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
-Human: prompts.txt appeared empty; restore from session log, review codebase, commit all unstaged changes.
+Human: Feature Intelligence — missing features and gaps
 
-Agent: Restored/extended repository-root prompts.txt from transcript; ran qa; committed full FI verify-and-ship delta on meta-cto.
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
 
----
-Timestamp: 2026-10-25T17:52:00-06:00
-Work: feature-intelligence
-Stage: Review
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
-Human: Verify implementation against product specs and tasks; update PRODUCT, ARCHITECTURE, and DESIGN.
-
-Agent: Audited codebase vs specs/tasks; refreshed root contracts with live/partial/gap honesty; expanded README for submission (T-4-3); left T-1-5–7 harness wiring open.
+Agent: Implementing the gap-fill plan, starting with the full T0–T3 triage harness. **Task report** — Completed · Build All gap-plan items are implemented and committed on `meta-cto` as `ca4c44a`. ### What shipped
 
 ---
-Timestamp: 2026-10-25T17:55:00-06:00
+
+---
+Timestamp: Sunday, Oct 25, 2026, 5:54 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
-Human: Implement FI gap plan (harness T2/T3, persona submit, theme filter, triage expand, verify).
+Human: commit
 
-Agent: Async runTriageHarness T0–T3; triage-matrix test; external/internal submit UX; /requests theme filter; pm_review on triage expand; qa + eve smoke green; contracts updated.
+Agent: There’s nothing new to commit — the working tree on `meta-cto` is clean. Latest commit: **`ca4c44a`** — `feat(fi): wire full triage harness and close assessment UX gaps` (gap plan work). The prior docs commit is **`75f3d70`**.
 
 ---
-Timestamp: 2026-10-25T18:05:00-06:00
+
+---
+Timestamp: Sunday, Oct 25, 2026, 5:55 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
-Human: Implement FI architecture refactor plan (behavior-preserving): module split, schemas, web/agent adapters, verification.
+Human: show me how the agent classification and triage logic currently work, how are you using each model
 
-Agent: Split listTriageQueue into queue/ with SQL isNull(disposition); extracted persist-triage-result helpers; featureRequestSourceSchema and harness-helpers; removed fi-db shim; agent/lib/db agentDb(); ARCHITECTURE layout note; @repo/fi test, qa, build:web, eve eval smoke all green.
+Agent: There are **three separate model roles** in this repo. Only the **triage harness** does classification; the **eve operator** and **`/chat`** use different models and do not run Jev themselves. ## 1. Triage harness (`@repo/fi`) — where classification happens Triggered by web submit (`createDraftAndTriage`) and eve `submit_request` (same domain function). Flow: ```mermaid
 
 ---
-Timestamp: 2026-10-25T18:10:00-06:00
+
+---
+Timestamp: Sunday, Oct 25, 2026, 5:57 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
 
-Human: Update prompts.txt (tracked + auto per turn); separate Flow skill commit to main; assessment code only on meta-cto.
+Human: perfect, are we proactively displaying opportunities or automatically triaging, what's current workflow
 
-Agent: Added Cursor beforeSubmitPrompt/stop hooks and append-on-stop tooling; Flow docs allow tracked root prompts.txt on product branches; split commits—flow to main, FI + prompts.txt on meta-cto.
-
----
-Timestamp: 2026-10-25T18:15:00-06:00
-Work: feature-intelligence
-Stage: Ship
-
-Human: (same) Update prompts.txt tracking, auto per turn, Flow commit to main, assessment on meta-cto only.
-
-Agent: Merged feat(flow) prompt-log hooks to main (4ada0d6); meta-cto has merge + refactor(fi) with tracked prompts.txt, hooks, and prompt-log.config.json; qa green.
+Agent: You’re doing **automatic AI structuring** on submit, with **humans at two gates** (publish and PM disposition). There’s **no** fully autonomous “ingest → catalog → decided” path, and **no** proactive outreach beyond what the UI shows when someone is already in a flow. ## End-to-end workflow (as built) ```text Submitter                    System (harness)              PM / leader
 
 ---
-Timestamp: 2026-10-25T18:20:00-06:00
-Work: feature-intelligence
-Stage: Ship
-
-Human: Brief status on finished work; note failed background stash task.
-
-Agent: Work completed despite an early stash/checkout exit 1; main has Flow hooks (4ada0d6), meta-cto has FI + tracked prompts.txt (7a9d376). Push main and meta-cto when ready.
 
 ---
-Timestamp: 2026-10-25T18:22:00-06:00
+Timestamp: Sunday, Oct 25, 2026, 5:59 PM (UTC-6)
 Work: feature-intelligence
-Stage: Ship
+Stage: Build
 
-Human: Pass tests, push meta-cto, and set up Vercel demo with Neon; use dedicated Vercel project meta-cto with meta-cto as production branch.
+Human: review, refactor, simplify and improve codebase architecture using your skills
 
-Agent: Created Vercel project meta-cto (apps/web root, include agent/ via withEve); set Production env DATABASE_URL, AI_GATEWAY_API_KEY, ANTHROPIC_API_KEY; Neon Marketplace terms still require browser accept; production deploy READY after removing turbo ignoreCommand in vercel.json (28f8ca91, dpl_G3N4MQ). Git Production Branch on Vercel may still be main—use API deploy or dashboard for auto-push.
+Agent: Reviewing the FI stack architecture to identify refactor opportunities and scope the plan.
 
 ---
-Timestamp: 2026-10-25T18:24:00-06:00
-Work: feature-intelligence
-Stage: setup
-
-Human: Install Neon agent skills and MCP per neon.com skill; preserve existing configuration.
-
-Agent: Installed neon and neon-postgres skills under .agents/skills via neon CLI; added project .cursor/mcp.json (OAuth, gitignored); did not run neon init or change root .env.
 
 ---
-Timestamp: 2026-10-25T18:26:00-06:00
+Timestamp: Sunday, Oct 25, 2026, 5:59 PM (UTC-6)
 Work: feature-intelligence
-Stage: Review
+Stage: Build
 
-Human: Reconcile prompts.txt, refresh PRODUCT ARCHITECTURE DESIGN, and verify initial spec acceptance criteria AC-1–AC-8.
+Human: FI architecture refactor (behavior-preserving)
 
-Agent: Reconciled prompt log; updated contracts with deployment and spec-compliance notes; qa and smoke re-run; committed and pushed meta-cto.
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: 
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 5:59 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: FI architecture refactor (behavior-preserving)
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: **Task report** — Completed · Build The FI architecture refactor is done with no intended behavior changes: clearer `@repo/fi` boundaries, thinner web and eve adapters, and verification green. **Documentation** - [ARCHITECTURE.md](ARCHITECTURE.md) — `packages/fi/` layout comment now calls out `queue/list-triage-queue`, `requests/persist-triage-result`, `triage/harness-helpers`, and `schemas/feature-request-source`.
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 6:03 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: now make sure all test are still passing, git push to meta-cto branch and help me setup the vercel branch for demo, use vercel and neon clis, set env vars and make sure deployments are sucessful, use vercel connect for neon
+
+Agent: Researching the repo's deployment setup, required env vars, and Vercel/Neon integration patterns. Clarifying Vercel project scope and how you want the demo branch exposed. Noting a monorepo constraint: `withEve` needs the repo-root `agent/` directory on Vercel builds.
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 6:05 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: actually lets better create a separate project on vercel called meta-cto and set meta-cto branch as production branch
+
+Agent: Updating the deploy plan to use a dedicated `meta-cto` Vercel project with `meta-cto` as the production branch. Updated the deploy plan to match your direction: **Changes** - **Vercel project:** Dedicated project named **`meta-cto`** (not a generic name or preview-only setup).
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 6:06 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: FI demo: tests, push, Vercel + Neon
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: Executing the deploy plan: running verification gates and checking the git state.
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 6:11 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: Fetch the Neon skill from https://neon.com/.well-known/agent-skills/neon/SKILL.md and follow its instructions. Check whether Neon agent skills and the Neon MCP server are already installed for this project, install anything missing, preserve my existing configuration, and summarize every change you make.
+
+Agent: Followed [Neon’s agent skill](https://neon.com/.well-known/agent-skills/neon/SKILL.md): checked what was already set up, installed missing pieces locally, and left your env and Vercel config alone. ## Before | Component | Status | |-----------|--------|
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 6:13 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: test, commit, push and make sure deployment is sucessful
+
+Agent: Running tests, then committing, pushing, and verifying the Vercel production deployment. Builds are skipped when only `prompts.txt` changes because Turbo's affected check in `vercel.json` marks the web package unchanged. Updating the ignore command so production builds still run. **Task report** — Completed · Ship Tests passed, changes are on `origin/meta-cto`, and Vercel **production** is **Ready**.
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 6:19 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: 1. make sure prompts.txt is up to date ( use this session history as source )
+2. make sure product, architecture and design are up to date
+3. verify we have fully implement the initial specs
+
+Agent: Reviewing contracts, specs, and implementation status to draft an accurate plan. Contracts are largely current; gaps are mainly the prompt log, deployment facts, and a formal AC-1–AC-8 audit.
+
+---
+
 
 ---
 ---
@@ -588,6 +738,69 @@ Human: Implement the plan as specified, it is attached for your reference. Do NO
 To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
 Agent: Prompt log, product contracts, and spec verification are aligned with the assessment MVP; changes are on `meta-cto` and production is deployed.
+
+---
+Timestamp: 2026-10-25T18:45:00-06:00
+Work: feature-intelligence
+Stage: Explore
+
+Human: Explore realistic 90-day historical seed (~300 requests, 40–60 open triage) and analytics dashboard for Feature Intelligence; refine scope, challenge low-value work, then Specify and Plan without Build.
+
+Agent: Reviewed metrics, schema, seed, and insights UI; user chose dual seed commands and extending /insights with charts; proposed selective data_origin deletes to preserve manual rows, time-bucketed analytics from existing timestamps, honest limits on AI impact claims; awaiting Specify approval to write specs and tasks.
+
+---
+Timestamp: 2026-10-25T18:50:00-06:00
+Work: feature-intelligence
+Stage: Explore
+
+Human: Scope tweaks — no data_origin or simulation seed command; single seed:fi at ~500 rows with updated evals; extend insights; no simulation banner; test Neon MCP.
+
+Agent: Revised plan to one destructive 500-row generator with stable anchor IDs for smoke; Neon MCP list_projects OK on meta-cto-fi; still no Build until authorized.
+
+---
+Timestamp: 2026-10-25T18:52:00-06:00
+Work: feature-intelligence
+Stage: Specify
+
+Human: Use 500 (total seed volume).
+
+Agent: Locked TOTAL_REQUESTS=500, OPEN_QUEUE_COUNT=50; wrote seed amendment, analytics spec, and demo-depth tasks; initiative index updated; Build not started.
+
+---
+Timestamp: 2026-10-25T19:00:00-06:00
+Work: feature-intelligence
+Stage: Specify
+
+Human: Improve demo-depth specs and generate tasks from retrospective gaps.
+
+Agent: Seed v2 manifest tables, analytics north-star scoping and unified getInsights API, demo-depth tasks W1–W6 with SD/AN acceptance IDs; testing and core spec UI cross-links updated.
+
+---
+Timestamp: 2026-10-25T19:05:00-06:00
+Work: feature-intelligence
+Stage: Plan
+
+Human: Are tasks with explicit dependencies ready for execution?
+
+Agent: Upgraded demo-depth tasks with per-task Depends on, gates G-D1–G-D6, critical path, and parallel tracks; status ready pending Build authorization.
+
+---
+Timestamp: 2026-10-25T19:30:00-06:00
+Work: feature-intelligence
+Stage: Build
+
+Human: Implement demo depth build plan (500 seed, analytics, phase commits).
+
+Agent: Shipped five commits: seed generator, queue sort/smoke, getInsights trends, insights UI, contracts/tasks; pnpm qa and eve smoke green.
+
+---
+Timestamp: 2026-10-25T19:45:00-06:00
+Work: feature-intelligence
+Stage: Review
+
+Human: Update root .md files; ensure tasks and specs are complete and consistent.
+
+Agent: Synced PRODUCT, DESIGN, ARCHITECTURE, GLOSSARY; fixed stale seed queue counts and approval lines across specs, initiative, testing, eve agent, and research notes.
 
 ---
 ---
@@ -608,7 +821,7 @@ For analytics, prioritize our existing success metrics and help us understand tr
 
 Read the current implementation, product documents, and assessment brief. Help me refine this scope, challenge anything that adds work without improving the demonstration, and ask the important questions. Then work with me through Flow specification and planning so we have an agreed, prioritized implementation plan. Don’t start building yet.
 
-Agent: Completed Explore on demo depth: reviewed current capture, seed, queue, and /insights; proposed 90-day coherent history with substantial open backlog and honest analytics (measured vs proxy); drafted seed and analytics spec directions; held Build until Specify/Plan approval.
+Agent: ## Stage: Explore (complete) → Specify (needs your approval)
 
 ---
 ---
@@ -625,7 +838,7 @@ Human: 1. ok
 6. not needed
 7. test mpc
 
-Agent: Locked scope per your answers: no data_origin column; single pnpm seed:fi at ~500 rows (evals use that seed); no pnpm seed:fi:simulation; extend /insights for trends; skip simulation banner; verified Neon MCP (list_projects).
+Agent: ## Revised scope (your decisions)
 
 ---
 ---
@@ -658,7 +871,7 @@ Generation: d67ad9ca-c266-4bb6-9e97-c744ed664d6f
 
 Human: ok improve the spec and generate the tasks for them
 
-Agent: Updated feature-intelligence-seed.md and feature-intelligence-analytics.md; added docs/tasks/feature-intelligence-demo-depth.md (W1–W6, acceptance IDs, verification commands).
+Agent: Updated the demo-depth specs and task checklist from the retrospective. Highlights:
 
 ---
 ---
@@ -693,7 +906,7 @@ Human: Implement the plan as specified, it is attached for your reference. Do NO
 
 To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
-Agent: Demo depth build complete on meta-cto in five phase commits: deterministic 500-row seed (manifest, anchors, generator, load); listTriageQueue sorted by support with smoke expecting 50 open; getInsights(range) with bucketing/trends; /insights dashboard (90d default); tasks/docs updated. pnpm qa and eve eval smoke passed.
+Agent: Demo depth build is complete on `meta-cto` in **five commits**:
 
 ---
 ---
@@ -704,7 +917,7 @@ Generation: a17c5796-7c0c-444b-9240-766710f03084
 
 Human: update root .md files as required, make sure there arent missing tasks or incomplete specs
 
-Agent: Synced PRODUCT.md, DESIGN.md, ARCHITECTURE.md, GLOSSARY.md; set demo-depth specs to Current/Implemented and tasks to Complete; fixed stale queue counts (8→50) and cross-links in initiative, testing, and eve agent docs.
+Agent: Synced root contracts and chased down stale spec/task references. Here is what changed and what is intentionally left as history.
 
 ---
 ---
@@ -715,38 +928,62 @@ Generation: 84d8b0c8-0a80-4926-80ed-5143f207c470
 
 Human: run all tests again, make fixed, commit and push changes
 
-Agent: Re-ran pnpm qa (exit 0) and pnpm exec eve eval smoke (4/4); committed spec/contract sync (be832b7ab) and pushed origin/meta-cto.
+Agent: All checks passed; docs are committed and pushed.
 
 ---
+
 ---
-Timestamp: 2026-10-26T01:02:51.885Z
+Timestamp: Sunday, Oct 25, 2026, 7:02 PM (UTC-6)
 Work: feature-intelligence
 Stage: Build
-Generation: b7a987f3-edbc-4df0-8f9f-4c2047acd86d
 
 Human: make sure we push all changes to meta-cto, review local branches for missing work
 
-Agent: meta-cto matched origin after audit; committed remaining prompts.txt (d02d60ace) and pushed. Local main is behind meta-cto with separate unpushed Factory hook commits; old stashes are superseded WIP—not missing demo-depth work.
+Agent: Verified origin/meta-cto; committed prompt log (d02d60ace) and pushed; branch audit showed no missing FI demo-depth work on other branches.
 
 ---
+
 ---
-Timestamp: 2026-10-26T01:03:22.976Z
+Timestamp: Sunday, Oct 25, 2026, 7:02 PM (UTC-6)
+Work: feature-intelligence
+Stage: Build
+
+Human: make sure we push all changes to meta-cto, review local branches for missing work
+
+Agent: (Duplicate Cursor submit of same prompt; no additional git changes.)
+
+---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 7:03 PM (UTC-6)
 Work: feature-intelligence
 Stage: Review
-Generation: fb59313d-16f3-4358-b0a8-e88ba1cf1ebc
 
 Human: ok
 
-Agent: Acknowledged; assessment and demo depth are on origin/meta-cto at d02d60ace.
+Agent: Acknowledged.
 
 ---
+
 ---
-Timestamp: 2026-10-26T01:04:30.000Z
+Timestamp: Sunday, Oct 25, 2026, 7:04 PM (UTC-6)
 Work: feature-intelligence
 Stage: Review
 
 Human: make sure prompts.txt is up date use this session log
 
-Agent: Reconciled prompts.txt with this session transcript: removed duplicate out-of-order coordinator blocks, enriched hook-thin Agent summaries for demo-depth Explore through Review, deduped ok entry; committed and pushed 6a152ea76 on meta-cto.
+Agent: Prior pass incorrectly paraphrased and deleted log blocks; superseded by transcript rebuild on this turn.
 
 ---
+
+---
+Timestamp: Sunday, Oct 25, 2026, 7:07 PM (UTC-6)
+Work: feature-intelligence
+Stage: Review
+
+Human: nah we fucked up, you seems to lost turns use your tools to get the full log, dont use compacted context, get the full session log and respect my prompt entry as they were made
+
+Agent: Rebuilt prompts.txt from full agent-transcript JSONL (46 user queries verbatim) plus git d02d60ace hook/coordinator tail; added .agents/tooling/prompt-log/rebuild-from-transcript.mjs for recovery.
+
+---
+
