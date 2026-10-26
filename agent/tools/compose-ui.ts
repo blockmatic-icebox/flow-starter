@@ -1,27 +1,54 @@
-import { composeQuery, MAX_QUERY_CODE_POINTS } from "@repo/genui";
+import type { CompositionEnvelope } from "@repo/genui";
+import { composeQueryToEnvelope, MAX_QUERY_CODE_POINTS } from "@repo/genui";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
+
+const priorEnvelopeSchema = z.object({
+  fallbackText: z.string(),
+  libraryVersion: z.number(),
+  openuiText: z.string(),
+  records: z.array(z.record(z.string(), z.unknown())),
+  requestId: z.string(),
+});
 
 export default defineTool({
   description:
     "Generate a validated OpenUI composition from a natural-language UI request (synthetic demo data).",
-  async execute({ query }) {
+  async execute({ mode, priorEnvelope, query, turns }) {
     const clientRequestId = `eve-${Date.now()}`;
-    const result = await composeQuery({
-      input: { clientRequestId, query, version: 1 },
+    const { envelope, result } = await composeQueryToEnvelope({
+      input: {
+        clientRequestId,
+        mode,
+        priorEnvelope: priorEnvelope as CompositionEnvelope | undefined,
+        query,
+        turns,
+        version: 1,
+      },
     });
-    const complete = result.events.find((e) => e.type === "complete");
-    if (!complete || complete.type !== "complete")
+    if (!envelope || result.metadata.outcome !== "success")
       return {
         error: "composition_failed",
+        failureCode: result.metadata.failureCode,
         validationOk: result.metadata.validationOk,
       };
     return {
-      envelope: complete.envelope,
+      envelope,
       metadata: result.metadata,
     };
   },
   inputSchema: z.object({
+    mode: z.enum(["create", "refine"]).optional(),
+    priorEnvelope: priorEnvelopeSchema.optional(),
     query: z.string().min(1).max(MAX_QUERY_CODE_POINTS),
+    turns: z
+      .array(
+        z.object({
+          content: z.string(),
+          role: z.enum(["assistant", "user"]),
+        })
+      )
+      .max(12)
+      .optional(),
   }),
 });

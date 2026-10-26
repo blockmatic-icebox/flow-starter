@@ -1,9 +1,11 @@
 import { registerAppTool } from "@modelcontextprotocol/ext-apps/server";
 import type { McpServer } from "@modelcontextprotocol/server";
+import type { CompositionEnvelope } from "@repo/genui";
 import {
   componentNames,
-  composeQuery,
+  composeQueryToEnvelope,
   compositionGuidance,
+  GENUI_LIBRARY_VERSION,
   MAX_QUERY_CODE_POINTS,
 } from "@repo/genui";
 import { z } from "zod";
@@ -52,23 +54,49 @@ export const registerStarterMcpTools = (server: McpServer) => {
       description:
         "Generate a validated OpenUI composition from a natural-language UI request using synthetic data.",
       inputSchema: {
+        mode: z.enum(["create", "refine"]).optional(),
+        priorEnvelope: z
+          .object({
+            fallbackText: z.string(),
+            libraryVersion: z.literal(GENUI_LIBRARY_VERSION),
+            openuiText: z.string(),
+            records: z.array(z.record(z.string(), z.unknown())),
+            requestId: z.string(),
+          })
+          .optional(),
         query: z.string().min(1).max(MAX_QUERY_CODE_POINTS),
+        turns: z
+          .array(
+            z.object({
+              content: z.string(),
+              role: z.enum(["assistant", "user"]),
+            })
+          )
+          .max(12)
+          .optional(),
       },
       ...previewToolMeta,
     },
-    async ({ query }) => {
+    async ({ mode, priorEnvelope, query, turns }) => {
       const clientRequestId = `mcp-${Date.now()}`;
-      const result = await composeQuery({
-        input: { clientRequestId, query, version: 1 },
+      const { envelope, result } = await composeQueryToEnvelope({
+        input: {
+          clientRequestId,
+          mode,
+          priorEnvelope: priorEnvelope as CompositionEnvelope | undefined,
+          query,
+          turns,
+          version: 1,
+        },
       });
-      const complete = result.events.find((e) => e.type === "complete");
-      if (!complete || complete.type !== "complete")
+      if (!envelope || result.metadata.outcome !== "success")
         return asToolResult({
           error: "composition_failed",
+          failureCode: result.metadata.failureCode,
           validationOk: result.metadata.validationOk,
         });
       return asToolResult({
-        envelope: complete.envelope,
+        envelope,
         metadata: result.metadata,
       });
     }

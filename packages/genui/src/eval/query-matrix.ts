@@ -229,10 +229,22 @@ export const queryMatrixCases: QueryMatrixCase[] = defineCases([
   ...openEndedPrompts.map((prompt) => ({
     category: "ambiguous" as const,
     expectNoCitations: true,
-    expectRoot: "Answer",
+    expectRoot: "StatusMessage",
     expectTier: 3 as const,
     prompt,
   })),
+  {
+    category: "controlled",
+    expectRoot: "SectionStack",
+    expectTier: 1,
+    prompt: "Design an onboarding form for new users",
+  },
+  {
+    category: "controlled",
+    expectRoot: "SectionStack",
+    expectTier: 1,
+    prompt: "Create a sign-up form",
+  },
   ...ambiguousPrompts.map((prompt) => ({
     category: "sparse" as const,
     expectRecordId: "document:api-overview",

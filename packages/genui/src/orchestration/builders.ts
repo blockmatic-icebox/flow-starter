@@ -1,6 +1,7 @@
 import { openUiStringList, openUiStringLiteral } from "../contract/openui-text";
 import type { CompositionEnvelope, GroundedRecord } from "../core/envelope";
 import { GENUI_LIBRARY_VERSION } from "../core/envelope";
+import { onboardingFormRecords } from "../fixtures/synthetic-onboarding";
 import {
   supportDashboardRecords,
   supportMetricIds,
@@ -113,6 +114,25 @@ export const sectionStackDocument = ({
   records,
   requestId,
 });
+
+export const onboardingFormDocument = ({
+  requestId,
+}: {
+  requestId: string;
+}) => {
+  const records = onboardingFormRecords;
+  const children = [
+    `Answer(${openUiStringLiteral(
+      "Welcome — tell us about yourself to get started."
+    )}, [])`,
+    `InteractiveForm("form-wizard", "form:onboarding")`,
+  ];
+  return sectionStackDocument({
+    childExpressions: children,
+    records,
+    requestId,
+  });
+};
 
 export const supportDashboardDocument = ({
   requestId,

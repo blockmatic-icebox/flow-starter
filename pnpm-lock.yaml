@@ -361,6 +361,9 @@ importers:
       '@openuidev/react-lang':
         specifier: 1.0.1
         version: 1.0.1(@modelcontextprotocol/sdk@1.32.2(supports-color@7.2.0)(zod@4.6.7))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
+      '@repo/ui':
+        specifier: workspace:*
+        version: link:../ui
       ai:
         specifier: ^7.0.152
         version: 7.0.152(zod@4.6.7)

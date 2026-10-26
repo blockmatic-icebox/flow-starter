@@ -76,6 +76,23 @@ const composeStreamEventSchema = z.discriminatedUnion("type", [
   }),
   z.strictObject({
     envelope: envelopeSchema,
+    metadata: z
+      .strictObject({
+        component: z.string().optional(),
+        composite: z.string().nullable().optional(),
+        failureCode: z
+          .enum([
+            "generation_invalid",
+            "missing_credentials",
+            "validation_failed",
+          ])
+          .optional(),
+        outcome: z.enum(["failed", "success"]),
+        refined: z.boolean().optional(),
+        tier: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+        validationOk: z.boolean(),
+      })
+      .optional(),
     requestId,
     sequence,
     type: z.literal("complete"),

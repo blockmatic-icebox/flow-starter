@@ -4,6 +4,7 @@ import {
   collectionDocument,
   comparisonDocument,
   dataExplorerDocument,
+  onboardingFormDocument,
   sectionStackDocument,
   statusDocument,
   timelineDocument,
@@ -20,6 +21,7 @@ export type FlowGenuiFixtureId =
   | "catalog-grid"
   | "compound-stack"
   | "injection-safe"
+  | "onboarding-form"
   | "unsupported-status";
 
 export interface FlowGenuiFixtureDefinition {
@@ -83,6 +85,10 @@ export const flowGenuiFixtures: Record<
       requestId,
     }),
     id: "metrics-dashboard",
+  },
+  "onboarding-form": {
+    envelope: onboardingFormDocument({ requestId }),
+    id: "onboarding-form",
   },
   "product-timeline": {
     envelope: timelineDocument({

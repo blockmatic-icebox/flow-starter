@@ -9,6 +9,7 @@ export type ControlledIntent =
   | "product-timeline"
   | "search-products"
   | "list-products"
+  | "onboarding-form"
   | "insufficient-data"
   | "injection-guard";
 
@@ -102,6 +103,19 @@ export const routeQuery = (query: string): RoutedIntent => {
     };
   }
 
+  if (
+    /onboarding\s+form|sign[- ]?up\s+form|new\s+user\s+form/u.test(
+      normalizedQuery
+    )
+  ) {
+    return {
+      injection: false,
+      intent: "onboarding-form",
+      normalizedQuery,
+      tier: 1,
+    };
+  }
+
   if (/list|show all|catalog/u.test(normalizedQuery)) {
     return {
       injection: false,
@@ -126,7 +140,7 @@ export const routeQuery = (query: string): RoutedIntent => {
     ambiguous: normalizedQuery.length < 8,
     hasControlledIntent: false,
     needsOpenComposition:
-      /custom layout|surprise me|design a|generate|onboarding form|pricing/u.test(
+      /custom layout|surprise me|design a|generate|pricing/u.test(
         normalizedQuery
       ),
     synthesisRequired: false,

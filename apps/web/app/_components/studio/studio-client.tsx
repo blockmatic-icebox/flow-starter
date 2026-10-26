@@ -38,67 +38,90 @@ export const StudioClient = () => {
   const latestRequestIdRef = useRef<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  const runCompose = useCallback(async (text: string) => {
-    const query = text.trim();
-    if (!query) return;
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
-    generationRef.current += 1;
-    const clientRequestId = `studio-${generationRef.current}`;
-    latestRequestIdRef.current = clientRequestId;
-    setError(null);
-    setLoading(true);
-    setMessages((prev) => [...prev, { content: query, role: "user" }]);
+  const runCompose = useCallback(
+    async (text: string) => {
+      const query = text.trim();
+      if (!query) return;
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+      generationRef.current += 1;
+      const clientRequestId = `studio-${generationRef.current}`;
+      latestRequestIdRef.current = clientRequestId;
+      const priorEnvelope = envelope;
+      const priorMessages = messages;
+      setError(null);
+      setLoading(true);
+      setMessages((prev) => [...prev, { content: query, role: "user" }]);
 
-    const streamState = {
-      latest: null as CompositionEnvelope | null,
-      message: null as string | null,
-    };
+      const streamState = {
+        latest: null as CompositionEnvelope | null,
+        message: null as string | null,
+        outcome: "success" as "failed" | "success",
+      };
 
-    try {
-      const response = await fetch("/api/genui/compose", {
-        body: JSON.stringify({
-          clientRequestId,
-          query,
-          version: 1,
-        }),
-        headers: { "Content-Type": "application/json" },
-        method: "POST",
-        signal: controller.signal,
-      });
+      try {
+        const response = await fetch("/api/genui/compose", {
+          body: JSON.stringify({
+            clientRequestId,
+            mode: priorEnvelope ? "refine" : "create",
+            priorEnvelope: priorEnvelope ?? undefined,
+            query,
+            turns: [...priorMessages, { content: query, role: "user" as const }]
+              .slice(-6)
+              .map((message) => ({
+                content: message.content,
+                role: message.role,
+              })),
+            version: 1,
+          }),
+          headers: { "Content-Type": "application/json" },
+          method: "POST",
+          signal: controller.signal,
+        });
 
-      const result = await consumeNdjsonResponse({
-        onEvent: (event) => {
-          if (event.requestId !== clientRequestId) return;
-          if (event.type === "error") streamState.message = event.message;
-          if (event.type === "partial" || event.type === "complete")
-            streamState.latest = event.envelope;
-        },
-        response,
-      });
+        const result = await consumeNdjsonResponse({
+          onEvent: (event) => {
+            if (event.requestId !== clientRequestId) return;
+            if (event.type === "error") streamState.message = event.message;
+            if (event.type === "partial") streamState.latest = event.envelope;
+            if (event.type === "complete") {
+              streamState.latest = event.envelope;
+              if (event.metadata?.outcome === "failed")
+                streamState.outcome = "failed";
+            }
+          },
+          response,
+        });
 
-      if (latestRequestIdRef.current !== clientRequestId) return;
+        if (latestRequestIdRef.current !== clientRequestId) return;
 
-      if (!result.ok && result.reason !== "aborted")
-        setError(`Stream error: ${result.reason}`);
-      else if (streamState.message) setError(streamState.message);
-      else if (streamState.latest) {
-        const composed = streamState.latest;
-        setEnvelope(composed);
-        setMessages((prev) => [
-          ...prev,
-          { content: composed.fallbackText, role: "assistant" },
-        ]);
-      } else setError("No composition returned.");
-      setLoading(false);
-    } catch (error_) {
-      if (latestRequestIdRef.current !== clientRequestId) return;
-      if ((error_ as Error).name !== "AbortError")
-        setError("Could not reach compose service.");
-      setLoading(false);
-    }
-  }, []);
+        if (!result.ok && result.reason !== "aborted")
+          setError(`Stream error: ${result.reason}`);
+        else if (streamState.message) setError(streamState.message);
+        else if (streamState.latest) {
+          const composed = streamState.latest;
+          if (streamState.outcome === "failed") {
+            setError(composed.fallbackText);
+            setEnvelope(composed);
+          } else {
+            setEnvelope(composed);
+            setMessages((prev) => [
+              ...prev,
+              { content: composed.fallbackText, role: "assistant" },
+            ]);
+          }
+        } else setError("No composition returned.");
+        setLoading(false);
+      } catch (error_) {
+        if (latestRequestIdRef.current !== clientRequestId) return;
+        if ((error_ as Error).name !== "AbortError")
+          setError("Could not reach compose service.");
+        setLoading(false);
+      }
+    },
+    [envelope, messages]
+  );
 
   const submit = async (text: string) => {
     const query = text.trim();

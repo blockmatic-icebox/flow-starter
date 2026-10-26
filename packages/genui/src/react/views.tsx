@@ -1,6 +1,12 @@
 "use client";
 
+import { Button } from "@repo/ui/components/button";
+import { Input } from "@repo/ui/components/input";
+import { Label } from "@repo/ui/components/label";
+import { useState } from "react";
+
 import type { GroundedRecord } from "../core/envelope";
+import { getFormSchema } from "../fixtures/form-schemas";
 
 const recordTitle = (records: GroundedRecord[], id: string) =>
   records.find((record) => record.id === id)?.kind === "entity"
@@ -333,17 +339,68 @@ export const InteractiveFormView = ({
 }: {
   composite: string;
   formId: string;
-}) => (
-  <section className="space-y-2">
-    <p className="text-muted-foreground text-xs tracking-wide uppercase">
-      {composite}
-    </p>
-    <StatusMessageView
-      message={`Form "${formId}" is not wired on this host. Register a privileged submit action before enabling submission.`}
-      variant="warning"
-    />
-  </section>
-);
+}) => {
+  const schema = getFormSchema(formId);
+  const [values, setValues] = useState<Record<string, string>>(() =>
+    Object.fromEntries((schema ?? []).map((field) => [field.name, ""]))
+  );
+  const [submitted, setSubmitted] = useState(false);
+
+  if (!schema) {
+    return (
+      <section className="space-y-2">
+        <p className="text-muted-foreground text-xs tracking-wide uppercase">
+          {composite}
+        </p>
+        <StatusMessageView
+          message={`Form "${formId}" is not registered on this host.`}
+          variant="warning"
+        />
+      </section>
+    );
+  }
+
+  return (
+    <section className="space-y-4">
+      <p className="text-muted-foreground text-xs tracking-wide uppercase">
+        {composite}
+      </p>
+      {submitted ? (
+        <StatusMessageView
+          message="Demo submission captured locally — connect a privileged submit action to persist data."
+          variant="empty"
+        />
+      ) : (
+        <form
+          className="space-y-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            setSubmitted(true);
+          }}
+        >
+          {schema.map((field) => (
+            <div className="space-y-2" key={field.name}>
+              <Label htmlFor={`${formId}-${field.name}`}>{field.label}</Label>
+              <Input
+                id={`${formId}-${field.name}`}
+                onChange={(event) =>
+                  setValues((prev) => ({
+                    ...prev,
+                    [field.name]: event.target.value,
+                  }))
+                }
+                required={field.required}
+                type={field.type}
+                value={values[field.name] ?? ""}
+              />
+            </div>
+          ))}
+          <Button type="submit">Continue</Button>
+        </form>
+      )}
+    </section>
+  );
+};
 
 export const EvidenceQuoteView = ({
   documentId,

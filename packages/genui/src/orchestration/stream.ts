@@ -1,4 +1,5 @@
 import type { CompositionEnvelope } from "../core/envelope";
+import type { ComposeResult } from "./compose";
 import {
   NDJSON_MAX_EVENTS,
   NDJSON_MAX_LINE_BYTES,
@@ -12,7 +13,14 @@ export type ComposeStreamEvent =
       envelope: CompositionEnvelope;
       requestId: string;
       sequence: number;
-      type: "partial" | "complete";
+      type: "partial";
+    }
+  | {
+      envelope: CompositionEnvelope;
+      metadata?: ComposeResult["metadata"];
+      requestId: string;
+      sequence: number;
+      type: "complete";
     }
   | { message: string; requestId: string; sequence: number; type: "error" };
 
