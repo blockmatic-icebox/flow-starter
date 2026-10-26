@@ -68,7 +68,8 @@ export const AskHunchClient = () => {
 
       if (latestRequestIdRef.current !== clientRequestId) return;
 
-      if (!result.ok) setError(`Stream error: ${result.reason}`);
+      if (!result.ok && result.reason !== "aborted")
+        setError(`Stream error: ${result.reason}`);
       else if (streamMessage) setError(streamMessage);
       else if (latest) setEnvelope(latest);
       else setError("No composition returned.");

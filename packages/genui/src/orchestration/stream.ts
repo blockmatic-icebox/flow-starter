@@ -17,6 +17,7 @@ export type ComposeStreamEvent =
   | { message: string; requestId: string; sequence: number; type: "error" };
 
 export type NdjsonFailureReason =
+  | "aborted"
   | "empty_stream"
   | "invalid_event"
   | "malformed_line"
@@ -139,7 +140,9 @@ export const consumeNdjsonResponse = async ({
       }
     }
     pending += decoder.decode();
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError")
+      return { ok: false, reason: "aborted" };
     return { ok: false, reason: "truncated_stream" };
   }
 

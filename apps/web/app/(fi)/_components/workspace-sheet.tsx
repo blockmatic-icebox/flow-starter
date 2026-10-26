@@ -7,9 +7,9 @@ export const WorkspaceSheet = ({
   children: ReactNode;
   className?: string;
 }) => (
-  <div
+  <main
     className={`border-border bg-card min-h-[min(70dvh,48rem)] rounded-md border ${className}`}
   >
     {children}
-  </div>
+  </main>
 );
