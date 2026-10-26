@@ -5,7 +5,7 @@
 Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundaries, security). Factory detail: [.agents/flow/architecture.md](.agents/flow/architecture.md).
 
 **Adoption:** [ADR 0001 — Use Flow Factory](docs/adr/0001-use-flow-factory.md)  
-**Feature Intelligence:** [ADR 0002](docs/adr/0002-feature-intelligence-architecture.md) · [ADR 0004](docs/adr/0004-fi-workflow-integrity-and-safety.md) · [spec](docs/specs/feature-intelligence.md) · [remediation](docs/specs/feature-intelligence-remediation.md)
+**Feature Intelligence:** [ADR 0002](docs/adr/0002-feature-intelligence-architecture.md) · [ADR 0004](docs/adr/0004-fi-workflow-integrity-and-safety.md) · [ADR 0005](docs/adr/0005-fi-agentic-discoverability-and-mcp.md) · [spec](docs/specs/feature-intelligence.md) · [remediation](docs/specs/feature-intelligence-remediation.md) · [agentic discoverability](docs/specs/feature-intelligence-agentic-discoverability.md)
 
 ## System overview (assessment)
 
@@ -34,11 +34,11 @@ Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundar
 
 | Path | Role | Implementation status |
 | --- | --- | --- |
-| `packages/fi` | Metrics, queue/CRUD, **disposition gate** (remediation), T0–T3 harness, `seed/` (500 rows + safety guard) | **Partial** — disposition/discovery gaps per RC-* |
+| `packages/fi` | Metrics, queue/CRUD, **disposition gate** (remediation), T0–T3 harness, `seed/` (500 rows + safety guard) | **Live** — RC-1–RC-8 per [remediation tasks](docs/tasks/feature-intelligence-remediation.md) |
 | `packages/db` | Drizzle schema; `fi-schema.ts`; migrations through `0002_feature_intelligence` | **Live** — `pnpm db:migrate`, remote SSL in client |
 | `agent/` | eve root agent; `instructions.md` + 8 tools → `@repo/fi` | **Live** — smoke evals in `evals/` |
-| `apps/web` | Next.js + `eve/next`; FI routes under `app/(fi)/` — **`force-dynamic`** on FI layout (counts from DB, not static prerender) | **Partial** — UI gaps per remediation spec |
-| `evals/` | eve smoke (`pnpm exec eve eval smoke`) | **Partial** — outcome-based evals in progress (RC-9) |
+| `apps/web` | Next.js + `eve/next`; FI routes under `app/(fi)/`; agentic routes (`llms.txt`, well-known MCP, `/api/mcp`, Markdown negotiation) — **`force-dynamic`** on FI layout | **Live** — remediation UI + [agentic discoverability](docs/specs/feature-intelligence-agentic-discoverability.md) |
+| `evals/` | eve smoke (`pnpm exec eve eval smoke`) | **Live** — behavioral smoke; deeper outcome evals optional (RC-9) |
 
 Also available: `@repo/ui`, `@repo/genui` (not used for FI triage UI), `@repo/ts`.
 

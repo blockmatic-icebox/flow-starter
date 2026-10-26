@@ -2,6 +2,7 @@
 
 **Last reviewed:** 2026-10-26  
 **Status:** Current  
+**Implementation:** Shipped on `meta-cto` (`meta-cto-two.vercel.app`); Is Agentic score claim pending fresh scan ([verification log](../research/20261026-fi-agentic-verification.md))  
 **ADR:** [0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) (Accepted)  
 **Initiative:** [feature-intelligence.md](../initiatives/feature-intelligence.md)
 
@@ -149,7 +150,9 @@ npx is-agentic@latest <production-host> --json
 | `agent-friendly-404`        | **pass**                                       |
 | `content-no-js`             | **pass** or partial acceptable                 |
 
-Add root script: `"agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-meta-cto-two.vercel.app}"` (devDependency `is-agentic`).
+On the assessment branch, root script: `"agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-meta-cto-two.vercel.app}"` (`is-agentic` devDependency). On Factory `main`, `AGENTIC_CHECK_URL` is required (see [.agents/flow/operations/verification.md](../../.agents/flow/operations/verification.md)).
+
+**Cache:** `pnpm agentic:check` returns the latest stored report; it does not force a rescan. After deploy, use **Rescan** on the [report page](https://is-agentic.com/scan/meta-cto-two.vercel.app) and confirm `scanned_at` is newer than the pre-build snapshot (~2026-10-26T02:53Z). Evidence log: [20261026-fi-agentic-verification.md](../research/20261026-fi-agentic-verification.md).
 
 ### Automated
 

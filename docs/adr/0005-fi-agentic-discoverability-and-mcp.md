@@ -8,7 +8,7 @@ Date: 2026-10-26
 
 Feature Intelligence already exposes **human UI**, **ask-only chat**, and **Eve** tools over `@repo/fi` ([ADR 0002](./0002-feature-intelligence-architecture.md)). External agents (ChatGPT, Claude, Cursor, custom MCP hosts) cannot discover or call those capabilities without a **standard interoperability surface**.
 
-An [Is Agentic](https://is-agentic.com/docs) audit of production (`meta-cto-two.vercel.app`, 2026-10-26) scored **59/100**, with essential gaps in **Markdown negotiation**, **agent instruction files**, and **live MCP handshake** (registry partial credit only; **`/.well-known/mcp` missing**).
+A **pre-implementation** [Is Agentic](https://is-agentic.com/docs) audit of production (`meta-cto-two.vercel.app`, 2026-10-26 ~02:53 UTC) scored **59/100**, with gaps in **Markdown negotiation**, **agent instruction files**, and **live MCP handshake**. Those surfaces were implemented on `meta-cto` the same day; confirm score with a **manual Rescan** after deploy (CLI returns cached reports until then). See [20261026-fi-agentic-verification.md](../research/20261026-fi-agentic-verification.md).
 
 [ADR 0004](./0004-fi-workflow-integrity-and-safety.md) deferred a separate FI MCP product server for the remediation slice. This ADR **adds** a deliberate MCP + discoverability layer for the assessment demo without replacing Eve as the primary in-repo agent.
 
@@ -40,6 +40,12 @@ Factory patterns apply: read-only external invocation ([Factory ADR 0006](../../
 - [feature-intelligence-eve-agent.md](../specs/feature-intelligence-eve-agent.md) MCP row superseded by [agentic discoverability spec](../specs/feature-intelligence-agentic-discoverability.md).
 - Deployment must expose MCP on the **production alias** (not only preview); Vercel Deployment Protection may block external auditors—document bypass or public alias policy.
 - `pnpm agentic:check` (script) runs `is-agentic` against configured URL in CI optional job.
+
+## Implementation status (2026-10-26)
+
+Shipped on assessment branch `meta-cto` / alias `meta-cto-two.vercel.app`: `llms.txt`, `sitemap.xml`, `/.well-known/mcp` (+ server-card, `mcp.json`, `ai-catalog.json`), `POST /api/mcp` (eight tools, demo-open), homepage Markdown negotiation (`next.config` rewrites — no `middleware.ts`), agent-friendly Markdown 404 via catch-all route, in-memory MCP rate limit stub, root `pnpm agentic:check` on `meta-cto` (Factory `main` uses `AGENTIC_CHECK_URL` without assessment default host).
+
+**Open:** Is Agentic **AD-6** / **G-A4** — rerun after [Rescan](https://is-agentic.com/scan/meta-cto-two.vercel.app) when `scanned_at` advances.
 
 ## Related documents
 

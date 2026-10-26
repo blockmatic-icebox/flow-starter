@@ -1,6 +1,6 @@
 # Spec: Feature Intelligence — workflow remediation
 
-**Last reviewed:** 2026-10-25  
+**Last reviewed:** 2026-10-26  
 **Status:** Current  
 **Initiative:** [feature-intelligence.md](../initiatives/feature-intelligence.md)  
 **Research:** [20261025-fi-adversarial-review.md](../research/20261025-fi-adversarial-review.md)  
@@ -8,7 +8,7 @@
 
 ## Problem
 
-Contracts and demo depth describe a **complete** PM workflow (merge, discovery, validation, AI recovery, audit). Implementation partially matches—creating evaluator risk and spec drift.
+Contracts and demo depth describe a **complete** PM workflow (merge, discovery, validation, AI recovery, audit). **Build (2026-10-26)** closed RC-1–RC-10 per [tasks](../tasks/feature-intelligence-remediation.md); residual risk is verification drift, not missing MVP remediation routes.
 
 ## Outcome
 
@@ -147,7 +147,7 @@ Restore **fidelity** between [core spec](./feature-intelligence.md) and runtime 
 
 ## RC-10 — Contract honesty
 
-- [PRODUCT.md](../../PRODUCT.md) implementation table lists **remediation** items as **Partial** until RC satisfied.
+- [PRODUCT.md](../../PRODUCT.md) implementation table lists remediation and human UI as **Live** after RC build (2026-10-26).
 - Core spec edge cases remain normative; this doc tracks **gap closure** only.
 
 ---

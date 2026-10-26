@@ -1,8 +1,9 @@
 # Research: Feature Intelligence adversarial review
 
 **Research date:** 2026-10-25  
-**Last reviewed:** 2026-10-25  
-**Status:** Current  
+**Last reviewed:** 2026-10-26  
+**Status:** Historical  
+**Supersedes:** Remediation and agentic gaps closed 2026-10-26 — [remediation tasks](../tasks/feature-intelligence-remediation.md), [agentic verification](./20261026-fi-agentic-verification.md)  
 **Branch:** `meta-cto`  
 **Purpose:** Evidence-backed reconciliation of an independent adversarial review vs code and contracts; input to [remediation spec](../specs/feature-intelligence-remediation.md).
 
@@ -56,10 +57,12 @@ The assessment delivers a credible **intake → publish → triage → insights*
 
 ## Agentic discoverability baseline (2026-10-26)
 
-`npx is-agentic meta-cto-two.vercel.app` → **59/100**. Notable gaps: `markdown-negotiation-vary` (failed), `mcp-server` (partial — no `/.well-known/mcp` handshake on origin). Plan: [agentic discoverability spec](../specs/feature-intelligence-agentic-discoverability.md).
+**Pre-build scan:** `npx is-agentic meta-cto-two.vercel.app` → **59/100** (`scanned_at` ~2026-10-26T02:53Z). **Post-build:** surfaces implemented per [agentic discoverability spec](../specs/feature-intelligence-agentic-discoverability.md); production curls pass — see [20261026-fi-agentic-verification.md](./20261026-fi-agentic-verification.md). CLI may still show **59** until Is Agentic **Rescan**.
 
 ## Related
 
 - [feature-intelligence-remediation.md](../specs/feature-intelligence-remediation.md)
 - [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md)
+- [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md)
 - [20261025-fi-browser-verification.md](./20261025-fi-browser-verification.md)
+- [20261026-fi-agentic-verification.md](./20261026-fi-agentic-verification.md)

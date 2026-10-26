@@ -1,7 +1,7 @@
 # Tasks: Feature Intelligence — agentic discoverability
 
 **Last reviewed:** 2026-10-26  
-**Status:** Build complete (2026-10-26)  
+**Status:** Build complete (2026-10-26) · **Acceptance:** AD-1–AD-5, AD-7 implemented; **AD-6 / G-A4** pending Is Agentic rescan on production alias  
 **Spec:** [feature-intelligence-agentic-discoverability.md](../specs/feature-intelligence-agentic-discoverability.md) (AD-1–AD-7)  
 **ADR:** [0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) (Accepted)  
 **Initiative:** [feature-intelligence.md](../initiatives/feature-intelligence.md)
@@ -141,7 +141,7 @@
 - [x] **T-A-30** — `is-agentic` CLI gate (**AD-6**)
   - **Depends on:** **G-A3**
   - **Do:** `devDependency` `is-agentic`; script `agentic:check`; document `AGENTIC_CHECK_URL`.
-  - **Verify:** `pnpm agentic:check` — target `mcp-server` **pass**, `markdown-negotiation-vary` **pass**.
+  - **Verify:** After manual Rescan on production, `pnpm agentic:check` — `mcp-server` **pass**, `markdown-negotiation-vary` **pass** (cached CLI may show pre-build failures until `scanned_at` updates).
 
 - [x] **T-A-31** — Vercel Deployment Protection note
   - **Depends on:** T-A-20
@@ -176,4 +176,4 @@ Integrator: merge **Wave 1 → 2 → 3 → 4**; run **T-A-30** on preview/prod U
 
 ## Acceptance
 
-All **[AD-1–AD-7](../specs/feature-intelligence-agentic-discoverability.md#acceptance-criteria)** and Is Agentic **`mcp-server` pass** on production alias.
+Implementation satisfies **[AD-1–AD-7](../specs/feature-intelligence-agentic-discoverability.md#acceptance-criteria)** in code and production curls ([verification log](../research/20261026-fi-agentic-verification.md)). **Ship claim:** Is Agentic **`mcp-server` pass** (and related essential checks) on `meta-cto-two.vercel.app` after Rescan confirms post-deploy `scanned_at`.

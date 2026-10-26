@@ -1,7 +1,7 @@
 # Initiative: Feature Intelligence (Meta CTO assessment)
 
-**Status:** Specified · MVP + demo depth + **remediation built** · **Agentic discoverability** planned (ADR/spec draft)  
-**Stage:** Plan ready — [agentic discoverability tasks](../tasks/feature-intelligence-agentic-discoverability.md) (gates G-A0–G-A4; Build not authorized)  
+**Status:** Specified · MVP + demo depth + **remediation built** · **agentic discoverability built** (Is Agentic rescan pending)  
+**Stage:** Review — [agentic discoverability tasks](../tasks/feature-intelligence-agentic-discoverability.md) (implementation complete; **G-A4** awaits fresh Is Agentic report on production alias)  
 **Time box:** ~2–3 hours implementation + ~5 min demo
 
 ## Outcome
@@ -33,7 +33,7 @@ Help a product team turn **unstructured feature requests** from customers, prosp
 - **Duplicate retrieval:** **Lexical top-10** for assessment (no pgvector).
 - **Testing:** [eve eval smoke + seed](../../docs/specs/feature-intelligence-testing.md); **web FI manual only** (no new Playwright for MVP).
 - **Remediation (2026-10-25):** Merge with **supporter rollup**; AI failure non-blocking UX; discovery search/sort/pagination; domain validation; decision transparency (outcome + audit on detail); seed production guard; **behavioral** Eve evals — [remediation spec](../specs/feature-intelligence-remediation.md), [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md).
-- **Agentic discoverability (2026-10-26):** `llms.txt`, well-known MCP, Streamable HTTP `/api/mcp`, Is Agentic verification — [spec](../specs/feature-intelligence-agentic-discoverability.md), [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) (Proposed).
+- **Agentic discoverability (2026-10-26):** `llms.txt`, well-known MCP, Streamable HTTP `/api/mcp`, Is Agentic verification — [spec](../specs/feature-intelligence-agentic-discoverability.md), [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md) (**Accepted**); production alias `meta-cto-two.vercel.app`.
 - **Agents:** Single eve root agent (no subagents in v1).
 - **Triage:** [Jev harness](../../docs/specs/feature-intelligence-triage-harness.md) via **AI Gateway** (`AI_GATEWAY_API_KEY`, `typesafe-ai/jev`); reference `@repo/genui` gateway wiring.
 - **Ask-only chat:** **Direct Anthropic** (`ANTHROPIC_API_KEY`); port Flow demo `streamText` pattern ([ADR 0010](../../.agents/flow/decisions/adr/0010-site-consultant-chat-and-mcp.md)) — [ADR 0003](../adr/0003-feature-intelligence-model-providers.md).
@@ -91,7 +91,7 @@ Detail: [MVP cut line](#mvp-cut-line-assessment); specs index in [feature-intell
 → **[docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md)** — MVP (complete).  
 → **[docs/tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md)** — demo depth (complete).  
 → **[docs/tasks/feature-intelligence-remediation.md](../tasks/feature-intelligence-remediation.md)** — workflow remediation (complete).  
-→ **[docs/tasks/feature-intelligence-agentic-discoverability.md](../tasks/feature-intelligence-agentic-discoverability.md)** — agentic discoverability + MCP (**Plan ready**).
+→ **[docs/tasks/feature-intelligence-agentic-discoverability.md](../tasks/feature-intelligence-agentic-discoverability.md)** — agentic discoverability + MCP (**Build complete**; acceptance verification pending Is Agentic rescan).
 
 ## Non-goals
 
@@ -156,21 +156,18 @@ See [docs/specs/feature-intelligence.md](../specs/feature-intelligence.md).
 | [feature-intelligence-analytics.md](../specs/feature-intelligence-analytics.md) | Insights trends, range, charts |
 | [feature-intelligence-testing.md](../specs/feature-intelligence-testing.md) | TDD + W-* + evals |
 | [feature-intelligence-remediation.md](../specs/feature-intelligence-remediation.md) | Workflow gap closure (RC-1–RC-10) |
+| [feature-intelligence-agentic-discoverability.md](../specs/feature-intelligence-agentic-discoverability.md) | `llms.txt`, MCP, Markdown negotiation, Is Agentic |
 | [tasks/feature-intelligence.md](../tasks/feature-intelligence.md) | MVP execution checklist |
 | [tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) | 500 seed + analytics (complete) |
-| [tasks/feature-intelligence-remediation.md](../tasks/feature-intelligence-remediation.md) | Remediation execution (draft) |
+| [tasks/feature-intelligence-remediation.md](../tasks/feature-intelligence-remediation.md) | Remediation execution (complete) |
+| [tasks/feature-intelligence-agentic-discoverability.md](../tasks/feature-intelligence-agentic-discoverability.md) | Agentic discoverability execution (complete) |
 
-Contracts: [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [ARCHITECTURE.md](../../ARCHITECTURE.md), [GLOSSARY.md](../../GLOSSARY.md), [ADR 0002](../adr/0002-feature-intelligence-architecture.md), [ADR 0003](../adr/0003-feature-intelligence-model-providers.md), [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md).  
-Research: [20261025-fi-adversarial-review.md](../research/20261025-fi-adversarial-review.md).
+Contracts: [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [ARCHITECTURE.md](../../ARCHITECTURE.md), [GLOSSARY.md](../../GLOSSARY.md), [ADR 0002](../adr/0002-feature-intelligence-architecture.md), [ADR 0003](../adr/0003-feature-intelligence-model-providers.md), [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md), [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md).  
+Research: [20261025-fi-adversarial-review.md](../research/20261025-fi-adversarial-review.md), [20261026-fi-agentic-verification.md](../research/20261026-fi-agentic-verification.md).
 
 ## Demo depth (post-MVP)
 
 **Built 2026-10-25:** Manifest-driven **500**-row seed (`SEED_REFERENCE_ISO`, intake ~20%, merge/dup graph), queue **support sort**, `getInsights({ range })` + `/insights` trends. Checklist: [feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) (complete).
-
-## Tasks (execution)
-
-- Assessment MVP: [docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md) (complete)
-- Demo depth: [docs/tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) (complete)
 
 ## Progress
 
@@ -183,5 +180,7 @@ Research: [20261025-fi-adversarial-review.md](../research/20261025-fi-adversaria
 - [x] **Explore (adversarial)** — [research](../research/20261025-fi-adversarial-review.md)
 - [x] **Specify (remediation)** — [remediation spec](../specs/feature-intelligence-remediation.md) + ADR 0004
 - [x] **Plan (remediation)** — [tasks](../tasks/feature-intelligence-remediation.md) (dependencies + gates)
-- [ ] **Build (remediation)** — not authorized
-- [ ] Review / Ship — after remediation Build
+- [x] **Build (remediation)** — [tasks](../tasks/feature-intelligence-remediation.md) (2026-10-26)
+- [x] **Specify (agentic)** — [spec](../specs/feature-intelligence-agentic-discoverability.md) + [ADR 0005](../adr/0005-fi-agentic-discoverability-and-mcp.md)
+- [x] **Build (agentic)** — [tasks](../tasks/feature-intelligence-agentic-discoverability.md) (2026-10-26)
+- [ ] **Review / Ship** — Is Agentic **G-A4** on `meta-cto-two.vercel.app` after manual **Rescan** ([verification log](../research/20261026-fi-agentic-verification.md))
