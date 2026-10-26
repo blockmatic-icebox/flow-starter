@@ -225,7 +225,7 @@ Quick check after seed:
 ```bash
 pnpm --filter @repo/fi seed
 npx eve dev   # from repo root after eve init
-# list_triage_queue → 8 items; search_requests "CSV" → FR-001, FR-002
+# list_triage_queue → 50 items; search_requests "CSV" → FR-001, FR-002
 ```
 
 ## Dependencies (Plan / Build)

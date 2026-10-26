@@ -19,7 +19,7 @@ Full spec: **[docs/specs/feature-intelligence-journeys.md](docs/specs/feature-in
 | External submitter | Home → submit → thank-you (no PM jargon) | “Feedback”, “similar ideas” |
 | Internal submitter | Home → paste → duplicates first | Duplicate prevention |
 | PM | Home/Triage → expand row → disposition | Glossary terms |
-| Leader | Home → Insights → optional audit | Read-only metrics |
+| Leader | Home → Insights (range + trends) → optional audit | Read-only metrics; no AI lift claims |
 
 **Demo script (recording direction only—not in-app):** Insights glance → PM triage (×2) → Insights refresh → optional live external submit. No Loom or recorder integration in the product.
 
@@ -42,7 +42,7 @@ Spec: [docs/specs/feature-intelligence.md](docs/specs/feature-intelligence.md). 
 - **Triage is not chat** — submit flow uses cards and explicit confirm/publish.
 - **Primary actions:** Publish request / Submit feedback (persona), Save disposition.
 - **Destructive:** Decline disposition (same form; no separate destructive button style required in MVP).
-- **Metrics UI:** Show `medianPmTriageMs` only when `pmTriageN >= 2`; otherwise footnote proxy if needed.
+- **Metrics UI:** PM triage card uses `medianPmTriageMs` when `pmTriageN >= 2`; otherwise headline may use **proxy** with explanatory footnote (see [analytics spec](docs/specs/feature-intelligence-analytics.md)).
 - **Motion:** Skeleton on triage loading only; toast on disposition save; keep demo recording calm.
 - **AI UX:** Submit loading uses harness **stage labels** + time estimate; human confirm before publish/disposition. Pattern map: [feature-intelligence-ai-ux-patterns.md](docs/specs/feature-intelligence-ai-ux-patterns.md) ([AI UX Playground](https://www.aiuxplayground.com/patterns)).
 
@@ -60,7 +60,7 @@ Sticky header: brand + Browse · Submit · Triage (badge when queue &gt; 0) · I
 | Triage queue + inline review | `Table` / `Item`, `Collapsible` or `Accordion`, `Select`, `Textarea` |
 | Empty queue | `Empty`, `EmptyTitle` |
 | Loading triage | `Skeleton`; submit uses `Spinner` + `aria-live` |
-| Insights | `Card` grid only (defer `Chart`) |
+| Insights | `Card` grid + **horizontal bar** trend panels (CSS bars, not Recharts); `Select` for range |
 | Detail audit | `Collapsible`, sidebar at `lg` |
 | Feedback | `toast` after disposition |
 

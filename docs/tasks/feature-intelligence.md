@@ -1,7 +1,7 @@
 # Tasks: Feature Intelligence
 
 **Last reviewed:** 2026-10-25 (post-ship contract sync)  
-**Status:** Current (execution checklist; not a spec)
+**Status:** Complete (assessment MVP). Post–demo depth: seed smoke expects **50** open queue — see [feature-intelligence-demo-depth.md](./feature-intelligence-demo-depth.md).
 
 **Role:** Agent/human **execution checklist** only — not product requirements.  
 **Specs (what):** [feature-intelligence.md](../specs/feature-intelligence.md) and linked specs.  

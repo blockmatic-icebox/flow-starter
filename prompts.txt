@@ -644,6 +644,15 @@ Human: Implement demo depth build plan (500 seed, analytics, phase commits).
 Agent: Shipped five commits: seed generator, queue sort/smoke, getInsights trends, insights UI, contracts/tasks; pnpm qa and eve smoke green.
 
 ---
+Timestamp: 2026-10-25T19:45:00-06:00
+Work: feature-intelligence
+Stage: Review
+
+Human: Update root .md files; ensure tasks and specs are complete and consistent.
+
+Agent: Synced PRODUCT, DESIGN, ARCHITECTURE, GLOSSARY; fixed stale seed queue counts and approval lines across specs, initiative, testing, eve agent, and research notes.
+
+---
 ---
 Timestamp: 2026-10-26T00:39:03.902Z
 Work: feature-intelligence
@@ -735,5 +744,29 @@ Generation: c7c72107-bd41-4ace-aef1-fd9db4e8d613
 Human: lets build, make sure to update tasks, and root .md files when done, commit often per phase
 
 Agent: Gathering the current implementation to draft a phased build plan aligned with the task file.
+
+---
+---
+Timestamp: 2026-10-26T00:57:52.322Z
+Work: feature-intelligence
+Stage: Build
+Generation: 018d4870-a843-4f93-a929-734b16639ad0
+
+Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: Demo depth build is complete on `meta-cto` in **five commits**:
+
+---
+---
+Timestamp: 2026-10-26T01:00:02.197Z
+Work: feature-intelligence
+Stage: Build
+Generation: a17c5796-7c0c-444b-9240-766710f03084
+
+Human: update root .md files as required, make sure there arent missing tasks or incomplete specs
+
+Agent: Synced root contracts and chased down stale spec/task references. Here is what changed and what is intentionally left as history.
 
 ---

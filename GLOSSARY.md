@@ -66,7 +66,7 @@ The underlying **need**, not the requested feature wording. Editable at confirm;
 
 ### Theme registry
 
-Closed set of `theme_key` values (`reporting_exports`, `collaboration_sharing`, `integrations_alerts`, `platform_other`). Classification must map here; filters and analytics use **keys**.
+Closed set of `theme_key` values in `packages/fi/src/theme/registry.ts`: `reporting_exports`, `collaboration_sharing`, `integrations_alerts`, `permissions_access`, `performance_scale`, `mobile_experience`, `data_governance`, `platform_other`. Triage classification maps here; filters and analytics use **keys**.
 
 ### Duplicate candidate
 

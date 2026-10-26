@@ -40,10 +40,10 @@ Run after `pnpm dev`, `pnpm --filter @repo/fi seed`, and env for AI triage.
 | W-2i | Internal context submit → duplicates prominent → link on confirm |  |
 | W-3 | Near-duplicate live submit surfaces FR-001/002 candidates |  |
 | W-4 | Support increments on detail |  |
-| W-5 | Triage queue shows **8** seeded items; **inline panel** expand → disposition + rationale (no dialog-first) |  |
+| W-5 | Triage queue shows **50** seeded items (sorted by support); **inline panel** expand → disposition + rationale (no dialog-first) |  |
 | W-5a | Triage badge on nav matches `openQueueCount`; empty queue uses `Empty` + Insights link |  |
 | W-6 | Detail transparency panel renders steps |  |
-| W-7 | Insights shows four metrics, `openQueueCount`, sample sizes; **capture rate** moves after W-5 (not stuck at 2/10) |  |
+| W-7 | Insights shows six metric cards, range **90d**, weekly panels, themes; `openQueueCount` **50** after seed; **capture rate** moves after W-5 dispositions |  |
 | W-8 | `/chat` answers product questions; **does not** mutate requests; empty state has **prompt starters** |  |
 | W-9 | Submit loading shows harness **stage label** + ~10–20s estimate (`aria-live`) |  |
 
@@ -78,7 +78,7 @@ Use natural-language prompts that should invoke tools; assert with `t.calledTool
 
 | Eval id | User message (example) | Gates |
 | --- | --- | --- |
-| `smoke/list-triage-queue` | “What’s on the PM triage queue?” | `list_triage_queue`; reply mentions ≥1 FR id or count **8** |
+| `smoke/list-triage-queue` | “What’s on the PM triage queue?” | `list_triage_queue`; count **50** |
 | `smoke/search-csv` | “Find requests about CSV export” | `search_requests`; mentions FR-001 or FR-002 |
 | `smoke/get-dispositioned` | “Why was FR-008 declined?” | `get_request`; includes decline rationale theme |
 | `smoke/submit-no-auto-confirm` | “Submit: Export to PDF” (after seed) | `submit_request` only; **no** `confirm_request` until follow-up “confirm” (AG-7) |

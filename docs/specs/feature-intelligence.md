@@ -17,7 +17,8 @@
 | [feature-intelligence-seed.md](./feature-intelligence-seed.md) | 500-row seed + anchors |
 | [feature-intelligence-analytics.md](./feature-intelligence-analytics.md) | Insights trends |
 | [feature-intelligence-testing.md](./feature-intelligence-testing.md) | TDD order, W-* manual, eve evals |
-| [docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md) | Build checklist (separate from specs) |
+| [docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md) | MVP build checklist (complete) |
+| [docs/tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) | Demo depth checklist (complete) |
 | [ADR 0003](../adr/0003-feature-intelligence-model-providers.md) | Gateway (Jev/triage) vs Anthropic (`/chat`) |
 
 ## Problem
@@ -290,7 +291,7 @@ Build and UX choices **prioritize measurable north-star metrics** over auxiliary
 
 **Published** = `status = 'published'`. Denominators exclude `draft`, `archived`.
 
-**Why capture rate uses open queue:** Seed already has 2 dispositioned rows; dividing by all published makes the rate static. **Open-queue denominator** makes dispositions in a **live demo** visibly move the metric.
+**Why capture rate uses open queue:** With a large seeded backlog, dividing by all published barely moves the rate during a demo. **Open-queue denominator** makes PM dispositions in a **live session** visibly move the metric.
 
 **Proxy (PM triage only):** `medianPmTriageMsProxy` = `disposition_at - published_at` when `pm_review_started_at` is missing. **UI:** show primary `medianPmTriageMs` only when `sample.pmTriageN >= 2`; otherwise show proxy in a **footnote** under the card—not as the headline number.
 
@@ -315,8 +316,12 @@ Return JSON (also powers eve `get_insights`):
     openQueueCount: number,
   },
   computedAt: string, // ISO
+  range: { preset, from, to } | null,  // web: set; eve: null
+  trends: { weekly, themes, strategicVsPopular } | null  // when range passed — see analytics spec
 }
 ```
+
+Full range scoping and `trends` shape: **[feature-intelligence-analytics.md](./feature-intelligence-analytics.md)**.
 
 **UI:** `/insights` shows north-star metrics (including **PM triage median**), **`openQueueCount`**, and `sample.publishedCount`; demo depth adds time range and trends per [analytics spec](./feature-intelligence-analytics.md). **Capture rate** and **open queue** are live snapshots; after two PM dispositions in demo they should move noticeably.
 
@@ -343,7 +348,7 @@ For a strong assessment **screen recording** (external tool; **no in-app recorde
 
 Canonical fixture, stable ids (FR-001–FR-011), eve v1 tool matrix, and seed CLI: **[feature-intelligence-seed.md](./feature-intelligence-seed.md)**.
 
-Summary: 10 published + 1 `pending_confirm` + 2 dispositioned examples; CSV duplicate pair (FR-001/002); **eight** items on PM triage queue for `list_triage_queue` (10 published − FR-003/FR-008 dispositioned).
+Summary: **500** total rows (`RNG_SEED` `fi-demo-v1`); anchors FR-001–FR-011 unchanged for smoke; **50** open PM queue items; **462** published; ~**20%** intake-linked. Eve smoke: `list_triage_queue` count **50**. Details: manifest tables in seed spec.
 
 ---
 
@@ -356,7 +361,7 @@ Summary: 10 published + 1 `pending_confirm` + 2 dispositioned examples; CSV dupl
 | AC-3 | PM dispositions two different items with non-empty rationale. |
 | AC-4 | List shows `theme_label` chip, support count, source; filter by `theme_key` works. |
 | AC-5 | Detail shows transparency steps JSON rendered as human list. |
-| AC-6 | `/insights` shows all four north-star metrics with correct `sample` counts from seed. |
+| AC-6 | `/insights` shows north-star metrics (incl. PM triage) with correct `sample` counts from seed; demo depth adds trends at default **90d**. |
 | AC-7 | `pnpm qa` passes for touched packages. |
 | AC-8 | Confirm with `intakeLinkedRequestId` increments `intakeLinkRate`; `recordPmReviewStarted` enables `medianPmTriageMs`. |
 

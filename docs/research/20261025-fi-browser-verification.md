@@ -19,10 +19,10 @@
 | W-2i | Pass | Internal dupes-first, PM summary collapsible, confirm → detail |
 | W-3 | Partial | Near-duplicate lexical matches surfaced on external confirm (FR-001 title overlap) |
 | W-4 | Pass | Support control on `/requests/00000000-0000-4000-8000-000000000001` |
-| W-5 | Pass | `/triage` shows 8 items with inline disposition combobox + rationale |
+| W-5 | Pass (MVP) | `/triage` shows 8 items (pre–demo depth; re-verify **50** + support sort) |
 | W-5a | Pass | Nav badge **Triage 9** after one new pending item; empty queue not exercised |
 | W-6 | Pass | “How this was evaluated” expands step list |
-| W-7 | Pass | `/insights` — open queue **8**, decision capture **20%**, four metric cards |
+| W-7 | Pass (MVP) | `/insights` — open queue **8**, decision capture **20%**, four metric cards (pre–demo depth; re-verify at **50** open + trends after `pnpm seed:fi`) |
 | W-8 | Pass | `/chat` prompt starters + composer; no mutation tools wired |
 | W-9 | Pass | `aria-live` + rotating stage labels on submit loading |
 | AC-4 | Pass | `/requests?theme=` filter chips via `themeRegistry` |

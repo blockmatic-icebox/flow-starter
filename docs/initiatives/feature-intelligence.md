@@ -1,7 +1,7 @@
 # Initiative: Feature Intelligence (Meta CTO assessment)
 
-**Status:** Specified (complete) · **Plan complete** (tasks below)  
-**Stage:** Plan → awaiting explicit **Build** authorization  
+**Status:** Specified (complete) · **MVP + demo depth built**  
+**Stage:** Review (external demo recording optional)  
 **Time box:** ~2–3 hours implementation + ~5 min demo
 
 ## Outcome
@@ -68,7 +68,7 @@ Help a product team turn **unstructured feature requests** from customers, prosp
 
 **Path B notes:** Empty `NEON_API_KEY` / `NEON_PROJECT_ID` will fail `db:start` — fill from [Neon console](https://console.neon.tech) or use Path A instead.
 
-**Verification gate (Wave 0):** `pnpm db:ping` exit 0; `pnpm --filter @repo/db db:check`; after seed, `list_triage_queue` smoke count **8**.
+**Verification gate (Wave 0):** `pnpm db:ping` exit 0; `pnpm --filter @repo/db db:check`; after seed, `list_triage_queue` smoke count **50** (demo depth).
 
 ## Plan — implementation waves (summary)
 
@@ -151,18 +151,18 @@ See [docs/specs/feature-intelligence.md](../specs/feature-intelligence.md).
 | [feature-intelligence-analytics.md](../specs/feature-intelligence-analytics.md) | Insights trends, range, charts |
 | [feature-intelligence-testing.md](../specs/feature-intelligence-testing.md) | TDD + W-* + evals |
 | [tasks/feature-intelligence.md](../tasks/feature-intelligence.md) | MVP execution checklist |
-| [tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) | 500 seed + analytics Build backlog |
+| [tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) | 500 seed + analytics (complete) |
 
 Contracts: [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [ARCHITECTURE.md](../../ARCHITECTURE.md), [GLOSSARY.md](../../GLOSSARY.md), [ADR 0002](../adr/0002-feature-intelligence-architecture.md), [ADR 0003](../adr/0003-feature-intelligence-model-providers.md).
 
 ## Demo depth (post-MVP)
 
-**Specified 2026-10-25 (v2):** Manifest-driven **500**-row seed (`SEED_REFERENCE_ISO`, intake ~20%, merge/dup graph), queue **support sort**, `getInsights({ range })` + `/insights` trends. Tasks: [feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md). **Build** authorization required.
+**Built 2026-10-25:** Manifest-driven **500**-row seed (`SEED_REFERENCE_ISO`, intake ~20%, merge/dup graph), queue **support sort**, `getInsights({ range })` + `/insights` trends. Checklist: [feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) (complete).
 
 ## Tasks (execution)
 
 - Assessment MVP: [docs/tasks/feature-intelligence.md](../tasks/feature-intelligence.md) (complete)
-- Demo depth: [docs/tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md)
+- Demo depth: [docs/tasks/feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) (complete)
 
 ## Progress
 
@@ -170,5 +170,6 @@ Contracts: [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [ARCHIT
 - [x] Specify — initiative + full spec set + contracts updated
 - [x] **Plan** — Neon paths, waves, gates, **Tasks** backlog
 - [x] **Specify (demo depth)** — 500 seed + analytics specs + tasks
+- [x] **Build (MVP)** — [feature-intelligence.md](../tasks/feature-intelligence.md)
 - [x] **Build (demo depth)** — [feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md)
 - [ ] Review / external demo recording (no in-app recorder)

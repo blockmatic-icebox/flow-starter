@@ -134,7 +134,7 @@ type GetInsightsResult = {
 5. Theme panel with prior delta (hide delta when `all`).
 6. Judgment table per selection rule above.
 
-**Charts:** `@repo/ui` + minimal SVG or shared chart primitive; document tokens in `DESIGN.md` during Build.
+**Charts:** Horizontal CSS bar panels in `insights-dashboard.tsx` (Meta CTO tokens via `@repo/ui` `Card`/`Select`); see [DESIGN.md](../../DESIGN.md).
 
 **Empty range:** Show “No activity in this period” on charts; cards show `—` where undefined.
 
@@ -157,4 +157,4 @@ type GetInsightsResult = {
 
 ## Approval
 
-**Specified** 2026-10-25 (v2). Implement in [demo depth tasks](../tasks/feature-intelligence-demo-depth.md).
+**Specified** 2026-10-25 (v2). **Implemented** — [demo depth tasks](../tasks/feature-intelligence-demo-depth.md) complete.

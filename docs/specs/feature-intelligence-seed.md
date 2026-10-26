@@ -265,4 +265,4 @@ Discover list keeps **most supported** sort separately (unchanged).
 
 ## Approval
 
-Assessment 12-row seed superseded **2026-10-25**. Implement via [demo depth tasks](../tasks/feature-intelligence-demo-depth.md) after explicit **Build** authorization.
+Assessment 12-row seed superseded **2026-10-25**. **Implemented** — [demo depth tasks](../tasks/feature-intelligence-demo-depth.md) complete.

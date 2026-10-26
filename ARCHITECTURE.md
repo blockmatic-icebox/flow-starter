@@ -34,7 +34,7 @@ Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundar
 
 | Path | Role | Implementation status |
 | --- | --- | --- |
-| `packages/fi` | Metrics, queue/CRUD, T0–T3 harness, seed, offline triage-matrix test | **Live** — degrades without gateway key |
+| `packages/fi` | Metrics (`getInsights` + trends), queue/CRUD, T0–T3 harness, `seed/` generator (500 rows), offline triage-matrix test | **Live** — degrades without gateway key |
 | `packages/db` | Drizzle schema; `fi-schema.ts`; migrations through `0002_feature_intelligence` | **Live** — `pnpm db:migrate`, remote SSL in client |
 | `agent/` | eve root agent; `instructions.md` + 8 tools → `@repo/fi` | **Live** — smoke evals in `evals/` |
 | `apps/web` | Next.js + `eve/next`; FI routes under `app/(fi)/` | **Live** — browse, submit, triage, insights, `/chat` |
@@ -110,7 +110,7 @@ Verify: `vercel inspect <deployment-url> -S gaboesquivel` after push. If Vercel 
 ```text
 apps/web/app/(fi)/  # FI routes (home, requests, triage, insights, chat)
 agent/              # eve Feature Intelligence operator
-packages/fi/        # domain + harness (queue/list-triage-queue, requests/persist-triage-result, triage/harness-helpers, schemas/feature-request-source)
+packages/fi/        # domain + harness; seed/manifest.ts + generate-seed.ts; insights/bucketing.ts, compute-trends.ts
 packages/db/        # Drizzle + FI migration
 docs/adr/           # product ADRs
 docs/specs/         # FI specifications (see main spec index)
