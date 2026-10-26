@@ -52,4 +52,15 @@
 
 ## Production re-verify
 
-_See section below after deploy._
+**Deploy:** `git push origin meta-cto` → preview `meta-qvcr4h6nh` → `vercel promote` → production `meta-p67xg3ijx` (2026-10-26).  
+**Session:** `hunch-full-qa-prod` (agent-browser)
+
+| ID | Result | Evidence |
+| --- | --- | --- |
+| `/` Overview | Pass | Needs attention + metrics; `<main>` present in HTML |
+| `/ask` | Pass | Duplicate starter compose returns shared-need Answer (no stream error) |
+| `/chat` | Pass | Redirects to `/ask` |
+| `/review`, `/patterns`, `/signals`, `/dev` | Pass | Spot-checked via agent-browser open (200, expected titles) |
+| `pnpm agentic:check` | Pass | Cached report; MCP + markdown checks per prior deploy (see CLI output) |
+
+**Prod vs local:** Ask compose behavior matches local after abort-handling fix.
