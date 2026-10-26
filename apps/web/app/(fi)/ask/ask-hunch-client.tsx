@@ -86,12 +86,12 @@ export const AskHunchClient = () => {
       <header className="space-y-1">
         <h1 className="text-lg font-semibold tracking-tight">Ask Hunch</h1>
         <p className="text-muted-foreground text-sm">
-          Task-specific views from your signal data. Generating a view does not
-          record decisions — use{" "}
+          Task-specific views from your feedback data. Generating a view does
+          not record decisions — use{" "}
           <Link className="text-primary underline" href="/review">
-            Review
+            Triage
           </Link>{" "}
-          for merges and dispositions.
+          to record decisions.
         </p>
       </header>
 
@@ -140,9 +140,9 @@ export const AskHunchClient = () => {
         }}
       >
         <Textarea
-          aria-label="Ask about signals, themes, or decisions"
+          aria-label="Ask about feedback, themes, or decisions"
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask about signals, themes, or decisions…"
+          placeholder="Ask about feedback, themes, or decisions…"
           rows={2}
           value={input}
         />

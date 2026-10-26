@@ -2,7 +2,7 @@
 
 Initiative: [hunch-redesign.md](../initiatives/hunch-redesign.md) · Spec: [hunch-pm-overview.md](../specs/hunch-pm-overview.md)
 
-**Branch:** `meta-cto` · **No push/deploy** per authorization.
+**Branch:** `meta-cto` · Shipped; see [verification log](../research/20261026-hunch-pm-overview-verification.md).
 
 ## Wave 1 — Domain
 
@@ -36,7 +36,7 @@ Initiative: [hunch-redesign.md](../initiatives/hunch-redesign.md) · Spec: [hunc
 
 - [x] `pnpm --filter @repo/fi test`, `pnpm --filter web test`, types
 - [x] Eve smoke eval (`insights-decisions-in-range`)
-- [ ] agent-browser walkthrough (manual)
+- [x] agent-browser walkthrough — [20261026-hunch-pm-overview-verification.md](../research/20261026-hunch-pm-overview-verification.md)
 - [x] PRODUCT, DESIGN, ARCHITECTURE, hunch-genui updates
 
 **Gate:** Automated checks pass; browser pass documented in Task report.

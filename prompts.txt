@@ -3395,6 +3395,18 @@ Q: Implement Hunch PM workflow and Overview per attached plan on meta-cto (no pu
 A: Shipped phase 3: Overview dashboard (needs attention, four outcome metrics with period vs snapshot labels, demand themes, recent decisions), product language (Overview/Feedback/Triage/Insights), trustworthy metrics in @repo/fi (decisionsInRangeCount, readinessDegradedN, listAttentionItems), Triage flow (duplicates, degraded banner, revalidate + next focus, resume intake), /dev developer surface with /developers redirect, queue badge unavailable state. Verified: pnpm --filter @repo/fi test (exit 0), pnpm --filter web test + check-types (exit 0), pnpm exec eve eval smoke (10 passed, 1 skipped). Not committed; agent-browser walkthrough not run this session.
 
 ---
+
+Q: git push and verify on Vercel; push fixes.
+
+A: Committed c339d9ed8 on meta-cto, pushed to origin. Vercel deployment dpl_36gYs7V9JUX3hs5vTaVWKcuFQ4nQ READY; aliased meta-cto-two.vercel.app to preview URL. agent-browser: Overview, Triage (68 badge), /dev + Copy MCP on production; lint fixes included in commit. Branch 0 ahead/behind origin.
+
+---
+
+Q: Fix all issues and pending tasks; validate the site works.
+
+A: Reverted next-env.d.ts dev noise; Ask Hunch copy + Triage link; listAttentionItems test; verification log; production agent-browser + Ask compose metrics confirmed on meta-cto-two.
+
+---
 ---
 Timestamp: 2026-10-26T06:09:26.779Z
 Work: feature-intelligence
@@ -3406,5 +3418,60 @@ Human: Implement the plan as specified, it is attached for your reference. Do NO
 To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
 
 Agent: ## Task report — Completed · Build
+
+---
+---
+Timestamp: 2026-10-26T06:27:34.711Z
+Work: feature-intelligence
+Stage: Build
+Generation: 6afd76eb-237c-45e8-af05-2b63015e8f02
+
+Human: git push and use brower agent or tools to verify everything works innvercel. push fixes
+
+Agent: ## Task report — Completed · Ship (partial)
+
+---
+---
+Timestamp: 2026-10-26T06:28:22.752Z
+Work: feature-intelligence
+Stage: Build
+Generation: 90025557-9c07-4f33-8ca6-e211bc96a29e
+
+Human: push
+
+Agent: `meta-cto` is already in sync with `origin/meta-cto` — `git push` reported **Everything up-to-date** (latest commit `c339d9ed8`).
+
+---
+---
+Timestamp: 2026-10-26T06:31:41.261Z
+Work: feature-intelligence
+Stage: Build
+Generation: 573d5275-d5d4-40f8-ba3f-d2397c62f393
+
+Human: use browser tools locally and test everything work on ui
+
+Agent: ## Local UI verification (agent-browser)
+
+---
+---
+Timestamp: 2026-10-26T06:31:45.926Z
+Work: feature-intelligence
+Stage: Build
+Generation: 0455a597-ed26-499f-a2a1-acdf4f8ab84b
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: The **portless** dev command failed because the Portless proxy isn’t running and there’s no TTY for `sudo portless proxy start`.
+
+---
+---
+Timestamp: 2026-10-26T06:39:54.155Z
+Work: feature-intelligence
+Stage: Build
+Generation: 0beb0078-79c3-4c52-ac78-962a8f99db8c
+
+Human: push
+
+Agent: `git push origin meta-cto` completed: **Everything up-to-date** (`c339d9ed8` already on `origin/meta-cto`).
 
 ---
