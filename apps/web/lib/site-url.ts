@@ -3,12 +3,30 @@ export const resolveSiteOrigin = (request?: Request) => {
   if (fromEnv) return fromEnv.replace(/\/$/u, "");
 
   if (request) {
-    const host =
-      request.headers.get("x-forwarded-host") ?? request.headers.get("host");
-    if (host) {
-      const proto = request.headers.get("x-forwarded-proto") ?? "https";
-      return `${proto}://${host}`;
+    try {
+      const { hostname, origin } = new URL(request.url);
+      if (hostname) return origin;
+    } catch {
+      // fall through to headers / env
     }
+
+    const host =
+      request.headers.get("host") ?? request.headers.get("x-forwarded-host");
+    if (host) {
+      const normalizedHost = host.split(",")[0]?.trim();
+      if (normalizedHost) {
+        const proto = request.headers.get("x-forwarded-proto") ?? "https";
+        return `${proto}://${normalizedHost}`;
+      }
+    }
+  }
+
+  const vercelProduction = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  if (vercelProduction) {
+    const host = vercelProduction
+      .replace(/^https?:\/\//u, "")
+      .replace(/\/$/u, "");
+    return `https://${host}`;
   }
 
   const vercel = process.env.VERCEL_URL?.trim();
