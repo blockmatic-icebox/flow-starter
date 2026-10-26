@@ -5,9 +5,16 @@ export type { InsightsRangePreset } from "./insights/insights-range";
 export { listTriageQueue } from "./queue/list-triage-queue";
 export { recordPmReviewStarted } from "./queue/record-pm-review";
 export { FI_SIMULATED_PM_ACTOR } from "./constants";
-export { DispositionError, setDisposition } from "./queue/set-disposition";
-export { supportRequest } from "./queue/support-request";
-export { confirmRequest } from "./requests/confirm-request";
+export {
+  DispositionError,
+  resolveDispositionUpdateFailure,
+  setDisposition,
+} from "./queue/set-disposition";
+export { SupportRequestError, supportRequest } from "./queue/support-request";
+export {
+  ConfirmRequestError,
+  confirmRequest,
+} from "./requests/confirm-request";
 export { createDraftAndTriage } from "./requests/create-draft-and-triage";
 export { retryTriage } from "./requests/retry-triage";
 export { getRequest } from "./requests/get-request";

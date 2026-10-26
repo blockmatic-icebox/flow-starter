@@ -31,6 +31,7 @@ export const POST = async (request: Request) => {
         onEvent: (event) => {
           controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
         },
+        signal: request.signal,
       })
         .then(() => controller.close())
         .catch(() => {

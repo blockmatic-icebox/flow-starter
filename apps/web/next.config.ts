@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  outputFileTracingIncludes: {
+    "/api/mcp": ["./mcp-app/dist/hunch-explorer.html"],
+    "/mcp": ["./mcp-app/dist/hunch-explorer.html"],
+  },
   redirects() {
     return [
       { destination: "/signals", permanent: false, source: "/requests" },

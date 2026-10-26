@@ -1,9 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { RESOURCE_MIME_TYPE } from "@modelcontextprotocol/ext-apps/server";
+
 import { POST as postApiMcp } from "../../app/api/mcp/route";
 import { POST as postMcpAlias } from "../../app/mcp/route";
+import { HUNCH_EXPLORER_RESOURCE_URI } from "../../lib/mcp/hunch-explorer-resource";
 import { fiMcpToolCatalog } from "../../lib/mcp/tool-catalog";
+
+const explorerLinkedTools = [
+  "search_requests",
+  "get_request",
+  "list_triage_queue",
+  "get_insights",
+  "submit_request",
+] as const;
 
 const mcpHeaders = {
   Accept: "application/json, text/event-stream",
@@ -49,11 +60,61 @@ test("POST /api/mcp tools/list returns all FI tools", async () => {
   });
   assert.equal(response.status, 200);
   const json = (await response.json()) as {
-    result?: { tools?: { name: string }[] };
+    result?: {
+      tools?: {
+        _meta?: { ui?: { resourceUri?: string } };
+        name: string;
+      }[];
+    };
   };
-  const names = (json.result?.tools ?? []).map((t) => t.name).toSorted();
+  const tools = json.result?.tools ?? [];
+  const names = tools.map((t) => t.name).toSorted();
   const expected = fiMcpToolCatalog.map((t) => t.name).toSorted();
   assert.deepEqual(names, expected);
+
+  for (const name of explorerLinkedTools) {
+    const tool = tools.find((t) => t.name === name);
+    assert.equal(
+      tool?._meta?.ui?.resourceUri,
+      HUNCH_EXPLORER_RESOURCE_URI,
+      `${name} should link Hunch Explorer`
+    );
+  }
+});
+
+test("POST /api/mcp resources/list includes Hunch Explorer", async () => {
+  const response = await mcpPost(postApiMcp, {
+    id: 10,
+    jsonrpc: "2.0",
+    method: "resources/list",
+    params: {},
+  });
+  assert.equal(response.status, 200);
+  const json = (await response.json()) as {
+    result?: { resources?: { name?: string; uri?: string }[] };
+  };
+  const uris = (json.result?.resources ?? []).map((r) => r.uri);
+  assert.ok(uris.includes(HUNCH_EXPLORER_RESOURCE_URI));
+});
+
+test("POST /api/mcp resources/read returns MCP App HTML", async () => {
+  const response = await mcpPost(postApiMcp, {
+    id: 11,
+    jsonrpc: "2.0",
+    method: "resources/read",
+    params: { uri: HUNCH_EXPLORER_RESOURCE_URI },
+  });
+  assert.equal(response.status, 200);
+  const json = (await response.json()) as {
+    result?: {
+      contents?: { mimeType?: string; text?: string; uri?: string }[];
+    };
+  };
+  const content = json.result?.contents?.[0];
+  assert.equal(content?.uri, HUNCH_EXPLORER_RESOURCE_URI);
+  assert.equal(content?.mimeType, RESOURCE_MIME_TYPE);
+  assert.match(content?.text ?? "", /<html/iu);
+  assert.match(content?.text ?? "", /Hunch Explorer/iu);
 });
 
 test("POST /api/mcp rejects Accept without text/event-stream", async () => {

@@ -23,7 +23,7 @@ export default defineTool({
       return result;
     } catch (error) {
       if (error instanceof DispositionError)
-        throw new Error(`${error.code}: ${error.message}`, { cause: error });
+        return { error: `${error.code}: ${error.message}` };
       throw error;
     }
   },

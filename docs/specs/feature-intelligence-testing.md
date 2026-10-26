@@ -97,6 +97,11 @@ Use natural-language prompts that should invoke tools; assert with `t.calledTool
 | `smoke/search-csv` | “Find requests about CSV export” | `search_requests`; mentions FR-001 or FR-002 |
 | `smoke/get-dispositioned` | “Why was FR-008 declined?” | `get_request`; includes decline rationale theme |
 | `smoke/submit-no-auto-confirm` | “Submit: Export to PDF” (after seed) | `submit_request` only; **no** `confirm_request` until follow-up “confirm” (AG-7) |
+| `smoke/confirm-after-approval` | Explicit confirm after draft | `@repo/fi` `createDraftAndTriage` → `confirmRequest`; **owned** row |
+| `smoke/set-disposition-monitor` | Monitor disposition on owned signal | Owned draft → confirm → `setDisposition` monitor (does not mutate seed queue) |
+| `smoke/merge-disposition` | Merge into canonical target | Owned published pair → `setDisposition` merge + `mergeTargetId` |
+
+**Eval DB:** `evals/evals.config.ts` migrates then runs `FI_SEED_IF_EMPTY=1 pnpm seed:fi` (skip reload when `feature_request` already has rows). Prefer `EVE_EVAL_DATABASE_URL` for an isolated branch ([remediation](./feature-intelligence-remediation.md#rc-9--verification-eve-and-domain)).
 
 **Model:** Use real model for evals that need tool routing, or a **fixture agent** with `mockModel` only for plumbing tests (see [eve evals docs](https://eve.dev/docs/evals.md)). Assessment minimum: **one real-model smoke** locally before demo recording; CI can run deterministic checks on `@repo/fi` if eval flakiness is a concern (document in Plan).
 

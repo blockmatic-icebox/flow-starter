@@ -8,6 +8,8 @@ This checkout is the Meta CTO technical assessment on [Flow Factory](.agents/flo
 
 **Hunch redesign:** [initiative](docs/initiatives/hunch-redesign.md) · [GenUI spec](docs/specs/hunch-genui.md) · [tasks](docs/tasks/hunch-redesign.md) · [phase 2 hardening](docs/tasks/hunch-hardening.md). UI brand **hunch**; domain language remains Feature Intelligence ([GLOSSARY.md](GLOSSARY.md#hunch-ui-brand)).
 
+**MCP App:** [initiative](docs/initiatives/hunch-mcp-app.md) · [spec](docs/specs/hunch-mcp-app.md) · [tasks](docs/tasks/hunch-mcp-app.md).
+
 ## Users and jobs
 
 | User | Job |
@@ -40,9 +42,10 @@ Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence
 | **Specification** | **MVP + demo depth specified**; **[workflow remediation](docs/specs/feature-intelligence-remediation.md) accepted** (Specify 2026-10-25) — [initiative](docs/initiatives/feature-intelligence.md) |
 | **Database** | **Live** — Vercel build: `db:migrate` + **if-empty** seed (`FI_SEED_IF_EMPTY`); local full reseed via `pnpm seed:fi` ([seed spec](docs/specs/feature-intelligence-seed.md)) |
 | **Domain (`@repo/fi`)** | **Live** — disposition validation, merge rollup, discovery pagination, degraded triage flags ([remediation](docs/specs/feature-intelligence-remediation.md)) |
-| **eve (`agent/`)** | **Live** — behavioral smoke evals (AG-7 + disposition monitor); `pnpm exec eve eval smoke` |
+| **eve (`agent/`)** | **Live** — behavioral smoke evals (AG-7, owned confirm/monitor/merge); `pnpm exec eve eval smoke` |
 | **Human UI (`apps/web`)** | **Live** — **Hunch** shell (Pulse, Signals, Review, Patterns, Ask Hunch GenUI); merge picker, search/sort/page, AI failure UX, decision sidebar; legacy URL redirects |
 | **Agentic discoverability** | **Live** — `llms.txt`, well-known MCP, Streamable HTTP `/api/mcp` (open demo tools), `pnpm agentic:check` ([spec](docs/specs/feature-intelligence-agentic-discoverability.md)) |
+| **MCP App (Hunch Explorer)** | **Planned** — interactive `ui://hunch/explorer` for Apps-capable hosts; non-UI fallback required ([initiative](docs/initiatives/hunch-mcp-app.md), [spec](docs/specs/hunch-mcp-app.md)) |
 | **Deployment (demo)** | **Live** — Vercel `meta-cto`, https://meta-cto-two.vercel.app (`DATABASE_URL`, gateway/Anthropic keys on Production) |
 
 **Build:** [Remediation tasks](docs/tasks/feature-intelligence-remediation.md) implemented on `meta-cto` (2026-10-26). Adversarial reconciliation: [research](docs/research/20261025-fi-adversarial-review.md). W-3 near-duplicate **partial** (lexical by design).

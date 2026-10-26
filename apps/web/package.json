@@ -6,17 +6,20 @@
   "scripts": {
     "dev": "portless",
     "dev:app": "next dev",
-    "build": "next build --webpack",
+    "build": "pnpm run build:mcp-app && next build --webpack",
+    "build:mcp-app": "vite build --config mcp-app/vite.config.ts",
     "start": "next start",
     "check-types": "tsc-ts --noEmit",
-    "test": "node --import tsx --test tests/starter.contract.test.ts tests/site-url.test.ts tests/mcp/smoke.test.ts tests/mcp/route.test.ts tests/agent-surfaces.test.ts tests/compose-fi.test.ts tests/genui-compose.route.test.ts",
+    "test": "pnpm run build:mcp-app && node --import tsx --test tests/starter.contract.test.ts tests/site-url.test.ts tests/mcp/smoke.test.ts tests/mcp/mcp-app-resource.test.ts tests/mcp/route.test.ts tests/agent-surfaces.test.ts tests/compose-fi.test.ts tests/genui-compose.route.test.ts",
     "test:browser": "playwright test",
     "test:browser:ui": "playwright test --ui"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.58",
     "@ai-sdk/react": "^3.0.58",
+    "@modelcontextprotocol/ext-apps": "^2.0.3",
     "@modelcontextprotocol/sdk": ">=1.32.2",
+    "@modelcontextprotocol/server": "^2.4.0",
     "@repo/fi": "workspace:*",
     "@repo/genui": "workspace:*",
     "@repo/ui": "workspace:*",
@@ -36,8 +39,11 @@
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "tsx": "^4.23.15",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "vite": "^6.4.5",
+    "vite-plugin-singlefile": "^2.3.4"
   },
   "portless": {
     "name": "meta-cto",

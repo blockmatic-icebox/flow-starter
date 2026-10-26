@@ -240,7 +240,7 @@ npx eve dev   # from repo root after eve init
 
 ### MVP tool surface
 
-**Shipped (assessment + demo depth):** `search_requests`, `get_request`, `submit_request`, `list_triage_queue`, `set_disposition`, `get_insights`, `confirm_request`, `support_request` in `agent/tools/`. AG-2 and AG-4 rely on manual terminal checks or harness tests; smoke suite covers AG-3, AG-7, queue count, and search.
+**Shipped (assessment + demo depth):** `search_requests`, `get_request`, `submit_request`, `list_triage_queue`, `set_disposition`, `get_insights`, `confirm_request`, `support_request` in `agent/tools/`. AG-2 terminal check remains manual; smoke suite covers AG-3, AG-7, queue count, search, **owned-row** confirm/monitor/merge (`confirm-after-approval`, `set-disposition-monitor`, `merge-disposition`).
 
 ---
 

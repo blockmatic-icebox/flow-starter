@@ -9,6 +9,7 @@ import {
   fiMcpPublicHostGuidance,
   fiProductTagline,
 } from "@/lib/fi-agent-surfaces-content";
+import { fiMcpAppResourceUri } from "@/lib/mcp/tool-catalog";
 
 const mcpInitializeCurl = `curl -sS -X POST '${fiMcpCanonicalUrl}' \\
   -H 'Content-Type: application/json' \\
@@ -57,6 +58,13 @@ export default function DevelopersPage() {
       <h2>MCP connection</h2>
       <p>{fiMcpConnectionSummary}</p>
       <p>{fiMcpClientGuidance}</p>
+      {fiMcpAppResourceUri ? (
+        <p>
+          MCP Apps hosts can load the Hunch Explorer UI at{" "}
+          <code>{fiMcpAppResourceUri}</code> via <code>resources/list</code> and{" "}
+          <code>resources/read</code> on the same MCP transport.
+        </p>
+      ) : null}
       <h3>Public host</h3>
       <p>{fiMcpPublicHostGuidance}</p>
       <h3>External auditors</h3>
@@ -90,6 +98,10 @@ export default function DevelopersPage() {
         </li>
         <li>
           <code>POST /api/chat</code> — ask-only streaming chat (no tools)
+        </li>
+        <li>
+          <code>POST /api/genui/compose</code> — Ask Hunch GenUI NDJSON compose
+          (read-only)
         </li>
       </ul>
       <h2>Sandbox</h2>

@@ -37,6 +37,21 @@ Legacy paths redirect (`/requests` → `/signals`, etc.).
 
 Same design system as static pages via `@repo/genui/react` `GenuiRenderer`. Entity records link to `/signals/[id]`. Generating a view does not write data; merge/publish/disposition stay on Review and Add feedback flows.
 
+### MCP App iframe (Hunch Explorer)
+
+Separate bundle from the main Next.js app: one focused **`ui://hunch/explorer`** view for MCP hosts ([spec](docs/specs/hunch-mcp-app.md)). Reuse Paper + Cobalt tokens; do not ship the full shell or duplicate `@repo/ui` tree unless bundle size allows.
+
+| State | UX |
+| --- | --- |
+| **Loading** | Skeleton or compact spinner; preserve layout height |
+| **Empty** | Plain copy (“No signals match”, “Queue is clear”) |
+| **Failure** | Tool or bridge error with retry hint where the host allows |
+| **Degraded** | When triage/harness marked degraded — label as partial AI output, not a recorded decision |
+
+**Trust labels:** recorded fact (DB fields), AI suggestion (harness pre-fill), uncommitted action (draft / pending confirm). **`confirm_request`** and **`set_disposition`** stay on the tool channel unless an explicit host-approval UI is added later.
+
+**Tokens in iframe:** `--background` Paper `#F5F3ED`, `--foreground` Ink `#22241F`, `--primary` Cobalt `#3454ED`, `--card` white `#FFFFFF`, `--muted-foreground` pewter for secondary text — mirror `:root` aliases from the table below where the bundle imports shared CSS.
+
 ### Component map
 
 | UX need               | Location / primitive                   |

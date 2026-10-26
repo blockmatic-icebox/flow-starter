@@ -50,6 +50,15 @@ const defaultDeps = (db: AppDatabase): ComposeFiDeps => ({
   searchRequests: (args) => searchRequests({ ...args, db }),
 });
 
+const duplicateSearchQuery = (text: string) =>
+  text
+    .replaceAll(
+      /\b(?:are|these|those|requests?|duplicate|duplicates|same)\b/giu,
+      " "
+    )
+    .replaceAll(/\s+/gu, " ")
+    .trim();
+
 /* eslint-disable complexity -- routes one user query to multiple FI-backed GenUI envelopes */
 export const composeFiQuery = async ({
   db,
@@ -101,24 +110,27 @@ export const composeFiQuery = async ({
     return rec;
   };
 
-  const loadTheme = async (themeHint: RegExp) => {
+  const loadTheme = async ({
+    query: themeQuery,
+    themeKey,
+  }: {
+    query?: string;
+    themeKey?: string;
+  }) => {
     const { items } = await fi.searchRequests({
-      pageSize: 50,
+      pageSize: 8,
+      query: themeQuery,
       sort: "support",
+      themeKey,
     });
-    return items.filter(
-      (row) =>
-        themeHint.test(row.themeLabel ?? "") ||
-        themeHint.test(row.title) ||
-        themeHint.test(row.description)
-    );
+    return items;
   };
 
   const intent = matchFiComposeIntent(query);
   let envelope;
 
   if (intent === "integration-failure") {
-    const rows = await loadTheme(/integrat/iu);
+    const rows = await loadTheme({ query: "integration" });
     const sourceIds = rows.slice(0, 6).map((r) => signalEntityId(r.id));
     for (const row of rows.slice(0, 6))
       pushSignal({
@@ -139,7 +151,12 @@ export const composeFiQuery = async ({
       requestId,
     });
   } else if (intent === "duplicates") {
-    const ranked = await fi.searchRequests({ pageSize: 2, sort: "support" });
+    const stripped = duplicateSearchQuery(query);
+    const ranked = await fi.searchRequests({
+      pageSize: 2,
+      query: stripped.length > 1 ? stripped : undefined,
+      sort: "support",
+    });
     const pair = ranked.items.slice(0, 2);
     if (pair.length < 2) {
       envelope = statusDocument({
@@ -212,18 +229,17 @@ export const composeFiQuery = async ({
     records.push(
       metricRecord({
         id: "metric:signals-30d",
-        label: "Signals received (30d)",
-        trend: "up",
+        label: "Published signals (last 30 days)",
         value: String(insights.sample.publishedCount),
       }),
       metricRecord({
         id: "metric:decisions-30d",
-        label: "Decisions recorded (30d)",
+        label: "Decisions with rationale (last 30 days)",
         value: String(insights.sample.dispositionWithRationaleCount),
       }),
       metricRecord({
         id: "metric:queue",
-        label: "Awaiting review (now)",
+        label: "Open review queue (current)",
         value: String(insights.openQueueCount),
       })
     );
@@ -274,12 +290,11 @@ export const composeFiQuery = async ({
             requestId,
           });
   } else if (intent === "prioritize-reporting") {
-    const rows = await loadTheme(/report|export/iu);
-    const fallbackSearch = await fi.searchRequests({
-      pageSize: 8,
-      sort: "support",
+    const rows = await loadTheme({
+      query: "report export",
+      themeKey: "reporting",
     });
-    const ranked = rows.length > 0 ? rows : fallbackSearch.items;
+    const ranked = rows;
     const ids = ranked.slice(0, 6).map((r) => {
       pushSignal({
         description: r.description,

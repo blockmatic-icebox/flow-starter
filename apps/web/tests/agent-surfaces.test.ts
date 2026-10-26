@@ -15,15 +15,25 @@ test("openapi.json route returns OpenAPI 3.1 with MCP and tool paths", async () 
   assert.equal(doc.openapi, "3.1.0");
   assert.ok(doc.paths["/api/mcp"]?.post?.operationId === "mcpStreamableHttp");
   assert.ok(doc.paths["/api/chat"]?.post?.operationId === "fiAskOnlyChat");
-  assert.ok(doc.paths["/api/agents/tools/search_requests"]);
+  assert.ok(
+    doc.paths["/api/genui/compose"]?.post?.operationId === "genuiCompose"
+  );
+  assert.ok(!doc.paths["/api/agents/tools/search_requests"]);
+  const searchSchema = doc.components?.schemas?.McpTool_search_requests as {
+    "x-mcp-tool"?: string;
+    operationId?: string;
+  };
+  assert.equal(searchSchema?.["x-mcp-tool"], "search_requests");
 });
 
-test("buildOpenApiDocument documents search_requests with operationId", () => {
+test("buildOpenApiDocument catalogs search_requests with x-mcp-tool", () => {
   const doc = buildOpenApiDocument("https://example.com");
-  const search = doc.paths["/api/agents/tools/search_requests"] as {
-    post?: { operationId?: string };
+  const search = doc.components.schemas.McpTool_search_requests as {
+    "x-mcp-tool"?: string;
+    description?: string;
   };
-  assert.equal(search.post?.operationId, "searchRequests");
+  assert.equal(search["x-mcp-tool"], "search_requests");
+  assert.match(search.description ?? "", /Search published/u);
 });
 
 test("GET /api/chat returns JSON error", async () => {

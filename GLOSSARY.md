@@ -134,6 +134,19 @@ eve root agent (`agent/`) exposing tools that call `@repo/fi`. Automates the sam
 
 `/chat` product Q&A without FI mutation tools. **Not** part of the triage or disposition bounded context.
 
+### MCP App (Hunch)
+
+Optional **embedded interactive UI** for MCP App–capable hosts, registered as an MCP **resource** (not a normal web route). Hunch uses URI **`ui://hunch/explorer`**, MIME **`text/html;profile=mcp-app`**, and the official Apps **bridge** for host ↔ iframe messaging.
+
+| Term | Meaning |
+| --- | --- |
+| **UI resource** | Discoverable via `resources/list`; body via `resources/read` |
+| **Tool association** | `_meta.ui.resourceUri` on a tool pointing at the UI resource |
+| **Hunch Explorer** | Compact Signals / Patterns / Review presentation inside the iframe |
+| **Non-UI fallback** | Text + structured tool results usable without loading the resource |
+
+The iframe must not access Postgres or server secrets directly; data flows through tool results and the bridge. Spec: [hunch-mcp-app.md](docs/specs/hunch-mcp-app.md).
+
 ### Persona (UX)
 
 Routing context for human UI—not a security role in MVP. **External** vs **internal** submitters (`?context=` on submit); **PM** and **leader** primarily use triage and insights. Same aggregate and APIs; disclosure differs per [journeys](docs/specs/feature-intelligence-journeys.md).
@@ -173,4 +186,5 @@ Canonical formulas: [feature-intelligence.md § Product metrics (first)](docs/sp
 - [docs/specs/feature-intelligence-journeys.md](docs/specs/feature-intelligence-journeys.md) — personas and UI
 - [docs/specs/feature-intelligence-ai-ux-patterns.md](docs/specs/feature-intelligence-ai-ux-patterns.md) — agent and chat UX
 - [docs/specs/feature-intelligence-triage-harness.md](docs/specs/feature-intelligence-triage-harness.md) — harness tiers
+- [docs/specs/hunch-mcp-app.md](docs/specs/hunch-mcp-app.md) — MCP App resource and Explorer
 - [docs/adr/0002-feature-intelligence-architecture.md](docs/adr/0002-feature-intelligence-architecture.md) — structure

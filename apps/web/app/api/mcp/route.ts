@@ -1,4 +1,4 @@
-import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/server";
 
 import { jsonError } from "@/lib/api/json-error";
 import { createFiMcpServer } from "@/lib/mcp/create-mcp-server";

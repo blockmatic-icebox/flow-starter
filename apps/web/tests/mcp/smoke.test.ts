@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/server";
 
 import { GET as getMcpDiscovery } from "../../app/.well-known/mcp/route";
 import { GET as getMcpServerCard } from "../../app/.well-known/mcp/server-card.json/route";

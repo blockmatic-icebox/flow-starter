@@ -75,6 +75,7 @@ Degraded path when `AI_GATEWAY_API_KEY` absent still sets `triage_completed_at` 
 | Web server actions → `@repo/fi` | **Live** — triage, submit, confirm, support, disposition |
 | `POST /api/chat` ask-only | **Live** — Anthropic via `ANTHROPIC_API_KEY` |
 | **MCP Streamable HTTP** | **Live** — [ADR 0005](docs/adr/0005-fi-agentic-discoverability-and-mcp.md); `POST /api/mcp`, `/.well-known/mcp/*`, `llms.txt`, Markdown negotiation; assessment demo exposes all eight FI tools without bearer |
+| **MCP App (Hunch Explorer)** | **Planned** — [hunch-mcp-app spec](docs/specs/hunch-mcp-app.md); UI resource `ui://hunch/explorer`; iframe bundle + Apps bridge; `@repo/fi` only via MCP tool handler (no DB in iframe) |
 | Postgres | **Live** when `DATABASE_URL` set — see initiative Neon plan |
 
 ## Security (inherited)
@@ -106,6 +107,21 @@ Root `pnpm test` includes `@repo/fi`.
 | Other aliases | e.g. `meta-cto-gaboesquivel.vercel.app` — may use Deployment Protection; prefer **meta-cto-two** for unauthenticated MCP and external auditors ([browser verification](docs/research/20261025-fi-browser-verification.md)) |
 
 Verify: `vercel inspect <deployment-url> -S gaboesquivel` after push. If Vercel Git **Production Branch** remains `main`, trigger production from `meta-cto` via dashboard or deployment API.
+
+## MCP App boundary (planned)
+
+```text
+MCP host → POST /api/mcp → register-tools ( @repo/fi )
+                ↓
+         resources/read → HTML bundle (text/html;profile=mcp-app)
+                ↓
+         iframe (sandbox) ↔ Apps bridge ↔ tool structured results
+```
+
+- **Domain:** All reads/writes stay in `apps/web/lib/mcp/` handlers calling `@repo/fi` — same as today’s eight tools.
+- **UI:** Dedicated build artifact (e.g. `apps/web/mcp-app/` or `packages/mcp-app/`) compiled into static HTML/JS served from `resources/read`.
+- **Build pipeline:** Extend `pnpm --filter web build` (or a prebuild step) to emit the iframe bundle; Vercel build unchanged at root (`apps/web/vercel.json`) except for added compile step and asset copy into the MCP resource provider.
+- **Fallback:** Tools return text + structured content when the host never loads the resource.
 
 ## Repository layout
 

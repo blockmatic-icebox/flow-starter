@@ -1,6 +1,7 @@
 "use server";
 
 import {
+  ConfirmRequestError,
   confirmRequest,
   createDraftAndTriage,
   getDb,
@@ -10,6 +11,7 @@ import {
   searchRequests,
   DispositionError,
   setDisposition,
+  SupportRequestError,
   supportRequest,
 } from "@repo/fi";
 import type { FeatureRequestSource, SearchRequestsSort } from "@repo/fi";
@@ -30,7 +32,13 @@ export async function actionConfirmRequest(input: {
   problemStatement: string;
   intakeLinkedRequestId?: string | null;
 }) {
-  return await confirmRequest({ db: db(), ...input });
+  try {
+    return await confirmRequest({ db: db(), ...input });
+  } catch (error) {
+    if (error instanceof ConfirmRequestError)
+      throw new Error(error.message, { cause: error });
+    throw error;
+  }
 }
 
 export async function actionSetDisposition(input: {
@@ -56,7 +64,13 @@ export async function actionSupportRequest(input: {
   requestId: string;
   supporterKey: string;
 }) {
-  return await supportRequest({ db: db(), ...input });
+  try {
+    return await supportRequest({ db: db(), ...input });
+  } catch (error) {
+    if (error instanceof SupportRequestError)
+      throw new Error(error.message, { cause: error });
+    throw error;
+  }
 }
 
 export async function actionGetRequest(input: { requestId: string }) {
@@ -91,9 +105,15 @@ export async function actionSupportWithCookie(input: { requestId: string }) {
       sameSite: "lax",
     });
   }
-  return await supportRequest({
-    db: db(),
-    requestId: input.requestId,
-    supporterKey,
-  });
+  try {
+    return await supportRequest({
+      db: db(),
+      requestId: input.requestId,
+      supporterKey,
+    });
+  } catch (error) {
+    if (error instanceof SupportRequestError)
+      throw new Error(error.message, { cause: error });
+    throw error;
+  }
 }

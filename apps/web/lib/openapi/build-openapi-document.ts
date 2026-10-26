@@ -99,38 +99,21 @@ const toolPaths = {
   },
 } as const;
 
-export const buildOpenApiDocument = (origin: string) => {
-  const toolPathEntries = Object.entries(toolPaths).map(([name, spec]) => [
-    `/api/agents/tools/${name}`,
-    {
-      post: {
-        description: `Invoke MCP tool \`${name}\` via Streamable HTTP at \`${origin}/api/mcp\` (JSON-RPC). This path documents the tool contract for function-calling and OpenAPI clients.`,
-        operationId: spec.operationId,
-        requestBody: {
-          content: { "application/json": { schema: spec.requestBody } },
-          required: true,
-        },
-        responses: {
-          "200": {
-            content: {
-              "application/json": {
-                schema: {
-                  properties: { result: { type: "object" } },
-                  type: "object",
-                },
-              },
-            },
-            description: "Tool result (via MCP transport)",
-          },
-        },
-        summary: spec.summary,
-        tags: ["mcp-tools"],
-        "x-mcp-tool": name,
-        "x-mcp-transport": `${origin}/api/mcp`,
-      },
-    },
-  ]);
+const mcpToolSchemaName = (name: string) =>
+  `McpTool_${name.replaceAll("-", "_")}`;
 
+const mcpToolComponents = Object.fromEntries(
+  Object.entries(toolPaths).map(([name, spec]) => [
+    mcpToolSchemaName(name),
+    {
+      description: spec.summary,
+      "x-mcp-tool": name,
+      ...spec.requestBody,
+    },
+  ])
+);
+
+export const buildOpenApiDocument = (origin: string) => {
   const paths = {
     "/api/chat": {
       post: {
@@ -169,10 +152,47 @@ export const buildOpenApiDocument = (origin: string) => {
         tags: ["chat"],
       },
     },
+    "/api/genui/compose": {
+      post: {
+        description:
+          "Ask Hunch GenUI composition stream (NDJSON). Read-only grounded views; does not mutate FI domain data.",
+        operationId: "genuiCompose",
+        requestBody: {
+          content: {
+            "application/json": {
+              schema: {
+                properties: {
+                  clientRequestId: { minLength: 1, type: "string" },
+                  query: { maxLength: 2000, minLength: 1, type: "string" },
+                  version: { minimum: 1, type: "integer" },
+                },
+                required: ["clientRequestId", "query", "version"],
+                type: "object",
+              },
+            },
+          },
+          required: true,
+        },
+        responses: {
+          "200": {
+            content: {
+              "application/x-ndjson": {
+                schema: { type: "object" },
+              },
+            },
+            description:
+              "NDJSON compose events (start, partial, complete, error)",
+          },
+          "400": { description: "Invalid request body" },
+        },
+        summary: "GenUI compose (Ask Hunch)",
+        tags: ["genui"],
+      },
+    },
     "/api/mcp": {
       post: {
         description:
-          "Model Context Protocol Streamable HTTP endpoint. Send JSON-RPC initialize, tools/list, and tools/call messages.",
+          "Model Context Protocol Streamable HTTP endpoint. Send JSON-RPC initialize, tools/list, and tools/call messages. Tool input schemas are cataloged under components.schemas with x-mcp-tool.",
         operationId: "mcpStreamableHttp",
         requestBody: {
           content: {
@@ -193,17 +213,19 @@ export const buildOpenApiDocument = (origin: string) => {
         tags: ["mcp"],
       },
     },
-    ...Object.fromEntries(toolPathEntries),
   };
 
   return {
+    components: {
+      schemas: mcpToolComponents,
+    },
     externalDocs: {
       description: "Developer portal",
       url: `${origin}/developers`,
     },
     info: {
       description:
-        "Feature Intelligence — product feature request triage for Meta CTO assessment. Agents should use Streamable HTTP MCP at /api/mcp; REST paths document tool schemas for function calling.",
+        "Feature Intelligence — product feature request triage for Meta CTO assessment. Agents invoke MCP tools via POST /api/mcp (Streamable HTTP JSON-RPC). Human Ask Hunch uses POST /api/genui/compose. Tool contracts are documented as OpenAPI component schemas tagged with x-mcp-tool.",
       title: "Feature Intelligence API",
       version: "1.0.0",
     },
@@ -214,7 +236,7 @@ export const buildOpenApiDocument = (origin: string) => {
     servers: [{ url: origin }],
     tags: [
       { description: "Streamable HTTP MCP", name: "mcp" },
-      { description: "Documented MCP tool contracts", name: "mcp-tools" },
+      { description: "Ask Hunch GenUI NDJSON compose", name: "genui" },
       { description: "Human ask-only assistant", name: "chat" },
     ],
   };

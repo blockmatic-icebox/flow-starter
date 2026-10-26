@@ -7,6 +7,8 @@
 **Initiative:** [feature-intelligence.md](../initiatives/feature-intelligence.md)  
 **Factory (separate):** Neutral starter MCP discoverability — [.agents/flow/initiatives/mcp-discoverability.md](../../.agents/flow/initiatives/mcp-discoverability.md) (does not extend this product spec)
 
+**MCP App (planned):** Interactive UI resource and tool associations — [hunch-mcp-app.md](./hunch-mcp-app.md) (extends this transport; eight tools unchanged).
+
 ## Problem
 
 Agents and MCP hosts cannot discover **what** Feature Intelligence is, **when** to use it, or **how** to call it on our domain. Eve tools exist for in-repo agents but are not advertised via standard discovery or Streamable HTTP MCP.

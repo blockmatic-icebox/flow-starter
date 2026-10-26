@@ -23,7 +23,8 @@ export const AskHunchClient = () => {
   const [envelope, setEnvelope] = useState<CompositionEnvelope | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const requestIdRef = useRef(0);
+  const generationRef = useRef(0);
+  const latestRequestIdRef = useRef<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const submit = useCallback(async (text: string) => {
@@ -32,8 +33,9 @@ export const AskHunchClient = () => {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
-    requestIdRef.current += 1;
-    const clientRequestId = `ask-${requestIdRef.current}`;
+    generationRef.current += 1;
+    const clientRequestId = `ask-${generationRef.current}`;
+    latestRequestIdRef.current = clientRequestId;
     setPrompt(query);
     setEnvelope(null);
     setError(null);
@@ -64,12 +66,15 @@ export const AskHunchClient = () => {
         response,
       });
 
+      if (latestRequestIdRef.current !== clientRequestId) return;
+
       if (!result.ok) setError(`Stream error: ${result.reason}`);
       else if (streamMessage) setError(streamMessage);
       else if (latest) setEnvelope(latest);
       else setError("No composition returned.");
       setLoading(false);
     } catch (error_) {
+      if (latestRequestIdRef.current !== clientRequestId) return;
       if ((error_ as Error).name !== "AbortError")
         setError("Could not reach compose service.");
       setLoading(false);

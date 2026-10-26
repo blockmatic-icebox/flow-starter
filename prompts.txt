@@ -2167,3 +2167,881 @@ Human: test everything and push when you are done
 Agent: Ran check-types (turbo, exit 0), pnpm test (genui 129, fi 27, web 23+3 skipped, db 5), eval:genui:offline (100/100), agentic:check (exit 0), db:check (exit 0). Fixed triage-panel lint (keyed remount), fi seed count typing, list-recent-decisions test import. pnpm qa failed on pre-existing knip unused exports (not in this diff). Committed 40bfa99b8 and pushed origin/meta-cto (0 ahead / 0 behind).
 
 ---
+---
+Timestamp: 2026-10-26T04:53:19.516Z
+Work: feature-intelligence
+Stage: Build
+Generation: 1a859cbd-4fac-4924-9e09-ee63bea55574
+
+Human: test everything and push when you are done
+
+Agent: ## Task report
+
+---
+---
+Timestamp: 2026-10-26T04:53:50.008Z
+Work: feature-intelligence
+Stage: Build
+Generation: 4d473d60-abd8-49a3-8f73-4d8c71c57b2b
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: The **Run fi package tests directly** task finished successfully: `@repo/fi` tests all passed (27 tests across seed, insights, triage, disposition, and related suites). That matches what we already ran in the full `pnpm test` before the simplify commits went to `origin/meta-cto`.
+
+---
+---
+Timestamp: 2026-10-26T04:53:51.806Z
+Work: feature-intelligence
+Stage: Build
+Generation: 3f0fab8c-a8c0-42a8-9bda-3adb50bcd47b
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: **Run fi and web tests and typecheck** completed successfully: typecheck and the `@repo/fi` and `web` test suites all passed with exit code 0.
+
+---
+---
+Timestamp: 2026-10-26T04:53:52.002Z
+Work: feature-intelligence
+Stage: Build
+Generation: 27668b55-5fe4-4c07-aca6-04199c7fb408
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: The isolated **`listRecentDecisions`** test finished successfully (exit **0**, one pass). It was slow (~20 minutes) because it hits a real database when `DATABASE_URL` is set—that’s why the full `pnpm --filter @repo/fi test` run looked hung earlier, not because the test failed.
+
+---
+---
+Timestamp: 2026-10-26T04:53:55.704Z
+Work: feature-intelligence
+Stage: Build
+Generation: eac86b3c-f3d3-4c0c-b88f-89a55822b742
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: **Run full verification gate commands** finished successfully (exit 0): `@repo/fi` (27), `@repo/genui` (129), `web` (23 pass, 3 skipped), `web` typecheck, and `agentic:check` all completed cleanly. The fi suite was the slow part (~24 minutes in that run).
+
+---
+---
+Timestamp: 2026-10-26T04:53:56.914Z
+Work: feature-intelligence
+Stage: Build
+Generation: b5962739-0f1f-4e21-ab1e-7aaf9d2ee943
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: That background run finished with **exit 0**:
+
+---
+---
+Timestamp: 2026-10-26T04:54:19.547Z
+Work: feature-intelligence
+Stage: Build
+Generation: 67f40c78-b351-4adf-859a-0a0ab8a2f0b8
+
+Human: can you talk to the mpc server on vercel
+
+Agent: Yes. From this environment the **Feature Intelligence** MCP server on Vercel responds normally.
+
+---
+---
+Timestamp: 2026-10-26T04:54:42.578Z
+Work: feature-intelligence
+Stage: Build
+Generation: f0350a86-65aa-459a-84ce-4bcbfb9866e2
+
+Human: is it public on vercel?
+
+Agent: Yes — **on the intended public alias**, with an important distinction between URLs.
+
+---
+---
+Timestamp: 2026-10-26T05:04:43.394Z
+Work: feature-intelligence
+Stage: Build
+Generation: 0dc60848-d830-4a5c-aa5c-956af5f51279
+
+Human: git push
+
+Agent: `git push origin meta-cto` completed — **everything up-to-date** with `origin/meta-cto` (`c791daa84`).
+
+---
+---
+Timestamp: 2026-10-26T05:09:38.867Z
+Work: feature-intelligence
+Stage: Build
+Generation: bf641408-d5c3-46da-95d7-5361aa302e7c
+
+Human: # Hunch — MCP App Integration, Workflow Reliability & Demo Readiness
+
+## Mission
+
+Perform an adversarial, evidence-based review and implement the remaining improvements needed to make Hunch a convincing Meta CTO assessment demo.
+
+Repository: `gaboesquivel/flow-factory`  
+Branch: `meta-cto`  
+Reviewed baseline: `c791daa842b948a5344c2922718539b65c8b29e9`  
+Production: `https://meta-cto-two.vercel.app`  
+Canonical MCP endpoint: `https://meta-cto-two.vercel.app/api/mcp`
+
+**Use Flow as the coordinating product engineering workflow**, following Explore → Specify → Plan → Build → Review → Ship proportionally. Load the relevant Flow skills and supporting engineering skills automatically. Follow the existing repository's authorization, documentation, verification, and delegation conventions.
+
+This is an existing product with accepted requirements. Do not restart product discovery or redesign the application.
+
+The user explicitly accepts the absence of authentication and authorization because this is an assessment demo. Do not spend this iteration implementing OAuth, RBAC, login, production-grade rate limiting, WAF, or multi-tenancy.
+
+Focus on interoperability, workflow integrity, agent behavior, data correctness, generative UI, and evidence of working software.
+
+The goal is not to produce more documentation or more code. The goal is to demonstrate a complete and trustworthy agentic product engineering solution.
+
+## 0. Inspect the current checkout first
+
+Before changing anything:
+
+1. Inspect `git status`, branch, HEAD, changes, and existing worktrees.
+2. Reconcile the current files with the reviewed baseline; do not assume HEAD is unchanged.
+3. Read `AGENTS.md`, `.agents/skills/flow/SKILL.md`, and the relevant sections of `.agents/flow/flow.md`.
+4. Read `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`, and `GLOSSARY.md`.
+5. Read the existing Feature Intelligence, Hunch, Eve, MCP, GenUI, and testing specifications and ADRs.
+6. Inspect the complete MCP, Eve, domain, and web integrations.
+7. Inspect package versions and available installed skills before selecting an implementation approach.
+8. Run the appropriate baseline checks and record their actual outcomes.
+
+Use the GitHub and Vercel integrations where available to compare current code against the deployed production commit.
+
+Classify each finding as:
+
+- Confirmed defect
+- Confirmed missing capability
+- Potential risk requiring reproduction
+- Accepted demo trade-off
+- Already fixed or not applicable
+
+Do not blindly apply recommendations from this prompt if the implementation has since changed.
+
+Keep all methodology and Flow Factory changes out of scope. Product-specific changes belong in the product, not `.agents/`.
+
+## 1. Product outcome: Hunch should work as a real MCP App
+
+Currently Hunch exposes a Streamable HTTP MCP server with eight tools, but the reviewed implementation does not register an interactive MCP Apps UI resource.
+
+Implement the smallest compelling MCP App experience using the official MCP Apps specification.
+
+References:
+
+- https://modelcontextprotocol.io/extensions/apps/overview
+- https://github.com/modelcontextprotocol/ext-apps
+- https://developers.openai.com/plugins/build/chatgpt-ui
+- https://developers.openai.com/plugins/build/app-quickstart
+
+Check current documentation and the actual installed SDK version before coding. Do not copy obsolete Apps SDK examples or mix incompatible protocols.
+
+### 1.1 Preserve the existing MCP transport
+
+Keep `/api/mcp` canonical, with `/mcp` as the existing convenience alias.
+
+Preserve the eight existing tools:
+
+- `search_requests`
+- `get_request`
+- `list_triage_queue`
+- `get_insights`
+- `submit_request`
+- `confirm_request`
+- `support_request`
+- `set_disposition`
+
+Keep their existing domain behavior and contracts where correct.
+
+Ensure standard clients can perform `initialize`, `tools/list`, `tools/call`, `resources/list`, and `resources/read` as applicable.
+
+Do not replace the existing MCP transport with a custom proprietary protocol.
+
+### 1.2 Register the interactive UI resource
+
+Introduce the official MCP Apps extension dependency if necessary.
+
+Register a resource such as `ui://hunch/explorer`, using the supported resource-registration helper.
+
+The resource must:
+
+- Serve HTML with the MCP Apps MIME type `text/html;profile=mcp-app`.
+- Be associated with appropriate tools through `_meta.ui.resourceUri`.
+- Support host initialization and communication through the official MCP Apps bridge.
+- Render meaningfully with tool results.
+- Remain useful when the host does not support interactive UI.
+- Avoid direct access to the application's database or server environment from the iframe.
+
+Validate the registered resource through actual `resources/list` and `resources/read` protocol calls.
+
+Do not mistake a normal Next.js page, server card, or external link for an MCP App resource.
+
+### 1.3 Build the Hunch MCP App interface
+
+Reuse the accepted Paper + Cobalt identity from `DESIGN.md`.
+
+Build one focused React-based MCP App view, not a second copy of the entire website.
+
+Recommended composition:
+
+**Hunch Explorer**
+
+A compact, responsive workspace capable of rendering three useful data presentations:
+
+**Signals**
+
+Search results with meaningful titles, themes, support counts, status, and links to request details.
+
+**Patterns**
+
+A small dashboard containing actual metrics, theme distribution, and appropriate time ranges.
+
+**Review**
+
+A concise list of pending PM decisions with rationale previews and links to the existing Review workflow.
+
+The interface must make it clear whether a displayed value is a recorded fact, an AI suggestion, or an uncommitted action.
+
+Provide clear loading, empty, failure, and degraded-data states.
+
+Use existing UI components and tokens where technically compatible, but do not force the entire Next.js application into the iframe.
+
+Avoid unnecessary UI complexity, duplicate design systems, and custom rendering protocols.
+
+### 1.4 Integrate tools with the UI
+
+Use standard MCP tool results with machine-readable structured content where appropriate, preserving useful text fallback for non-UI clients.
+
+Recommended associations:
+
+| Tool | Intended presentation |
+|---|---|
+| `search_requests` | Signals explorer |
+| `get_request` | Signal details |
+| `list_triage_queue` | Review queue |
+| `get_insights` | Patterns dashboard |
+| `submit_request` | Draft preview if appropriate |
+
+Keep `confirm_request`, `support_request`, and `set_disposition` functional through the normal tool channel without requiring custom UI.
+
+If an interactive confirmation interface can be implemented cleanly, it must respect the existing workflow and host approval semantics. Otherwise, use the established Hunch web flow.
+
+The interface should communicate through the host bridge for supported interactions rather than inventing a parallel backend.
+
+### 1.5 Non-UI fallback
+
+This is mandatory.
+
+All model-facing tools must remain usable from Cursor, CLI agents, and other MCP clients without the iframe.
+
+A host lacking MCP Apps support should still receive useful tool descriptions, usable structured results, and understandable text content.
+
+Do not make UI resource loading a prerequisite for searching or reading Hunch data.
+
+## 2. Preserve Eve while unifying behavior
+
+Inspect `agent/`, including its instructions and eight Eve tools.
+
+Do not replace Eve or create a competing agent framework.
+
+The existing architecture should remain:
+
+- `@repo/fi`: product domain logic
+- `@repo/db`: persisted data
+- Eve: autonomous product operator
+- MCP: interoperability adapter
+- Next.js: human-facing application
+- `@repo/genui`: generative composition and rendering
+
+### 2.1 Check tool parity
+
+Compare Eve and MCP tool input schemas, descriptions, validation, return shapes, and error semantics.
+
+Equivalent operations must yield equivalent business outcomes.
+
+Do not duplicate domain logic into MCP callbacks, agent prompts, or React components.
+
+Centralize truly shared domain-level types or contracts where beneficial, without introducing unnecessary layers.
+
+### 2.2 Verify behavioral workflows
+
+Check the following agent scenarios:
+
+1. Search feedback and summarize evidence.
+2. Retrieve request details and explain duplicate candidates.
+3. Summarize the PM queue and propose a disposition.
+4. Create a draft and stop for confirmation.
+5. Confirm a previously created draft only after an explicit approval.
+6. Propose a merge with a valid target and rationale.
+7. Handle missing data without inventing IDs, support counts, or metrics.
+8. Explain degraded AI triage without presenting fallback results as fully evaluated.
+
+Distinguish agent recommendations from persisted decisions.
+
+Evaluate actual state transitions and tool calls, not only whether the generated text sounds convincing.
+
+### 2.3 Chat surface reconciliation
+
+Inspect `/api/chat`, `/ask`, and the Eve interface.
+
+The existing ask-only chat is intentionally separate from the Eve operator, while `/ask` already provides read-only GenUI.
+
+Avoid building another chat experience merely for parity.
+
+Decide whether `/api/chat` is still useful or redundant.
+
+If retained, its purpose and capability limits must be explicit. If obsolete, remove it carefully with any affected routes, clients, and documentation.
+
+Do not claim that the MCP server invokes Eve directly when it actually calls `@repo/fi`.
+
+## 3. Fix domain workflow correctness
+
+These items take precedence over visual improvements.
+
+### 3.1 Request confirmation
+
+Inspect `packages/fi/src/requests/confirm-request.ts`.
+
+The reviewed code updates records by ID without enforcing the required prior state.
+
+Implement an atomic status-guarded transition:
+
+`pending_confirm → published`
+
+Prevent confirmation of missing, already-published, archived, or otherwise ineligible records.
+
+Define clear idempotency and error behavior and cover it with tests.
+
+Preserve existing confirmation semantics for valid drafts.
+
+### 3.2 Disposition and merge integrity
+
+Inspect `packages/fi/src/queue/set-disposition.ts`.
+
+The merge path currently performs support transfer, source support deletion, and archival through separate operations.
+
+Make the merge logically atomic using the database transaction facilities already available in the project.
+
+Verify:
+
+- Valid source and target states
+- No self-merge
+- No merge into an ineligible target
+- No duplicate support inflation
+- No partial support transfer on failure
+- No inconsistent archive state
+- No conflicting concurrent dispositions
+- No second disposition after a final decision
+
+Prefer conditional updates and transaction-safe invariants over application-only prechecks.
+
+Do not introduce an event-sourcing system or a new infrastructure dependency for this demo.
+
+### 3.3 Triage failures
+
+Inspect `run-triage-harness.ts`, `synthesize-artifact.ts`, `create-draft-and-triage.ts`, and `retry-triage.ts`.
+
+Currently the synthesis path has a no-model fallback but can still fail when an available model errors during generation.
+
+Define deterministic behavior for:
+
+- Gateway unavailable
+- Decision model failure
+- Synthesis model failure
+- Invalid structured output
+- Transient database failure
+- Duplicate candidate lookup failure
+- Retry after a degraded result
+
+The submitter must always know whether analysis completed successfully, completed in a degraded state, or failed.
+
+A model failure must not be misrepresented as a completed assessment.
+
+Where the domain can safely produce a useful fallback, preserve it and mark degradation clearly.
+
+Where it cannot, provide an explicit recoverable error state rather than leaving an unexplainable `triaging` record.
+
+Ensure retry does not duplicate candidate rows or silently corrupt prior results.
+
+### 3.4 Support semantics
+
+Verify `support_request` only affects eligible requests and respects deduplication rules.
+
+Maintain consistency among the support table, request details, ranked results, and reported metrics.
+
+For demo scope, keep the existing lightweight supporter identity model. Do not implement full user authentication.
+
+## 4. Improve Ask Hunch's grounded GenUI
+
+Keep the existing `@repo/genui` architecture and accepted Hunch design.
+
+Do not replace it with handwritten AI HTML or a second rendering engine.
+
+### 4.1 Duplicate comparison
+
+Inspect `compose-fi.ts`.
+
+The existing duplicate-intent branch appears to compare the two most-supported signals, not necessarily the two relevant to the user's question.
+
+Use query-relevant evidence or a specified request context to choose comparison candidates.
+
+If the system cannot identify relevant signals confidently, say so rather than inventing a semantic relationship.
+
+### 4.2 Query coverage
+
+Review the routing rules in `compose-fi-routes.ts`.
+
+Preserve fast deterministic routing for known intent classes, but test paraphrases, questions with multiple entities, and unfamiliar queries.
+
+Avoid making the system appear more intelligent than the data supports.
+
+Do not build a general-purpose autonomous planner simply to handle a handful of assessment scenarios.
+
+### 4.3 Grounded metrics
+
+Inspect the monthly-change and reporting branches.
+
+Make sure the answer correctly distinguishes:
+
+- Current queue depth
+- Counts inside selected time ranges
+- Historic baseline values
+- Actual changes between time windows
+- Theme rankings
+- Suggested priorities versus recorded decisions
+
+Do not describe a 90-day total as a month-over-month change.
+
+### 4.4 Search and pagination
+
+The current theme helper retrieves a limited set of rows and then filters in memory.
+
+Use appropriate domain queries and pagination so results are not silently truncated.
+
+Keep data reads bounded and deterministic.
+
+### 4.5 Streaming and cancellation
+
+Inspect `ask-hunch-client.tsx` and the compose route.
+
+Handle overlapping submissions correctly.
+
+A canceled or superseded request must not:
+
+- Replace the latest composition
+- Clear a newer request's loading state
+- Display a stale error
+- Continue expensive work unnecessarily when cancellation is supported
+
+Pass and respect abort signals where practical.
+
+Prefer the existing composition stream contract rather than adding a second transport format.
+
+### 4.6 Generic answer reliability
+
+Inspect the optional model-generated answer path.
+
+Verify that evidence-sensitive claims are supported by retrieved records.
+
+If model synthesis fails, fall back to a useful collection or status view.
+
+Keep unsupported recommendations clearly labeled and avoid fabricating confidence.
+
+## 5. Fix API and documentation contract drift
+
+Inspect `build-openapi-document.ts`.
+
+The reviewed OpenAPI document advertises `/api/agents/tools/*` POST paths even though the Next.js catch-all route returns 404.
+
+Do not publish executable API operations that are only illustrative.
+
+Choose the simplest standards-compliant solution:
+
+- Describe actual HTTP endpoints truthfully.
+- Keep MCP tools documented as MCP operations rather than fictitious REST endpoints.
+- Only add REST routes if there is a real product requirement for REST clients.
+
+Reconcile:
+
+- `/api/mcp`
+- `/mcp`
+- `/.well-known/mcp`
+- `/.well-known/mcp.json`
+- `/.well-known/mcp/server-card.json`
+- `/openapi.json`
+- `/llms.txt`
+- `/developers`
+
+Ensure canonical production URLs are coherent and that the advertised tools match registered tools.
+
+Update the developer portal with a concise MCP connection example and accurate information about the interactive app resource.
+
+Do not optimize solely for an Is Agentic score; prioritize correct interoperability.
+
+## 6. Testing and evaluation
+
+Implement tests before or alongside each relevant fix.
+
+Use the existing test runner and repository conventions.
+
+### 6.1 MCP protocol tests
+
+Cover:
+
+- Initialize handshake
+- Tool discovery and schemas
+- Successful read-only invocation
+- Invalid tool arguments
+- Unknown tool errors
+- UI resource listing and reading
+- UI resource MIME type
+- Correct `_meta.ui.resourceUri` linkage
+- Tool result structured content
+- Text-only fallback
+- `/mcp` alias behavior
+- Correct protocol headers
+- Invalid protocol requests
+
+Do not treat `tools/list` success alone as evidence that an MCP App works.
+
+### 6.2 Domain tests
+
+Create or extend tests for all corrected lifecycle invariants.
+
+Tests must verify persisted database outcomes, not merely function return shapes.
+
+Cover confirmation guards, disposition concurrency, support transfer, degraded triage, and retries.
+
+Use real database integration tests where transaction behavior matters.
+
+### 6.3 Isolated evaluation data
+
+The existing Eve smoke evaluation selects a triage queue item and sets its disposition.
+
+Change evaluation setup so tests create and own their records instead of consuming arbitrary production/demo queue entries.
+
+Follow the repository's local Neon/Postgres strategy and Flow verification conventions.
+
+Use a dedicated test database or isolated schema per worker where supported.
+
+No evaluation should mutate the deployed demo's canonical dataset by default.
+
+A live production smoke may call read-only tools, but write tests must operate on explicitly isolated fixtures.
+
+Preserve reproducible seeded data and avoid unnecessary database resets.
+
+### 6.4 Eve behavioral evals
+
+Test observed tool use for:
+
+- Search grounded in real records
+- Draft without auto-confirm
+- Explicit approval before publish
+- Disposition rationale
+- Merge target correctness
+- Degraded/failure disclosure
+- No fabricated data
+
+Capture invocation inputs, outputs, final database state, and relevant assertions.
+
+Distinguish actual Eve execution from direct domain-function unit tests.
+
+### 6.5 GenUI tests
+
+Cover recognized scenarios, paraphrases, missing data, failed model calls, canceled requests, compiler validity, evidence linkage, and safe fallbacks.
+
+Retain deterministic fixtures for stable CI.
+
+Only test model-dependent outcomes with an appropriate evaluation approach, not brittle exact prose comparisons.
+
+### 6.6 UI verification
+
+Verify the smallest meaningful browser surface:
+
+- Hunch's existing `/ask` interaction
+- At least one MCP App widget rendering
+- A useful empty state
+- A relevant signal detail or dashboard view
+
+Use the official MCP Apps host/testing utilities if available.
+
+An isolated local widget preview is useful, but it is not equivalent to successful rendering inside ChatGPT.
+
+Do not add a broad screenshot testing suite unless it is necessary to reproduce a real problem.
+
+## 7. Deployment and external verification
+
+After local verification, inspect the Vercel deployment associated with `meta-cto`.
+
+Account for the distinction between Preview and the Production alias. A successful Git push does not prove that `meta-cto-two.vercel.app` has the latest implementation.
+
+Use the connected Vercel tools and CLI appropriately.
+
+Verify from an external HTTP client:
+
+1. The application is reachable.
+2. The canonical MCP endpoint accepts initialization.
+3. Tool listing returns the intended catalog.
+4. `search_requests` returns actual seeded records.
+5. `resources/list` exposes the app UI resource.
+6. `resources/read` returns the correct HTML resource.
+7. The relevant tools advertise the UI resource metadata.
+8. The resource and structured tool results render using an MCP Apps-compatible host.
+
+Attempt a real ChatGPT custom MCP connection if the available client, account, and workspace support it.
+
+Document any platform access restrictions separately from code defects.
+
+Do not report ChatGPT UI rendering as verified based only on a local browser page or static HTML response.
+
+Do not bypass ChatGPT host restrictions on write tools.
+
+Deploy a verified preview first; request confirmation before changing the public Production alias unless that action has already been specifically authorized.
+
+## 8. Flow documentation
+
+Keep documentation proportional and under the correct ownership.
+
+Create or update a focused product initiative and specification for MCP Apps integration if they do not already exist.
+
+Suggested documents:
+
+- `docs/initiatives/hunch-mcp-app.md`
+- `docs/specs/hunch-mcp-app.md`
+- `docs/tasks/hunch-mcp-app.md`
+- `docs/research/hunch-mcp-app-verification.md`
+
+Use existing equivalent files instead of producing duplicates.
+
+Record the accepted demo trade-off: no authentication or authorization in this assessment iteration.
+
+Update `PRODUCT.md` only for meaningful capability or scope changes.
+
+Update `DESIGN.md` for the MCP App interface, states, and token usage.
+
+Update `ARCHITECTURE.md` for the app resource, protocol, component boundaries, and execution architecture.
+
+Add a product ADR only if a consequential architecture decision is introduced. Do not generate ADRs for routine implementation details.
+
+Keep `GLOSSARY.md` consistent.
+
+Do not change `.agents/` methodology, skill definitions, or Factory evals merely to complete this product feature.
+
+Respect Flow's task reporting and prompt-log conventions.
+
+## 9. Delegation and execution strategy
+
+The main Composer agent is the coordinator.
+
+Use specialized subagents where the work is independent and benefits from parallel execution.
+
+Recommended roles:
+
+**MCP researcher / integrator**
+
+Check the current MCP Apps specification, review existing transport, and implement the server/resource integration.
+
+**Domain engineer**
+
+Reproduce and fix lifecycle, transaction, degraded triage, and data consistency problems.
+
+**GenUI engineer**
+
+Improve grounded query behavior, streaming, cancellation, and targeted UI composition.
+
+**Verifier**
+
+Develop independent protocol, domain, and agent behavioral tests; challenge unsupported completion claims.
+
+Prefer independent worktrees or explicitly isolated file ownership to prevent overlapping edits.
+
+Each subagent must report findings, files changed, tests run, and unresolved issues to the coordinator.
+
+The coordinator owns integration, regression verification, and the final report.
+
+Do not equate the number of workers with quality. Keep the work proportional.
+
+## 10. Implementation order
+
+Execute in the following dependency order.
+
+### Wave A — Baseline and contracts
+
+- [ ] Inspect current code and branch state.
+- [ ] Reproduce or dismiss the reported issues.
+- [ ] Update the minimum product specification and task checklist.
+- [ ] Confirm MCP Apps SDK/protocol decisions against current documentation.
+- [ ] Identify isolated test data requirements.
+
+**Gate:** Current implementation and required changes are understood without disturbing accepted product direction.
+
+### Wave B — Correctness foundation
+
+- [ ] Fix confirmation state transitions.
+- [ ] Make merge/disposition atomic.
+- [ ] Handle AI triage degradation and failure.
+- [ ] Correct evaluation data isolation.
+- [ ] Add regression tests.
+
+**Gate:** Core state transitions are reliable and testable.
+
+### Wave C — MCP App vertical slice
+
+- [ ] Register one UI resource.
+- [ ] Associate at least `search_requests` with the resource.
+- [ ] Return structured content and text fallback.
+- [ ] Render a real signal explorer via the MCP Apps bridge.
+- [ ] Verify `resources/list`, `resources/read`, and `tools/call`.
+
+**Gate:** A standards-compatible MCP host can invoke and display a real Hunch UI.
+
+### Wave D — Broaden the useful experience
+
+- [ ] Add Insights/Patterns presentation.
+- [ ] Add Review queue presentation.
+- [ ] Reconcile tool contracts with Eve.
+- [ ] Correct advertised API contracts.
+- [ ] Fix the prioritized GenUI evidence and cancellation issues.
+
+**Gate:** Hunch supports coherent demo scenarios without duplicating the domain layer.
+
+### Wave E — Independent verification
+
+- [ ] Run all applicable quality checks.
+- [ ] Run isolated domain/database integration tests.
+- [ ] Run MCP protocol tests.
+- [ ] Run actual Eve behavioral evals.
+- [ ] Run focused browser/widget verification.
+- [ ] Challenge errors, stale states, and misleading success claims.
+- [ ] Resolve regressions.
+
+**Gate:** Tests and recorded evidence support the claims being made.
+
+### Wave F — Delivery
+
+- [ ] Verify Vercel preview.
+- [ ] Attempt supported external MCP App host verification.
+- [ ] Document remaining external/platform limitations.
+- [ ] Complete Flow task reporting.
+- [ ] Present the release status and remaining blockers.
+- [ ] Request approval for production promotion if required.
+
+**Gate:** The implementation is ready to demonstrate with truthful verification evidence.
+
+## 11. Acceptance criteria
+
+Consider the work complete when:
+
+**MCP interoperability**
+- Standard initialization and tool invocation work.
+- MCP Apps UI resource is discoverable and readable.
+- At least one interactive widget renders in a compatible host.
+- Non-UI clients retain meaningful tool access.
+
+**Product correctness**
+- Draft confirmation follows the intended state machine.
+- Merge and disposition operations maintain consistency.
+- Degraded triage is identifiable and recoverable.
+- Support counts and insights reflect persisted data.
+
+**Agent correctness**
+- Eve and MCP use the same domain behavior.
+- Recommendations do not imply committed changes.
+- Confirmation boundaries remain intact.
+- Evals verify tool calls and outcomes.
+
+**Experience**
+- The UI follows the approved Hunch design.
+- Results are grounded in actual records.
+- Stale requests cannot overwrite current results.
+- Failure and empty states remain useful.
+
+**Quality**
+- All relevant tests pass or any failure is explicitly reported.
+- Evaluation fixtures do not corrupt the demo dataset.
+- Live verification is separated from local verification.
+- Product documentation reflects the code.
+
+## 12. Scope control
+
+Do not implement:
+
+- OAuth, RBAC, Better Auth integration, or login
+- Production-grade WAF or distributed throttling
+- A new agent framework replacing Eve
+- A second GenUI architecture
+- A wholesale Hunch redesign
+- Multi-tenant infrastructure
+- Large-scale event sourcing
+- General-purpose autonomous planning
+- A new CI platform
+- Factory skill or evaluation refactoring
+- Unrelated dependency migrations
+- Broad performance rewrites without demonstrated need
+
+Preserve the existing stack and accepted design decisions.
+
+For consequential changes outside this scope, present the trade-off and obtain approval instead of silently expanding the project.
+
+## 13. Final task report
+
+Once execution finishes, report in the main Composer conversation.
+
+Include:
+
+**Summary**
+What changed and why it matters to the Meta CTO assessment.
+
+**Findings**
+Which reported issues were confirmed, fixed, dismissed, or deferred.
+
+**Product documentation**
+Files created or updated, including specifications, decisions, research, and the task checklist.
+
+**Code**
+Key implementation files and architectural changes.
+
+**Testing**
+Exact commands executed, pass/fail counts where available, skipped tests, and database isolation evidence.
+
+**MCP App**
+Protocol checks, available tools, UI resources, compatible-host results, and any ChatGPT-specific restrictions.
+
+**Eve**
+Evals executed, evidence captured, and unresolved behavioral gaps.
+
+**Deployment**
+Commit SHA, branch, preview URL, production alias status, and external verification results.
+
+**Remaining work**
+Only concrete blockers or meaningful follow-ups, in priority order.
+
+**Skills loaded**
+Follow the standard Flow footer.
+
+Never invent successful verification, a completed deployment, or a connected ChatGPT session.
+
+The desired final state is a focused, working, standards-compliant Hunch MCP App that demonstrates good agentic product engineering through actual outcomes rather than architectural complexity.
+
+Agent: Baseline matches reviewed commit `c791daa`; production Vercel is five commits behind `origin/meta-cto`. Drafting the implementation plan from code evidence.
+
+---
+
+Q: Hunch MCP App, Workflow Reliability & Demo Readiness — implement the attached plan; use more subagents.
+
+A: Coordinated parallel builders: domain Wave B (`@repo/fi` confirm/disposition/triage/support + tests), MCP App Wave C (`ui://hunch/explorer`, ext-apps, Vite bundle), GenUI/OpenAPI Wave D, docs/evals Wave A, adapter error wiring, integration-test verifier, Eve behavioral evals, MCP transport research, MCP resource node tests. Coordinator fixed lint/format and `list-triage-queue` eval (≥50 queue). Local: `pnpm lint`/`check-types`/`test` exit 0; `eve eval smoke` 9 passed, 1 skipped; production MCP initialize OK; MCP App resources verified locally only until deploy promote.
+
+---
+---
+Timestamp: 2026-10-26T05:20:26.464Z
+Work: feature-intelligence
+Stage: Build
+Generation: eb1a023b-93d2-417d-8ff8-95236eddd5ce
+
+Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: ## Subagent fleet (this session)
+
+---

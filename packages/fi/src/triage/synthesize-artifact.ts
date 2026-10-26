@@ -18,6 +18,33 @@ const synthesisSchema = z.object({
   themeRationale: z.string().max(500),
 });
 
+export const DEGRADED_SYNTHESIS_BRIEFS = [
+  "Manual review recommended (degraded synthesis).",
+  "Manual review recommended (synthesis model failed; degraded fallback).",
+] as const;
+
+export const isDegradedSynthesisBrief = (decisionBrief: string) =>
+  (DEGRADED_SYNTHESIS_BRIEFS as readonly string[]).includes(decisionBrief);
+
+const degradedSynthesis = ({
+  description,
+  decisionBrief,
+  themeKey,
+}: {
+  description: string;
+  decisionBrief: string;
+  themeKey: ThemeKey;
+}) => {
+  const themeLabel = themeLabelForKey(themeKey);
+  return {
+    decisionBrief,
+    dispositionSuggestion: null,
+    duplicateExplanations: [] as { explanation: string; requestId: string }[],
+    problemStatement: description.trim().slice(0, 500),
+    themeRationale: `Theme ${themeLabel} from deterministic routing.`,
+  };
+};
+
 export const synthesizeArtifact = async ({
   title,
   description,
@@ -39,17 +66,16 @@ export const synthesizeArtifact = async ({
   const themeLabel = themeLabelForKey(themeKey);
 
   if (!model)
-    return {
+    return degradedSynthesis({
       decisionBrief: "Manual review recommended (degraded synthesis).",
-      dispositionSuggestion: null,
-      duplicateExplanations: [] as { explanation: string; requestId: string }[],
-      problemStatement: description.trim().slice(0, 500),
-      themeRationale: `Theme ${themeLabel} from deterministic routing.`,
-    };
+      description,
+      themeKey,
+    });
 
-  const { object } = await generateObject({
-    model,
-    prompt: `You are a product triage assistant. Synthesize a decision-ready artifact.
+  try {
+    const { object } = await generateObject({
+      model,
+      prompt: `You are a product triage assistant. Synthesize a decision-ready artifact.
 
 Title: ${title}
 Description: ${description}
@@ -58,8 +84,16 @@ Theme: ${themeKey} (${themeLabel})
 Solution-shaped submitter: ${isSolutionShaped}
 Recommended duplicate link: ${linkDuplicateId ?? "none"}
 Candidates: ${JSON.stringify(candidateSnippets)}`,
-    schema: synthesisSchema,
-  });
+      schema: synthesisSchema,
+    });
 
-  return object;
+    return object;
+  } catch {
+    return degradedSynthesis({
+      decisionBrief:
+        "Manual review recommended (synthesis model failed; degraded fallback).",
+      description,
+      themeKey,
+    });
+  }
 };

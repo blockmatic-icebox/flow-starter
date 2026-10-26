@@ -8,7 +8,10 @@ import {
   triageModelLabel,
 } from "./harness-helpers";
 import { retrieveLexicalCandidates } from "./retrieve-candidates";
-import { synthesizeArtifact } from "./synthesize-artifact";
+import {
+  isDegradedSynthesisBrief,
+  synthesizeArtifact,
+} from "./synthesize-artifact";
 import type { TriageHarnessResult } from "./types";
 
 export const runTriageHarness = async ({
@@ -83,7 +86,7 @@ export const runTriageHarness = async ({
     title,
   });
 
-  if (gatewayMissing) degraded = true;
+  if (isDegradedSynthesisBrief(synthesis.decisionBrief)) degraded = true;
 
   steps.push({
     detail: degraded ? "degraded synthesis" : "generateObject",

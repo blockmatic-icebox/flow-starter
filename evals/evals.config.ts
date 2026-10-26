@@ -33,9 +33,9 @@ export default defineEvalConfig({
       env,
       stdio: "inherit",
     });
-    execSync("pnpm seed:fi", {
+    execSync("FI_SEED_IF_EMPTY=1 pnpm seed:fi", {
       cwd: root,
-      env,
+      env: { ...env, FI_SEED_IF_EMPTY: "1" },
       stdio: "inherit",
     });
     return { root };

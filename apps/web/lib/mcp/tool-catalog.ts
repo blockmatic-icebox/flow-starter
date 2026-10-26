@@ -1,3 +1,8 @@
+import { HUNCH_EXPLORER_RESOURCE_URI } from "./hunch-explorer-resource";
+
+/** MCP Apps UI resource registered in `create-mcp-server`. */
+export const fiMcpAppResourceUri = HUNCH_EXPLORER_RESOURCE_URI;
+
 export interface FiMcpToolCard {
   description: string;
   name: string;
@@ -46,6 +51,18 @@ export const buildMcpServerCard = (origin: string) => ({
   authentication: { required: false },
   description:
     "Search feature requests, triage queue, and product insights for Meta CTO Feature Intelligence. Assessment demo exposes read and write tools without bearer auth.",
+  ...(fiMcpAppResourceUri
+    ? {
+        resources: [
+          {
+            description:
+              "Hunch Explorer MCP App (interactive signals, patterns, review)",
+            mimeType: "text/html;profile=mcp-app",
+            uri: fiMcpAppResourceUri,
+          },
+        ],
+      }
+    : {}),
   serverInfo: {
     name: "feature-intelligence",
     title: "Feature Intelligence",

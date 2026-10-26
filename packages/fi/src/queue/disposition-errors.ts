@@ -41,3 +41,29 @@ export const validateDispositionInput = ({
 
   return { mergeTargetId: mergeTargetId ?? null, rationale };
 };
+
+export const resolveDispositionUpdateFailure = (
+  source:
+    | {
+        disposition: string | null;
+        status: string;
+      }
+    | undefined
+): never => {
+  if (!source)
+    throw new DispositionError("not_found", "Feature request not found");
+  if (source.status !== "published")
+    throw new DispositionError(
+      "invalid_status",
+      "Disposition applies only to published requests"
+    );
+  if (source.disposition)
+    throw new DispositionError(
+      "already_dispositioned",
+      "Request already has a disposition"
+    );
+  throw new DispositionError(
+    "invalid_status",
+    "Disposition could not be applied to this request"
+  );
+};
