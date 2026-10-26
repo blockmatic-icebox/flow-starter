@@ -6,16 +6,16 @@ The starter uses the **Porcelain** theme in `@repo/ui` ([packages/ui/src/styles/
 
 ### Token parity (`packages/ui`)
 
-| Token | Light (`:root`) |
-| --- | --- |
-| `--background` | `#f7f7f2` |
-| `--foreground` | `#202522` |
-| `--primary` | `#4f46a5` |
-| `--primary-foreground` | `#ffffff` |
-| `--muted-foreground` | `#626a65` |
-| `--border` | `#7d867f` |
-| `--input` | `#7d867f` |
-| `--radius` | `0.5rem` |
+| Token                  | Light (`:root`) |
+| ---------------------- | --------------- |
+| `--background`         | `#f7f7f2`       |
+| `--foreground`         | `#202522`       |
+| `--primary`            | `#4f46a5`       |
+| `--primary-foreground` | `#ffffff`       |
+| `--muted-foreground`   | `#626a65`       |
+| `--border`             | `#7d867f`       |
+| `--input`              | `#7d867f`       |
+| `--radius`             | `0.5rem`        |
 
 Dark mode uses a restrained ink-on-charcoal palette with indigo accents (`next-themes` on the studio root).
 
