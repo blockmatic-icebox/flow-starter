@@ -39,7 +39,7 @@ Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence
 | **Database** | **Live** with `DATABASE_URL` — migrate; demo seed **500** rows (`pnpm seed:fi`, dev/CI only) |
 | **Domain (`@repo/fi`)** | **Live** — full T0–T3 harness orchestration; **degraded** when `AI_GATEWAY_API_KEY` absent |
 | **eve (`agent/`)** | **Live** — MVP tools, `evals/` smoke (AG-7), `pnpm exec eve eval smoke` |
-| **Human UI (`apps/web`)** | **Live** — `app/(fi)/` routes, insights trends UI, ask-only `/chat`; [browser verification](docs/research/20261025-fi-browser-verification.md) (MVP pass; re-verify insights/triage at 50 open after demo depth) |
+| **Human UI (`apps/web`)** | **Live** — `app/(fi)/` routes, insights trends UI, ask-only `/chat`; [browser verification](docs/research/20261025-fi-browser-verification.md) (demo depth: triage **50**, insights **90d** at localhost 2026-10-26) |
 | **Deployment (demo)** | **Live** — Vercel project `meta-cto`, branch `meta-cto`, production https://meta-cto-gaboesquivel.vercel.app (Vercel Authentication may require sign-in or share link; env: `DATABASE_URL`, `AI_GATEWAY_API_KEY`, `ANTHROPIC_API_KEY` on Production) |
 
 **Build checklist:** [assessment MVP](docs/tasks/feature-intelligence.md) complete; [demo depth](docs/tasks/feature-intelligence-demo-depth.md) (500 seed + analytics) complete. Analytics spec: [feature-intelligence-analytics.md](docs/specs/feature-intelligence-analytics.md).

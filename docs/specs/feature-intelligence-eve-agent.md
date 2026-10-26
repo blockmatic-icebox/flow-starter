@@ -240,7 +240,7 @@ npx eve dev   # from repo root after eve init
 
 ### MVP tool surface
 
-Implement **core tools first** per [initiative MVP cut](../initiatives/feature-intelligence.md#mvp-cut-line-assessment): `search_requests`, `get_request`, `submit_request`, `list_triage_queue`, `set_disposition`, `get_insights`. Add `confirm_request` and `support_request` when wave 4+ time allows.
+**Shipped (assessment + demo depth):** `search_requests`, `get_request`, `submit_request`, `list_triage_queue`, `set_disposition`, `get_insights`, `confirm_request`, `support_request` in `agent/tools/`. AG-2 and AG-4 rely on manual terminal checks or harness tests; smoke suite covers AG-3, AG-7, queue count, and search.
 
 ---
 

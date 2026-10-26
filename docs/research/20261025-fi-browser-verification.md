@@ -2,30 +2,36 @@
 
 **Research date:** 2026-10-25
 
-**Last reviewed:** 2026-10-25
+**Last reviewed:** 2026-10-26
 
 **Status:** Current
 
-**Environment:** `http://localhost:3000` (Next dev), seeded DB (`pnpm seed:fi`)
+**Environment:** `http://localhost:3000` (`pnpm exec next dev -p 3000`), seeded DB (`pnpm seed:fi`, 500 rows)
 
-**Tool:** agent-browser session `fi-verify`
+**Tool:** agent-browser sessions `fi-spec-verify-*`
 
-## Summary
+## Summary (demo depth — 2026-10-26)
 
 | ID | Result | Notes |
 | --- | --- | --- |
-| W-1 | Pass | `/requests` lists seeded titles with theme badges and sources |
-| W-2e | Pass | External copy (“We heard this as”, Submit feedback, thank-you + view link); similar-ideas radio when matches |
-| W-2i | Pass | Internal dupes-first, PM summary collapsible, confirm → detail |
-| W-3 | Partial | Near-duplicate lexical matches surfaced on external confirm (FR-001 title overlap) |
-| W-4 | Pass | Support control on `/requests/00000000-0000-4000-8000-000000000001` |
-| W-5 | Pass (MVP) | `/triage` shows 8 items (pre–demo depth; re-verify **50** + support sort) |
-| W-5a | Pass | Nav badge **Triage 9** after one new pending item; empty queue not exercised |
-| W-6 | Pass | “How this was evaluated” expands step list |
-| W-7 | Pass (MVP) | `/insights` — open queue **8**, decision capture **20%**, four metric cards (pre–demo depth; re-verify at **50** open + trends after `pnpm seed:fi`) |
-| W-8 | Pass | `/chat` prompt starters + composer; no mutation tools wired |
-| W-9 | Pass | `aria-live` + rotating stage labels on submit loading |
-| AC-4 | Pass | `/requests?theme=` filter chips via `themeRegistry` |
+| W-1 | Pass | `/requests` lists seeded titles; theme filter chips (All themes + registry keys) |
+| W-2e | Pass | (Prior pass 2026-10-25) External thank-you + similar-ideas when matches |
+| W-2i | Pass | (Prior pass) Internal dupes-first, confirm → detail |
+| W-3 | Partial | Lexical near-dup on live external submit (spec-intended); seed/matrix + smoke cover FR-001/002 |
+| W-4 | Pass | (Prior pass) Support on detail |
+| W-5 | Pass | Nav **Triage 50**; queue shows **50** “Review & disposition” rows; subtitle “sorted by support” (server) |
+| W-5a | Pass | Badge **50** matches open queue after seed |
+| W-6 | Pass | (Prior pass) Transparency steps on detail |
+| W-7 | Pass | **Open queue 50**; range **90d**; north-star cards + weekly panels + themes + judgment links |
+| W-8 | Pass | `/chat` prompt starters + composer |
+| W-9 | Pass | (Prior pass) Submit loading `aria-live` + stage labels |
+| AC-4 | Pass | Theme chips on `/requests` |
+
+**Not re-run this session:** W-2e/i, W-4, W-6, W-9 (unchanged since 2026-10-25 pass).
+
+## Summary (MVP baseline — 2026-10-25)
+
+Historical record at 8 open queue before 500-row seed; superseded by table above for demo depth.
 
 ## Demo rehearsal script (T-4-5)
 
@@ -37,29 +43,42 @@
 
 Record with any external screen recorder; no in-app capture.
 
-## Commands
+## Commands (2026-10-26 verification)
 
 ```bash
+pnpm seed:fi                         # ~30s local; 500 rows
 pnpm qa                              # exit 0
-pnpm build:web                       # webpack build, exit 0
-pnpm exec eve eval smoke             # 4/4 eve smoke evals
-pnpm --filter web test:browser
+pnpm build:web                       # exit 0
+pnpm exec eve eval smoke             # 4/4
+pnpm --filter @repo/fi test          # 18/18
 ```
 
 ## Spec acceptance (AC-1–AC-8)
 
 | ID | Result | Evidence |
 | --- | --- | --- |
-| AC-1 | Met | Submit flow + `createDraftAndTriage` / confirm; `triage_completed_at` on harness path |
-| AC-2 | Partial | W-3 lexical near-dup on live external submit; seed/matrix tests + smoke submit gates |
-| AC-3 | Met | W-5 inline disposition with rationale |
-| AC-4 | Met | W-1, theme filter chips (`/requests?theme=`) |
-| AC-5 | Met | W-6 transparency steps on detail |
-| AC-6 | Met | W-7 four metrics + sample counts from seed |
-| AC-7 | Met | `pnpm qa` on assessment branch |
-| AC-8 | Met | `confirmRequest` intake link + `recordPmReviewStarted` on triage expand (W-5) |
+| AC-1 | Met | Submit + harness; `triage_completed_at` (unit/harness tests + prior W-2) |
+| AC-2 | Partial | W-3 lexical live submit; SD-4 / search-csv smoke |
+| AC-3 | Met | Inline triage disposition (prior W-5 expand + rationale) |
+| AC-4 | Met | W-1 + theme filter |
+| AC-5 | Met | W-6 transparency |
+| AC-6 | Met | W-7 six north-star cards + trends at 90d; open queue **50** |
+| AC-7 | Met | `pnpm qa` exit 0 (2026-10-26) |
+| AC-8 | Met | Intake link on confirm + `recordPmReviewStarted` (code + prior W-5) |
 
-MVP waves 0–4: see [tasks checklist](../tasks/feature-intelligence.md) (all checked).
+MVP + demo depth tasks: [feature-intelligence.md](../tasks/feature-intelligence.md), [feature-intelligence-demo-depth.md](../tasks/feature-intelligence-demo-depth.md) (complete).
+
+## Traceability snapshot (automated — 2026-10-26)
+
+| Family | Met | Partial | Notes |
+| --- | --- | --- | --- |
+| SD-1–SD-8 | All | — | `manifest.test.ts`, `fixture.test.ts`, `generate-seed.test.ts`, eve smoke |
+| SD-9 | — | Doc | Local `pnpm seed:fi` ~30s; no CI timing assertion in repo |
+| AN-1–AN-8 | All | — | `insights-dashboard.tsx`, `get-insights.ts`, `bucketing.test.ts`, `insights-range.test.ts`, `compute-insights.test.ts` |
+| AG-1,3,5–7 | Met | — | 8 tools in `agent/tools/`; smoke ×4; `/chat` ask-only |
+| AG-2,4 | Partial | — | Tools shipped; no dedicated smoke eval (manual / harness tests) |
+| VT-1–VT-3, VT-5 | Met | — | Testing spec links; 4 smoke evals; fi unit tests |
+| VT-4 | Met | — | W-* checklist (this doc + prior passes) |
 
 ## Production deployment (2026-10-25)
 

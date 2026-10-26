@@ -113,7 +113,7 @@ Detail: [MVP cut line](#mvp-cut-line-assessment); specs index in [feature-intell
 
 1. `/chat` ask-only route
 2. `eve/next` proxy (web + eve deploy convenience)
-3. Remaining eve tools (`confirm_request`, `support_request`) — cover via web only
+3. ~~Remaining eve tools (`confirm_request`, `support_request`)~~ — **shipped** in `agent/tools/`; optional extra smoke evals still cut-first
 4. Live Jev in CI (keep deterministic T1 + degraded path; Jev on manual demo with gateway key)
 5. Fourth/fifth smoke eval
 

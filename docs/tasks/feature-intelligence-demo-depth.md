@@ -52,7 +52,7 @@
 - [x] **T-D3-1** — `listTriageQueue` support sort
 - [x] **T-D3-2** — Covered by smoke + manual pass (`pnpm build:web`)
 - [x] **T-D3-3** — Triage subtitle
-- [x] **T-D3-4** — Build verification; browser pass recommended on `/triage`
+- [x] **T-D3-4** — Browser pass on `/triage` at 50 open (2026-10-26, [research log](../research/20261025-fi-browser-verification.md))
 
 ---
 

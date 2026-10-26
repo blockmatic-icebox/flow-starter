@@ -261,6 +261,8 @@ Discover list keeps **most supported** sort separately (unchanged).
 | SD-8 | `GENERATED_BULK_ID_HASH` in tests matches committed constant in manifest. |
 | SD-9 | Seed completes in **≤ 30s** on CI (document if exceeded). |
 
+**Measured (2026-10-26):** local `pnpm seed:fi` ~30s for 500 rows on developer machine; no CI timing gate in repo yet.
+
 ---
 
 ## Approval
