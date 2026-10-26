@@ -8,6 +8,31 @@ const nextConfig: NextConfig = {
       ".js": [".ts", ".tsx", ".js"],
     },
   },
+  headers() {
+    return [
+      {
+        headers: [{ key: "Vary", value: "Accept" }],
+        source: "/",
+      },
+    ];
+  },
+  rewrites() {
+    return {
+      beforeFiles: [
+        {
+          destination: "/markdown/home",
+          has: [
+            {
+              key: "accept",
+              type: "header",
+              value: "(?i).*text/markdown.*",
+            },
+          ],
+          source: "/",
+        },
+      ],
+    };
+  },
   transpilePackages: ["@repo/db", "@repo/fi", "@repo/ui"],
 };
 
