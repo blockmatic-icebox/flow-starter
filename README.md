@@ -20,9 +20,11 @@ Requires Node.js 24+ and pnpm 12+.
 pnpm setup
 cp .env.defaults.example .env   # then set DATABASE_URL (Neon) and keys below
 pnpm db:migrate
-pnpm seed:fi
+pnpm seed:fi                    # loads 500 demo rows; wipes all FI tables
 pnpm dev                        # https://meta-cto.localhost (portless) or pnpm dev:app --port 3000
 ```
+
+**Seed warning:** `pnpm seed:fi` deletes and reloads all Feature Intelligence data. Use for local dev, CI, and demos only — **never on production** (deploy with `pnpm db:migrate` only).
 
 ### Environment
 

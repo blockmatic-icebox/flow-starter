@@ -15,7 +15,12 @@ export default async function TriagePage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <h1 className="font-heading text-2xl font-semibold">PM triage queue</h1>
+      <div>
+        <h1 className="font-heading text-2xl font-semibold">PM triage queue</h1>
+        <p className="text-muted-foreground text-sm">
+          {queue.length} items · sorted by support
+        </p>
+      </div>
       {queue.length === 0 ? (
         <Empty>
           <EmptyHeader>
