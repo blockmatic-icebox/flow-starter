@@ -1,27 +1,44 @@
 # Local prompt log
 
-Gitignored conversation trail for assessments, audits, and collaboration review. **Never commit** `prompts.txt` or `.agents/flow/prompts.txt`.
+Conversation trail for assessments, audits, and collaboration review. **Never commit** `.agents/flow/prompts.txt`. Repository-root `prompts.txt` is **gitignored by default**; an employer brief may require a **tracked** root log on a product branch (remove `prompts.txt` from `.gitignore` and commit the file there—never on `main` for assessment-only work).
 
 Task closeout in chat still uses the [Task report](journal.md#task-report-user-visible).
+
+## Automatic append (Cursor hooks)
+
+When `.cursor/hooks.json` is present, project hooks append on every agent turn:
+
+| Hook | Script | Role |
+| --- | --- | --- |
+| `beforeSubmitPrompt` | `node .agents/tooling/prompt-log/append-on-stop.mjs submit` | Stash the human prompt for the current `generation_id` |
+| `stop` | `node .agents/tooling/prompt-log/append-on-stop.mjs stop` | Append one block to `prompts.txt` (transcript + stash); dedupe by `generation_id` |
+
+Hooks run only when `AGENTS.md` contains `## Local prompt log (enabled)`. They fail open (exit 0). The coordinator should still append or enrich the block when the hook summary is thin—hooks are the floor, not a substitute for an honest Task report.
+
+Work metadata for hooks: optional `.agents/flow/prompt-log.config.json` (may be committed on a product branch) or gitignored `.agents/flow/local/prompt-log.json`:
+
+```json
+{ "work": "feature-intelligence", "stage": "Build" }
+```
 
 ## Preference (post-install)
 
 On the **first handled repository task** after Flow Factory install (or when neither opt-in nor decline is recorded):
 
-1. End the response with one question (no option lists in the log question itself): **Enable local Q/A prompt logging to gitignored `prompts.txt`?**
+1. End the response with one question (no option lists in the log question itself): **Enable local Q/A prompt logging to `prompts.txt`?**
 2. **Yes** — add the [AGENTS.md enabled block](#agentsmd-enabled-block) to the repo agent entrypoint (`AGENTS.md` at the repository root, or `CLAUDE.md` / `.cursor/rules` when that file is the primary agent router for the checkout).
 3. **No** — create `.agents/flow/local/prompt-log.declined` (gitignored) with one line: `declined: <ISO-8601>`. Do not ask again.
 
 **Already decided:** Skip the question when `AGENTS.md` (or equivalent) contains `## Local prompt log (enabled)`, or when `prompt-log.declined` exists.
 
-**Employer brief:** When a brief requires a prompt trail, reconcile with [journal.md](journal.md) and [flow.md](../flow.md#starting-from-an-existing-brief). Prefer gitignored local files; never commit logs. Brief path wins over decline, but conflicts (for example “commit prompts.txt”) still require a human decision.
+**Employer brief:** When a brief requires a prompt trail in Git, reconcile with [journal.md](journal.md) and [flow.md](../flow.md#starting-from-an-existing-brief). Use a **product branch** (for example `meta-cto`), track root `prompts.txt`, and keep assessment application code off `main`.
 
 ## When to append
 
 | Condition | Append Q/A block |
 | --- | --- |
-| `## Local prompt log (enabled)` in agent entrypoint | **Required** after every handled human request |
-| Employer brief requires local trail | **Required** (use brief path if specified) |
+| `## Local prompt log (enabled)` in agent entrypoint | **Required** each turn (hooks + coordinator) |
+| Employer brief requires trail | **Required** (tracked or gitignored per brief) |
 | Declined and no brief requirement | **Do not** append |
 | Unset preference | **Do not** append until enabled; ask on first task |
 
@@ -38,6 +55,7 @@ One block per handled human request. Log **questions and answers**, not multiple
 Timestamp: <ISO-8601>
 Work: <initiative slug or short id>
 Stage: <Explore|Specify|Plan|Build|Review|Ship|setup|eval|flow-improve>
+Generation: <cursor generation_id when appended by hook>
 
 Human: <human message intent, redacted>
 
@@ -61,7 +79,7 @@ Paste under the Flow section when the human opts in:
 ```markdown
 ## Local prompt log (enabled)
 
-The coordinator **must** append one Q/A block per handled human request to gitignored repository-root `prompts.txt`. Format: [.agents/flow/operations/journal.md](.agents/flow/operations/journal.md#prompt-log-qa-format). Log **questions and answers** only—do not paste multiple-choice option lists into **Q:**. Never commit `prompts.txt`. Workers and subagents do not append.
+The coordinator **must** ensure repository-root `prompts.txt` receives one Q/A block per handled human request. Cursor hooks in `.cursor/hooks.json` append automatically when logging is enabled; the coordinator still reconciles summaries after delegated work. Format: [.agents/flow/operations/journal.md](.agents/flow/operations/journal.md#prompt-log-qa-format). Log **questions and answers** only—do not paste multiple-choice option lists into **Q:**. Default: gitignored local file; employer briefs may require a tracked log on a product branch only. Workers and subagents do not append.
 ```
 
 ## Extended journal block (optional)

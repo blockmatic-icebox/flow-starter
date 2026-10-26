@@ -61,14 +61,18 @@ const collectLayoutErrors = (root) => {
     errors.push(
       "skills-lock.json belongs at .agents/skills-lock.json, not repository root"
     );
+  let trackedPromptLogs = [];
   if (existsSync(path.join(root, ".git"))) {
-    const trackedPromptLogs = execSync(
+    trackedPromptLogs = execSync(
       "git ls-files -- prompts.txt .agents/flow/prompts.txt",
       { cwd: root, encoding: "utf-8" }
-    ).trim();
-    if (trackedPromptLogs)
+    )
+      .trim()
+      .split("\n")
+      .filter(Boolean);
+    if (trackedPromptLogs.includes(".agents/flow/prompts.txt"))
       errors.push(
-        "prompt logs must not be committed (gitignore prompts.txt and .agents/flow/prompts.txt)"
+        ".agents/flow/prompts.txt must stay gitignored and must not be committed"
       );
   }
   const gitignorePath = path.join(root, ".gitignore");
@@ -77,8 +81,11 @@ const collectLayoutErrors = (root) => {
     if (!gitignore.includes(".agents/flow/prompts.txt"))
       errors.push(".gitignore must list .agents/flow/prompts.txt");
     const gitignoreLines = gitignore.split("\n").map((line) => line.trim());
-    if (!gitignoreLines.includes("prompts.txt"))
-      errors.push(".gitignore must list prompts.txt");
+    const tracksRootPrompts = trackedPromptLogs.includes("prompts.txt");
+    if (!tracksRootPrompts && !gitignoreLines.includes("prompts.txt"))
+      errors.push(
+        ".gitignore must list prompts.txt when the root prompt log is not tracked"
+      );
   }
   return errors;
 };
