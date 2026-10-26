@@ -49,15 +49,6 @@
       "entry": ["src/**/*.ts", "drizzle.config.ts", "scripts/db-ping.mjs"],
       "project": ["src/**/*.ts", "drizzle.config.ts", "scripts/**/*.mjs"]
     },
-    "packages/fi": {
-      "entry": [
-        "src/**/*.ts",
-        "seed/**/*.ts",
-        "eval/**/*.ts",
-        "eval/smoke-cli.ts"
-      ],
-      "project": ["src/**/*.ts", "seed/**/*.ts", "eval/**/*.ts"]
-    },
     "packages/ts": {
       "entry": ["base.json", "nextjs.json", "react-library.json"],
       "project": ["*.json"]

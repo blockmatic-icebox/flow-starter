@@ -4742,3 +4742,63 @@ Q: test local and make sure all changes are pushed
 A: Ran `pnpm qa` (exit 0), fixed lint/knip issues, committed Crewday seed and agent-discovery work, fixed `.agents/tooling/git-env.mjs` so pre-commit hooks can run worktree/eval tests under an in-progress `git commit`, and pushed `meta-cto` to `origin`.
 
 ---
+---
+Timestamp: 2026-10-26T19:29:01.658Z
+Work: feature-intelligence
+Stage: Build
+Generation: 2c37f143-9200-4cd3-b467-d632a0a06c2c
+
+Human: docs/simplified-flow-prd.md 
+
+we want this on fresh branch called "simple"
+
+remove everything related to the meta-cto assesment and leave all the base in web required to build agentic aplications, the extractable sharable part.
+
+is-agentic compliance
+eve agent stuff
+genui with shadcnui and openui lang, a couple declarative layouts but leave it fully open to generation, you ask generate me a costumer support dashaboard and it does it with fake data.
+on the landing page a search bar for generation prompts and a chat inside the sidebar 
+that's the base for applications with these stack, keep db blank but with all tooling ready and vercel deployments stuff, migrations on push etc
+all code quality tools
+use default shadcnui in design.md and architecture.md, in product.md only mention this is agentic and mpc first/api first application. that's all.
+
+keep adr-001. use-flow-agentic-starter.md.  because it provides foundation for agentic apps.
+
+clean leftover and unused files
+
+Agent: Clarifying two decisions that significantly affect the plan:
+
+---
+---
+Timestamp: 2026-10-26T19:35:18.516Z
+Work: feature-intelligence
+Stage: Build
+Generation: 13fcbc41-3699-424c-8338-d06ada466bcf
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: The QA and production promote from pass 2 are already done; nothing else is pending from that work.
+
+---
+Timestamp: 2026-10-26T19:45:00-06:00
+Work: flow-starter
+Stage: Build
+
+Human: Implement the Simple branch agentic starter strip-down plan on branch `simple` (remove meta-cto assessment, keep GenUI/MCP/Eve/is-agentic, studio UI, blank DB tooling).
+
+Agent: Created branch `simple`; removed `@repo/fi`, Hunch routes, assessment docs; added studio shell with compose API, MCP `compose_ui`, Eve tools, GenUI support-dashboard routing and LLM OpenUI path; rewrote PRODUCT/DESIGN/ARCHITECTURE/AGENTS/README; verified `pnpm qa`, `pnpm exec eve eval smoke`, `pnpm test:browser`, `pnpm build:web`.
+
+Q: Implement the plan as specified on branch simple.
+
+A: Completed on branch `simple` with checks above; push/deploy not performed.
+
+---
+Timestamp: 2026-10-26T19:50:00-06:00
+Work: flow-starter
+Stage: Review
+
+Q: any leftovers ?
+
+A: Yes—user-visible FI copy (API discovery, 404/markdown catch-all, env examples), `FI_CHAT_MODEL` in agent, Meta CTO paragraph in SECURITY.md, Hunch/Meta CTO theme tokens in globals.css, stale slug allowlist for deleted FI routes, Factory eval/prompt-log defaults, spec/PRD still mention kiss/meta-cto; branch `simple` is uncommitted.
+
+---

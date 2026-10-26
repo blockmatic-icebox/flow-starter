@@ -1,0 +1,240 @@
+"use client";
+
+import type { CompositionEnvelope } from "@repo/genui";
+import { consumeNdjsonResponse } from "@repo/genui";
+import { GenuiRenderer } from "@repo/genui/react";
+import { Button } from "@repo/ui/components/button";
+import { Input } from "@repo/ui/components/input";
+import { ScrollArea } from "@repo/ui/components/scroll-area";
+import { Textarea } from "@repo/ui/components/textarea";
+import Link from "next/link";
+import { parseAsString, useQueryState } from "nuqs";
+import { useCallback, useRef, useState } from "react";
+
+const starters = [
+  "Generate a customer support dashboard",
+  "Create a pricing comparison for two plans",
+  "Design an onboarding form for new users",
+  "Show revenue metrics dashboard",
+  "Compare orbit and nova plans",
+];
+
+interface ChatMessage {
+  content: string;
+  role: "assistant" | "user";
+}
+
+export const StudioClient = () => {
+  const [queryParam, setQueryParam] = useQueryState(
+    "q",
+    parseAsString.withDefault("")
+  );
+  const [input, setInput] = useState(queryParam);
+  const [envelope, setEnvelope] = useState<CompositionEnvelope | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const generationRef = useRef(0);
+  const latestRequestIdRef = useRef<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const runCompose = useCallback(async (text: string) => {
+    const query = text.trim();
+    if (!query) return;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    generationRef.current += 1;
+    const clientRequestId = `studio-${generationRef.current}`;
+    latestRequestIdRef.current = clientRequestId;
+    setError(null);
+    setLoading(true);
+    setMessages((prev) => [...prev, { content: query, role: "user" }]);
+
+    const streamState = {
+      latest: null as CompositionEnvelope | null,
+      message: null as string | null,
+    };
+
+    try {
+      const response = await fetch("/api/genui/compose", {
+        body: JSON.stringify({
+          clientRequestId,
+          query,
+          version: 1,
+        }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        signal: controller.signal,
+      });
+
+      const result = await consumeNdjsonResponse({
+        onEvent: (event) => {
+          if (event.requestId !== clientRequestId) return;
+          if (event.type === "error") streamState.message = event.message;
+          if (event.type === "partial" || event.type === "complete")
+            streamState.latest = event.envelope;
+        },
+        response,
+      });
+
+      if (latestRequestIdRef.current !== clientRequestId) return;
+
+      if (!result.ok && result.reason !== "aborted")
+        setError(`Stream error: ${result.reason}`);
+      else if (streamState.message) setError(streamState.message);
+      else if (streamState.latest) {
+        const composed = streamState.latest;
+        setEnvelope(composed);
+        setMessages((prev) => [
+          ...prev,
+          { content: composed.fallbackText, role: "assistant" },
+        ]);
+      } else setError("No composition returned.");
+      setLoading(false);
+    } catch (error_) {
+      if (latestRequestIdRef.current !== clientRequestId) return;
+      if ((error_ as Error).name !== "AbortError")
+        setError("Could not reach compose service.");
+      setLoading(false);
+    }
+  }, []);
+
+  const submit = async (text: string) => {
+    const query = text.trim();
+    if (!query) return;
+    setInput("");
+    await setQueryParam(query);
+    await runCompose(query);
+  };
+
+  const showLanding = !envelope && !loading && messages.length === 0;
+
+  return (
+    <main className="flex min-h-dvh flex-col lg:flex-row">
+      <aside className="flex w-full flex-col border-b lg:w-80 lg:border-r lg:border-b-0">
+        <div className="border-b p-4">
+          <p className="text-sm font-medium">Chat</p>
+          <p className="text-muted-foreground text-xs">
+            Refine the generated UI with follow-up prompts.
+          </p>
+        </div>
+        <ScrollArea className="min-h-48 flex-1 p-4">
+          <ul className="space-y-3 text-sm">
+            {messages.map((message, index) => (
+              <li
+                key={`${message.role}-${index}`}
+                className={
+                  message.role === "user"
+                    ? "text-foreground"
+                    : "text-muted-foreground"
+                }
+              >
+                <span className="font-medium capitalize">{message.role}: </span>
+                {message.content}
+              </li>
+            ))}
+            {loading ? (
+              <li className="text-muted-foreground text-xs">Generating…</li>
+            ) : null}
+          </ul>
+        </ScrollArea>
+        <form
+          className="flex gap-2 border-t p-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void submit(input);
+          }}
+        >
+          <Textarea
+            className="min-h-10 resize-none"
+            onChange={(event) => setInput(event.target.value)}
+            placeholder="Ask for changes…"
+            rows={2}
+            value={input}
+          />
+          <Button disabled={loading || !input.trim()} type="submit">
+            Send
+          </Button>
+        </form>
+      </aside>
+
+      <section className="flex flex-1 flex-col">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight">Studio</h1>
+            <p className="text-muted-foreground text-sm">
+              Agentic UI generation with OpenUI Lang and shadcn.
+            </p>
+          </div>
+          <Link
+            className="text-primary text-sm underline-offset-4 hover:underline"
+            href="/dev"
+          >
+            MCP &amp; API
+          </Link>
+        </header>
+
+        {showLanding ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-6 p-8">
+            <div className="w-full max-w-xl space-y-3 text-center">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                What should we build?
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Describe a screen, dashboard, or flow. Sample data is synthetic.
+              </p>
+            </div>
+            <form
+              className="flex w-full max-w-xl gap-2"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void submit(input);
+              }}
+            >
+              <Input
+                className="h-11"
+                onChange={(event) => setInput(event.target.value)}
+                placeholder="Generate a customer support dashboard…"
+                value={input}
+              />
+              <Button className="h-11" disabled={loading} type="submit">
+                Generate
+              </Button>
+            </form>
+            <ul className="flex max-w-xl flex-wrap justify-center gap-2">
+              {starters.map((starter) => (
+                <li key={starter}>
+                  <Button
+                    onClick={() => {
+                      submit(starter).catch(() =>
+                        setError("Could not compose.")
+                      );
+                    }}
+                    size="sm"
+                    type="button"
+                    variant="secondary"
+                  >
+                    {starter}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div className="flex-1 space-y-4 p-4 md:p-6">
+            {error ? (
+              <p className="text-destructive text-sm" role="alert">
+                {error}
+              </p>
+            ) : null}
+            {envelope ? <GenuiRenderer envelope={envelope} /> : null}
+            {!envelope && loading ? (
+              <p className="text-muted-foreground text-sm">Composing…</p>
+            ) : null}
+          </div>
+        )}
+      </section>
+    </main>
+  );
+};

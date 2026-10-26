@@ -11,8 +11,10 @@ import {
   dataExplorerDocument,
   sectionStackDocument,
   statusDocument,
+  supportDashboardDocument,
   timelineDocument,
 } from "./builders";
+import { synthesizeOpenUiComposition } from "./generate-openui";
 import { synthesizeOpenEndedAnswer } from "./model";
 import { defaultEntityIds, routeQuery } from "./routing";
 import type { ComposeStreamEvent } from "./stream";
@@ -89,6 +91,10 @@ const controlledDocument = ({
       records,
       requestId,
     });
+  }
+
+  if (intent === "support-dashboard") {
+    return supportDashboardDocument({ requestId });
   }
 
   if (intent === "product-timeline") {
@@ -234,16 +240,26 @@ export const composeQuery = async ({
     envelope = declarativeCompound({ query, requestId });
   } else {
     tier = 3;
-    const synthesized = await synthesizeOpenEndedAnswer({ query, signal });
-    if (synthesized) modelCalls = 1;
-    envelope = answerDocument({
-      body:
-        synthesized ??
-        "No grounded answer is available for this request in the demo catalog. Configure AI_GATEWAY_API_KEY to enable optional general model responses.",
-      records: acmeCatalogRecords,
+    const generated = await synthesizeOpenUiComposition({
+      query,
       requestId,
-      sourceIds: [],
+      signal,
     });
+    if (generated) {
+      modelCalls = 1;
+      envelope = generated;
+    } else {
+      const synthesized = await synthesizeOpenEndedAnswer({ query, signal });
+      if (synthesized) modelCalls = 1;
+      envelope = answerDocument({
+        body:
+          synthesized ??
+          "Generation requires AI_GATEWAY_API_KEY for open layouts, or try a supported prompt such as customer support dashboard, metrics, or plan comparison.",
+        records: acmeCatalogRecords,
+        requestId,
+        sourceIds: [],
+      });
+    }
   }
 
   const published = publishComposition({

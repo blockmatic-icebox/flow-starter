@@ -8,12 +8,10 @@ const run = (cmd) =>
 
 const hasDatabase = Boolean(process.env.DATABASE_URL?.trim());
 
-if (hasDatabase) {
-  run("pnpm db:migrate");
-  run("FI_SEED_IF_EMPTY=1 pnpm seed:fi");
-} else
+if (hasDatabase) run("pnpm db:migrate");
+else
   console.warn(
-    "[vercel-build] Skipping db:migrate and seed:fi — DATABASE_URL is not set (typical Preview builds)."
+    "[vercel-build] Skipping db:migrate — DATABASE_URL is not set (typical Preview builds)."
   );
 
 run("pnpm --filter web build");

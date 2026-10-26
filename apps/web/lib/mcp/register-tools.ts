@@ -1,215 +1,76 @@
 import { registerAppTool } from "@modelcontextprotocol/ext-apps/server";
 import type { McpServer } from "@modelcontextprotocol/server";
 import {
-  confirmRequest,
-  createDraftAndTriage,
-  DispositionError,
-  featureRequestSourceSchema,
-  getInsights,
-  getRequest,
-  listTriageQueue,
-  searchRequests,
-  setDisposition,
-  supportRequest,
-  getDb,
-} from "@repo/fi";
+  componentNames,
+  composeQuery,
+  compositionGuidance,
+  MAX_QUERY_CODE_POINTS,
+} from "@repo/genui";
 import { z } from "zod";
 
-import { HUNCH_EXPLORER_RESOURCE_URI } from "./hunch-explorer-resource";
+import { GENUI_PREVIEW_RESOURCE_URI } from "./genui-preview-resource";
 import { asToolResult } from "./tool-result";
 
-const db = () => getDb();
-
-const explorerToolMeta = {
-  _meta: { ui: { resourceUri: HUNCH_EXPLORER_RESOURCE_URI } },
+const previewToolMeta = {
+  _meta: { ui: { resourceUri: GENUI_PREVIEW_RESOURCE_URI } },
 };
 
-export const registerFiMcpTools = (server: McpServer) => {
+const plainToolMeta = { _meta: {} };
+
+export const registerStarterMcpTools = (server: McpServer) => {
   registerAppTool(
     server,
-    "search_requests",
+    "health",
     {
-      description:
-        "Search published Crewday feedback by text and optional theme key (e.g. shift_swaps, scheduling_coverage).",
-      inputSchema: z.object({
-        limit: z.number().int().min(1).max(50).optional(),
-        query: z.string().optional(),
-        themeKey: z.string().optional(),
-      }),
-      ...explorerToolMeta,
+      ...plainToolMeta,
+      description: "Liveness check for the MCP server.",
+      inputSchema: { ping: z.boolean().optional() },
     },
-    async ({ limit, query, themeKey }) => {
-      const result = await searchRequests({
-        db: db(),
-        pageSize: limit ?? 25,
-        query,
-        themeKey,
-      });
-      return asToolResult({
-        count: result.items.length,
-        page: result.page,
-        requests: result.items.map((r) => ({
-          id: r.id,
-          source: r.source,
-          supportCount: r.supportCount,
-          themeKey: r.themeKey,
-          title: r.title,
-        })),
-      });
-    }
+    () => asToolResult({ ok: true, service: "flow-starter-mcp" })
   );
 
   registerAppTool(
     server,
-    "get_request",
+    "list_component_catalog",
     {
+      ...plainToolMeta,
       description:
-        "Get a Crewday feature request by id with duplicates and support count.",
-      inputSchema: z.object({ requestId: z.string().uuid() }),
-      ...explorerToolMeta,
+        "List registered GenUI root components and composition guidance.",
+      inputSchema: { detail: z.boolean().optional() },
     },
-    async ({ requestId }) => {
-      const detail = await getRequest({ db: db(), requestId });
-      if (!detail) return asToolResult({ found: false });
-      return asToolResult({
-        found: true,
-        request: detail.request,
-        supportCount: detail.supportCount,
-      });
-    }
-  );
-
-  registerAppTool(
-    server,
-    "list_triage_queue",
-    {
-      description:
-        "List published Crewday requests awaiting PM disposition (shift swaps, coverage, notifications).",
-      inputSchema: z.object({}),
-      ...explorerToolMeta,
-    },
-    async () => {
-      const rows = await listTriageQueue({ db: db() });
-      return asToolResult({
-        count: rows.length,
-        requests: rows.map((r) => ({
-          decisionBrief: r.decisionBrief,
-          id: r.id,
-          themeKey: r.themeKey,
-          title: r.title,
-        })),
-      });
-    }
-  );
-
-  registerAppTool(
-    server,
-    "get_insights",
-    {
-      description:
-        "North-star metrics for the Crewday demo workspace (queue depth, capture rate, themes).",
-      inputSchema: z.object({
-        range: z.enum(["7d", "30d", "90d", "all"]).optional(),
-      }),
-      ...explorerToolMeta,
-    },
-    async ({ range }) => asToolResult(await getInsights({ db: db(), range }))
-  );
-
-  registerAppTool(
-    server,
-    "submit_request",
-    {
-      description:
-        "Create a draft feature request and run the AI triage harness. Returns pending_confirm preview only—call confirm_request after user approval.",
-      inputSchema: z.object({
-        description: z.string().min(1).max(8000),
-        source: featureRequestSourceSchema,
-        title: z.string().min(1).max(500),
-      }),
-      ...explorerToolMeta,
-    },
-    async ({ description, source, title }) =>
-      asToolResult(
-        await (async () => {
-          const { harness, request } = await createDraftAndTriage({
-            db: db(),
-            description,
-            source,
-            title,
-          });
-          return { harness, request, status: "pending_confirm" };
-        })()
-      )
-  );
-
-  server.registerTool(
-    "confirm_request",
-    {
-      description:
-        "Publish a draft request after the user confirms or edits the problem statement.",
-      inputSchema: z.object({
-        intakeLinkedRequestId: z.string().uuid().nullable().optional(),
-        problemStatement: z.string().min(1).max(4000),
-        requestId: z.string().uuid(),
-      }),
-    },
-    async ({ intakeLinkedRequestId, problemStatement, requestId }) =>
+    () =>
       asToolResult({
-        request: await confirmRequest({
-          db: db(),
-          intakeLinkedRequestId,
-          problemStatement,
-          requestId,
-        }),
+        components: componentNames,
+        guidance: compositionGuidance,
       })
   );
 
-  server.registerTool(
-    "support_request",
+  registerAppTool(
+    server,
+    "compose_ui",
     {
-      description: "Add support for a published feature request.",
-      inputSchema: z.object({
-        requestId: z.string().uuid(),
-        supporterKey: z.string().min(1).max(200),
-      }),
+      description:
+        "Generate a validated OpenUI composition from a natural-language UI request using synthetic data.",
+      inputSchema: {
+        query: z.string().min(1).max(MAX_QUERY_CODE_POINTS),
+      },
+      ...previewToolMeta,
     },
-    async ({ requestId, supporterKey }) =>
-      asToolResult(await supportRequest({ db: db(), requestId, supporterKey }))
-  );
-
-  server.registerTool(
-    "set_disposition",
-    {
-      description: "Set PM disposition on a published feature request.",
-      inputSchema: z.object({
-        disposition: z.enum([
-          "merge",
-          "monitor",
-          "decline",
-          "needs_discussion",
-        ]),
-        dispositionRationale: z.string().min(1),
-        mergeTargetId: z.string().uuid().optional(),
-        requestId: z.string().uuid(),
-      }),
-    },
-    async ({ disposition, dispositionRationale, mergeTargetId, requestId }) => {
-      try {
-        return asToolResult(
-          await setDisposition({
-            db: db(),
-            disposition,
-            dispositionRationale,
-            mergeTargetId,
-            requestId,
-          })
-        );
-      } catch (error) {
-        if (error instanceof DispositionError)
-          throw new Error(`${error.code}: ${error.message}`, { cause: error });
-        throw error;
-      }
+    async ({ query }) => {
+      const clientRequestId = `mcp-${Date.now()}`;
+      const result = await composeQuery({
+        input: { clientRequestId, query, version: 1 },
+      });
+      const complete = result.events.find((e) => e.type === "complete");
+      if (!complete || complete.type !== "complete")
+        return asToolResult({
+          error: "composition_failed",
+          validationOk: result.metadata.validationOk,
+        });
+      return asToolResult({
+        envelope: complete.envelope,
+        metadata: result.metadata,
+      });
     }
   );
 };

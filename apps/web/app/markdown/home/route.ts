@@ -1,6 +1,6 @@
-import { fiHomeMarkdown } from "@/lib/fi-home-content";
 import { markdownResponse } from "@/lib/markdown-negotiation";
+import { starterHomeMarkdown } from "@/lib/starter-content";
 
 export const dynamic = "force-dynamic";
 
-export const GET = () => markdownResponse(fiHomeMarkdown);
+export const GET = () => markdownResponse(starterHomeMarkdown);

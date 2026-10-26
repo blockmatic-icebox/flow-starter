@@ -51,5 +51,5 @@ export const resolveSiteOrigin = (request?: Request) => {
     return `https://${host}`;
   }
 
-  return "https://meta-cto-two.vercel.app";
+  return "http://localhost:3000";
 };

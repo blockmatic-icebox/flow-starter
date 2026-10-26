@@ -2,7 +2,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 
 import { jsonError, withExtraHeaders } from "@/lib/api/json-error";
 import { mergeResponseHeaders } from "@/lib/api/rate-limit-headers";
-import { createFiMcpServer } from "@/lib/mcp/create-mcp-server";
+import { createStarterMcpServer } from "@/lib/mcp/create-mcp-server";
 import { consumeMcpRateLimit } from "@/lib/mcp/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ const handleMcp = async (request: Request) => {
   const { headers: rateHeaders, limited } = consumeMcpRateLimit(request);
   if (limited) return mergeResponseHeaders(limited, rateHeaders);
 
-  const server = createFiMcpServer();
+  const server = createStarterMcpServer();
   const transport = new WebStandardStreamableHTTPServerTransport({
     enableJsonResponse: true,
     sessionIdGenerator: undefined,

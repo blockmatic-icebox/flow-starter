@@ -1,5 +1,5 @@
 {
-  "name": "meta-cto",
+  "name": "flow-starter",
   "private": true,
   "type": "module",
   "scripts": {
@@ -22,9 +22,7 @@
     "hooks:commit-msg": "node tooling/checks/check-commit-message.mjs",
     "prepare": "simple-git-hooks",
     "qa": "pnpm lint && pnpm knip && pnpm sherif && pnpm check-types && pnpm test && pnpm --filter @repo/db db:check",
-    "test": "pnpm --filter @repo/genui test && pnpm --filter @repo/fi test && pnpm --filter feature-intelligence-cli test && pnpm --filter web test && pnpm --filter @repo/db test",
-    "seed:fi": "pnpm --filter @repo/fi seed",
-    "seed:fi:if-empty": "FI_SEED_IF_EMPTY=1 pnpm seed:fi",
+    "test": "pnpm --filter @repo/genui test && pnpm --filter web test && pnpm --filter @repo/db test",
     "test:browser": "pnpm test:browser:web",
     "lint": "oxlint . && oxfmt --check .",
     "lint:fix": "oxlint --fix . && oxfmt --write --no-error-on-unmatched-pattern .",
@@ -48,13 +46,14 @@
     "db:ping": "pnpm --filter @repo/db exec node --import tsx scripts/db-ping.mjs",
     "deepsec": "pnpm --dir=.deepsec exec deepsec",
     "mcp:next": "next-devtools-mcp",
-    "agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-meta-cto-two.vercel.app}",
-    "fi": "pnpm --filter feature-intelligence-cli exec fi"
+    "agentic:check": "is-agentic ${AGENTIC_CHECK_URL:-localhost:3000}"
   },
   "dependencies": {
     "@ai-sdk/gateway": "4.0.125",
     "@repo/db": "workspace:*",
-    "@repo/fi": "workspace:*",
+    "@repo/genui": "workspace:*",
+    "@openuidev/lang-core": "1.0.1",
+    "@openuidev/react-lang": "1.0.1",
     "ai": "^7.0.152",
     "drizzle-orm": "^0.45.4",
     "eve": "^0.83.2",

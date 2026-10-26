@@ -5,6 +5,7 @@ import { acmeEntityIds } from "../fixtures/acme-catalog";
 export type ControlledIntent =
   | "compare-plans"
   | "show-metrics"
+  | "support-dashboard"
   | "product-timeline"
   | "search-products"
   | "list-products"
@@ -61,6 +62,19 @@ export const routeQuery = (query: string): RoutedIntent => {
     };
   }
 
+  if (
+    /support\s+dashboard|help\s*desk|customer\s*service|\bticket\b|csat/u.test(
+      normalizedQuery
+    )
+  ) {
+    return {
+      injection: false,
+      intent: "support-dashboard",
+      normalizedQuery,
+      tier: 1,
+    };
+  }
+
   if (/metric|mrr|churn|revenue|dashboard|chart/u.test(normalizedQuery)) {
     return {
       injection: false,
@@ -111,9 +125,10 @@ export const routeQuery = (query: string): RoutedIntent => {
   const decision = tierFromSignals({
     ambiguous: normalizedQuery.length < 8,
     hasControlledIntent: false,
-    needsOpenComposition: /custom layout|surprise me|design a/u.test(
-      normalizedQuery
-    ),
+    needsOpenComposition:
+      /custom layout|surprise me|design a|generate|onboarding form|pricing/u.test(
+        normalizedQuery
+      ),
     synthesisRequired: false,
   });
 

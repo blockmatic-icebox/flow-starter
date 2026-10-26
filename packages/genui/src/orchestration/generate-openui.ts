@@ -1,0 +1,101 @@
+import { generateObject } from "ai";
+import { z } from "zod";
+
+import { validateCompositionEnvelope } from "../contract/compiler";
+import type { CompositionEnvelope, GroundedRecord } from "../core/envelope";
+import { GENUI_LIBRARY_VERSION } from "../core/envelope";
+import { acmeCatalogRecords } from "../fixtures/acme-catalog";
+import { supportDashboardRecords } from "../fixtures/synthetic-support";
+import { componentNames } from "../registry/components";
+import { compositionGuidance } from "../registry/semantics";
+
+const DEFAULT_GENUI_MODEL = "anthropic/claude-sonnet-4.6";
+
+const groundedRecordSchema = z.discriminatedUnion("kind", [
+  z.object({
+    id: z.string(),
+    kind: z.literal("entity"),
+    summary: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    title: z.string(),
+    url: z.string(),
+  }),
+  z.object({
+    excerpt: z.string(),
+    id: z.string(),
+    kind: z.literal("document"),
+    revisedAt: z.string().optional(),
+    title: z.string(),
+    url: z.string(),
+  }),
+  z.object({
+    id: z.string(),
+    kind: z.literal("metric"),
+    label: z.string(),
+    trend: z.enum(["up", "down", "flat"]).optional(),
+    unit: z.string().optional(),
+    value: z.string(),
+  }),
+  z.object({
+    id: z.string(),
+    kind: z.literal("media"),
+    mimeType: z.string(),
+    title: z.string(),
+    url: z.string(),
+  }),
+]);
+
+const generationSchema = z.object({
+  fallbackText: z.string().min(1).max(400),
+  openuiText: z
+    .string()
+    .min(8)
+    .max(2000)
+    .refine((t) => /^\s*root\s*=/u.test(t), "must start with root ="),
+  records: z.array(groundedRecordSchema).max(24),
+});
+
+export const synthesizeOpenUiComposition = async ({
+  query,
+  requestId,
+  signal,
+}: {
+  query: string;
+  requestId: string;
+  signal?: AbortSignal;
+}): Promise<CompositionEnvelope | null> => {
+  const apiKey = process.env.AI_GATEWAY_API_KEY?.trim();
+  if (!apiKey) return null;
+
+  const model = process.env.GENUI_MODEL?.trim() || DEFAULT_GENUI_MODEL;
+  const seedRecords = [...acmeCatalogRecords, ...supportDashboardRecords];
+
+  const result = await generateObject({
+    abortSignal: signal,
+    maxOutputTokens: 1200,
+    model,
+    prompt: `You generate declarative OpenUI compositions for a demo app. Use ONLY these root components: ${componentNames.join(", ")}.
+Rules:
+- openuiText must be a single expression: root = ComponentName(...)
+- Use realistic synthetic data in records; ids must match references in openuiText.
+- No scripts, URLs to arbitrary domains, or credentials.
+- Guidance: ${compositionGuidance}
+
+User request: ${query}
+
+Example records (you may copy ids or invent similar synthetic rows): ${JSON.stringify(seedRecords.slice(0, 6))}`,
+    schema: generationSchema,
+  });
+
+  const envelope: CompositionEnvelope = {
+    fallbackText: result.object.fallbackText,
+    libraryVersion: GENUI_LIBRARY_VERSION,
+    openuiText: result.object.openuiText,
+    records: result.object.records as GroundedRecord[],
+    requestId,
+  };
+
+  const validated = validateCompositionEnvelope({ envelope });
+  if (!validated.ok) return null;
+  return envelope;
+};

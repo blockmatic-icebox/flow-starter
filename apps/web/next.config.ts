@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
 const markdownAcceptPattern = "^(?!.*text/html).*text/markdown";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["meta-cto.localhost", "*.meta-cto.localhost"],
+  allowedDevOrigins: ["app.localhost", "*.app.localhost"],
   experimental: {
     extensionAlias: {
       ".js": [".ts", ".tsx", ".js"],
@@ -20,32 +20,11 @@ const nextConfig: NextConfig = {
     ];
   },
   outputFileTracingIncludes: {
-    "/api/mcp": ["./mcp-app/dist/hunch-explorer.html"],
-    "/mcp": ["./mcp-app/dist/hunch-explorer.html"],
+    "/api/mcp": ["./mcp-app/dist/genui-preview.html"],
+    "/mcp": ["./mcp-app/dist/genui-preview.html"],
   },
   redirects() {
-    return [
-      { destination: "/signals", permanent: false, source: "/requests" },
-      {
-        destination: "/signals/:path*",
-        permanent: false,
-        source: "/requests/:path*",
-      },
-      {
-        destination: "/feedback/new",
-        permanent: false,
-        source: "/requests/new",
-      },
-      { destination: "/review", permanent: false, source: "/triage" },
-      { destination: "/patterns", permanent: false, source: "/insights" },
-      { destination: "/ask", permanent: false, source: "/chat" },
-      { destination: "/dev", permanent: false, source: "/developers" },
-      {
-        destination: "/dev/:path*",
-        permanent: false,
-        source: "/developers/:path*",
-      },
-    ];
+    return [{ destination: "/dev", permanent: false, source: "/developers" }];
   },
   rewrites() {
     return {
@@ -72,7 +51,7 @@ const nextConfig: NextConfig = {
       ],
     };
   },
-  transpilePackages: ["@repo/db", "@repo/fi", "@repo/genui", "@repo/ui"],
+  transpilePackages: ["@repo/db", "@repo/genui", "@repo/ui"],
 };
 
 export default withEve(nextConfig, { eveRoot: "../.." });

@@ -5,36 +5,36 @@ import {
 import { McpServer } from "@modelcontextprotocol/server";
 
 import {
-  HUNCH_EXPLORER_RESOURCE_URI,
-  hunchExplorerResourceDescription,
-  readHunchExplorerHtml,
-} from "./hunch-explorer-resource";
-import { registerFiMcpTools } from "./register-tools";
+  GENUI_PREVIEW_RESOURCE_URI,
+  genuiPreviewResourceDescription,
+  readGenuiPreviewHtml,
+} from "./genui-preview-resource";
+import { registerStarterMcpTools } from "./register-tools";
 
-export const createFiMcpServer = () => {
+export const createStarterMcpServer = () => {
   const server = new McpServer({
-    name: "feature-intelligence",
+    name: "flow-starter",
     version: "1.0.0",
   });
 
   registerAppResource(
     server,
-    "Hunch Explorer",
-    HUNCH_EXPLORER_RESOURCE_URI,
+    "GenUI Preview",
+    GENUI_PREVIEW_RESOURCE_URI,
     {
-      description: hunchExplorerResourceDescription,
+      description: genuiPreviewResourceDescription,
     },
     async () => ({
       contents: [
         {
           mimeType: RESOURCE_MIME_TYPE,
-          text: await readHunchExplorerHtml(),
-          uri: HUNCH_EXPLORER_RESOURCE_URI,
+          text: await readGenuiPreviewHtml(),
+          uri: GENUI_PREVIEW_RESOURCE_URI,
         },
       ],
     })
   );
 
-  registerFiMcpTools(server);
+  registerStarterMcpTools(server);
   return server;
 };

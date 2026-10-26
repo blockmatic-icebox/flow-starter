@@ -4,11 +4,12 @@ import { streamText } from "ai";
 import { jsonError, withExtraHeaders } from "@/lib/api/json-error";
 import { discoveryRateLimitHeaders } from "@/lib/api/rate-limit-headers";
 
-const fiAskOnlySystemPrompt = `You answer questions about the Feature Intelligence product: feature requests, triage, dispositions, metrics, and workflows.
+const systemPrompt = `You assist users building agentic application UIs in this starter.
 
-You do not have access to live data or tools. You cannot submit, confirm, support, or disposition requests. If asked to change data, explain which screen or eve agent tool the user should use instead.
+You can explain GenUI, MCP compose_ui, and Eve tools. You do not mutate remote systems.
+When users want a new screen, suggest they use the studio prompt or compose_ui with a clear UI description.
 
-Use progressive disclosure: short answer first, then optional detail. End with 2–3 suggested next steps as plain bullets under "Next:".`;
+Keep answers concise. Use bullets for next steps when helpful.`;
 
 const anthropic = createAnthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -45,7 +46,7 @@ export async function POST(req: Request) {
       return jsonError({
         code: "invalid_request",
         message: "Request body must include a non-empty messages array.",
-        resolution: "See /openapi.json operation fiAskOnlyChat.",
+        resolution: "See /openapi.json.",
         status: 400,
       });
     messages = parsed;
@@ -61,9 +62,9 @@ export async function POST(req: Request) {
   const result = streamText({
     messages,
     model: anthropic(
-      process.env.FI_CHAT_MODEL?.trim() ?? "claude-sonnet-4-20250514"
+      process.env.CHAT_MODEL?.trim() ?? "claude-sonnet-4-20250514"
     ),
-    system: fiAskOnlySystemPrompt,
+    system: systemPrompt,
   });
 
   return result.toUIMessageStreamResponse();

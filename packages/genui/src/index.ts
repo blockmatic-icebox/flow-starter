@@ -46,6 +46,8 @@ export {
 export { publishComposition } from "./orchestration/compose";
 export { openUiStringList, openUiStringLiteral } from "./contract/openui-text";
 export { synthesizeOpenEndedAnswer } from "./orchestration/model";
+export { synthesizeOpenUiComposition } from "./orchestration/generate-openui";
+export { supportDashboardRecords } from "./fixtures/synthetic-support";
 export {
   consumeNdjsonResponse,
   parseNdjsonText,

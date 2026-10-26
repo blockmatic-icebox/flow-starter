@@ -4,12 +4,13 @@ Date: 2026-10-26
 **Status:** Current  
 **Last reviewed:** 2026-10-26  
 Owner: Gabo Esquivel  
-**Delivery (this record):** Specification accepted and landed on `meta-cto` (commit `9e2f85dd4`). Requirements P1–P10 describe the future `kiss` experiment; they are **not** implemented on `meta-cto`, which remains the Feature Intelligence assessment checkout.  
-Source baseline for future `kiss`: `meta-cto` @ `6323ad9d24ccc09d1bf09f5e7dec980336226607`
+**Delivery:** Implemented on branch **`simple`**.  
+Source baseline: `meta-cto` @ `9afd416fa0093d49cdef114ea6837a50e8010b26`  
+**Visual system:** default shadcn/ui (not Porcelain).
 
 ## Purpose
 
-Experiment on the `kiss` branch, created from `meta-cto` in the existing repository, with a much smaller development contract and a clean, reusable agentic web starter. Replace the custom Flow skill workflow with a lean **`FLOW.md`** at the repository root that supplies project overrides to Addy Osmani’s engineering skills. This is a branch experiment, not a fork.
+Experiment on the `simple` branch, created from `meta-cto` in the existing repository, with a much smaller development contract and a clean, reusable agentic web starter. Replace the custom Flow skill workflow with a lean **`FLOW.md`** at the repository root that supplies project overrides to Addy Osmani’s engineering skills. This is a branch experiment, not a fork.
 
 The starter should let a developer begin an agentic prototype immediately: define API and MCP capabilities first, then expose them through a website, chat and an MCP App. Its reference experience accepts a UI request and generates a creative composition using only **`@repo/ui`** (`packages/ui`) components and realistic sample data.
 

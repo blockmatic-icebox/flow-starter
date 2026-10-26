@@ -3,13 +3,4 @@ export {
   resolveDatabaseConnection,
   type AppDatabase,
 } from "./client";
-export {
-  account,
-  appMeta,
-  featureRequest,
-  featureRequestDuplicateCandidate,
-  featureRequestSupport,
-  session,
-  user,
-  verification,
-} from "./schema";
+export { account, appMeta, session, user, verification } from "./schema";

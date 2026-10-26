@@ -2,39 +2,33 @@ import { resolveSiteOrigin } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
-const body = (
-  origin: string
-) => `# Feature Intelligence — feature request triage
+const body = (origin: string) => `# Agentic application starter
 
-> Turn unstructured feedback into clear product decisions for the Meta CTO assessment demo (human UI brand: hunch).
+> MCP-first and API-first web shell with GenUI (OpenUI Lang + shadcn), Eve agent tools, and discovery endpoints.
 
-## When to use Feature Intelligence
+## When to use this starter
 
-Use this product when you need to capture customer or internal feature requests, check for duplicates before filing, run AI-assisted triage on drafts, prioritize a PM review queue, record merge/monitor/decline decisions with rationale, and report north-star outcome metrics. Agents should prefer MCP tools for structured search and triage reads; humans use the web UI at ${origin}.
+Use when you need a web UI that generates declarative compositions from natural language, exposes the same capability over MCP, and documents agent entrypoints (\`llms.txt\`, OpenAPI, well-known MCP).
 
 ## Human routes
 
-- ${origin}/ (Overview)
-- ${origin}/signals (Feedback)
-- ${origin}/feedback/new
-- ${origin}/review (Triage)
-- ${origin}/patterns (Insights)
-- ${origin}/ask (GenUI compose — read-only)
+- ${origin}/ (studio — prompt + chat sidebar + preview)
+- ${origin}/dev (MCP and API links)
 
 ## Agent interoperability
 
-- CLI: npx feature-intelligence-cli (npm package feature-intelligence-cli)
-- Developer overview: ${origin}/dev
 - OpenAPI 3.1: ${origin}/openapi.json
 - MCP server card: ${origin}/.well-known/mcp/server-card.json
 - MCP registry: ${origin}/.well-known/mcp.json
 - Streamable HTTP MCP: ${origin}/api/mcp
+- GenUI compose API: POST ${origin}/api/genui/compose
 - Sitemap: ${origin}/sitemap.xml
-- Trust pages: ${origin}/about, ${origin}/contact, ${origin}/privacy
 
 ## Tools (MCP)
 
-search_requests, get_request, list_triage_queue, get_insights, submit_request, confirm_request, support_request, set_disposition — all call the same @repo/fi domain layer as the Eve agent (assessment demo is open; no bearer token).
+compose_ui — generate a validated OpenUI composition from a natural-language UI request (synthetic data).
+list_component_catalog — introspect registered GenUI components.
+health — liveness for protocol clients.
 `;
 
 export const GET = (request: Request) =>

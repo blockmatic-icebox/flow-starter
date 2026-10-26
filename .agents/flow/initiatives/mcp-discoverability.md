@@ -8,13 +8,13 @@ Date: 2026-10-26
 
 ## Outcome
 
-Adopters of Flow Factory can make a **neutral** `apps/web` deployment discoverable by external agents and MCP hosts using documented, reusable patterns: well-known metadata, optional Streamable HTTP MCP, `llms.txt`, sitemap, Markdown negotiation, and **Is Agentic** verification—without copying the Meta CTO assessment product ([Feature Intelligence](../../../docs/initiatives/feature-intelligence.md) stays unchanged on `meta-cto`).
+Adopters of Flow Factory can make a **neutral** `apps/web` deployment discoverable by external agents and MCP hosts using documented, reusable patterns: well-known metadata, optional Streamable HTTP MCP, `llms.txt`, sitemap, Markdown negotiation, and **Is Agentic** verification—without copying the Meta CTO assessment product (Feature Intelligence stays unchanged on branch `meta-cto`).
 
 ## Problem
 
 - External agents cannot infer **what** a starter deployment is, **when** to use it, or **how** to call it without standard surfaces (`llms.txt`, `/.well-known/mcp/*`, `POST /api/mcp`).
 - Factory already documents security boundaries ([ADR 0011](../decisions/adr/0011-api-and-agent-security-boundaries.md)) and historical Flow Agent MCP shape ([ADR 0010](../decisions/adr/0010-site-consultant-chat-and-mcp.md)), but the **current** `apps/web` starter does not ship a complete discoverability kit by default.
-- Assessment-specific agentic work on FI ([product ADR 0005](../../../docs/adr/0005-fi-agentic-discoverability-and-mcp.md)) must not be conflated with the **reusable baseline** every adopter needs.
+- Assessment-specific agentic work on FI (product ADR 0005 on `meta-cto`) must not be conflated with the **reusable baseline** every adopter needs.
 
 ## Users
 
@@ -61,7 +61,7 @@ Adopters of Flow Factory can make a **neutral** `apps/web` deployment discoverab
 | [factory.md](../factory.md) | Factory mission and starter scope |
 | [ADR 0014](../decisions/adr/0014-web-only-product-application.md) | Web-only product application |
 | [flow-improvement-loop.md](flow-improvement-loop.md) | Methodology evidence loop (factory tooling promotions) |
-| FI (unchanged) | [docs/adr/0005](../../../docs/adr/0005-fi-agentic-discoverability-and-mcp.md), [agentic spec](../../../docs/specs/feature-intelligence-agentic-discoverability.md), [FI initiative](../../../docs/initiatives/feature-intelligence.md) — product assessment only |
+| FI (unchanged) | Feature Intelligence docs on branch `meta-cto` only — product assessment, not this starter |
 
 ## Progress
 

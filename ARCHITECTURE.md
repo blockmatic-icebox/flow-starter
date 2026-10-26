@@ -1,162 +1,79 @@
 # Architecture
 
-> Product technical contract. [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), [GLOSSARY.md](GLOSSARY.md). Product ADRs: [docs/adr/](docs/adr/).
+> Product technical contract. [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md). Adoption: [ADR 0001](docs/adr/0001-use-flow-factory.md). Starter spec: [001](docs/specs/001-lean-agentic-starter.md).
 
-Inherits **[Flow Factory](.agents/flow/factory.md)** (methodology, GenUI boundaries, security). Factory detail: [.agents/flow/architecture.md](.agents/flow/architecture.md).
-
-**Adoption:** [ADR 0001 — Use Flow Factory](docs/adr/0001-use-flow-factory.md)  
-**Feature Intelligence:** [ADR 0002](docs/adr/0002-feature-intelligence-architecture.md) · [ADR 0004](docs/adr/0004-fi-workflow-integrity-and-safety.md) · [ADR 0005](docs/adr/0005-fi-agentic-discoverability-and-mcp.md) · [spec](docs/specs/feature-intelligence.md) · [remediation](docs/specs/feature-intelligence-remediation.md) · [agentic discoverability](docs/specs/feature-intelligence-agentic-discoverability.md)
-
-## System overview (assessment)
+## System overview
 
 ```text
-                    ┌─────────────────┐
-                    │   apps/web      │  FI UI + ask-only /api/chat
-                    │  server actions │
-                    └────────┬────────┘
-                             │
-┌──────────────┐             │             ┌──────────────┐
-│ agent/       │── tools ────┼────────────►│  @repo/fi    │
-│ (eve)        │             │             │  domain +    │
-└──────────────┘             │             │  triage      │
-                             │             └──────┬───────┘
-                             │                    │
-                             ▼                    ▼
-                      ┌──────────────────────────────┐
-                      │  @repo/db  (Postgres/Drizzle) │
-                      │  feature_request + related    │
-                      └──────────────────────────────┘
-```
+┌─────────────────┐     POST /api/genui/compose      ┌──────────────┐
+│   apps/web      │ ───────────────────────────────► │ @repo/genui  │
+│   studio + MCP  │ ◄── OpenUI envelope + records ── │  compose     │
+└────────┬────────┘                                  └──────┬───────┘
+         │                                                   │
+         │  MCP compose_ui                                   ▼
+         ├──────────────────────────────────────────► @repo/ui (render)
+         │
+┌────────┴────────┐
+│ agent/ (eve)    │  compose-ui, list-component-catalog → @repo/genui
+└─────────────────┘
 
-**Rule:** Business logic lives in **`@repo/fi`**. Web and eve are adapters ([Factory PDR 0001](.agents/flow/decisions/pdr/0001-agnostic-api-first.md)).
+Optional: @repo/db (app_meta + Better Auth scaffold) when DATABASE_URL is set
+```
 
 ## Components
 
-| Path | Role | Implementation status |
-| --- | --- | --- |
-| `packages/fi` | Metrics, queue/CRUD, **disposition gate** (remediation), T0–T3 harness, `seed/` (~**75–85** Crewday curated rows + safety guard) | **Live** — RC-1–RC-8 per [remediation tasks](docs/tasks/feature-intelligence-remediation.md) |
-| `packages/db` | Drizzle schema; `fi-schema.ts`; migrations through `0002_feature_intelligence` | **Live** — `pnpm db:migrate`, remote SSL in client |
-| `agent/` | eve root agent; `instructions.md` + 8 tools → `@repo/fi` | **Live** — smoke evals in `evals/` |
-| `apps/web` | Next.js + `eve/next`; Hunch UI under `app/(fi)/` (Overview, Feedback, Triage, Insights, `/dev`); GenUI `POST /api/genui/compose`; agentic routes (`llms.txt`, well-known MCP, `/api/mcp`) — **`force-dynamic`** on FI layout | **Live** — [hunch-pm-overview](docs/specs/hunch-pm-overview.md), [hunch-genui](docs/specs/hunch-genui.md) + [agentic discoverability](docs/specs/feature-intelligence-agentic-discoverability.md) |
-| `evals/` | eve smoke (`pnpm exec eve eval smoke`) | **Live** — behavioral smoke; deeper outcome evals optional (RC-9) |
-
-Also available: `@repo/ui`, `@repo/genui` (Ask Hunch compose + renderer), `@repo/ts`.
-
-## Data model (product)
-
-Owned tables (see [spec](docs/specs/feature-intelligence.md)):
-
-- `feature_request` — aggregate root (status lifecycle, triage fields, disposition, metric timestamps)
-- `feature_request_duplicate_candidate`
-- `feature_request_support`
-
-Seed: `pnpm seed:fi` → `@repo/fi/seed/load.ts` loads **`assembleCrewdaySeed()`** (~**75–85** authored records from `packages/fi/seed/fixtures/*`, canon in [`crewday-scenario.ts`](packages/fi/seed/crewday-scenario.ts)). **Vercel:** migrate + `FI_SEED_IF_EMPTY=1` (no wipe when data exists). **Local destructive reseed:** `pnpm seed:fi` with production guard per [ADR 0004](docs/adr/0004-fi-workflow-integrity-and-safety.md). See [Crewday demo fidelity spec](docs/specs/crewday-demo-fidelity.md) (historical 500-row manifest: [feature-intelligence-seed.md](docs/specs/feature-intelligence-seed.md)).
-
-PM triage queue: `listTriageQueue` orders by **support count** desc, then `published_at` desc.
-
-Insights: `getInsights({ db, range? })` — eve omits `range` (all-time, `trends: null`); web defaults `90d` with weekly trends per [analytics spec](docs/specs/feature-intelligence-analytics.md).
-
-## Triage pipeline
-
-Canonical: [triage harness spec](docs/specs/feature-intelligence-triage-harness.md).
-
-- **T0:** Lexical duplicate retrieve (top 10)
-- **T1:** Deterministic theme when confidence ≥ 0.9
-- **T2:** Jev `experimental_decide` — `classify-decisions.ts` (composed in `runTriageHarness`)
-- **T3:** `generateObject` synthesis — `synthesize-artifact.ts` (composed in `runTriageHarness`)
-
-Degraded path when `AI_GATEWAY_API_KEY` absent still sets `triage_completed_at` for metrics. Gateway helpers: `packages/fi/src/ai/gateway.ts`. Ask-only `/chat` uses **`ANTHROPIC_API_KEY`** (not gateway) — [ADR 0003](docs/adr/0003-feature-intelligence-model-providers.md).
-
-## APIs and surfaces (planned vs live)
-
-| Surface | Status |
+| Path | Role |
 | --- | --- |
-| eve tools → `@repo/fi` | **Live** — read + `submit_request`, `confirm_request`, `support_request`, `set_disposition`, `get_request` |
-| Web server actions → `@repo/fi` | **Live** — triage, submit, confirm, support, disposition |
-| `POST /api/chat` ask-only | **Live** — Anthropic via `ANTHROPIC_API_KEY` |
-| **MCP Streamable HTTP** | **Live** — [ADR 0005](docs/adr/0005-fi-agentic-discoverability-and-mcp.md); `POST /api/mcp`, `/.well-known/mcp/*`, `llms.txt`, Markdown negotiation; assessment demo exposes all eight FI tools without bearer |
-| **MCP App (Hunch Explorer)** | **Live** — [hunch-mcp-app spec](docs/specs/hunch-mcp-app.md); UI resource `ui://hunch/explorer`; Vite bundle [`apps/web/mcp-app/`](apps/web/mcp-app/) + Apps bridge; `@repo/fi` only via MCP tool handler (no DB in iframe) |
-| Postgres | **Live** when `DATABASE_URL` set — see initiative Neon plan |
+| `apps/web` | Next.js app — studio UI, `/api/mcp`, `/api/genui/compose`, `/api/chat`, discovery routes |
+| `packages/genui` | OpenUI Lang orchestration, validation, React renderer |
+| `packages/ui` | shadcn component library and global CSS |
+| `packages/db` | Drizzle schema and migrations (blank product schema) |
+| `agent/` | Eve root agent and tools |
+| `apps/web/mcp-app/` | Single-file MCP App bundle (`genui-preview.html`) |
 
-## Security (inherited)
+## APIs and agent surfaces
 
-- Bounded tool inputs (Zod); disposition policy in host code, not model flags — [ADR 0011](.agents/flow/decisions/adr/0011-api-and-agent-security-boundaries.md).
-- No auth in assessment slice; eve HTTP open on localhost only for demo.
-
-## Testing
-
-| Layer | Command / approach |
+| Surface | Notes |
 | --- | --- |
-| `@repo/fi` unit | `pnpm --filter @repo/fi test` |
-| Schema | `pnpm --filter @repo/db db:check` |
-| eve smoke | `pnpm exec eve eval smoke` |
-| FI web | agent-browser W-* — [verification log](docs/research/20261025-fi-browser-verification.md); [testing spec](docs/specs/feature-intelligence-testing.md) |
+| `POST /api/genui/compose` | NDJSON stream; no database |
+| `POST /api/mcp` | Streamable HTTP; tools `compose_ui`, `list_component_catalog`, `health` |
+| `POST /api/chat` | Optional Anthropic sidebar chat (`ANTHROPIC_API_KEY`) |
+| `llms.txt`, `.well-known/mcp/*`, `/openapi.json` | Agent discovery |
 
-Root `pnpm test` includes `@repo/fi`.
+## Database
 
-## Deployment (Vercel demo)
+Migrations: `0000_app_meta`, `0001_better_auth_core` only. No product tables on `simple`.
 
-| Setting | Value |
-| --- | --- |
-| Project | `meta-cto` (team `gaboesquivel`) |
-| Git branch (source) | `meta-cto` on `gaboesquivel/flow-factory` |
-| Root directory | `apps/web` |
-| Build | `pnpm install --frozen-lockfile --filter web...` then `pnpm --filter web build` ([`apps/web/vercel.json`](apps/web/vercel.json); no `ignoreCommand` — always build) |
-| Runtime | `next build --webpack`; `sourceFilesOutsideRootDirectory` enabled for repo-root [`agent/`](agent/) via `withEve` |
-| Production URL (public MCP / Is Agentic) | https://meta-cto-two.vercel.app |
-| Other aliases | e.g. `meta-cto-gaboesquivel.vercel.app` — may use Deployment Protection; prefer **meta-cto-two** for unauthenticated MCP and external auditors ([browser verification](docs/research/20261025-fi-browser-verification.md)) |
-
-Verify: `vercel inspect <deployment-url> -S gaboesquivel` after push. If Vercel Git **Production Branch** remains `main`, trigger production from `meta-cto` via dashboard or deployment API.
-
-## MCP App boundary (live)
-
-```text
-MCP host → POST /api/mcp → register-tools ( @repo/fi )
-                ↓
-         resources/read → HTML bundle (text/html;profile=mcp-app)
-                ↓
-         iframe (sandbox) ↔ Apps bridge ↔ tool structured results
+```bash
+pnpm db:migrate    # when DATABASE_URL is set
+pnpm --filter @repo/db db:check
 ```
 
-- **Domain:** All reads/writes stay in `apps/web/lib/mcp/` handlers calling `@repo/fi` — same as today’s eight tools.
-- **UI:** `apps/web/mcp-app/` → `mcp-app/dist/hunch-explorer.html` served from `resources/read` ([`hunch-explorer-resource.ts`](apps/web/lib/mcp/hunch-explorer-resource.ts)).
-- **Build pipeline:** `pnpm --filter web build` runs `build:mcp-app` (Vite) before `next build`; [`next.config.ts`](apps/web/next.config.ts) traces the HTML artifact for `/api/mcp` and `/mcp`.
-- **Fallback:** Tools return text + structured content when the host never loads the resource.
+**Vercel:** [`apps/web/scripts/vercel-build.mjs`](apps/web/scripts/vercel-build.mjs) runs `pnpm db:migrate` when `DATABASE_URL` is present; no seed step.
 
-## Repository layout
+## Environment
 
-```text
-apps/web/app/(fi)/  # FI routes (home, requests, triage, insights, chat)
-agent/              # eve Feature Intelligence operator
-packages/fi/        # domain + harness; seed/crewday-scenario.ts, fixtures/, assemble-seed.ts; insights/bucketing.ts, compute-trends.ts
-packages/db/        # Drizzle + FI migration
-docs/adr/           # product ADRs
-docs/specs/         # FI specifications (see main spec index)
-docs/tasks/         # execution checklists (separate from specs)
-docs/plans/         # optional standalone plans
-docs/initiatives/   # product initiatives
-.agents/flow/initiatives/  # Factory initiatives (e.g. MCP discoverability)
-PRODUCT.md          # product contract
-DESIGN.md           # experience contract
-GLOSSARY.md         # ubiquitous language
-ARCHITECTURE.md     # this file
-.agents/            # Flow Factory (not imported by product)
+| Variable             | Purpose                               |
+| -------------------- | ------------------------------------- |
+| `AI_GATEWAY_API_KEY` | Open-ended OpenUI generation (tier 3) |
+| `ANTHROPIC_API_KEY`  | Optional `/api/chat`                  |
+| `DATABASE_URL`       | Optional Postgres for future features |
+| `GENUI_MODEL`        | Override gateway model for compose    |
+| `AGENTIC_CHECK_URL`  | Host passed to `pnpm agentic:check`   |
+
+## Commands
+
+```bash
+pnpm setup
+pnpm dev                 # https://app.localhost (portless)
+pnpm qa
+pnpm test
+pnpm exec eve eval smoke
+pnpm agentic:check
+pnpm build:web
+pnpm test:browser
 ```
 
-## React / Next.js
+## Eve
 
-Route-first colocation under `apps/web/app/(fi)/` — [Factory ADR 0009](.agents/flow/decisions/adr/0009-react-nextjs-fractal-architecture.md). Server Components by default; server actions in `actions.ts` delegate to `@repo/fi`. Production build uses **`next build --webpack`** (Turbopack does not resolve `@repo/fi` `.js` import aliases).
-
-## Quality gates
-
-- `pnpm qa` — lint, types, tests (includes `@repo/fi`), `db:check`
-- `pnpm architecture:check` — client boundaries (when UI grows)
-- `pnpm --dir .agents flow:check` — documentation conventions
-
-UI verification: [.agents/flow/operations/verification.md](.agents/flow/operations/verification.md).
-
-## Factory navigation
-
-- [factory.md](.agents/flow/factory.md) · [flow.md](.agents/flow/flow.md) · [Factory glossary](.agents/flow/glossary.md)
-
-Update this file when product implementation or boundaries change materially.
+Repo root `agent/` with `withEve` in [`apps/web/next.config.ts`](apps/web/next.config.ts). Smoke eval: [`evals/smoke/compose-support-dashboard.eval.ts`](evals/smoke/compose-support-dashboard.eval.ts).

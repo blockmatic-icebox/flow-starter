@@ -1,9 +1,8 @@
-import { getDb, loadRootEnv } from "@repo/fi";
-import { MAX_QUERY_CODE_POINTS } from "@repo/genui";
+import { composeQuery, MAX_QUERY_CODE_POINTS } from "@repo/genui";
 import type { ComposeInput } from "@repo/genui";
 import { z } from "zod";
 
-import { composeFiQuery } from "@/app/_lib/genui/compose-fi";
+import { loadRootEnv } from "@/lib/env";
 
 loadRootEnv();
 
@@ -25,8 +24,7 @@ export const POST = async (request: Request) => {
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     start(controller) {
-      void composeFiQuery({
-        db: getDb(),
+      void composeQuery({
         input,
         onEvent: (event) => {
           controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
@@ -52,8 +50,7 @@ export const POST = async (request: Request) => {
 
   return new Response(stream, {
     headers: {
-      "Cache-Control": "no-store",
-      "Content-Type": "application/x-ndjson",
+      "Content-Type": "application/x-ndjson; charset=utf-8",
     },
   });
 };

@@ -1,14 +1,12 @@
 # Product application (`apps/web`)
 
-Minimal Next.js product app. **Hunch** human UI (Feature Intelligence domain) + **Ask Hunch** GenUI at `/ask` via `POST /api/genui/compose` (read-only; no mutations from generated UI). Legacy `/chat` redirects to `/ask`. **eve** root agent lives at repo `agent/` (not in-app agent sidebar).
+Next.js studio: prompt + sidebar chat + GenUI preview. MCP at `/api/mcp`, compose at `/api/genui/compose`. Eve root agent at repo `agent/`.
 
-**FI MVP testing:** Manual browser verification only — do not add Playwright specs under `tests/browser/` for feature-intelligence routes. See [docs/specs/feature-intelligence-testing.md](../../docs/specs/feature-intelligence-testing.md).
+- Colocate route code under `app/<route>/`.
+- Shared UI from `@repo/ui`; GenUI from `@repo/genui`.
+- Local hostname: `app.localhost` (portless).
 
-- Colocate route code under `app/<route>/` (see ADR 0009).
-- Shared UI from `@repo/ui`; optional database via `@repo/db`.
-- Local hostname: `meta-cto.localhost` (Portless).
-
-Root `AGENTS.md` and `ARCHITECTURE.md` own monorepo-wide rules.
+Root [AGENTS.md](../../AGENTS.md) and [ARCHITECTURE.md](../../ARCHITECTURE.md) own monorepo-wide rules.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

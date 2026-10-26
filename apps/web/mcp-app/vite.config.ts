@@ -9,7 +9,7 @@ export default defineConfig({
     emptyOutDir: true,
     outDir: "dist",
     rollupOptions: {
-      input: path.resolve(import.meta.dirname, "hunch-explorer.html"),
+      input: path.resolve(import.meta.dirname, "genui-preview.html"),
     },
     target: "es2022",
   },

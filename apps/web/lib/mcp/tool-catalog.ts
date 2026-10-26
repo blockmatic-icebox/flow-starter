@@ -1,76 +1,45 @@
-import { HUNCH_EXPLORER_RESOURCE_URI } from "./hunch-explorer-resource";
+import { GENUI_PREVIEW_RESOURCE_URI } from "./genui-preview-resource";
 
-/** MCP Apps UI resource registered in `create-mcp-server`. */
-export const fiMcpAppResourceUri = HUNCH_EXPLORER_RESOURCE_URI;
+const starterMcpAppResourceUri = GENUI_PREVIEW_RESOURCE_URI;
 
-export interface FiMcpToolCard {
+export interface StarterMcpToolCard {
   description: string;
   name: string;
 }
 
-export const fiMcpToolCatalog: FiMcpToolCard[] = [
+export const starterMcpToolCatalog: StarterMcpToolCard[] = [
   {
-    description:
-      "Search published Crewday feedback (scheduling, swaps, notifications) by text and optional theme key.",
-    name: "search_requests",
+    description: "Liveness check for the MCP server.",
+    name: "health",
+  },
+  {
+    description: "List registered GenUI root components.",
+    name: "list_component_catalog",
   },
   {
     description:
-      "Get a Crewday feature request by id with duplicates and support count.",
-    name: "get_request",
-  },
-  {
-    description:
-      "List published Crewday requests awaiting PM disposition (open triage queue).",
-    name: "list_triage_queue",
-  },
-  {
-    description:
-      "North-star product metrics for Crewday demo feedback and triage outcomes.",
-    name: "get_insights",
-  },
-  {
-    description:
-      "Create a draft feature request and run AI triage; returns pending_confirm preview.",
-    name: "submit_request",
-  },
-  {
-    description:
-      "Publish a draft request after the user confirms or edits the problem statement.",
-    name: "confirm_request",
-  },
-  {
-    description: "Add support for a published feature request.",
-    name: "support_request",
-  },
-  {
-    description: "Set PM disposition on a published feature request.",
-    name: "set_disposition",
+      "Generate a validated OpenUI composition from a natural-language UI request.",
+    name: "compose_ui",
   },
 ];
 
 export const buildMcpServerCard = (origin: string) => ({
   authentication: { required: false },
   description:
-    "Search Crewday workforce-scheduling feedback, triage queue, and product insights for Meta CTO Feature Intelligence. Assessment demo uses fictional sample data; read and write tools run without bearer auth.",
-  ...(fiMcpAppResourceUri
-    ? {
-        resources: [
-          {
-            description:
-              "Hunch Explorer MCP App — Crewday signals, demand patterns, and triage review",
-            mimeType: "text/html;profile=mcp-app",
-            uri: fiMcpAppResourceUri,
-          },
-        ],
-      }
-    : {}),
+    "Agentic UI starter — compose OpenUI layouts with synthetic data over MCP.",
+  resources: [
+    {
+      description: "GenUI Preview MCP App",
+      mimeType: "text/html;profile=mcp-app",
+      uri: starterMcpAppResourceUri,
+    },
+  ],
   serverInfo: {
-    name: "feature-intelligence",
-    title: "Feature Intelligence",
+    name: "flow-starter",
+    title: "Flow Starter MCP",
     version: "1.0.0",
   },
-  tools: fiMcpToolCatalog,
+  tools: starterMcpToolCatalog,
   transport: {
     endpoint: `${origin}/api/mcp`,
     type: "streamable-http",
@@ -80,7 +49,7 @@ export const buildMcpServerCard = (origin: string) => ({
 
 export const buildMcpRegistryManifest = (origin: string) => ({
   mcpServers: {
-    "feature-intelligence": {
+    "flow-starter": {
       transport: {
         type: "http",
         url: `${origin}/api/mcp`,
@@ -93,9 +62,8 @@ export const buildMcpRegistryManifest = (origin: string) => ({
 export const buildAiCatalog = (origin: string) => ({
   servers: [
     {
-      description:
-        "Feature Intelligence MCP — Crewday demo search, triage, insights, and workflow tools.",
-      name: "feature-intelligence",
+      description: "Flow Starter MCP — GenUI compose and catalog tools.",
+      name: "flow-starter",
       transport: {
         type: "streamable-http",
         url: `${origin}/api/mcp`,

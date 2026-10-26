@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -24,23 +23,6 @@ export default defineEvalConfig({
   setup() {
     const root = new URL("..", import.meta.url).pathname;
     loadRootEnv(root);
-    const evalUrl = process.env.EVE_EVAL_DATABASE_URL?.trim();
-    if (!evalUrl) {
-      throw new Error(
-        "EVE_EVAL_DATABASE_URL is required for eve eval setup (isolated eval database; no DATABASE_URL fallback)"
-      );
-    }
-    const env = { ...process.env, DATABASE_URL: evalUrl };
-    execSync("pnpm db:migrate", {
-      cwd: root,
-      env,
-      stdio: "inherit",
-    });
-    execSync("FI_SEED_IF_EMPTY=1 pnpm seed:fi", {
-      cwd: root,
-      env: { ...env, FI_SEED_IF_EMPTY: "1" },
-      stdio: "inherit",
-    });
     return { root };
   },
 });

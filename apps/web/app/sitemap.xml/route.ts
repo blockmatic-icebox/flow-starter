@@ -2,18 +2,7 @@ import { resolveSiteOrigin } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
-const publicRoutes = [
-  "/",
-  "/about",
-  "/contact",
-  "/privacy",
-  "/dev",
-  "/signals",
-  "/feedback/new",
-  "/review",
-  "/patterns",
-  "/ask",
-];
+const publicRoutes = ["/", "/dev"];
 
 const escapeXml = (value: string) =>
   value

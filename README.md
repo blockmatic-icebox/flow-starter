@@ -1,62 +1,36 @@
-# Meta CTO — Feature Intelligence
+# Flow Starter — agentic application shell
 
-Web application built with Flow Factory.
+Web application built with Flow Factory. MCP-first and API-first web starter: GenUI (OpenUI Lang + shadcn), Eve agent tools, and is-agentic discovery surfaces. Branch **`simple`** — see [docs/specs/001-lean-agentic-starter.md](docs/specs/001-lean-agentic-starter.md).
 
-Technical assessment: turn unstructured feature requests into **clear product decisions** with an AI intake gate, PM triage queue, and metrics-first insights.
-
-**Architecture:** Human UI and eve agent both call **`@repo/fi`** (no duplicated business logic). Postgres via **`@repo/db`**. See [ADR 0002](docs/adr/0002-feature-intelligence-architecture.md).
-
-```text
-Submit → triage harness (T0–T3) → pending confirm → published → PM disposition → Insights
-```
-
-North-star metrics (decision readiness, PM effort, capture rate, intake link rate) are defined in [Product metrics](docs/specs/feature-intelligence.md#product-metrics-first) and surfaced on `/insights`.
-
-## Development
+## Setup
 
 Requires Node.js 24+ and pnpm 12+.
 
 ```bash
 pnpm setup
-cp .env.defaults.example .env   # then set DATABASE_URL (Neon) and keys below
-pnpm db:migrate
-pnpm seed:fi                    # loads ~75–85 Crewday demo rows; wipes all FI tables (see docs/specs/crewday-demo-fidelity.md)
-pnpm dev                        # https://meta-cto.localhost (portless) or pnpm dev:app --port 3000
+cp .env.defaults.example .env   # optional keys below
+pnpm dev                        # https://app.localhost (portless) or pnpm --filter web dev:app --port 3000
 ```
 
-**Seed warning:** `pnpm seed:fi` deletes and reloads all Feature Intelligence data. Use for local dev, CI, and demos only — **never on production** (deploy with `pnpm db:migrate` only).
-
-### Environment
-
-| Variable             | Purpose                                       |
-| -------------------- | --------------------------------------------- |
-| `DATABASE_URL`       | Postgres (Neon Path A or local proxy)         |
-| `AI_GATEWAY_API_KEY` | Triage harness Jev + synthesis via AI Gateway |
-| `ANTHROPIC_API_KEY`  | Ask-only `/chat` (no FI mutations)            |
-
-### Quality and agents
+| Variable             | Purpose                                         |
+| -------------------- | ----------------------------------------------- |
+| `AI_GATEWAY_API_KEY` | Open-ended UI generation                        |
+| `ANTHROPIC_API_KEY`  | Optional sidebar chat API                       |
+| `DATABASE_URL`       | Optional — runs migrations on Vercel build only |
 
 ```bash
 pnpm qa
-pnpm build:web                  # webpack build (FI monorepo packages)
-pnpm exec eve eval smoke        # eve smoke evals (migrate + seed in evals.config.ts)
-pnpm --filter web test:browser  # starter smoke only
+pnpm test:browser
+pnpm exec eve eval smoke
+pnpm agentic:check
 ```
 
-Manual FI checklist: [testing spec](docs/specs/feature-intelligence-testing.md). Logged pass: [browser verification](docs/research/20261025-fi-browser-verification.md).
+## Matt Pocock workflow (optional)
 
-**Prompt log:** Tracked `prompts.txt` at repo root (assessment collaboration trail; Cursor hooks append each turn when logging is enabled).
+Install skills when you want structured discovery → spec → tickets → implement. See [docs/simplified-flow-prd.md](docs/simplified-flow-prd.md). **GitHub Issues** are the canonical multi-session tracker; root contracts stay in `PRODUCT.md`, `DESIGN.md`, and `ARCHITECTURE.md`.
 
-## Product documentation
+## Docs
 
-- [Product](PRODUCT.md) — Purpose, scope, implementation status
-- [Design](DESIGN.md) — Experience direction and Meta CTO UI
-- [Architecture](ARCHITECTURE.md) — Components, triage pipeline, testing
-- [Glossary](GLOSSARY.md) — Domain language
-- [Specs index](docs/specs/feature-intelligence.md) — Requirements and acceptance
-- [Tasks](docs/tasks/feature-intelligence.md) — Build checklist
-- [Agent instructions](AGENTS.md) — Development conventions
-
-## Workflow
-
-This project uses [Flow](.agents/flow/README.md) to guide product development.
+- [PRODUCT.md](PRODUCT.md) · [DESIGN.md](DESIGN.md) · [ARCHITECTURE.md](ARCHITECTURE.md)
+- [ADR 0001 — Use Flow Factory](docs/adr/0001-use-flow-factory.md)
+- [AGENTS.md](AGENTS.md) — short pointers for coding agents

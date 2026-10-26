@@ -1,6 +1,11 @@
 import { openUiStringList, openUiStringLiteral } from "../contract/openui-text";
 import type { CompositionEnvelope, GroundedRecord } from "../core/envelope";
 import { GENUI_LIBRARY_VERSION } from "../core/envelope";
+import {
+  supportDashboardRecords,
+  supportMetricIds,
+  supportTicketIds,
+} from "../fixtures/synthetic-support";
 import type { CompositeName } from "../registry/composites";
 import { chooseCollectionComposite } from "../registry/composites";
 
@@ -108,6 +113,28 @@ export const sectionStackDocument = ({
   records,
   requestId,
 });
+
+export const supportDashboardDocument = ({
+  requestId,
+}: {
+  requestId: string;
+}) => {
+  const records = supportDashboardRecords;
+  const metrics = supportMetricIds();
+  const tickets = supportTicketIds();
+  const children = [
+    `DataExplorer("metrics-dashboard", ${openUiStringList(metrics)})`,
+    `CollectionGrid("list-compact", ${openUiStringList(tickets)})`,
+    `Answer(${openUiStringLiteral(
+      "Queue is stable; billing and auth issues dominate escalations this week."
+    )}, ${openUiStringList(["document:playbook-escalation"])})`,
+  ];
+  return sectionStackDocument({
+    childExpressions: children,
+    records,
+    requestId,
+  });
+};
 
 export const statusDocument = ({
   message,
