@@ -1842,3 +1842,52 @@ Human: regenerate prompts.txt again from this session transcript, you have a scr
 Agent: ## Task report — Completed · setup
 
 ---
+---
+Timestamp: 2026-10-26T04:01:43.308Z
+Work: feature-intelligence
+Stage: Build
+Generation: aaeba84f-6b62-43e0-bbd1-cfbafa6dc152
+
+Human: and finish any pending work git commit push all changes,
+
+Agent: ## Task report — Completed · Build
+
+---
+---
+Timestamp: 2026-10-26T04:11:57.052Z
+Work: feature-intelligence
+Stage: Build
+Generation: 05586663-4939-4cee-a725-a59f14375196
+
+Human: Astra still can’t connect to https://meta-cto-two.vercel.app/. Use Flow explore and your debugging tools, Vercel CLI, and available MCP integrations to diagnose the actual blocker, fix confirmed issues, and verify the deployed MCP server end to end.
+
+Astra’s latest evidence:
+- Vercel connector returned 403 Forbidden at read_protection_bypass while reading /v2/deployments/dpl_2q3xvUWKtAyu7cqBxjNM4WVkSXjr/aliases.
+- Direct curl failed with “Could not resolve host” in Astra’s environment.
+- Web retrieval failed for / and /llms.txt.
+- No successful MCP initialize, tools/list, or tools/call.
+These failures don’t establish that the application is broken.
+
+Inspect the meta-cto branch, actual MCP routes, Vercel project/team linkage, deployment protection, authentication, routing, and runtime logs. Use CLI identity and project inspection to distinguish account permissions from application failures. Never print credentials or bypass tokens.
+
+Find the exact MCP endpoint rather than assuming /mcp. Test it from your environment using curl and a proper MCP client or Inspector. Complete initialize → notifications/initialized → tools/list → a safe read-only tools/call, preserving negotiated protocol and session headers. Inspect failures alongside Vercel runtime logs. Verify Eve integration if the selected tool is supposed to invoke Eve.
+
+Use Flow plan and build to fix confirmed defects, with focused API/MCP regression tests. Check discovery documents and connection instructions against the actual deployed endpoint and authentication behavior. Don’t weaken security or change unrelated UI.
+
+Use Flow review and ship to verify the fix on the intended deployment, following repository deployment rules. Separate local test results from deployed results. If the remaining blocker is Astra’s connector authorization or networking, say so explicitly and give me the exact account/configuration steps required; don’t make speculative code changes.
+
+Report the root cause with evidence, changes made, documentation updated, test results, exact MCP URL and transport, authentication requirements, and a reproducible retry command for Astra without embedded secrets. Distinguish working MCP protocol access from configuring it as a ChatGPT connector.
+
+Agent: Evidence shows MCP works on the public alias; Astra's failures point to DNS, Vercel API permissions, and a stale production deployment missing `/mcp`.
+
+---
+---
+Timestamp: 2026-10-26T04:22:00.000Z
+Work: meta-cto-assessment
+Stage: Ship
+
+Q: Implement Astra MCP diagnosis plan — promote production, verify MCP, document external auditor steps, tests, push meta-cto.
+
+A: Root cause: MCP healthy on meta-cto-two (POST /api/mcp); Astra DNS and Vercel connector 403 are client-side; production alias lagged at f17becd so POST /mcp returned 405 until vercel promote → dpl_26uHp (d7b477c). Promoted production; POST /mcp now 200. Docs: research log, developers host/auditor guidance, task checklist; live AGENTIC_LIVE_MCP test for /mcp alias. Tests: pnpm --filter web test exit 0; live tests exit 0; fi mcp-smoke exit 0. Astra must resolve meta-cto-two and use /api/mcp with Accept application/json, text/event-stream — not team URL or Vercel bypass APIs.
+
+---

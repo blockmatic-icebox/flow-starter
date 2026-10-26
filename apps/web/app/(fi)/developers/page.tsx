@@ -5,6 +5,8 @@ import {
   fiMcpCanonicalUrl,
   fiMcpClientGuidance,
   fiMcpConnectionSummary,
+  fiMcpExternalAuditorGuidance,
+  fiMcpPublicHostGuidance,
   fiProductTagline,
 } from "@/lib/fi-agent-surfaces-content";
 
@@ -55,6 +57,10 @@ export default function DevelopersPage() {
       <h2>MCP connection</h2>
       <p>{fiMcpConnectionSummary}</p>
       <p>{fiMcpClientGuidance}</p>
+      <h3>Public host</h3>
+      <p>{fiMcpPublicHostGuidance}</p>
+      <h3>External auditors</h3>
+      <p>{fiMcpExternalAuditorGuidance}</p>
       <h3>Smoke probes (curl)</h3>
       <p>Initialize:</p>
       <pre>

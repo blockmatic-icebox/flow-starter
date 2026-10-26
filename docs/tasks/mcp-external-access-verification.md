@@ -1,6 +1,6 @@
 # Tasks: MCP external access verification
 
-**Status:** Build complete (pending deploy for `/mcp` alias on production)  
+**Status:** Build complete — production on `d7b477c` (`dpl_26uHpNeQU5ja6kqADS7wsCzZjz8f`, 2026-10-26)  
 **Plan:** MCP access verification (2026-10-25)  
 **Spec:** [feature-intelligence-agentic-discoverability.md](../specs/feature-intelligence-agentic-discoverability.md)
 
@@ -13,7 +13,8 @@
 - [x] Route-level MCP regression tests (`tests/mcp/route.test.ts`)
 - [x] `fi --mcp-smoke` in `@repo/fi-cli`
 - [x] Research log append — [20261026-fi-agentic-verification.md](../research/20261026-fi-agentic-verification.md)
-- [ ] Deploy `meta-cto` to Vercel so `POST /mcp` is live on production (canonical `/api/mcp` already verified)
+- [x] Deploy `meta-cto` to Vercel so `POST /mcp` is live on production (promoted via `vercel promote`; `/api/mcp` canonical)
+- [x] Developers portal — wrong-host 401 + external auditor (Astra) DNS/connector notes
 
 ## Verification
 

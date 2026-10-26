@@ -121,26 +121,49 @@ test("POST /api/mcp tools/call search_requests returns text content", async (t) 
   assert.match(text, /requests/u);
 });
 
+const liveMcpHost = () =>
+  (
+    process.env.AGENTIC_CHECK_URL?.replace(/^https?:\/\//u, "") ??
+    "meta-cto-two.vercel.app"
+  ).replace(/\/$/u, "");
+
+const liveMcpInitializeBody = {
+  id: 1,
+  jsonrpc: "2.0",
+  method: "initialize",
+  params: {
+    capabilities: {},
+    clientInfo: { name: "live-smoke", version: "1.0.0" },
+    protocolVersion: "2025-03-26",
+  },
+};
+
 test("live MCP smoke when AGENTIC_LIVE_MCP=1", async (t) => {
   if (process.env.AGENTIC_LIVE_MCP !== "1") {
     t.skip("Set AGENTIC_LIVE_MCP=1 to hit production");
     return;
   }
-  const host =
-    process.env.AGENTIC_CHECK_URL?.replace(/^https?:\/\//u, "") ??
-    "meta-cto-two.vercel.app";
-  const url = `https://${host.replace(/\/$/u, "")}/api/mcp`;
+  const url = `https://${liveMcpHost()}/api/mcp`;
   const response = await fetch(url, {
-    body: JSON.stringify({
-      id: 1,
-      jsonrpc: "2.0",
-      method: "initialize",
-      params: {
-        capabilities: {},
-        clientInfo: { name: "live-smoke", version: "1.0.0" },
-        protocolVersion: "2025-03-26",
-      },
-    }),
+    body: JSON.stringify(liveMcpInitializeBody),
+    headers: mcpHeaders,
+    method: "POST",
+  });
+  assert.equal(response.status, 200);
+  const json = (await response.json()) as {
+    result?: { serverInfo?: { name?: string } };
+  };
+  assert.equal(json.result?.serverInfo?.name, "feature-intelligence");
+});
+
+test("live POST /mcp alias when AGENTIC_LIVE_MCP=1", async (t) => {
+  if (process.env.AGENTIC_LIVE_MCP !== "1") {
+    t.skip("Set AGENTIC_LIVE_MCP=1 to hit production");
+    return;
+  }
+  const url = `https://${liveMcpHost()}/mcp`;
+  const response = await fetch(url, {
+    body: JSON.stringify(liveMcpInitializeBody),
     headers: mcpHeaders,
     method: "POST",
   });
