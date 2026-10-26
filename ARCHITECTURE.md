@@ -88,6 +88,19 @@ Degraded path when `AI_GATEWAY_API_KEY` absent still sets `triage_completed_at` 
 
 Root `pnpm test` includes `@repo/fi`.
 
+## Deployment (Vercel demo)
+
+| Setting | Value |
+| --- | --- |
+| Project | `meta-cto` (team `gaboesquivel`) |
+| Git branch (source) | `meta-cto` on `gaboesquivel/flow-factory` |
+| Root directory | `apps/web` |
+| Build | `pnpm install --frozen-lockfile --filter web...` then `pnpm --filter web build` ([`apps/web/vercel.json`](apps/web/vercel.json); no `ignoreCommand` — always build) |
+| Runtime | `next build --webpack`; `sourceFilesOutsideRootDirectory` enabled for repo-root [`agent/`](agent/) via `withEve` |
+| Production URL | https://meta-cto-gaboesquivel.vercel.app |
+
+Verify: `vercel inspect <deployment-url> -S gaboesquivel` after push. If Vercel Git **Production Branch** remains `main`, trigger production from `meta-cto` via dashboard or deployment API.
+
 ## Repository layout
 
 ```text

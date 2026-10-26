@@ -39,8 +39,11 @@ Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence
 | **Domain (`@repo/fi`)** | **Live** — full T0–T3 harness orchestration; **degraded** when `AI_GATEWAY_API_KEY` absent |
 | **eve (`agent/`)** | **Live** — MVP tools, `evals/` smoke (AG-7), `pnpm exec eve eval smoke` |
 | **Human UI (`apps/web`)** | **Live** — `app/(fi)/` routes, server actions, ask-only `/chat`; [browser verification](docs/research/20261025-fi-browser-verification.md) |
+| **Deployment (demo)** | **Live** — Vercel project `meta-cto`, branch `meta-cto`, production https://meta-cto-gaboesquivel.vercel.app (Vercel Authentication may require sign-in or share link; env: `DATABASE_URL`, `AI_GATEWAY_API_KEY`, `ANTHROPIC_API_KEY` on Production) |
 
 **Build checklist:** [docs/tasks/feature-intelligence.md](docs/tasks/feature-intelligence.md) — Waves 0–4 complete for assessment MVP; live gateway improves triage quality when `AI_GATEWAY_API_KEY` is set.
+
+**Spec compliance:** MVP acceptance criteria AC-1–AC-8 are met for assessment scope; W-3 near-duplicate live submit is **partial** in manual pass (lexical harness still surfaces seeded candidates when text overlaps). See [spec verification](docs/specs/feature-intelligence.md#verification-mvp) and browser log.
 
 ## Success metrics
 

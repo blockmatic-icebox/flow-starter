@@ -30,7 +30,7 @@ Spec: [docs/specs/feature-intelligence.md](docs/specs/feature-intelligence.md). 
 | Route | Screen | Layout / behavior |
 | --- | --- | --- |
 | `/` | Home (persona router) | Four intent cards + Browse secondary; not a flat feature list |
-| `/requests` | Discover | List + filter by `theme_key`; cards show problem one-liner, theme label, source, support |
+| `/requests` | Discover | List + **theme filter chips** (`theme_key` query); cards show problem one-liner, theme label, source, support |
 | `/requests/new` | Submit | Step 1 form → step 2 triage preview (editable problem, duplicate link default, confirm) |
 | `/requests/[id]` | Detail | Main: problem, description, brief; sidebar: support, disposition audit, transparency |
 | `/triage` | PM queue | Table or `Item` list; **inline expand panel** for disposition (not dialog-first); `pm_review_started_at` on first expand |

@@ -45,3 +45,24 @@ pnpm build:web                       # webpack build, exit 0
 pnpm exec eve eval smoke             # 4/4 eve smoke evals
 pnpm --filter web test:browser
 ```
+
+## Spec acceptance (AC-1–AC-8)
+
+| ID | Result | Evidence |
+| --- | --- | --- |
+| AC-1 | Met | Submit flow + `createDraftAndTriage` / confirm; `triage_completed_at` on harness path |
+| AC-2 | Partial | W-3 lexical near-dup on live external submit; seed/matrix tests + smoke submit gates |
+| AC-3 | Met | W-5 inline disposition with rationale |
+| AC-4 | Met | W-1, theme filter chips (`/requests?theme=`) |
+| AC-5 | Met | W-6 transparency steps on detail |
+| AC-6 | Met | W-7 four metrics + sample counts from seed |
+| AC-7 | Met | `pnpm qa` on assessment branch |
+| AC-8 | Met | `confirmRequest` intake link + `recordPmReviewStarted` on triage expand (W-5) |
+
+MVP waves 0–4: see [tasks checklist](../tasks/feature-intelligence.md) (all checked).
+
+## Production deployment (2026-10-25)
+
+- **URL:** https://meta-cto-gaboesquivel.vercel.app
+- **Deployment:** `dpl_G3N4MQfBFixH4prZhdamdVUC8YPK` (Ready), commit `28f8ca91c`
+- **Note:** Vercel Authentication enabled; unauthenticated HTTP may return 403. Sign in to Vercel or use a deployment share link for browser smoke.
