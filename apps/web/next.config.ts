@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
             {
               key: "accept",
               type: "header",
-              value: "(?i).*text/markdown.*",
+              value: ".*text/markdown.*",
             },
           ],
           source: "/",
