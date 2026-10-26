@@ -1410,3 +1410,27 @@ Human: Agentic discoverability — parallel Build orchestration (implement attac
 Agent: Implemented waves 0–4 on meta-cto: accepted ADR 0005 (demo-open MCP), llms.txt/sitemap/JSON-LD/well-known, markdown negotiation + 404, Streamable HTTP /api/mcp with eight @repo/fi tools, is-agentic script, contract sync. Commits d30796ad3 and 2fc97774a pushed. Local curls and pnpm --filter web test pass; pnpm build:web exit 0. Production deploy failed (db:migrate on Vercel build; CLI deploy Eve edge middleware). pnpm agentic:check still 59/100 until prod ships.
 
 ---
+---
+Timestamp: 2026-10-26T03:07:26.080Z
+Work: feature-intelligence
+Stage: Build
+Generation: 10028875-9ee9-4934-a153-2a79f5beb04b
+
+Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: Agentic discoverability is implemented on `meta-cto` per the orchestration plan (waves 0–4). Production is still on the previous build, so Is Agentic on `meta-cto-two.vercel.app` remains **59/100** until a successful Vercel deploy.
+
+---
+---
+Timestamp: 2026-10-26T03:16:00.000Z
+Work: feature-intelligence
+Stage: Build
+Generation: deploy-continuation
+
+Human: continue
+
+Agent: Unblocked Vercel: skip migrate without DATABASE_URL on Preview; removed middleware (Eve Services edge conflict); fixed Accept rewrite regex. Production deploy READY on meta-cto-two; curl markdown/MCP/well-known pass. is-agentic CLI still shows cached 59 until site rescans.
+
+---

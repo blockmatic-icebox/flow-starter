@@ -93,4 +93,5 @@ MVP + demo depth tasks: [feature-intelligence.md](../tasks/feature-intelligence.
 - **Public alias for auditors:** Prefer `https://meta-cto-two.vercel.app` for Is Agentic and remote MCP clients. Deployment Protection on other aliases can block unauthenticated `curl` and MCP handshakes; use a public production alias or documented bypass — do not commit bypass tokens.
 - **Remote MCP config:** `{ "type": "http", "url": "https://meta-cto-two.vercel.app/api/mcp" }` (Streamable HTTP). Clients must send `Accept: application/json, text/event-stream` on POST.
 - **Manual smoke (post-deploy):** `tools/list` includes eight tools; `search_requests` with `query: "CSV"` returns seeded rows when DB is populated.
-- **CLI gate:** `pnpm agentic:check` (`is-agentic` against `AGENTIC_CHECK_URL`).
+- **CLI gate:** `pnpm agentic:check` (`is-agentic` against `AGENTIC_CHECK_URL`; rescans when no cached report).
+- **Vercel build (2026-10-26):** Preview builds lack `DATABASE_URL` — `vercel-build.mjs` skips migrate/seed when unset. Do not add `apps/web/middleware.ts` with Eve + Vercel Services (EDGE_RUNTIME_UNSUPPORTED_IN_SERVICES); use `next.config` header rewrites for Markdown on `/`.

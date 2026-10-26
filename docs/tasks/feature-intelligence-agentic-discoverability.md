@@ -41,7 +41,7 @@
 | T-A-2 | T-A-0 | — | `apps/web/app/sitemap.ts` |
 | T-A-3 | T-A-0 | — | `apps/web/app/(fi)/page.tsx`, layout metadata |
 | T-A-4 | T-A-0, T-A-1 | AD-1 | `apps/web/app/.well-known/**/route.ts` |
-| T-A-10 | T-A-1 | AD-5 | `apps/web/middleware.ts` or route `page.tsx` + markdown helper |
+| T-A-10 | T-A-1 | AD-5 | `apps/web/next.config.ts` rewrites + `markdown/home` route (no `middleware.ts` — conflicts with Eve on Vercel Services) |
 | T-A-11 | T-A-1 | AD-5 | `apps/web/app/not-found.tsx` |
 | T-A-12 | T-A-10, T-A-11 | — | spec verification section only |
 | T-A-20 | T-A-4, G-A1 | AD-2 | `apps/web/app/api/mcp/route.ts`, `@modelcontextprotocol/sdk` dep |
