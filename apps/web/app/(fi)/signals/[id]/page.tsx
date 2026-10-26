@@ -4,6 +4,8 @@ import { Button } from "@repo/ui/components/button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { isFeatureRequestId } from "@/app/_lib/feature-request-id";
+
 import { SignalStatusBadge } from "../../_components/signal-status";
 import { actionGetRequest, actionSupportWithCookie } from "../../actions";
 import { TransparencyPanel } from "../../requests/[id]/transparency-panel";
@@ -17,6 +19,7 @@ export default async function SignalDetailPage({
 }) {
   const { id } = await params;
   const { view } = await searchParams;
+  if (!isFeatureRequestId(id)) notFound();
   const detail = await actionGetRequest({ requestId: id });
   const externalView = view === "external";
   if (!detail) notFound();
