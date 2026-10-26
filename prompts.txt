@@ -3029,6 +3029,18 @@ Agent: Baseline matches reviewed commit `c791daa`; production Vercel is five com
 
 Q: Hunch MCP App, Workflow Reliability & Demo Readiness — implement the attached plan; use more subagents.
 
+A: Verified lint/types/test/eve smoke/build; committed a9ccd5f1e; pushed origin/meta-cto; assigned meta-cto-two.vercel.app to deployment dpl_61DdmBADNsWVbZUzrZFNRHEeVy8d; production resources/list returns ui://hunch/explorer.
+
+---
+
+Q: verify all task completed, run tests, and push to prod
+
+A: (see above)
+
+---
+
+Q: Hunch MCP App — use more subagents / implement plan
+
 A: Coordinated parallel builders: domain Wave B (`@repo/fi` confirm/disposition/triage/support + tests), MCP App Wave C (`ui://hunch/explorer`, ext-apps, Vite bundle), GenUI/OpenAPI Wave D, docs/evals Wave A, adapter error wiring, integration-test verifier, Eve behavioral evals, MCP transport research, MCP resource node tests. Coordinator fixed lint/format and `list-triage-queue` eval (≥50 queue). Local: `pnpm lint`/`check-types`/`test` exit 0; `eve eval smoke` 9 passed, 1 skipped; production MCP initialize OK; MCP App resources verified locally only until deploy promote.
 
 ---
