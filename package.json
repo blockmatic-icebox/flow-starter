@@ -23,6 +23,7 @@
     "qa": "pnpm lint && pnpm knip && pnpm sherif && pnpm check-types && pnpm test && pnpm --filter @repo/db db:check",
     "test": "pnpm --filter @repo/genui test && pnpm --filter @repo/fi test && pnpm --filter web test && pnpm --filter @repo/db test",
     "seed:fi": "pnpm --filter @repo/fi seed",
+    "seed:fi:if-empty": "FI_SEED_IF_EMPTY=1 pnpm seed:fi",
     "test:browser": "pnpm test:browser:web",
     "lint": "oxlint . && oxfmt --check .",
     "lint:fix": "oxlint --fix . && oxfmt --write --no-error-on-unmatched-pattern .",

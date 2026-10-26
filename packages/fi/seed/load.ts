@@ -4,15 +4,20 @@ import {
   featureRequestDuplicateCandidate,
   featureRequestSupport,
 } from "@repo/db";
+import { sql as drizzleSql } from "drizzle-orm";
 
 import { loadRootEnv } from "../src/db/get-db";
 import { assertSeedAllowed } from "./assert-seed-allowed";
 import { generateSeed } from "./generate-seed";
+import { isDestructiveSeedMode, isIfEmptySeedMode } from "./seed-mode";
 import { labelForThemeKey } from "./theme-label";
 import { validateGeneratedSeed } from "./validate-manifest";
 
 loadRootEnv();
-assertSeedAllowed();
+
+const ifEmpty = isIfEmptySeedMode();
+if (isDestructiveSeedMode()) assertSeedAllowed();
+
 const url = process.env.DATABASE_URL?.trim();
 if (!url) {
   console.error("DATABASE_URL is required to seed");
@@ -47,6 +52,21 @@ const insertChunks = async <T>(
   await Promise.all(tasks);
 };
 
+if (ifEmpty) {
+  const [{ count }] = await db
+    .select({ count: drizzleSql<number>`count(*)::int` })
+    .from(featureRequest);
+  const n = Number(count ?? 0);
+  if (n > 0) {
+    console.log(
+      `FI seed skipped (if-empty): feature_request already has ${n} rows`
+    );
+    await sql.end();
+    process.exit(0);
+  }
+  console.log("FI seed if-empty: database empty, loading demo seed…");
+}
+
 const { duplicateCandidates, requests } = generateSeed();
 const validation = validateGeneratedSeed({ duplicateCandidates, requests });
 if (!validation.ok) {
@@ -55,9 +75,11 @@ if (!validation.ok) {
   process.exit(1);
 }
 
-await sql`DELETE FROM feature_request_support`;
-await sql`DELETE FROM feature_request_duplicate_candidate`;
-await sql`DELETE FROM feature_request`;
+if (isDestructiveSeedMode()) {
+  await sql`DELETE FROM feature_request_support`;
+  await sql`DELETE FROM feature_request_duplicate_candidate`;
+  await sql`DELETE FROM feature_request`;
+}
 
 await insertChunks(requests, (slice) =>
   db.insert(featureRequest).values(

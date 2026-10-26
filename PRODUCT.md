@@ -36,7 +36,7 @@ Detailed requirements: [feature-intelligence.md](docs/specs/feature-intelligence
 | Area | Status |
 | --- | --- |
 | **Specification** | **MVP + demo depth specified**; **[workflow remediation](docs/specs/feature-intelligence-remediation.md) accepted** (Specify 2026-10-25) — [initiative](docs/initiatives/feature-intelligence.md) |
-| **Database** | **Live** — migrate + seed on Vercel build (`apps/web/scripts/vercel-build.mjs`); local seed guarded ([RC-8](docs/specs/feature-intelligence-remediation.md)) |
+| **Database** | **Live** — Vercel build: `db:migrate` + **if-empty** seed (`FI_SEED_IF_EMPTY`); local full reseed via `pnpm seed:fi` ([seed spec](docs/specs/feature-intelligence-seed.md)) |
 | **Domain (`@repo/fi`)** | **Live** — disposition validation, merge rollup, discovery pagination, degraded triage flags ([remediation](docs/specs/feature-intelligence-remediation.md)) |
 | **eve (`agent/`)** | **Live** — behavioral smoke evals (AG-7 + disposition monitor); `pnpm exec eve eval smoke` |
 | **Human UI (`apps/web`)** | **Live** — merge picker, discover search/sort/page, AI failure UX, decision sidebar; manual W-R pass on deploy |

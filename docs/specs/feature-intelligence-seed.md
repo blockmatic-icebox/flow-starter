@@ -15,9 +15,12 @@
 
 ## Safety (remediation — [ADR 0004](../adr/0004-fi-workflow-integrity-and-safety.md))
 
-- Seed **wipes** FI tables — unacceptable on production without explicit opt-in.
-- **Required behavior (RC-8):** abort when `NODE_ENV=production` unless `FI_SEED_ALLOW_DESTRUCTIVE=1`.
-- Eve evals should prefer `EVE_EVAL_DATABASE_URL` when set (isolated branch); document in [testing spec](./feature-intelligence-testing.md).
+| Mode | Env | Behavior |
+| --- | --- | --- |
+| **Destructive (default)** | `pnpm seed:fi` | Wipes FI tables then reloads 500 rows. Blocked in `NODE_ENV=production` unless `FI_SEED_ALLOW_DESTRUCTIVE=1`. |
+| **If empty** | `FI_SEED_IF_EMPTY=1` or `pnpm seed:fi:if-empty` | Skips when `feature_request` has rows; otherwise loads seed **without** deletes. **Vercel build** uses this after `pnpm db:migrate`. |
+
+Eve evals should prefer `EVE_EVAL_DATABASE_URL` when set (isolated branch); document in [testing spec](./feature-intelligence-testing.md).
 
 ## Volume and manifest (canonical)
 

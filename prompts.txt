@@ -1331,3 +1331,27 @@ Human: run tasks in parallel subagents all ff merging back to meta-cto branch un
 Agent: Noting `setDisposition` is a thin update with no validation; schema already has `mergeTargetId`, `canonicalRequestId`, and `archived` status. Planning wave-based parallel builders with serial integration to avoid file conflicts.
 
 ---
+---
+Timestamp: 2026-10-26T02:13:18.125Z
+Work: feature-intelligence
+Stage: Build
+Generation: 588df616-ae6f-47ce-a7d1-04ca2ad355fb
+
+Human: Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+Agent: ---
+
+---
+---
+Timestamp: 2026-10-26T02:13:20.488Z
+Work: feature-intelligence
+Stage: Build
+Generation: 250f2db9-2d74-465f-917b-4109427ff41d
+
+Human: Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+Agent: The **`@repo/fi` unit test** run finished successfully: **24 tests, 13 suites, 0 failures** (exit code 0), including the new seed guard and disposition validation cases. That matches what we relied on before the remediation commit and Vercel deploy.
+
+---

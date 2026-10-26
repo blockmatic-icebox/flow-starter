@@ -50,7 +50,7 @@ Owned tables (see [spec](docs/specs/feature-intelligence.md)):
 - `feature_request_duplicate_candidate`
 - `feature_request_support`
 
-Seed: `pnpm seed:fi` → `@repo/fi/seed/load.ts` (manifest **500** rows). **Policy ([ADR 0004](docs/adr/0004-fi-workflow-integrity-and-safety.md)):** refuse `NODE_ENV=production` unless `FI_SEED_ALLOW_DESTRUCTIVE=1`; optional `EVE_EVAL_DATABASE_URL` for eval isolation. See [seed spec](docs/specs/feature-intelligence-seed.md).
+Seed: `pnpm seed:fi` → `@repo/fi/seed/load.ts` (manifest **500** rows). **Vercel:** migrate + `FI_SEED_IF_EMPTY=1` (no wipe when data exists). **Local destructive reseed:** `pnpm seed:fi` with production guard per [ADR 0004](docs/adr/0004-fi-workflow-integrity-and-safety.md). See [seed spec](docs/specs/feature-intelligence-seed.md).
 
 PM triage queue: `listTriageQueue` orders by **support count** desc, then `published_at` desc.
 

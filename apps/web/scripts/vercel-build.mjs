@@ -7,5 +7,5 @@ const run = (cmd) =>
   execSync(cmd, { cwd: root, env: process.env, stdio: "inherit" });
 
 run("pnpm db:migrate");
-run("FI_SEED_ALLOW_DESTRUCTIVE=1 pnpm seed:fi");
+run("FI_SEED_IF_EMPTY=1 pnpm seed:fi");
 run("pnpm --filter web build");
