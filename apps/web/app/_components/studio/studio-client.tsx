@@ -29,7 +29,9 @@ export const StudioClient = () => {
     "q",
     parseAsString.withDefault("")
   );
-  const [input, setInput] = useState(queryParam);
+  const [landingDraft, setLandingDraft] = useState<string | null>(null);
+  const landingInput = landingDraft ?? queryParam;
+  const [refineInput, setRefineInput] = useState("");
   const [envelope, setEnvelope] = useState<CompositionEnvelope | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,7 +45,8 @@ export const StudioClient = () => {
     setEnvelope(null);
     setMessages([]);
     setError(null);
-    setInput("");
+    setLandingDraft(null);
+    setRefineInput("");
     await setQueryParam(null);
   }, [setQueryParam]);
 
@@ -138,7 +141,8 @@ export const StudioClient = () => {
   const submit = async (text: string, mode: "create" | "refine" = "create") => {
     const query = text.trim();
     if (!query) return;
-    setInput("");
+    setLandingDraft(null);
+    setRefineInput("");
     await setQueryParam(query);
     await runCompose(query, mode);
   };
@@ -178,17 +182,17 @@ export const StudioClient = () => {
           className="flex gap-2 border-t p-4"
           onSubmit={(event) => {
             event.preventDefault();
-            void submit(input, "refine");
+            void submit(refineInput, "refine");
           }}
         >
           <Textarea
             className="min-h-10 resize-none"
-            onChange={(event) => setInput(event.target.value)}
+            onChange={(event) => setRefineInput(event.target.value)}
             placeholder="Ask for changes…"
             rows={2}
-            value={input}
+            value={refineInput}
           />
-          <Button disabled={loading || !input.trim()} type="submit">
+          <Button disabled={loading || !refineInput.trim()} type="submit">
             Send
           </Button>
         </form>
@@ -238,14 +242,14 @@ export const StudioClient = () => {
               className="flex w-full max-w-xl gap-2"
               onSubmit={(event) => {
                 event.preventDefault();
-                void submit(input);
+                void submit(landingInput);
               }}
             >
               <Input
                 className="h-11"
-                onChange={(event) => setInput(event.target.value)}
+                onChange={(event) => setLandingDraft(event.target.value)}
                 placeholder="Generate a customer support dashboard…"
-                value={input}
+                value={landingInput}
               />
               <Button className="h-11" disabled={loading} type="submit">
                 Generate

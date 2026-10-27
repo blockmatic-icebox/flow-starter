@@ -4,7 +4,7 @@ Date: 2026-10-26
 **Status:** Current  
 **Last reviewed:** 2026-10-26
 
-This document responds to the **Flow Factory — simple branch audit** dated 2026-10-26 that reviewed `simple` at `447de36c`. **Current product truth is `main` at merge commit `edfdefe42`** ([PR #8](https://github.com/gaboesquivel/flow-factory/pull/8), merged 2026-10-26). Re-verify against that SHA, not the pre-closeout snapshot.
+This document responds to the **Flow Factory — simple branch audit** dated 2026-10-26 that reviewed `simple` at `447de36c`. **Current product truth is `main` at `593720602`** ([PR #8](https://github.com/gaboesquivel/flow-factory/pull/8) merged at `edfdefe42`; audit follow-up and `/simplify` refactor on top). Re-verify against that SHA, not the pre-closeout snapshot. **`origin/simple` matches `origin/main`** at this tip.
 
 ## P0 blockers cited in the audit
 
