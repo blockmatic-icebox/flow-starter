@@ -62,11 +62,11 @@
   },
   "devDependencies": {
     "is-agentic": "^1.0.1",
-    "knip": "^6.42.1",
+    "knip": "^6.43.0",
     "next-devtools-mcp": "0.4.0",
     "oxfmt": "^0.74.0",
     "oxlint": "^1.89.0",
-    "portless": "^0.15.10",
+    "portless": "^0.15.11",
     "sherif": "^1.13.0",
     "simple-git-hooks": "2.14.0",
     "tsc-ts": "^0.0.9",
