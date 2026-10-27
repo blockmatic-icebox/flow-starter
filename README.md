@@ -25,53 +25,50 @@ pnpm exec eve eval smoke
 pnpm agentic:check
 ```
 
-## Matt Pocock workflow
+## Flow Skills
 
-Development on **`simple`** uses [Matt Pocock’s published engineering skills](https://github.com/mattpocock/skills) for discovery, specs, and implementation. There is no custom Flow phase router—load skills only when a task needs them. Full experiment context: [docs/simplified-flow-prd.md](docs/simplified-flow-prd.md).
+Methodology and delivery skills come from [gaboesquivel/flow-skills](https://github.com/gaboesquivel/flow-skills). There is no custom Flow phase router—invoke skills only when a task needs them.
 
-### Install and refresh skills
-
-Project skills are declared in [`.agents/skills-lock.json`](.agents/skills-lock.json). After clone or lockfile changes:
+### Install and verify (Cursor, project scope)
 
 ```bash
+npx skills add gaboesquivel/flow-skills --skill '*' -a cursor -y
+```
+
+After clone or when [`.agents/skills-lock.json`](.agents/skills-lock.json) changes, restore project skills:
+
+```bash
+npx skills add gaboesquivel/flow-skills --skill '*' -a cursor -y
 pnpm --dir .agents skills:install
 ```
 
-Verify skills exist on disk under `.agents/skills/` (symlinks into `.agents/.agents/skills/`). A lockfile entry does not mean a skill is loaded in your client.
+Confirm skills on disk under `.agents/skills/` (for example `flow`, `explore`, `grill`, `to-spec`, `to-tickets`, `implement`, `review`, `retro`, `jtbd`, `competitors`, `write-agents`, `write-humans`, `tldr`) and list them:
 
-**Matt workflow skills installed for this experiment** (plus dependencies such as `domain-modeling`, `tdd`, `code-review`, `setup-matt-pocock-skills`): `grilling`, `grill-with-docs`, `wayfinder`, `research`, `prototype`, `to-spec`, `to-tickets`, `implement`, `implement-spec`, `diagnosing-bugs`, `retro`.
+```bash
+npx skills list -a cursor
+```
 
-Run **`setup-matt-pocock-skills`** once per repo to configure GitHub Issues labels and domain doc layout before `to-spec` / `to-tickets`.
+Read each skill’s `SKILL.md` before claiming it was loaded. Clients without slash commands can open `.agents/skills/<name>/SKILL.md` directly.
 
-### How to invoke (Cursor and slash-capable clients)
+| Situation                                                   | Skill        |
+| ----------------------------------------------------------- | ------------ |
+| Align product, design, architecture after meaningful change | `flow`       |
+| Understand problem and repo before planning                 | `explore`    |
+| Stress-test a plan                                          | `grill`      |
+| Numbered spec in `docs/specs/`                              | `to-spec`    |
+| GitHub implementation slices                                | `to-tickets` |
+| Authorized implementation                                   | `implement`  |
+| Review diff or working tree                                 | `review`     |
+| Session learning                                            | `retro`      |
 
-| Situation | Skill | Notes |
-| --- | --- | --- |
-| Vague product or domain change | `/grill-with-docs` | Needs `grilling` + `domain-modeling`; builds glossary/ADRs sparingly |
-| Very large, foggy effort | `/wayfinder` | Decision map on the tracker—not a default kickoff |
-| Outside evidence matters | `research` | Sourced markdown in-repo when useful |
-| Interaction or logic uncertainty | `/prototype` | Throwaway experiment; human reviews |
-| Settled multi-session work | `/to-spec` | Publishes a GitHub spec issue from the conversation |
-| Spec needs implementable slices | `/to-tickets` | Child issues and blockers on GitHub |
-| One clear change | `/implement` | Skip spec/ticket ceremony when proportional |
-| Parallel implementation tickets | `/implement-spec` | Only when workers and worktrees are actually isolated |
-| Hard bug or regression | `/diagnosing-bugs` | Repro and evidence before behavior changes |
-| Session post-mortem | `/retro` | Targeted improvements; no auto self-improve loop |
+### Stack skills
 
-Typical chain for large work: **grill-with-docs → to-spec → to-tickets → implement / implement-spec → review → retro**. Use only the stages the task needs.
-
-Clients without slash commands can open the matching `SKILL.md` under `.agents/skills/<name>/` after install.
+The same [`.agents/skills-lock.json`](.agents/skills-lock.json) also lists framework helpers (Vercel, Matt, and others). `pnpm --dir .agents skills:install` restores the full lockfile after clone.
 
 ### Tracker and contracts
 
-- **GitHub Issues** — canonical multi-session specs and task issues (native sub-issues and blockers where supported).
-- **Root contracts** — `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md` describe current verified behavior; link issues and [docs/adr/](docs/adr/) for consequential decisions (Matt `domain-modeling` convention).
-
-Example prompts:
-
-- “Use `grill-with-docs` to clarify this product’s main user jobs, vocabulary, and priorities. Challenge assumptions and recommend research or a prototype where useful.”
-- “Scope is settled—use `to-spec` for the agreed journey on GitHub, then `to-tickets` if multiple sessions are needed.”
-- “Implement the first unblocked issue, verify through an actual MCP client, and report checks separately from journey verification.”
+- **GitHub Issues** — canonical specs and tasks when using `to-tickets`.
+- **Root contracts** — `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`; specs under `docs/specs/`, decisions under `docs/decisions/` when needed.
 
 ## Docs
 
