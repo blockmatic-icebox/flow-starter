@@ -17,7 +17,7 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
-    "postgres": "^3.4.9"
+    "postgres": "^4.0.0"
   },
   "devDependencies": {
     "@repo/ts": "workspace:*",
