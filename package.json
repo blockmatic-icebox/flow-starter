@@ -62,18 +62,18 @@
   },
   "devDependencies": {
     "is-agentic": "^1.0.1",
-    "knip": "^6.42.1",
+    "knip": "^6.45.1",
     "next-devtools-mcp": "0.4.0",
-    "oxfmt": "^0.74.0",
-    "oxlint": "^1.89.0",
-    "portless": "^0.15.10",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
+    "portless": "^0.17.0",
     "sherif": "^1.13.0",
     "simple-git-hooks": "2.14.0",
-    "tsc-ts": "^0.0.9",
-    "turbo": "^2.11.10",
+    "tsc-ts": "^0.1.4",
+    "turbo": "^2.11.11",
     "typescript": "7.0.2",
     "typescript-ast": "npm:typescript@5.8.3",
-    "ultracite": "8.0.2"
+    "ultracite": "8.1.1"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm run hooks:pre-commit",
