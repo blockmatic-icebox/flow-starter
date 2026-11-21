@@ -16,12 +16,12 @@
     "test": "node --import tsx --test src/**/*.test.ts"
   },
   "dependencies": {
-    "@openuidev/lang-core": "1.0.1",
-    "@openuidev/react-lang": "1.0.1",
+    "@openuidev/lang-core": "1.1.1",
+    "@openuidev/react-lang": "1.1.1",
     "@repo/ui": "workspace:*",
     "@typesafe-ai/sdk": "^0.7.0",
-    "ai": "^7.0.152",
-    "recharts": "3.10.1",
+    "ai": "^7.0.177",
+    "recharts": "3.11.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {
